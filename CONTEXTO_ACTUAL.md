@@ -14,6 +14,7 @@ Anon key: en `.env` del proyecto
 
 ## BUILD
 `npm run build` → OK sin errores. Bundle en `dist/`.
+Servidor local: `npm run dev` → http://localhost:5173
 
 ## LO QUE YA ESTA HECHO ✅
 - Reconstrucción completa desde 0 (original era build minificado de Bolt.new)
@@ -32,6 +33,13 @@ Anon key: en `.env` del proyecto
 - Navbar: fondo blanco, logo degradado azul, "Explorar" visible sin login, "Entrar"/"Registro" azul
 - Hero landing: gradiente azul saturado, imagen copas vino tinto (pexels 19721743)
 - Notificaciones automáticas: triggers SQL en `supabase/migrations/002_lifecycle_and_notifications.sql`
+- Migración 002 ejecutada en Supabase ✅
+- RLS activado en vip_cards, referrals, restaurant_terms_acceptance ✅
+- search_path fijado en todas las funciones SQL ✅
+- 0 errores seguridad Supabase (17 warnings aceptables) ✅
+- Logo oficial (PNG con degradado azul→naranja) en navbar y footer ✅
+- Logos en `public/icons/logo-full.png` y `public/icons/logo-icon.png` ✅
+- 3 commits pusheados a GitHub (airtifexlab/Table4singles) ✅
 
 ## LO QUE FALTA ⚠️
 
@@ -54,9 +62,14 @@ Para Google: Google Cloud Console → OAuth 2.0 Client ID
 Para Apple: Apple Developer → Services ID → Sign in with Apple
   - Luego en Supabase Dashboard → Auth → Providers → Apple
 
-### 4. DESPLIEGUE PRODUCCIÓN
-- Hacer commit + push de todo el código fuente (actualmente untracked en git)
-- Netlify: conectar repo, publish dir = `dist`, variables de entorno:
+### 4. DESPLIEGUE PRODUCCIÓN (usar Vercel, no Netlify)
+- Vercel → New Project → importar repo airtifexlab/Table4singles
+- Variables de entorno en Vercel:
+  - VITE_SUPABASE_URL = https://zocrwanhcschmydczgeh.supabase.co
+  - VITE_SUPABASE_ANON_KEY = (del .env local)
+- Cliente da credenciales dominio table4singles.online → apuntar DNS a Vercel
+- Old build de Netlify quedará obsoleta (dominio se redirige a Vercel)
+- Netlify antiguo: conectar repo, publish dir = `dist`, variables de entorno:
   - VITE_SUPABASE_URL
   - VITE_SUPABASE_ANON_KEY
   - VITE_STRIPE_PUBLISHABLE_KEY (cuando tengas Stripe)
@@ -117,6 +130,6 @@ supabase/
 - Gradiente hero: sky-500 → sky-400 → orange-300
 
 ## PRÓXIMO PASO INMEDIATO
-1. Usuario ejecuta `002_lifecycle_and_notifications.sql` en Supabase SQL Editor
+1. Probar flujo completo en local (registro, crear mesa, unirse, chat, reseña)
 2. Crear Edge Functions Stripe
-3. Commit + push + deploy Netlify
+3. Deploy en Vercel (cliente da credenciales dominio)

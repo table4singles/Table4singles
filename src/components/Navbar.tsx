@@ -31,22 +31,8 @@ export function Navbar({ currentPage, onNavigate, onAuthClick }: NavbarProps) {
   return (
     <header className="sticky top-0 z-50 bg-white border-b border-gray-100">
       <div className="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
-        <button onClick={() => onNavigate(user ? 'browse' : 'landing')} className="flex items-center gap-2">
-          <svg className="w-8 h-8" viewBox="0 0 40 40" fill="none">
-            <defs>
-              <linearGradient id="logoGrad" x1="0" y1="0" x2="40" y2="40">
-                <stop offset="0%" stopColor="#06b6d4" />
-                <stop offset="100%" stopColor="#2563eb" />
-              </linearGradient>
-            </defs>
-            <circle cx="20" cy="20" r="18" fill="url(#logoGrad)" />
-            <path d="M12 12L28 28M28 12L12 28" stroke="white" strokeWidth="3" strokeLinecap="round" />
-            <circle cx="12" cy="12" r="2.5" fill="white" />
-            <circle cx="28" cy="12" r="2.5" fill="white" />
-            <circle cx="12" cy="28" r="2.5" fill="white" />
-            <circle cx="28" cy="28" r="2.5" fill="white" />
-          </svg>
-          <span className="font-display font-bold text-xl text-gray-900">Table4Singles</span>
+        <button onClick={() => onNavigate(user ? 'browse' : 'landing')} className="flex items-center">
+          <img src="/icons/logo-full.png" alt="Table4Singles" className="h-12 w-auto" />
         </button>
 
         <nav className="hidden md:flex items-center gap-1">

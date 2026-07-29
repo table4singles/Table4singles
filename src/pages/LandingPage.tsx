@@ -121,8 +121,8 @@ export function LandingPage({ onNavigate, onAuthClick }: LandingPageProps) {
         <div className="max-w-5xl mx-auto px-4">
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-2 text-white">
-              <UtensilsCrossed className="w-5 h-5" />
-              <span className="font-semibold">Table4Singles</span>
+              <img src="/icons/logo-icon.png" alt="" className="h-8 w-8 rounded-xl" />
+              <span className="font-semibold text-lg">Table4Singles</span>
             </div>
             <div className="flex items-center gap-4 text-sm text-gray-400">
               <button onClick={() => onNavigate('aviso-legal')} className="hover:text-white transition-colors">{t('landing.footer.legal')}</button>

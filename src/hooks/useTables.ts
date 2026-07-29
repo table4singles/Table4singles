@@ -1,0 +1,123 @@
+import { useState, useEffect, useCallback } from 'react'
+import { supabase } from '@/lib/supabase'
+import type { DiningTable, TableParticipant } from '@/types/database'
+
+interface UseTablesOptions {
+  city?: string
+  cuisine?: string
+  language?: string
+  search?: string
+  status?: string
+}
+
+export function useTables(options: UseTablesOptions = {}) {
+  const [tables, setTables] = useState<DiningTable[]>([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+
+  const fetchTables = useCallback(async () => {
+    setLoading(true)
+    setError(null)
+    let query = supabase
+      .from('dining_tables')
+      .select('*')
+      .eq('status', options.status || 'open')
+      .order('date', { ascending: true })
+
+    if (options.city) query = query.eq('restaurant_city', options.city)
+    if (options.cuisine) query = query.eq('cuisine_type', options.cuisine)
+    if (options.search) {
+      query = query.or(`restaurant_name.ilike.%${options.search}%,restaurant_city.ilike.%${options.search}%`)
+    }
+
+    const { data, error: err } = await query
+    if (!err) setTables(data || [])
+    else setError(err.message)
+    setLoading(false)
+  }, [options.city, options.cuisine, options.search, options.status])
+
+  useEffect(() => { fetchTables() }, [fetchTables])
+
+  return { tables, loading, error, refresh: fetchTables }
+}
+
+export function useTableDetail(tableId: string | null) {
+  const [table, setTable] = useState<DiningTable | null>(null)
+  const [participants, setParticipants] = useState<TableParticipant[]>([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+
+  const fetchTable = useCallback(async () => {
+    if (!tableId) return
+    setLoading(true)
+    setError(null)
+
+    const [tableRes, partRes] = await Promise.all([
+      supabase.from('dining_tables').select('*').eq('id', tableId).single(),
+      supabase.from('table_participants').select('*, profiles(*)').eq('table_id', tableId),
+    ])
+
+    if (!tableRes.error) setTable(tableRes.data)
+    else setError(tableRes.error.message)
+    if (!partRes.error) setParticipants(partRes.data || [])
+    setLoading(false)
+  }, [tableId])
+
+  useEffect(() => { fetchTable() }, [fetchTable])
+
+  const joinTable = useCallback(async (joinType: 'word' | 'deposit' = 'word') => {
+    if (!tableId) throw new Error('No table selected')
+    const { error: err } = await supabase.rpc('join_table', { p_table_id: tableId, p_join_type: joinType })
+    if (err) throw err
+    await fetchTable()
+  }, [tableId, fetchTable])
+
+  const cancelTable = useCallback(async () => {
+    if (!tableId) throw new Error('No table selected')
+    const { error: err } = await supabase.from('dining_tables').update({ status: 'cancelled' }).eq('id', tableId)
+    if (err) throw err
+    await fetchTable()
+  }, [tableId, fetchTable])
+
+  return { table, participants, loading, error, refresh: fetchTable, joinTable, cancelTable }
+}
+
+export function useMyTables(userId: string | null) {
+  const [hosting, setHosting] = useState<DiningTable[]>([])
+  const [reservations, setReservations] = useState<(TableParticipant & { dining_tables: DiningTable })[]>([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+
+  const fetchMyTables = useCallback(async () => {
+    if (!userId) return
+    setLoading(true)
+    setError(null)
+
+    const [hostRes, resRes] = await Promise.all([
+      supabase.from('dining_tables').select('*').eq('host_id', userId).order('date', { ascending: false }),
+      supabase.from('table_participants').select('*, dining_tables(*)').eq('user_id', userId).order('created_at', { ascending: false }),
+    ])
+
+    if (!hostRes.error) setHosting(hostRes.data || [])
+    else setError(hostRes.error.message)
+    if (!resRes.error) setReservations((resRes.data as any) || [])
+    else setError(resRes.error.message)
+    setLoading(false)
+  }, [userId])
+
+  useEffect(() => { fetchMyTables() }, [fetchMyTables])
+
+  const cancelHostedTable = useCallback(async (tableId: string) => {
+    const { error: err } = await supabase.from('dining_tables').update({ status: 'cancelled' }).eq('id', tableId)
+    if (err) throw err
+    await fetchMyTables()
+  }, [fetchMyTables])
+
+  const cancelReservation = useCallback(async (participantId: string) => {
+    const { error: err } = await supabase.rpc('cancel_reservation', { p_participant_id: participantId })
+    if (err) throw err
+    await fetchMyTables()
+  }, [fetchMyTables])
+
+  return { hosting, reservations, loading, error, refresh: fetchMyTables, cancelHostedTable, cancelReservation }
+}

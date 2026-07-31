@@ -5,6 +5,8 @@ import { ShareButton } from '@/components/ShareButton'
 import { StarRating } from '@/components/StarRating'
 import { InviteModal } from '@/components/InviteModal'
 import { CancelModal } from '@/components/CancelModal'
+import { ParticipantCard } from '@/components/ParticipantCard'
+import { DinerReviewModal } from '@/components/DinerReviewModal'
 import { useLanguage } from '@/contexts/LanguageContext'
 import { useAuth } from '@/contexts/AuthContext'
 import { useTableDetail } from '@/hooks/useTables'
@@ -22,13 +24,14 @@ interface TableDetailPageProps {
 export function TableDetailPage({ tableId, paymentSuccess, onNavigate, onAuthClick }: TableDetailPageProps) {
   const { t, language } = useLanguage()
   const { user } = useAuth()
-  const { table, participants, loading, error, joinTable, cancelTable, refresh } = useTableDetail(tableId)
+  const { table, participants, hostProfile, loading, error, joinTable, cancelTable, refresh } = useTableDetail(tableId)
   const { reviews, submitReview } = useReviews(tableId)
   const { messages, sendMessage } = useMessages(tableId)
   const [joining, setJoining] = useState(false)
   const [joinError, setJoinError] = useState<string | null>(null)
   const [showChat, setShowChat] = useState(false)
   const [showReview, setShowReview] = useState(false)
+  const [showDinerReview, setShowDinerReview] = useState(false)
   const [showInvite, setShowInvite] = useState(false)
   const [showCancel, setShowCancel] = useState(false)
   const [showCancelTable, setShowCancelTable] = useState(false)
@@ -45,6 +48,12 @@ export function TableDetailPage({ tableId, paymentSuccess, onNavigate, onAuthCli
   const isPast = table ? new Date(`${table.date}T${table.time}`) < new Date() : false
   const canReview = isParticipant && isPast && !isCancelled && !reviews.some(r => (r as any).reviewer_id === user?.id)
   const avgRating = reviews.length > 0 ? (reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length).toFixed(1) : null
+
+  const coDiners = [
+    ...(hostProfile && hostProfile.id !== user?.id ? [hostProfile] : []),
+    ...participants.filter(p => p.profiles && p.user_id !== user?.id).map(p => p.profiles!),
+  ]
+  const canReviewDiners = (isParticipant || isHost) && isPast && !isCancelled && coDiners.length > 0
 
   const handleJoinWord = async () => {
     setJoining(true)
@@ -120,7 +129,7 @@ export function TableDetailPage({ tableId, paymentSuccess, onNavigate, onAuthCli
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50">
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
         <Navbar currentPage="browse" onNavigate={onNavigate} onAuthClick={onAuthClick} />
         <div className="flex items-center justify-center py-32"><Loader2 className="w-8 h-8 text-primary-500 animate-spin" /></div>
       </div>
@@ -129,10 +138,10 @@ export function TableDetailPage({ tableId, paymentSuccess, onNavigate, onAuthCli
 
   if (!table || error) {
     return (
-      <div className="min-h-screen bg-gray-50">
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
         <Navbar currentPage="browse" onNavigate={onNavigate} onAuthClick={onAuthClick} />
         <div className="text-center py-20">
-          <p className="text-gray-500">{error || 'Mesa no encontrada'}</p>
+          <p className="text-gray-500 dark:text-gray-400">{error || 'Mesa no encontrada'}</p>
           <button onClick={() => onNavigate('browse')} className="mt-4 text-primary-600 font-medium text-sm">{t('create.back')}</button>
         </div>
       </div>
@@ -140,10 +149,10 @@ export function TableDetailPage({ tableId, paymentSuccess, onNavigate, onAuthCli
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       <Navbar currentPage="browse" onNavigate={onNavigate} onAuthClick={onAuthClick} />
       <main className="max-w-4xl mx-auto px-4 py-6 pb-24 md:pb-8">
-        <button onClick={() => onNavigate('browse')} className="flex items-center gap-2 text-gray-500 hover:text-gray-700 mb-4 text-sm">
+        <button onClick={() => onNavigate('browse')} className="flex items-center gap-2 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 mb-4 text-sm">
           <ArrowLeft className="w-4 h-4" /> {t('create.back')}
         </button>
 
@@ -175,11 +184,11 @@ export function TableDetailPage({ tableId, paymentSuccess, onNavigate, onAuthCli
         <div className="grid md:grid-cols-3 gap-6">
           {/* Main info */}
           <div className="md:col-span-2 space-y-6">
-            <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+            <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 p-6">
               <div className="flex items-start justify-between mb-4">
                 <div>
-                  <h1 className="text-2xl font-display font-bold text-gray-900">{table.restaurant_name}</h1>
-                  <div className="flex items-center gap-1 text-gray-500 mt-1">
+                  <h1 className="text-2xl font-display font-bold text-gray-900 dark:text-white">{table.restaurant_name}</h1>
+                  <div className="flex items-center gap-1 text-gray-500 dark:text-gray-400 mt-1">
                     <MapPin className="w-4 h-4" />
                     <span>{table.restaurant_city}, {table.restaurant_country}</span>
                   </div>
@@ -198,27 +207,36 @@ export function TableDetailPage({ tableId, paymentSuccess, onNavigate, onAuthCli
                 <InfoBox icon={<Users className="w-4 h-4" />} label={`${table.available_seats}/${table.max_seats} ${t('card.seats')}`} />
               </div>
 
-              {table.description && <p className="text-gray-600 text-sm">{table.description}</p>}
+              {table.description && <p className="text-gray-600 dark:text-gray-300 text-sm">{table.description}</p>}
 
               {table.cuisine_type && (
-                <span className="inline-block mt-3 px-3 py-1 bg-gray-100 text-gray-600 rounded-full text-sm">{table.cuisine_type}</span>
+                <span className="inline-block mt-3 px-3 py-1 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 rounded-full text-sm">{table.cuisine_type}</span>
               )}
             </div>
 
             {/* Participants */}
-            <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
-              <h3 className="font-semibold text-gray-900 mb-3">{t('card.confirmedDiners')}</h3>
-              {participants.length === 0 ? (
-                <p className="text-sm text-gray-400">{t('card.noDiners')}</p>
+            <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 p-6">
+              <h3 className="font-semibold text-gray-900 dark:text-white mb-3">{t('card.confirmedDiners')}</h3>
+              {participants.length === 0 && !hostProfile ? (
+                <p className="text-sm text-gray-400 dark:text-gray-500">{t('card.noDiners')}</p>
               ) : (
-                <div className="space-y-2">
-                  {participants.map(p => (
-                    <div key={p.id} className="flex items-center justify-between py-2 border-b border-gray-50 last:border-0">
-                      <span className="text-sm font-medium text-gray-700">{(p.profiles as any)?.display_name || 'User'}</span>
-                      <span className={`text-xs px-2 py-1 rounded-full ${p.join_type === 'deposit' ? 'bg-green-50 text-green-600' : 'bg-blue-50 text-blue-600'}`}>
-                        {p.join_type === 'deposit' ? t('card.depositBadge') : t('card.wordBadge')}
-                      </span>
-                    </div>
+                <div>
+                  {hostProfile && (
+                    <ParticipantCard
+                      profile={hostProfile}
+                      badge={<span className="text-xs px-2 py-1 rounded-full flex-shrink-0 bg-primary-50 text-primary-600">Anfitrión</span>}
+                    />
+                  )}
+                  {participants.map(p => p.profiles && (
+                    <ParticipantCard
+                      key={p.id}
+                      profile={p.profiles}
+                      badge={
+                        <span className={`text-xs px-2 py-1 rounded-full flex-shrink-0 ${p.join_type === 'deposit' ? 'bg-green-50 text-green-600' : 'bg-blue-50 text-blue-600'}`}>
+                          {p.join_type === 'deposit' ? t('card.depositBadge') : t('card.wordBadge')}
+                        </span>
+                      }
+                    />
                   ))}
                 </div>
               )}
@@ -226,16 +244,16 @@ export function TableDetailPage({ tableId, paymentSuccess, onNavigate, onAuthCli
 
             {/* Reviews */}
             {reviews.length > 0 && (
-              <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
-                <h3 className="font-semibold text-gray-900 mb-3">{t('review.title')}</h3>
+              <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 p-6">
+                <h3 className="font-semibold text-gray-900 dark:text-white mb-3">{t('review.title')}</h3>
                 <div className="space-y-4">
                   {reviews.map(r => (
-                    <div key={r.id} className="border-b border-gray-50 pb-3 last:border-0">
+                    <div key={r.id} className="border-b border-gray-50 dark:border-gray-800 pb-3 last:border-0">
                       <div className="flex items-center justify-between">
                         <span className="text-sm font-medium">{(r.profiles as any)?.display_name || 'User'}</span>
                         <StarRating rating={r.rating} readonly size="sm" />
                       </div>
-                      {r.comment && <p className="text-sm text-gray-600 mt-1">{r.comment}</p>}
+                      {r.comment && <p className="text-sm text-gray-600 dark:text-gray-300 mt-1">{r.comment}</p>}
                     </div>
                   ))}
                 </div>
@@ -245,7 +263,7 @@ export function TableDetailPage({ tableId, paymentSuccess, onNavigate, onAuthCli
 
           {/* Sidebar actions */}
           <div className="space-y-4">
-            <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 space-y-3">
+            <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 p-6 space-y-3">
               {user && !isHost && !isParticipant && !isFull && !isCancelled && !isPast && (
                 <>
                   <div className="relative">
@@ -254,10 +272,10 @@ export function TableDetailPage({ tableId, paymentSuccess, onNavigate, onAuthCli
                     </button>
                     <span className="absolute -top-2 -right-2 text-[10px] font-semibold bg-gray-800 text-white px-2 py-0.5 rounded-full">Próximamente</span>
                   </div>
-                  <button onClick={handleJoinWord} disabled={joining} className="w-full py-3 border border-gray-200 text-gray-700 rounded-xl font-medium hover:bg-gray-50 disabled:opacity-50 transition-colors text-sm">
+                  <button onClick={handleJoinWord} disabled={joining} className="w-full py-3 border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-200 rounded-xl font-medium hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50 transition-colors text-sm">
                     {joining ? t('card.registering') : t('card.giveWord')}
                   </button>
-                  <p className="text-xs text-gray-400 text-center">{t('card.depositNote')}</p>
+                  <p className="text-xs text-gray-400 dark:text-gray-500 text-center">{t('card.depositNote')}</p>
                   {joinError && <p className="text-xs text-red-600 text-center">{joinError}</p>}
                 </>
               )}
@@ -274,7 +292,7 @@ export function TableDetailPage({ tableId, paymentSuccess, onNavigate, onAuthCli
                 </div>
               )}
               {isFull && !isParticipant && !isHost && (
-                <p className="text-center text-sm font-medium text-gray-500 py-2">{t('card.tableFull')}</p>
+                <p className="text-center text-sm font-medium text-gray-500 dark:text-gray-400 py-2">{t('card.tableFull')}</p>
               )}
 
               {isHost && !isCancelled && (
@@ -292,12 +310,12 @@ export function TableDetailPage({ tableId, paymentSuccess, onNavigate, onAuthCli
                 </>
               )}
 
-              <button onClick={downloadICS} className="w-full py-2.5 border border-gray-200 text-gray-600 rounded-xl text-sm font-medium hover:bg-gray-50 flex items-center justify-center gap-2">
+              <button onClick={downloadICS} className="w-full py-2.5 border border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300 rounded-xl text-sm font-medium hover:bg-gray-50 dark:hover:bg-gray-700 flex items-center justify-center gap-2">
                 <Download className="w-4 h-4" /> Add to calendar
               </button>
 
               {(isParticipant || isHost) && (
-                <button onClick={() => setShowChat(!showChat)} className="w-full py-2.5 border border-gray-200 text-gray-600 rounded-xl text-sm font-medium hover:bg-gray-50 flex items-center justify-center gap-2">
+                <button onClick={() => setShowChat(!showChat)} className="w-full py-2.5 border border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300 rounded-xl text-sm font-medium hover:bg-gray-50 dark:hover:bg-gray-700 flex items-center justify-center gap-2">
                   <MessageSquare className="w-4 h-4" /> {t('chat.title')} ({messages.length})
                 </button>
               )}
@@ -307,21 +325,27 @@ export function TableDetailPage({ tableId, paymentSuccess, onNavigate, onAuthCli
                   <Star className="w-4 h-4 inline mr-1" /> {t('review.title')}
                 </button>
               )}
+
+              {canReviewDiners && (
+                <button onClick={() => setShowDinerReview(true)} className="w-full py-2.5 bg-teal-50 text-teal-700 border border-teal-200 rounded-xl text-sm font-medium hover:bg-teal-100">
+                  Puntúa a tus comensales
+                </button>
+              )}
             </div>
           </div>
         </div>
 
         {/* Chat panel */}
         {showChat && (
-          <div className="mt-6 bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
-            <h3 className="font-semibold text-gray-900 mb-4">{t('chat.title')}</h3>
+          <div className="mt-6 bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 p-6">
+            <h3 className="font-semibold text-gray-900 dark:text-white mb-4">{t('chat.title')}</h3>
             <div className="max-h-64 overflow-y-auto space-y-3 mb-4">
               {messages.length === 0 ? (
-                <p className="text-sm text-gray-400 text-center py-4">{t('chat.noMessages')}</p>
+                <p className="text-sm text-gray-400 dark:text-gray-500 text-center py-4">{t('chat.noMessages')}</p>
               ) : (
                 messages.map(m => (
                   <div key={m.id} className={`flex ${m.sender_id === user?.id ? 'justify-end' : 'justify-start'}`}>
-                    <div className={`max-w-[70%] px-3 py-2 rounded-xl text-sm ${m.sender_id === user?.id ? 'bg-primary-500 text-white' : 'bg-gray-100 text-gray-900'}`}>
+                    <div className={`max-w-[70%] px-3 py-2 rounded-xl text-sm ${m.sender_id === user?.id ? 'bg-primary-500 text-white' : 'bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white'}`}>
                       {m.sender_id !== user?.id && <p className="text-xs font-medium mb-0.5 opacity-70">{(m.profiles as any)?.display_name}</p>}
                       <p>{m.content}</p>
                     </div>
@@ -335,7 +359,7 @@ export function TableDetailPage({ tableId, paymentSuccess, onNavigate, onAuthCli
                 onChange={e => setChatInput(e.target.value)}
                 onKeyDown={e => e.key === 'Enter' && handleSendMessage()}
                 placeholder={t('chat.placeholder')}
-                className="flex-1 px-4 py-2.5 border border-gray-300 rounded-xl text-sm focus:ring-2 focus:ring-primary-500 outline-none"
+                className="flex-1 px-4 py-2.5 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 dark:text-white rounded-xl text-sm focus:ring-2 focus:ring-primary-500 outline-none"
               />
               <button onClick={handleSendMessage} className="px-4 py-2.5 bg-primary-500 text-white rounded-xl text-sm font-medium hover:bg-primary-600">
                 Send
@@ -347,17 +371,17 @@ export function TableDetailPage({ tableId, paymentSuccess, onNavigate, onAuthCli
         {/* Review modal */}
         {showReview && (
           <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4" onClick={() => setShowReview(false)}>
-            <div className="bg-white rounded-2xl shadow-xl w-full max-w-md p-6" onClick={e => e.stopPropagation()}>
-              <h3 className="text-lg font-display font-bold text-gray-900 mb-4">{t('review.title')}</h3>
-              <p className="text-sm text-gray-500 mb-4">{t('review.dinnerAt')} {table.restaurant_name}</p>
+            <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl w-full max-w-md p-6" onClick={e => e.stopPropagation()}>
+              <h3 className="text-lg font-display font-bold text-gray-900 dark:text-white mb-4">{t('review.title')}</h3>
+              <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">{t('review.dinnerAt')} {table.restaurant_name}</p>
               <div className="space-y-4">
                 <div>
-                  <label className="text-sm font-medium text-gray-700 block mb-1">{t('review.overallRating')}</label>
+                  <label className="text-sm font-medium text-gray-700 dark:text-gray-200 block mb-1">{t('review.overallRating')}</label>
                   <StarRating rating={reviewRating} onChange={setReviewRating} size="lg" />
                 </div>
                 <div>
-                  <label className="text-sm font-medium text-gray-700 block mb-1">{t('review.comment')}</label>
-                  <textarea value={reviewComment} onChange={e => setReviewComment(e.target.value)} placeholder={t('review.commentPlaceholder')} rows={3} className="w-full px-4 py-2.5 border border-gray-300 rounded-xl text-sm focus:ring-2 focus:ring-primary-500 outline-none resize-none" />
+                  <label className="text-sm font-medium text-gray-700 dark:text-gray-200 block mb-1">{t('review.comment')}</label>
+                  <textarea value={reviewComment} onChange={e => setReviewComment(e.target.value)} placeholder={t('review.commentPlaceholder')} rows={3} className="w-full px-4 py-2.5 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 dark:text-white rounded-xl text-sm focus:ring-2 focus:ring-primary-500 outline-none resize-none" />
                 </div>
                 <button onClick={handleSubmitReview} disabled={reviewRating === 0} className="w-full py-3 bg-primary-500 text-white rounded-xl font-medium hover:bg-primary-600 disabled:opacity-50">
                   {t('review.submit')}
@@ -365,6 +389,10 @@ export function TableDetailPage({ tableId, paymentSuccess, onNavigate, onAuthCli
               </div>
             </div>
           </div>
+        )}
+
+        {showDinerReview && (
+          <DinerReviewModal tableId={table.id} coDiners={coDiners} onClose={() => setShowDinerReview(false)} />
         )}
 
         {showInvite && <InviteModal tableId={table.id} onClose={() => setShowInvite(false)} />}
@@ -392,9 +420,9 @@ export function TableDetailPage({ tableId, paymentSuccess, onNavigate, onAuthCli
 
 function InfoBox({ icon, label }: { icon: React.ReactNode; label: string }) {
   return (
-    <div className="bg-gray-50 rounded-xl p-3 text-center">
-      <div className="flex items-center justify-center text-gray-400 mb-1">{icon}</div>
-      <p className="text-sm text-gray-700 font-medium">{label}</p>
+    <div className="bg-gray-50 dark:bg-gray-900 rounded-xl p-3 text-center">
+      <div className="flex items-center justify-center text-gray-400 dark:text-gray-500 mb-1">{icon}</div>
+      <p className="text-sm text-gray-700 dark:text-gray-200 font-medium">{label}</p>
     </div>
   )
 }

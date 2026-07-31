@@ -5,6 +5,7 @@ import 'react-phone-number-input/style.css'
 import { useAuth } from '@/contexts/AuthContext'
 import { supabase } from '@/lib/supabase'
 import { ErrorBanner } from '@/components/ErrorBanner'
+import { LANGUAGE_OPTIONS, INTEREST_OPTIONS } from '@/lib/options'
 
 const ADMIN_EMAIL = 'joseviangles@gmail.com'
 
@@ -23,8 +24,13 @@ export function OnboardingPage({ onNavigate }: { onNavigate: (page: string) => v
   const [bio, setBio] = useState('')
   const [phone, setPhone] = useState('')
   const [instagram, setInstagram] = useState('')
+  const [languages, setLanguages] = useState<string[]>([])
+  const [interests, setInterests] = useState<string[]>([])
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
+
+  const toggleLanguage = (l: string) => setLanguages(prev => (prev.includes(l) ? prev.filter(x => x !== l) : [...prev, l]))
+  const toggleInterest = (i: string) => setInterests(prev => (prev.includes(i) ? prev.filter(x => x !== i) : [...prev, i]))
 
   const isValid = (isAdmin || avatarUrl) && fullName.trim() && streetAddress.trim() && city.trim() && province.trim() && country.trim() && dateOfBirth && bio.trim() && phone.trim()
 
@@ -62,6 +68,8 @@ export function OnboardingPage({ onNavigate }: { onNavigate: (page: string) => v
       bio: bio.trim(),
       phone: phone.trim(),
       instagram: instagram.trim() || null,
+      languages: languages.length > 0 ? languages : null,
+      interests: interests.length > 0 ? interests : null,
       onboarding_completed: true,
     }).eq('id', user.id)
 
@@ -76,28 +84,28 @@ export function OnboardingPage({ onNavigate }: { onNavigate: (page: string) => v
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4 py-10">
-      <div className="w-full max-w-lg bg-white rounded-2xl shadow-sm border border-gray-100 p-6 md:p-8">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center px-4 py-10">
+      <div className="w-full max-w-lg bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 p-6 md:p-8">
         <div className="mb-6 text-center">
-          <h1 className="text-2xl font-display font-bold text-gray-900">Completa tu perfil</h1>
-          <p className="text-gray-500 text-sm mt-1">Necesitamos estos datos antes de que empieces a usar Table4Singles</p>
+          <h1 className="text-2xl font-display font-bold text-gray-900 dark:text-white">Completa tu perfil</h1>
+          <p className="text-gray-500 dark:text-gray-400 text-sm mt-1">Necesitamos estos datos antes de que empieces a usar Table4Singles</p>
         </div>
 
         {error && <ErrorBanner message={error} className="mb-4" />}
 
         <div className="space-y-4">
           <div className="flex flex-col items-center mb-2">
-            <label className="relative w-24 h-24 rounded-full border-2 border-dashed border-gray-300 hover:border-primary-400 transition-colors cursor-pointer flex items-center justify-center overflow-hidden bg-gray-50">
+            <label className="relative w-24 h-24 rounded-full border-2 border-dashed border-gray-300 dark:border-gray-600 hover:border-primary-400 transition-colors cursor-pointer flex items-center justify-center overflow-hidden bg-gray-50 dark:bg-gray-900">
               {avatarUrl ? (
                 <img src={avatarUrl} alt="Foto de perfil" className="w-full h-full object-cover" />
               ) : uploadingAvatar ? (
-                <Loader2 className="w-6 h-6 text-gray-400 animate-spin" />
+                <Loader2 className="w-6 h-6 text-gray-400 dark:text-gray-500 animate-spin" />
               ) : (
-                <Camera className="w-7 h-7 text-gray-400" />
+                <Camera className="w-7 h-7 text-gray-400 dark:text-gray-500" />
               )}
               <input type="file" accept="image/jpeg,image/png,image/webp" onChange={handleAvatarUpload} disabled={uploadingAvatar} className="hidden" />
             </label>
-            <p className="text-xs text-gray-500 mt-2">
+            <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
               {isAdmin ? 'Foto de perfil (opcional)' : 'Foto de perfil (obligatoria)'}
             </p>
           </div>
@@ -105,7 +113,7 @@ export function OnboardingPage({ onNavigate }: { onNavigate: (page: string) => v
           <Field label="Nombre completo" value={fullName} onChange={setFullName} placeholder="Jose Angles" />
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Dirección</label>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-2">Dirección</label>
             <div className="space-y-3">
               <Field label="Calle y número" value={streetAddress} onChange={setStreetAddress} placeholder="Calle Mayor 12, 3ºB" hideLabel />
               <div className="grid grid-cols-2 gap-3">
@@ -119,18 +127,18 @@ export function OnboardingPage({ onNavigate }: { onNavigate: (page: string) => v
           <Field label="Fecha de nacimiento" value={dateOfBirth} onChange={setDateOfBirth} type="date" />
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Sobre ti</label>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Sobre ti</label>
             <textarea
               value={bio}
               onChange={e => setBio(e.target.value)}
               rows={3}
               placeholder="Cuéntanos algo sobre ti..."
-              className="w-full px-4 py-2.5 border border-gray-300 rounded-xl text-sm focus:ring-2 focus:ring-primary-500 outline-none resize-none"
+              className="w-full px-4 py-2.5 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 dark:text-white rounded-xl text-sm focus:ring-2 focus:ring-primary-500 outline-none resize-none"
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Teléfono</label>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Teléfono</label>
             <PhoneInput
               international
               defaultCountry="ES"
@@ -143,6 +151,38 @@ export function OnboardingPage({ onNavigate }: { onNavigate: (page: string) => v
           <Field label="Correo electrónico" value={user?.email || ''} onChange={() => {}} disabled />
 
           <Field label="Instagram (opcional)" value={instagram} onChange={setInstagram} placeholder="@tuusuario" />
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-2">Idiomas que hablas (opcional)</label>
+            <div className="flex flex-wrap gap-2">
+              {LANGUAGE_OPTIONS.map(l => (
+                <button
+                  key={l}
+                  type="button"
+                  onClick={() => toggleLanguage(l)}
+                  className={`px-3 py-1.5 rounded-full text-sm transition-colors ${languages.includes(l) ? 'bg-primary-500 text-white' : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-600'}`}
+                >
+                  {l}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-2">Tus intereses (opcional)</label>
+            <div className="flex flex-wrap gap-2">
+              {INTEREST_OPTIONS.map(i => (
+                <button
+                  key={i}
+                  type="button"
+                  onClick={() => toggleInterest(i)}
+                  className={`px-3 py-1.5 rounded-full text-sm transition-colors ${interests.includes(i) ? 'bg-primary-500 text-white' : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-600'}`}
+                >
+                  {i}
+                </button>
+              ))}
+            </div>
+          </div>
         </div>
 
         <button
@@ -170,14 +210,14 @@ function Field({
 }) {
   return (
     <div>
-      {!hideLabel && <label className="block text-sm font-medium text-gray-700 mb-1">{label}</label>}
+      {!hideLabel && <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">{label}</label>}
       <input
         type={type}
         value={value}
         onChange={e => onChange(e.target.value)}
         placeholder={hideLabel ? label : placeholder}
         disabled={disabled}
-        className="w-full px-4 py-2.5 border border-gray-300 rounded-xl text-sm focus:ring-2 focus:ring-primary-500 outline-none disabled:bg-gray-50 disabled:text-gray-500"
+        className="w-full px-4 py-2.5 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 dark:text-white rounded-xl text-sm focus:ring-2 focus:ring-primary-500 outline-none disabled:bg-gray-50 dark:disabled:bg-gray-800 disabled:text-gray-500 dark:disabled:text-gray-400 dark:text-gray-500"
       />
     </div>
   )

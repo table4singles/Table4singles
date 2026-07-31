@@ -55,17 +55,17 @@ export function AuthModal({ isOpen, onClose, mode, onSwitchMode }: AuthModalProp
   return (
     <>
       <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4" onClick={onClose}>
-        <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md max-h-[90vh] overflow-y-auto" onClick={e => e.stopPropagation()}>
+        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl w-full max-w-md max-h-[90vh] overflow-y-auto" onClick={e => e.stopPropagation()}>
           <div className="flex items-center justify-between p-6 pb-4">
             <div>
-              <h2 className="text-2xl font-serif font-bold text-gray-900">
+              <h2 className="text-2xl font-serif font-bold text-gray-900 dark:text-white">
                 {mode === 'signup' ? t('auth.createAccount') : t('auth.welcomeBack')}
               </h2>
-              <p className="text-sm text-gray-500 mt-1">
+              <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
                 {mode === 'signup' ? t('auth.joinCommunity') : t('auth.signInContinue')}
               </p>
             </div>
-            <button onClick={onClose} className="p-2 hover:bg-gray-100 rounded-full">
+            <button onClick={onClose} className="p-2 hover:bg-gray-100 dark:hover:bg-gray-600 rounded-full">
               <X className="w-5 h-5" />
             </button>
           </div>
@@ -73,7 +73,7 @@ export function AuthModal({ isOpen, onClose, mode, onSwitchMode }: AuthModalProp
           <div className="px-6 pb-6">
             {mode === 'signup' && (
               <div className="mb-5">
-                <p className="text-sm font-medium text-gray-700 mb-2">{t('auth.iAm')}</p>
+                <p className="text-sm font-medium text-gray-700 dark:text-gray-200 mb-2">{t('auth.iAm')}</p>
                 <div className="grid grid-cols-2 gap-3">
                   <RoleButton selected={role === 'user'} onClick={() => setRole('user')} title={t('auth.privateUser')} desc={t('auth.privateUserDesc')} />
                   <RoleButton selected={role === 'restaurant'} onClick={() => setRole('restaurant')} title={t('auth.restaurant')} desc={t('auth.restaurantDesc')} />
@@ -85,23 +85,23 @@ export function AuthModal({ isOpen, onClose, mode, onSwitchMode }: AuthModalProp
               <button onClick={() => signInWithApple()} className="w-full flex items-center justify-center gap-3 px-4 py-3 bg-black text-white rounded-xl text-sm font-medium hover:bg-gray-800 transition-colors">
                 <Apple className="w-5 h-5" /> {t('auth.continueWithApple')}
               </button>
-              <button onClick={() => signInWithGoogle()} className="w-full flex items-center justify-center gap-3 px-4 py-3 bg-white border border-gray-300 rounded-xl text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors">
+              <button onClick={() => signInWithGoogle()} className="w-full flex items-center justify-center gap-3 px-4 py-3 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 dark:text-white rounded-xl text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
                 <GoogleIcon /> {t('auth.continueWithGoogle')}
               </button>
             </div>
 
             <div className="flex items-center gap-3 mb-5">
-              <div className="flex-1 h-px bg-gray-200" />
-              <span className="text-xs text-gray-400">{t('auth.or')}</span>
-              <div className="flex-1 h-px bg-gray-200" />
+              <div className="flex-1 h-px bg-gray-200 dark:bg-gray-700" />
+              <span className="text-xs text-gray-400 dark:text-gray-500">{t('auth.or')}</span>
+              <div className="flex-1 h-px bg-gray-200 dark:bg-gray-700" />
             </div>
 
             <form onSubmit={handleSubmit} className="space-y-4">
               {mode === 'signup' && (
                 <Input label={t('auth.name')} placeholder={t('auth.namePlaceholder')} value={name} onChange={setName} />
               )}
-              <IconInput icon={<Mail className="w-4 h-4 text-gray-400" />} placeholder={t('auth.emailPlaceholder')} type="email" value={email} onChange={setEmail} />
-              <IconInput icon={<Lock className="w-4 h-4 text-gray-400" />} placeholder={t('auth.passwordPlaceholder')} type="password" value={password} onChange={setPassword} />
+              <IconInput icon={<Mail className="w-4 h-4 text-gray-400 dark:text-gray-500" />} placeholder={t('auth.emailPlaceholder')} type="email" value={email} onChange={setEmail} />
+              <IconInput icon={<Lock className="w-4 h-4 text-gray-400 dark:text-gray-500" />} placeholder={t('auth.passwordPlaceholder')} type="password" value={password} onChange={setPassword} />
 
               {error && <p className="text-sm text-red-600 bg-red-50 px-3 py-2 rounded-lg">{error}</p>}
               {success && <p className="text-sm text-green-600 bg-green-50 px-3 py-2 rounded-lg">{success}</p>}
@@ -111,7 +111,7 @@ export function AuthModal({ isOpen, onClose, mode, onSwitchMode }: AuthModalProp
               </button>
             </form>
 
-            <p className="text-center text-sm text-gray-500 mt-4">
+            <p className="text-center text-sm text-gray-500 dark:text-gray-400 mt-4">
               {mode === 'signup' ? t('auth.alreadyHaveAccount') : t('auth.noAccount')}{' '}
               <button onClick={() => onSwitchMode(mode === 'signup' ? 'signin' : 'signup')} className="text-primary-600 font-medium hover:text-primary-700">
                 {mode === 'signup' ? t('auth.switchSignIn') : t('auth.switchSignUp')}
@@ -126,9 +126,9 @@ export function AuthModal({ isOpen, onClose, mode, onSwitchMode }: AuthModalProp
 
 function RoleButton({ selected, onClick, title, desc }: { selected: boolean; onClick: () => void; title: string; desc: string }) {
   return (
-    <button onClick={onClick} className={`p-3 rounded-xl border-2 text-left transition-all ${selected ? 'border-primary-500 bg-primary-50' : 'border-gray-200 hover:border-gray-300'}`}>
-      <p className={`font-medium text-sm ${selected ? 'text-primary-700' : 'text-gray-700'}`}>{title}</p>
-      <p className="text-xs text-gray-500 mt-0.5">{desc}</p>
+    <button onClick={onClick} className={`p-3 rounded-xl border-2 text-left transition-all ${selected ? 'border-primary-500 bg-primary-50' : 'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-500'}`}>
+      <p className={`font-medium text-sm ${selected ? 'text-primary-700' : 'text-gray-700 dark:text-gray-200'}`}>{title}</p>
+      <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">{desc}</p>
     </button>
   )
 }
@@ -136,14 +136,14 @@ function RoleButton({ selected, onClick, title, desc }: { selected: boolean; onC
 function Input({ label, placeholder, type = 'text', value, onChange }: { label: string; placeholder: string; type?: string; value: string; onChange: (v: string) => void }) {
   return (
     <div>
-      <label className="block text-sm font-medium text-gray-700 mb-1">{label}</label>
+      <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">{label}</label>
       <input
         type={type}
         placeholder={placeholder}
         value={value}
         onChange={e => onChange(e.target.value)}
         required
-        className="w-full px-4 py-2.5 border border-gray-300 rounded-xl text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none transition-all"
+        className="w-full px-4 py-2.5 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 dark:text-white rounded-xl text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none transition-all"
       />
     </div>
   )
@@ -159,7 +159,7 @@ function IconInput({ icon, placeholder, type = 'text', value, onChange }: { icon
         value={value}
         onChange={e => onChange(e.target.value)}
         required
-        className="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-xl text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none transition-all"
+        className="w-full pl-10 pr-4 py-2.5 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 dark:text-white rounded-xl text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none transition-all"
       />
     </div>
   )

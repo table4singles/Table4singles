@@ -21,7 +21,7 @@ export function StarRating({ rating, onChange, size = 'md', readonly = false }: 
           className={readonly ? 'cursor-default' : 'cursor-pointer hover:scale-110 transition-transform'}
         >
           <Star
-            className={`${sizes[size]} ${star <= rating ? 'text-yellow-400 fill-yellow-400' : 'text-gray-300'}`}
+            className={`${sizes[size]} ${star <= rating ? 'text-yellow-400 fill-yellow-400' : 'text-gray-300 dark:text-gray-600'}`}
           />
         </button>
       ))}

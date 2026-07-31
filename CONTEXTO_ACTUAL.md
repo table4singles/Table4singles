@@ -12,7 +12,7 @@ Deploy futuro: VERCEL (no Netlify)
 Dev local: `npm run dev` → localhost:5173 (si puerto ocupado, matar procesos viejos: `lsof -i :5173`, `kill -9 <pid>`)
 
 ## MIGRACIONES SQL — TODAS EJECUTADAS ✅
-001 schema.sql, 002 lifecycle+notifs, 003 onboarding, 004 settings, 005 avatar, 006 geolocation, 007 lock_role (bloquea cambio de profiles.role tras creacion).
+001 schema.sql, 002 lifecycle+notifs, 003 onboarding, 004 settings, 005 avatar, 006 geolocation, 007 lock_role, 008 referrals, 009 favorites, 010 diner_reviews, 011 reminders (pg_cron habilitado, job `send_dinner_reminders_hourly` programado con id 1, `0 * * * *`).
 Todas en `supabase/migrations/`. Ninguna pendiente ahora mismo.
 
 ## HECHO ✅
@@ -34,31 +34,46 @@ Todas en `supabase/migrations/`. Ninguna pendiente ahora mismo.
 - ROL INMUTABLE: usuario y restaurante son cuentas distintas, el rol se elige solo al registrarse (AuthModal) y ya NO se puede cambiar despues. Se quito el boton "Cambiar a cuenta de restaurante/personal" de ProfilePage. Ademas bloqueado a nivel BD con trigger (migracion 007, ver arriba) para que ni siquiera se pueda cambiar manipulando la API directamente
 - 5+ commits pusheados a GitHub
 
+### MEJORAS LADO USUARIO (10 features, plan "Mejoras lado usuario") — codigo + migraciones 008-011 completos y ejecutados
+1. **Mini-perfiles de comensales**: `components/ParticipantCard.tsx` (avatar, edad, bio, idiomas/intereses, badge de confianza), usado en TableDetailPage para el anfitrion + participantes
+2. **Idiomas e intereses**: chips multiseleccion nuevos (`lib/options.ts`) en OnboardingPage (opcional) y ProfilePage (editable), guardan en `profiles.languages`/`interests`
+3. **Mapa de restaurantes**: dependencias `leaflet`+`react-leaflet@4`(compatibles con React 18)+`@types/leaflet`. `components/RestaurantsMap.tsx` (tiles OSM gratis), toggle Lista/Mapa en RestaurantsBrowsePage. `useRestaurants` acepta `ensureCoordinates` para geocodificar bajo demanda al activar el mapa
+4. **Favoritos**: `hooks/useFavorites.ts` + tabla `favorites` (migracion 009). Corazon en tarjeta de RestaurantsBrowsePage y en cabecera de RestaurantProfilePage. Filtro "Solo favoritos"
+5. **Filtros de mesas**: en RestaurantProfilePage, filtro client-side por fecha desde/idioma/plazas libres minimas sobre las mesas ya cargadas
+6. **Resenas entre comensales**: `hooks/useDinerReviews.ts` + tabla `diner_reviews` (migracion 010, solo rating 1-5 sin comentario, filas privadas). Agregado publico solo via funcion SQL `get_diner_trust_score` (security definer). Modal `components/DinerReviewModal.tsx` en TableDetailPage cuando la mesa ya paso
+7. **Recordatorios in-app**: migracion 011, funcion `send_dinner_reminders()` + `cron.schedule` cada hora (pg_cron), inserta en `notifications` 24h antes. Sin cambios de frontend (NotificationsPanel ya es generico)
+8. **Modo oscuro completo (lado usuario)**: variantes `dark:` anadidas a Navbar, LandingPage, RestaurantsBrowsePage, RestaurantProfilePage, TableDetailPage, MyTablesPage, ProfilePage, OnboardingPage, AuthModal, NotificationsPanel, TableCard, ShareButton, InviteModal, CancelModal, StarRating, RestaurantsMap + componentes nuevos. Fuera de alcance a proposito: CreateTablePage, RestaurantDashboardPage, BrowsePage (lado restaurante)
+9. **Estadisticas de perfil**: seccion "Mi actividad" en ProfilePage (cenas asistidas, confianza, miembro desde)
+10. **Referidos**: enlace `?ref={user_id}` compartible desde ProfilePage (ShareButton), capturado en `App.tsx` (localStorage) y aplicado en `AuthContext.signUp` -> `profiles.referred_by` (migracion 008, via `handle_new_user()` actualizado). Contador de invitados en ProfilePage
+
 ## PENDIENTE ⚠️
-1. PROBAR flujo completo en local: onboarding+foto, listado restaurantes, ficha restaurante, unirse mesa, chat, reseña
+1. PROBAR flujo completo en local: onboarding+foto, listado restaurantes, ficha restaurante, unirse mesa, chat, reseña, favoritos, mapa, resenas entre comensales, referidos
 2. STRIPE: crear Edge Functions (create-checkout, stripe-webhook), conectar deposito. Falta cuenta Stripe+keys
 3. LOGIN SOCIAL: solo falta config externa (Google Cloud Console + Apple Developer + pegar keys en Supabase dashboard). Código ya OK.
 4. DEPLOY VERCEL: importar repo, env vars (VITE_SUPABASE_URL, VITE_SUPABASE_ANON_KEY), esperar cliente de dominio table4singles.online
-5. Modo oscuro solo aplicado en pantalla Ajustes, resto app sin dark mode (decidir si se extiende)
+5. Modo oscuro: completo en todo el lado usuario. Lado restaurante (CreateTablePage, RestaurantDashboardPage, BrowsePage) sigue sin dark mode, fuera de alcance de este plan
 
 ## ESTRUCTURA CLAVE
 ```
-src/App.tsx              routing principal (switch por 'page' string)
-src/contexts/            AuthContext, LanguageContext, ThemeContext
-src/hooks/                useTables, useMyTables, useTableDetail, useInvitations,
-                          useMessages, useNotifications, useReviews, useRestaurants
+src/App.tsx              routing principal (switch por 'page' string) + captura ?ref= para referidos
+src/contexts/            AuthContext(signUp con referred_by), LanguageContext, ThemeContext
+src/hooks/                useTables, useMyTables, useTableDetail(+hostProfile), useInvitations,
+                          useMessages, useNotifications, useReviews, useRestaurants(+ensureCoordinates),
+                          useFavorites(nuevo), useDinerReviews(nuevo, trust score + envio ratings)
 src/pages/
-  LandingPage, BrowsePage(mesas-solo restaurantes), RestaurantsBrowsePage(nuevo, usuarios),
-  RestaurantProfilePage(nuevo, ficha), CreateTablePage, TableDetailPage, MyTablesPage,
-  RestaurantDashboardPage, OnboardingPage(nuevo), SettingsPage(nuevo), ProfilePage,
+  LandingPage, BrowsePage(mesas-solo restaurantes), RestaurantsBrowsePage(usuarios, +mapa+favoritos),
+  RestaurantProfilePage(ficha, +favorito+filtros mesas), CreateTablePage, TableDetailPage(+mini-perfiles+resenas comensales),
+  RestaurantDashboardPage, OnboardingPage(+idiomas/intereses), SettingsPage, ProfilePage(+stats+referidos+idiomas/intereses),
   PrivacyPolicyPage, AvisoLegalPage
 src/components/
   Navbar(diferenciado por rol), AuthModal, TableCard, InviteModal, CancelModal,
-  LoadingSpinner, ErrorBanner, ShareButton, StarRating, LanguageSwitcher, NotificationsPanel
+  LoadingSpinner, ErrorBanner, ShareButton, StarRating, LanguageSwitcher, NotificationsPanel,
+  ParticipantCard(nuevo), DinerReviewModal(nuevo), RestaurantsMap(nuevo, Leaflet)
 src/lib/geocoding.ts     geocodeQuery (Nominatim/OSM) + haversineDistanceKm + RADIUS_STEPS_KM
-src/types/database.ts    tipos+Profile con todos los campos nuevos (incluye latitude/longitude)
+src/lib/options.ts       LANGUAGE_OPTIONS + INTEREST_OPTIONS (chips)
+src/types/database.ts    tipos+Profile con todos los campos nuevos (incluye referred_by, created_at)
 supabase/schema.sql       schema base
-supabase/migrations/      002 a 006 (ver arriba)
+supabase/migrations/      002 a 011, todas ejecutadas (ver arriba)
 ```
 
 ## OJO / GOTCHAS

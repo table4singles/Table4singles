@@ -29,7 +29,7 @@ export function Navbar({ currentPage, onNavigate, onAuthClick }: NavbarProps) {
   }, [])
 
   return (
-    <header className="sticky top-0 z-50 bg-white border-b border-gray-100">
+    <header className="sticky top-0 z-50 bg-white dark:bg-gray-800 border-b border-gray-100 dark:border-gray-700">
       <div className="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
         <button onClick={() => onNavigate(user ? 'browse' : 'landing')} className="flex items-center">
           <img src="/icons/logo-full.png" alt="Table4Singles" className="h-12 w-auto" />
@@ -55,8 +55,8 @@ export function Navbar({ currentPage, onNavigate, onAuthClick }: NavbarProps) {
           {user ? (
             <>
               <div className="relative">
-                <button onClick={() => setShowNotifications(!showNotifications)} className="relative p-2 rounded-lg hover:bg-gray-100 transition-colors">
-                  <Bell className="w-5 h-5 text-gray-600" />
+                <button onClick={() => setShowNotifications(!showNotifications)} className="relative p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors">
+                  <Bell className="w-5 h-5 text-gray-600 dark:text-gray-300" />
                   {unreadCount > 0 && (
                     <span className="absolute -top-0.5 -right-0.5 w-5 h-5 bg-blue-500 text-white text-xs rounded-full flex items-center justify-center font-medium">
                       {unreadCount > 9 ? '9+' : unreadCount}
@@ -74,7 +74,7 @@ export function Navbar({ currentPage, onNavigate, onAuthClick }: NavbarProps) {
               </div>
 
               <div className="relative" ref={menuRef}>
-                <button onClick={() => setShowMenu(!showMenu)} className="flex items-center gap-2 px-3 py-1.5 rounded-lg hover:bg-gray-100 transition-colors">
+                <button onClick={() => setShowMenu(!showMenu)} className="flex items-center gap-2 px-3 py-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors">
                   <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center overflow-hidden">
                     {profile?.avatar_url ? (
                       <img src={profile.avatar_url} alt="" className="w-full h-full object-cover" />
@@ -82,19 +82,19 @@ export function Navbar({ currentPage, onNavigate, onAuthClick }: NavbarProps) {
                       <User className="w-4 h-4 text-blue-600" />
                     )}
                   </div>
-                  <span className="hidden sm:block text-sm font-medium text-gray-700 max-w-[120px] truncate">
+                  <span className="hidden sm:block text-sm font-medium text-gray-700 dark:text-gray-200 max-w-[120px] truncate">
                     {profile?.display_name || profile?.restaurant_name || 'User'}
                   </span>
                 </button>
                 {showMenu && (
-                  <div className="absolute right-0 top-full mt-1 bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden z-50 w-48 animate-fade-in">
-                    <button onClick={() => { onNavigate('profile'); setShowMenu(false) }} className="w-full px-4 py-3 text-left text-sm hover:bg-gray-50 flex items-center gap-2">
+                  <div className="absolute right-0 top-full mt-1 bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 overflow-hidden z-50 w-48 animate-fade-in">
+                    <button onClick={() => { onNavigate('profile'); setShowMenu(false) }} className="w-full px-4 py-3 text-left text-sm hover:bg-gray-50 dark:hover:bg-gray-700 flex items-center gap-2">
                       <User className="w-4 h-4" /> {t('nav.profile')}
                     </button>
-                    <button onClick={() => { onNavigate('settings'); setShowMenu(false) }} className="w-full px-4 py-3 text-left text-sm hover:bg-gray-50 flex items-center gap-2">
+                    <button onClick={() => { onNavigate('settings'); setShowMenu(false) }} className="w-full px-4 py-3 text-left text-sm hover:bg-gray-50 dark:hover:bg-gray-700 flex items-center gap-2">
                       <Settings className="w-4 h-4" /> Ajustes
                     </button>
-                    <button onClick={() => { signOut(); setShowMenu(false) }} className="w-full px-4 py-3 text-left text-sm hover:bg-gray-50 flex items-center gap-2 text-red-600 border-t border-gray-100">
+                    <button onClick={() => { signOut(); setShowMenu(false) }} className="w-full px-4 py-3 text-left text-sm hover:bg-gray-50 dark:hover:bg-gray-700 flex items-center gap-2 text-red-600 border-t border-gray-100 dark:border-gray-700">
                       <LogOut className="w-4 h-4" /> {t('nav.signOut')}
                     </button>
                   </div>
@@ -116,7 +116,7 @@ export function Navbar({ currentPage, onNavigate, onAuthClick }: NavbarProps) {
 
       {/* Mobile bottom nav */}
       {user && (
-        <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 z-50 px-2 pb-safe">
+        <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 z-50 px-2 pb-safe">
           <div className="flex justify-around py-2">
             <MobileNavButton active={currentPage === 'browse' || currentPage === 'restaurant-profile'} onClick={() => onNavigate('browse')} icon={<Search className="w-5 h-5" />} label={profile?.role === 'restaurant' ? t('nav.explore') : 'Restaurantes'} />
             {profile?.role === 'restaurant' && (
@@ -134,7 +134,7 @@ export function Navbar({ currentPage, onNavigate, onAuthClick }: NavbarProps) {
 
 function NavLink({ active, onClick, icon, label }: { active: boolean; onClick: () => void; icon: React.ReactNode; label: string }) {
   return (
-    <button onClick={onClick} className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-semibold transition-colors ${active ? 'text-blue-600 bg-blue-50' : 'text-gray-600 hover:bg-gray-100'}`}>
+    <button onClick={onClick} className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-semibold transition-colors ${active ? 'text-blue-600 bg-blue-50' : 'text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-600'}`}>
       {icon} {label}
     </button>
   )
@@ -142,7 +142,7 @@ function NavLink({ active, onClick, icon, label }: { active: boolean; onClick: (
 
 function MobileNavButton({ active, onClick, icon, label }: { active: boolean; onClick: () => void; icon: React.ReactNode; label: string }) {
   return (
-    <button onClick={onClick} className={`flex flex-col items-center gap-0.5 px-3 py-1 rounded-lg text-xs transition-colors ${active ? 'text-blue-600' : 'text-gray-500'}`}>
+    <button onClick={onClick} className={`flex flex-col items-center gap-0.5 px-3 py-1 rounded-lg text-xs transition-colors ${active ? 'text-blue-600' : 'text-gray-500 dark:text-gray-400'}`}>
       {icon}
       <span>{label}</span>
     </button>

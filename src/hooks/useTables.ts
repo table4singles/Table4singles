@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react'
 import { supabase } from '@/lib/supabase'
-import type { DiningTable, TableParticipant } from '@/types/database'
+import type { DiningTable, TableParticipant, Profile } from '@/types/database'
 
 interface UseTablesOptions {
   city?: string
@@ -46,6 +46,7 @@ export function useTables(options: UseTablesOptions = {}) {
 export function useTableDetail(tableId: string | null) {
   const [table, setTable] = useState<DiningTable | null>(null)
   const [participants, setParticipants] = useState<TableParticipant[]>([])
+  const [hostProfile, setHostProfile] = useState<Profile | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
@@ -62,6 +63,11 @@ export function useTableDetail(tableId: string | null) {
     if (!tableRes.error) setTable(tableRes.data)
     else setError(tableRes.error.message)
     if (!partRes.error) setParticipants(partRes.data || [])
+
+    if (!tableRes.error && tableRes.data) {
+      const { data: hostData } = await supabase.from('profiles').select('*').eq('id', tableRes.data.host_id).single()
+      setHostProfile(hostData || null)
+    }
     setLoading(false)
   }, [tableId])
 
@@ -81,7 +87,7 @@ export function useTableDetail(tableId: string | null) {
     await fetchTable()
   }, [tableId, fetchTable])
 
-  return { table, participants, loading, error, refresh: fetchTable, joinTable, cancelTable }
+  return { table, participants, hostProfile, loading, error, refresh: fetchTable, joinTable, cancelTable }
 }
 
 export function useMyTables(userId: string | null) {

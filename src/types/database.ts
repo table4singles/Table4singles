@@ -36,6 +36,8 @@ export interface Profile {
   restaurant_phone: string | null
   restaurant_price_range: string | null
   restaurant_photos: string[] | null
+  referred_by: string | null
+  created_at: string
 }
 
 export interface DiningTable {
@@ -55,6 +57,7 @@ export interface DiningTable {
   cuisine_type: string | null
   languages: string[] | null
   deposit_amount: number
+  host_reminder_sent: boolean
   created_at: string
 }
 
@@ -65,6 +68,7 @@ export interface TableParticipant {
   status: ParticipantStatus
   join_type: JoinType
   deposit_paid: boolean
+  reminder_sent: boolean
   created_at: string
   profiles?: Profile
 }
@@ -132,6 +136,27 @@ export interface RefundClaim {
   created_at: string
 }
 
+export interface Favorite {
+  id: string
+  user_id: string
+  restaurant_id: string
+  created_at: string
+}
+
+export interface DinerReview {
+  id: string
+  table_id: string
+  reviewer_id: string
+  reviewee_id: string
+  rating: number
+  created_at: string
+}
+
+export interface DinerTrustScore {
+  avg_rating: number
+  review_count: number
+}
+
 export interface Database {
   public: {
     Tables: {
@@ -144,6 +169,8 @@ export interface Database {
       notifications: { Row: Notification; Insert: Omit<Notification, 'id' | 'created_at'>; Update: Partial<Notification> }
       cities: { Row: City; Insert: Omit<City, 'id'>; Update: Partial<City> }
       refund_claims: { Row: RefundClaim; Insert: Omit<RefundClaim, 'id' | 'created_at'>; Update: Partial<RefundClaim> }
+      favorites: { Row: Favorite; Insert: Omit<Favorite, 'id' | 'created_at'>; Update: Partial<Favorite> }
+      diner_reviews: { Row: DinerReview; Insert: Omit<DinerReview, 'id' | 'created_at'>; Update: Partial<DinerReview> }
     }
   }
 }

@@ -31,6 +31,18 @@ function AppRouter() {
     if (!loading && !user && !['landing', 'politica-privacidad', 'aviso-legal'].includes(page)) setPage('landing')
   }, [user, loading])
 
+  // Capture referral code (?ref=<user_id>) for use during sign up
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search)
+    const ref = params.get('ref')
+    if (ref) {
+      localStorage.setItem('t4s_referred_by', ref)
+      params.delete('ref')
+      const newSearch = params.toString()
+      window.history.replaceState({}, '', window.location.pathname + (newSearch ? `?${newSearch}` : ''))
+    }
+  }, [])
+
   // Handle payment success redirect
   useEffect(() => {
     const params = new URLSearchParams(window.location.search)

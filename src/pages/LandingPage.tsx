@@ -25,7 +25,7 @@ export function LandingPage({ onNavigate, onAuthClick }: LandingPageProps) {
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
             <button
               onClick={() => onNavigate('browse')}
-              className="px-8 py-3.5 bg-white text-gray-800 hover:bg-gray-100 rounded-full font-medium text-lg transition-colors flex items-center gap-2"
+              className="px-8 py-3.5 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-600 rounded-full font-medium text-lg transition-colors flex items-center gap-2"
             >
               {t('landing.hero.browseTables')} <ArrowRight className="w-5 h-5" />
             </button>
@@ -40,10 +40,10 @@ export function LandingPage({ onNavigate, onAuthClick }: LandingPageProps) {
       </section>
 
       {/* How it works */}
-      <section className="py-20 bg-white">
+      <section className="py-20 bg-white dark:bg-gray-800">
         <div className="max-w-5xl mx-auto px-4 text-center">
-          <h2 className="font-display text-3xl md:text-4xl italic text-gray-900 mb-3">{t('landing.howItWorks.title')}</h2>
-          <p className="text-gray-500 text-lg mb-14">{t('landing.howItWorks.subtitle')}</p>
+          <h2 className="font-display text-3xl md:text-4xl italic text-gray-900 dark:text-white mb-3">{t('landing.howItWorks.title')}</h2>
+          <p className="text-gray-500 dark:text-gray-400 text-lg mb-14">{t('landing.howItWorks.subtitle')}</p>
           <div className="grid md:grid-cols-3 gap-10">
             <StepCard
               icon={<Globe className="w-7 h-7 text-white" />}
@@ -81,9 +81,9 @@ export function LandingPage({ onNavigate, onAuthClick }: LandingPageProps) {
         <div className="relative max-w-3xl mx-auto px-4 py-24 text-center">
           <div className="flex items-center justify-center gap-3 mb-6">
             <span className="w-10 h-10 rounded-full bg-amber-500 flex items-center justify-center"><Wine className="w-5 h-5 text-white" /></span>
-            <span className="w-1.5 h-1.5 rounded-full bg-white/50" />
+            <span className="w-1.5 h-1.5 rounded-full bg-white dark:bg-gray-800/50" />
             <span className="w-10 h-10 rounded-full bg-teal-500 flex items-center justify-center"><Users className="w-5 h-5 text-white" /></span>
-            <span className="w-1.5 h-1.5 rounded-full bg-white/50" />
+            <span className="w-1.5 h-1.5 rounded-full bg-white dark:bg-gray-800/50" />
             <span className="w-10 h-10 rounded-full bg-pink-500 flex items-center justify-center"><Heart className="w-5 h-5 text-white" /></span>
           </div>
           <h2 className="font-display text-3xl md:text-4xl font-bold mb-4">{t('landing.sunset.title')}</h2>
@@ -95,7 +95,7 @@ export function LandingPage({ onNavigate, onAuthClick }: LandingPageProps) {
           </div>
           <button
             onClick={() => onNavigate('browse')}
-            className="px-8 py-3.5 bg-white text-gray-800 hover:bg-gray-100 rounded-full font-medium text-lg transition-colors inline-flex items-center gap-2"
+            className="px-8 py-3.5 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-600 rounded-full font-medium text-lg transition-colors inline-flex items-center gap-2"
           >
             {t('landing.sunset.button')} <ArrowRight className="w-5 h-5" />
           </button>
@@ -109,7 +109,7 @@ export function LandingPage({ onNavigate, onAuthClick }: LandingPageProps) {
           <p className="text-lg text-white/90 mb-8">{t('landing.cta.desc')}</p>
           <button
             onClick={() => onAuthClick('signup')}
-            className="px-8 py-3.5 bg-white text-gray-800 hover:bg-gray-100 rounded-full font-semibold text-lg transition-colors inline-flex items-center gap-2"
+            className="px-8 py-3.5 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-600 rounded-full font-semibold text-lg transition-colors inline-flex items-center gap-2"
           >
             {t('landing.cta.button')} <ArrowRight className="w-5 h-5" />
           </button>
@@ -124,13 +124,13 @@ export function LandingPage({ onNavigate, onAuthClick }: LandingPageProps) {
               <img src="/icons/logo-icon.png" alt="" className="h-8 w-8 rounded-xl" />
               <span className="font-semibold text-lg">Table4Singles</span>
             </div>
-            <div className="flex items-center gap-4 text-sm text-gray-400">
+            <div className="flex items-center gap-4 text-sm text-gray-400 dark:text-gray-500">
               <button onClick={() => onNavigate('aviso-legal')} className="hover:text-white transition-colors">{t('landing.footer.legal')}</button>
-              <span className="text-gray-600">|</span>
+              <span className="text-gray-600 dark:text-gray-300">|</span>
               <button onClick={() => onNavigate('privacy')} className="hover:text-white transition-colors">{t('landing.footer.privacy')}</button>
             </div>
           </div>
-          <p className="text-center text-gray-500 text-sm">{t('landing.footer.tagline')}</p>
+          <p className="text-center text-gray-500 dark:text-gray-400 text-sm">{t('landing.footer.tagline')}</p>
         </div>
       </footer>
     </div>
@@ -143,8 +143,8 @@ function StepCard({ icon, bg, number, title, desc }: { icon: React.ReactNode; bg
       <div className={`w-14 h-14 ${bg} rounded-full flex items-center justify-center mx-auto mb-4`}>
         {icon}
       </div>
-      <h3 className="font-semibold text-lg text-gray-900 mb-2">{number}. {title}</h3>
-      <p className="text-gray-500">{desc}</p>
+      <h3 className="font-semibold text-lg text-gray-900 dark:text-white mb-2">{number}. {title}</h3>
+      <p className="text-gray-500 dark:text-gray-400">{desc}</p>
     </div>
   )
 }

@@ -57,6 +57,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, [fetchProfile])
 
   const signUp = useCallback(async (email: string, password: string, name: string, role: 'user' | 'restaurant') => {
+    const referredBy = localStorage.getItem('t4s_referred_by') || undefined
     const { error } = await supabase.auth.signUp({
       email,
       password,
@@ -64,9 +65,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         data: {
           display_name: name,
           role,
+          referred_by: referredBy,
         },
       },
     })
+    if (!error) localStorage.removeItem('t4s_referred_by')
     return { error: error ? new Error(error.message) : null }
   }, [])
 

@@ -53,13 +53,13 @@ export function InviteModal({ tableId, onClose }: InviteModalProps) {
 
   return (
     <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4" onClick={onClose}>
-      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md" onClick={e => e.stopPropagation()}>
+      <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl w-full max-w-md" onClick={e => e.stopPropagation()}>
         <div className="flex items-center justify-between p-6 pb-4">
           <div>
-            <h2 className="text-xl font-display font-bold text-gray-900">{t('invite.title')}</h2>
-            <p className="text-sm text-gray-500 mt-1">{t('invite.subtitle')}</p>
+            <h2 className="text-xl font-display font-bold text-gray-900 dark:text-white">{t('invite.title')}</h2>
+            <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">{t('invite.subtitle')}</p>
           </div>
-          <button onClick={onClose} className="p-2 hover:bg-gray-100 rounded-full">
+          <button onClick={onClose} className="p-2 hover:bg-gray-100 dark:hover:bg-gray-600 rounded-full">
             <X className="w-5 h-5" />
           </button>
         </div>
@@ -70,9 +70,9 @@ export function InviteModal({ tableId, onClose }: InviteModalProps) {
               <div className="w-14 h-14 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-3">
                 <Check className="w-7 h-7 text-green-600" />
               </div>
-              <p className="font-medium text-gray-900 mb-1">{t('invite.success')}</p>
-              <p className="text-sm text-gray-500 mb-4">{t('invite.successDesc')}</p>
-              <p className="text-xs text-gray-400 mb-4">
+              <p className="font-medium text-gray-900 dark:text-white mb-1">{t('invite.success')}</p>
+              <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">{t('invite.successDesc')}</p>
+              <p className="text-xs text-gray-400 dark:text-gray-500 mb-4">
                 {paymentCovered ? t('invite.successBillIncluded') : t('invite.successDepositRequired')}
               </p>
               <button onClick={onClose} className="w-full py-3 bg-primary-500 text-white rounded-xl font-medium hover:bg-primary-600 transition-colors">
@@ -82,12 +82,12 @@ export function InviteModal({ tableId, onClose }: InviteModalProps) {
           ) : (
             <>
               <div className="relative mb-3">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 dark:text-gray-500" />
                 <input
                   value={query}
                   onChange={e => handleSearch(e.target.value)}
                   placeholder={t('invite.searchPlaceholder')}
-                  className="w-full pl-9 pr-4 py-2.5 border border-gray-300 rounded-xl text-sm focus:ring-2 focus:ring-primary-500 outline-none"
+                  className="w-full pl-9 pr-4 py-2.5 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 dark:text-white rounded-xl text-sm focus:ring-2 focus:ring-primary-500 outline-none"
                 />
               </div>
 
@@ -99,11 +99,11 @@ export function InviteModal({ tableId, onClose }: InviteModalProps) {
                     <button
                       key={u.id}
                       onClick={() => setSelected(u)}
-                      className={`w-full text-left px-3 py-2.5 rounded-xl text-sm transition-colors flex items-center justify-between ${selected?.id === u.id ? 'bg-primary-50 border border-primary-300' : 'hover:bg-gray-50 border border-transparent'}`}
+                      className={`w-full text-left px-3 py-2.5 rounded-xl text-sm transition-colors flex items-center justify-between ${selected?.id === u.id ? 'bg-primary-50 border border-primary-300' : 'hover:bg-gray-50 dark:hover:bg-gray-700 border border-transparent'}`}
                     >
                       <span>
-                        <span className="font-medium text-gray-900">{u.display_name || 'Usuario'}</span>
-                        {u.email && <span className="text-gray-400 ml-1.5">{u.email}</span>}
+                        <span className="font-medium text-gray-900 dark:text-white">{u.display_name || 'Usuario'}</span>
+                        {u.email && <span className="text-gray-400 dark:text-gray-500 ml-1.5">{u.email}</span>}
                       </span>
                       {selected?.id === u.id && <Check className="w-4 h-4 text-primary-600" />}
                     </button>
@@ -113,15 +113,15 @@ export function InviteModal({ tableId, onClose }: InviteModalProps) {
 
               {selected && (
                 <div className="mb-4">
-                  <p className="text-sm font-medium text-gray-700 mb-2">{t('invite.type')}</p>
+                  <p className="text-sm font-medium text-gray-700 dark:text-gray-200 mb-2">{t('invite.type')}</p>
                   <div className="space-y-2">
-                    <button onClick={() => setPaymentCovered(true)} className={`w-full text-left p-3 rounded-xl border-2 transition-all ${paymentCovered ? 'border-primary-500 bg-primary-50' : 'border-gray-200 hover:border-gray-300'}`}>
-                      <p className={`font-medium text-sm ${paymentCovered ? 'text-primary-700' : 'text-gray-700'}`}>{t('invite.iInvite')}</p>
-                      <p className="text-xs text-gray-500 mt-0.5">{t('invite.iInviteDesc')}</p>
+                    <button onClick={() => setPaymentCovered(true)} className={`w-full text-left p-3 rounded-xl border-2 transition-all ${paymentCovered ? 'border-primary-500 bg-primary-50' : 'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-500'}`}>
+                      <p className={`font-medium text-sm ${paymentCovered ? 'text-primary-700' : 'text-gray-700 dark:text-gray-200'}`}>{t('invite.iInvite')}</p>
+                      <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">{t('invite.iInviteDesc')}</p>
                     </button>
-                    <button onClick={() => setPaymentCovered(false)} className={`w-full text-left p-3 rounded-xl border-2 transition-all ${!paymentCovered ? 'border-primary-500 bg-primary-50' : 'border-gray-200 hover:border-gray-300'}`}>
-                      <p className={`font-medium text-sm ${!paymentCovered ? 'text-primary-700' : 'text-gray-700'}`}>{t('invite.splitPay')}</p>
-                      <p className="text-xs text-gray-500 mt-0.5">{t('invite.splitPayDesc')}</p>
+                    <button onClick={() => setPaymentCovered(false)} className={`w-full text-left p-3 rounded-xl border-2 transition-all ${!paymentCovered ? 'border-primary-500 bg-primary-50' : 'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-500'}`}>
+                      <p className={`font-medium text-sm ${!paymentCovered ? 'text-primary-700' : 'text-gray-700 dark:text-gray-200'}`}>{t('invite.splitPay')}</p>
+                      <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">{t('invite.splitPayDesc')}</p>
                     </button>
                   </div>
                 </div>

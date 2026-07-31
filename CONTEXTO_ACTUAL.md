@@ -11,9 +11,9 @@ Dominio: table4singles.online (aun apunta build vieja, deploy pendiente)
 Deploy futuro: VERCEL (no Netlify)
 Dev local: `npm run dev` → localhost:5173 (si puerto ocupado, matar procesos viejos: `lsof -i :5173`, `kill -9 <pid>`)
 
-## MIGRACIONES SQL
-001 schema.sql, 002 lifecycle+notifs, 003 onboarding, 004 settings, 005 avatar → EJECUTADAS ✅
-006 geolocation (lat/lng en profiles, para busqueda por radio km) → ⚠️ PENDIENTE DE EJECUTAR EN SUPABASE (MCP no tiene acceso al proyecto zocrwanhcschmydczgeh, hay que correrla a mano en el SQL Editor)
+## MIGRACIONES SQL — TODAS EJECUTADAS ✅
+001 schema.sql, 002 lifecycle+notifs, 003 onboarding, 004 settings, 005 avatar, 006 geolocation (lat/lng en profiles).
+Todas en `supabase/migrations/`. Ninguna pendiente ahora mismo.
 
 ## HECHO ✅
 - Reconstrucción código fuente completo desde build Bolt vieja

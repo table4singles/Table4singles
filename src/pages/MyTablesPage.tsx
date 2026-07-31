@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Plus, CalendarDays, Users, Clock, Loader2, UtensilsCrossed, XCircle } from 'lucide-react'
 import { Navbar } from '@/components/Navbar'
 import { CancelModal } from '@/components/CancelModal'
@@ -10,17 +10,22 @@ import { useInvitations } from '@/hooks/useInvitations'
 interface MyTablesPageProps {
   onNavigate: (page: string, id?: string) => void
   onAuthClick: (mode?: 'signin' | 'signup') => void
+  initialTab?: Tab
 }
 
 type Tab = 'hosting' | 'reservations' | 'invitations'
 
-export function MyTablesPage({ onNavigate, onAuthClick }: MyTablesPageProps) {
+export function MyTablesPage({ onNavigate, onAuthClick, initialTab }: MyTablesPageProps) {
   const { t, language } = useLanguage()
   const { user, profile } = useAuth()
   const isRestaurant = profile?.role === 'restaurant'
   const { hosting, reservations, loading, error, cancelHostedTable, cancelReservation } = useMyTables(user?.id ?? null)
   const { invitations, respondInvitation } = useInvitations(user?.id ?? null)
-  const [tab, setTab] = useState<Tab>(isRestaurant ? 'hosting' : 'reservations')
+  const [tab, setTab] = useState<Tab>(initialTab ?? (isRestaurant ? 'hosting' : 'reservations'))
+
+  useEffect(() => {
+    if (initialTab) setTab(initialTab)
+  }, [initialTab])
   const [cancelTableId, setCancelTableId] = useState<string | null>(null)
   const [cancelReservationTarget, setCancelReservationTarget] = useState<{ id: string; joinType: 'word' | 'deposit' } | null>(null)
 

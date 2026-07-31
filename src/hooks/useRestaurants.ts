@@ -7,7 +7,7 @@ export type RestaurantWithDistance = Profile & { distanceKm?: number }
 
 interface UseRestaurantsOptions {
   city?: string
-  cuisine?: string
+  cuisine?: string[]
   search?: string
   /** Radio en km. Si esta definido junto con `search`, se busca por proximidad geografica en vez de coincidencia de texto. */
   radiusKm?: number | null
@@ -18,6 +18,7 @@ export function useRestaurants(options: UseRestaurantsOptions = {}) {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [locationNotFound, setLocationNotFound] = useState(false)
+  const cuisineKey = options.cuisine?.join(',') ?? ''
 
   const fetchRestaurants = useCallback(async () => {
     setLoading(true)
@@ -32,7 +33,7 @@ export function useRestaurants(options: UseRestaurantsOptions = {}) {
 
     const useRadius = !!options.radiusKm && !!options.search?.trim()
 
-    if (options.cuisine) query = query.eq('restaurant_cuisine', options.cuisine)
+    if (options.cuisine && options.cuisine.length > 0) query = query.in('restaurant_cuisine', options.cuisine)
     if (!useRadius) {
       if (options.city) query = query.eq('city', options.city)
       if (options.search) {
@@ -91,7 +92,8 @@ export function useRestaurants(options: UseRestaurantsOptions = {}) {
     withDistance.sort((a, b) => (a.distanceKm ?? 0) - (b.distanceKm ?? 0))
     setRestaurants(withDistance)
     setLoading(false)
-  }, [options.city, options.cuisine, options.search, options.radiusKm])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [options.city, cuisineKey, options.search, options.radiusKm])
 
   useEffect(() => { fetchRestaurants() }, [fetchRestaurants])
 

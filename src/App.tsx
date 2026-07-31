@@ -55,7 +55,7 @@ function AppRouter() {
 
   const navigate = (p: string, id?: string) => {
     setPage(p)
-    if (id) setSelectedId(id)
+    setSelectedId(id ?? null)
     if (p !== 'table-detail') setPaymentSuccess(false)
     window.scrollTo(0, 0)
   }
@@ -90,8 +90,13 @@ function AppRouter() {
         return <CreateTablePage onNavigate={navigate} onAuthClick={openAuth} />
       case 'table-detail':
         return selectedId ? <TableDetailPage tableId={selectedId} paymentSuccess={paymentSuccess} onNavigate={navigate} onAuthClick={openAuth} /> : null
-      case 'my-tables':
-        return <MyTablesPage onNavigate={navigate} onAuthClick={openAuth} />
+      case 'my-tables': {
+        const validTabs = ['hosting', 'reservations', 'invitations'] as const
+        const initialTab = validTabs.includes(selectedId as typeof validTabs[number])
+          ? (selectedId as typeof validTabs[number])
+          : undefined
+        return <MyTablesPage onNavigate={navigate} onAuthClick={openAuth} initialTab={initialTab} />
+      }
       case 'restaurant-dashboard':
         return <RestaurantDashboardPage onNavigate={navigate} onAuthClick={openAuth} />
       case 'profile':

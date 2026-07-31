@@ -4,7 +4,7 @@ import type { DiningTable, TableParticipant } from '@/types/database'
 
 interface UseTablesOptions {
   city?: string
-  cuisine?: string
+  cuisine?: string[]
   language?: string
   search?: string
   status?: string
@@ -14,6 +14,7 @@ export function useTables(options: UseTablesOptions = {}) {
   const [tables, setTables] = useState<DiningTable[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const cuisineKey = options.cuisine?.join(',') ?? ''
 
   const fetchTables = useCallback(async () => {
     setLoading(true)
@@ -25,7 +26,7 @@ export function useTables(options: UseTablesOptions = {}) {
       .order('date', { ascending: true })
 
     if (options.city) query = query.eq('restaurant_city', options.city)
-    if (options.cuisine) query = query.eq('cuisine_type', options.cuisine)
+    if (options.cuisine && options.cuisine.length > 0) query = query.in('cuisine_type', options.cuisine)
     if (options.search) {
       query = query.or(`restaurant_name.ilike.%${options.search}%,restaurant_city.ilike.%${options.search}%`)
     }
@@ -34,7 +35,8 @@ export function useTables(options: UseTablesOptions = {}) {
     if (!err) setTables(data || [])
     else setError(err.message)
     setLoading(false)
-  }, [options.city, options.cuisine, options.search, options.status])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [options.city, cuisineKey, options.search, options.status])
 
   useEffect(() => { fetchTables() }, [fetchTables])
 

@@ -15,15 +15,19 @@ interface RestaurantsBrowsePageProps {
 
 export function RestaurantsBrowsePage({ onNavigate, onAuthClick }: RestaurantsBrowsePageProps) {
   const [search, setSearch] = useState('')
-  const [cuisine, setCuisine] = useState('')
+  const [cuisines, setCuisines] = useState<string[]>([])
   const [showFilters, setShowFilters] = useState(false)
   const [radiusIndex, setRadiusIndex] = useState(0) // 0 = coincidencia exacta (sin radio)
 
   const radiusKm = radiusIndex > 0 ? RADIUS_STEPS_KM[radiusIndex - 1] : null
   const canUseRadius = search.trim().length > 0
 
-  const { restaurants, loading, error, locationNotFound } = useRestaurants({ search, cuisine, radiusKm })
-  const hasFilters = search || cuisine || radiusKm
+  const toggleCuisine = (c: string) => {
+    setCuisines(prev => (prev.includes(c) ? prev.filter(x => x !== c) : [...prev, c]))
+  }
+
+  const { restaurants, loading, error, locationNotFound } = useRestaurants({ search, cuisine: cuisines, radiusKm })
+  const hasFilters = search || cuisines.length > 0 || radiusKm
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -56,9 +60,9 @@ export function RestaurantsBrowsePage({ onNavigate, onAuthClick }: RestaurantsBr
           <div className="bg-white rounded-xl border border-gray-200 p-4 mb-6 animate-fade-in space-y-5">
             <div>
               <div className="flex items-center justify-between mb-3">
-                <h3 className="font-medium text-gray-900">Tipo de cocina</h3>
+                <h3 className="font-medium text-gray-900">Tipo de cocina <span className="text-gray-400 font-normal">(elige tantos como quieras)</span></h3>
                 {hasFilters && (
-                  <button onClick={() => { setSearch(''); setCuisine(''); setRadiusIndex(0) }} className="text-xs text-primary-600 font-medium">
+                  <button onClick={() => { setSearch(''); setCuisines([]); setRadiusIndex(0) }} className="text-xs text-primary-600 font-medium">
                     Limpiar filtros
                   </button>
                 )}
@@ -67,8 +71,8 @@ export function RestaurantsBrowsePage({ onNavigate, onAuthClick }: RestaurantsBr
                 {CUISINE_TYPES.map(c => (
                   <button
                     key={c}
-                    onClick={() => setCuisine(cuisine === c ? '' : c)}
-                    className={`px-3 py-1.5 rounded-full text-sm transition-colors ${cuisine === c ? 'bg-primary-500 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`}
+                    onClick={() => toggleCuisine(c)}
+                    className={`px-3 py-1.5 rounded-full text-sm transition-colors ${cuisines.includes(c) ? 'bg-primary-500 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`}
                   >
                     {c}
                   </button>

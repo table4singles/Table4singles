@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react'
-import { LayoutGrid, Search, Plus, CalendarDays, User, LogOut, Bell, LayoutDashboard, FileText, Settings } from 'lucide-react'
+import { LayoutGrid, Search, Plus, CalendarDays, Mail, User, LogOut, Bell, LayoutDashboard, FileText, Settings } from 'lucide-react'
 import { useAuth } from '@/contexts/AuthContext'
 import { useLanguage } from '@/contexts/LanguageContext'
 import { useNotifications } from '@/hooks/useNotifications'
@@ -8,7 +8,7 @@ import { NotificationsPanel } from './NotificationsPanel'
 
 interface NavbarProps {
   currentPage: string
-  onNavigate: (page: string) => void
+  onNavigate: (page: string, id?: string) => void
   onAuthClick: (mode?: 'signin' | 'signup') => void
 }
 
@@ -123,6 +123,7 @@ export function Navbar({ currentPage, onNavigate, onAuthClick }: NavbarProps) {
               <MobileNavButton active={currentPage === 'create'} onClick={() => onNavigate('create')} icon={<Plus className="w-5 h-5" />} label={t('nav.create')} />
             )}
             <MobileNavButton active={currentPage === 'my-tables'} onClick={() => onNavigate('my-tables')} icon={<CalendarDays className="w-5 h-5" />} label={profile?.role === 'restaurant' ? t('nav.myTables') : 'Reservas'} />
+            <MobileNavButton active={currentPage === 'my-tables'} onClick={() => onNavigate('my-tables', 'invitations')} icon={<Mail className="w-5 h-5" />} label="Invitaciones" />
             <MobileNavButton active={currentPage === 'profile'} onClick={() => onNavigate('profile')} icon={<User className="w-5 h-5" />} label={t('nav.profile')} />
           </div>
         </nav>

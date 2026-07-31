@@ -17,12 +17,16 @@ interface BrowsePageProps {
 export function BrowsePage({ onNavigate, onAuthClick }: BrowsePageProps) {
   const { t } = useLanguage()
   const [search, setSearch] = useState('')
-  const [cuisine, setCuisine] = useState('')
+  const [cuisines, setCuisines] = useState<string[]>([])
   const [showFilters, setShowFilters] = useState(false)
 
-  const { tables, loading, error } = useTables({ search, cuisine })
+  const toggleCuisine = (c: string) => {
+    setCuisines(prev => (prev.includes(c) ? prev.filter(x => x !== c) : [...prev, c]))
+  }
 
-  const hasFilters = search || cuisine
+  const { tables, loading, error } = useTables({ search, cuisine: cuisines })
+
+  const hasFilters = search || cuisines.length > 0
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -50,9 +54,9 @@ export function BrowsePage({ onNavigate, onAuthClick }: BrowsePageProps) {
         {showFilters && (
           <div className="bg-white rounded-xl border border-gray-200 p-4 mb-6 animate-fade-in">
             <div className="flex items-center justify-between mb-3">
-              <h3 className="font-medium text-gray-900">{t('browse.cuisine')}</h3>
+              <h3 className="font-medium text-gray-900">{t('browse.cuisine')} <span className="text-gray-400 font-normal">(elige tantos como quieras)</span></h3>
               {hasFilters && (
-                <button onClick={() => { setSearch(''); setCuisine('') }} className="text-xs text-primary-600 font-medium">
+                <button onClick={() => { setSearch(''); setCuisines([]) }} className="text-xs text-primary-600 font-medium">
                   {t('browse.clearFilters')}
                 </button>
               )}
@@ -61,8 +65,8 @@ export function BrowsePage({ onNavigate, onAuthClick }: BrowsePageProps) {
               {CUISINE_TYPES.map(c => (
                 <button
                   key={c}
-                  onClick={() => setCuisine(cuisine === c ? '' : c)}
-                  className={`px-3 py-1.5 rounded-full text-sm transition-colors ${cuisine === c ? 'bg-primary-500 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`}
+                  onClick={() => toggleCuisine(c)}
+                  className={`px-3 py-1.5 rounded-full text-sm transition-colors ${cuisines.includes(c) ? 'bg-primary-500 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`}
                 >
                   {c}
                 </button>

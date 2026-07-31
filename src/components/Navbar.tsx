@@ -36,18 +36,17 @@ export function Navbar({ currentPage, onNavigate, onAuthClick }: NavbarProps) {
         </button>
 
         <nav className="hidden md:flex items-center gap-1">
-          <NavLink active={currentPage === 'browse'} onClick={() => onNavigate('browse')} icon={<LayoutGrid className="w-4 h-4" />} label={t('nav.explore')} />
-          {user && (
+          <NavLink active={currentPage === 'browse' || currentPage === 'restaurant-profile'} onClick={() => onNavigate('browse')} icon={<LayoutGrid className="w-4 h-4" />} label={profile?.role === 'restaurant' ? t('nav.explore') : 'Restaurantes'} />
+          {user && profile?.role === 'restaurant' && (
             <>
               <NavLink active={currentPage === 'create'} onClick={() => onNavigate('create')} icon={<Plus className="w-4 h-4" />} label={t('nav.create')} />
               <NavLink active={currentPage === 'my-tables'} onClick={() => onNavigate('my-tables')} icon={<CalendarDays className="w-4 h-4" />} label={t('nav.myTables')} />
-              {profile?.role === 'restaurant' && (
-                <>
-                  <NavLink active={currentPage === 'restaurant-dashboard'} onClick={() => onNavigate('restaurant-dashboard')} icon={<LayoutDashboard className="w-4 h-4" />} label={t('nav.dashboard')} />
-                  <NavLink active={currentPage === 'aviso-legal'} onClick={() => onNavigate('aviso-legal')} icon={<FileText className="w-4 h-4" />} label="Contrato" />
-                </>
-              )}
+              <NavLink active={currentPage === 'restaurant-dashboard'} onClick={() => onNavigate('restaurant-dashboard')} icon={<LayoutDashboard className="w-4 h-4" />} label={t('nav.dashboard')} />
+              <NavLink active={currentPage === 'aviso-legal'} onClick={() => onNavigate('aviso-legal')} icon={<FileText className="w-4 h-4" />} label="Contrato" />
             </>
+          )}
+          {user && profile?.role === 'user' && (
+            <NavLink active={currentPage === 'my-tables'} onClick={() => onNavigate('my-tables')} icon={<CalendarDays className="w-4 h-4" />} label="Mis reservas" />
           )}
         </nav>
 
@@ -76,8 +75,12 @@ export function Navbar({ currentPage, onNavigate, onAuthClick }: NavbarProps) {
 
               <div className="relative" ref={menuRef}>
                 <button onClick={() => setShowMenu(!showMenu)} className="flex items-center gap-2 px-3 py-1.5 rounded-lg hover:bg-gray-100 transition-colors">
-                  <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center">
-                    <User className="w-4 h-4 text-blue-600" />
+                  <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center overflow-hidden">
+                    {profile?.avatar_url ? (
+                      <img src={profile.avatar_url} alt="" className="w-full h-full object-cover" />
+                    ) : (
+                      <User className="w-4 h-4 text-blue-600" />
+                    )}
                   </div>
                   <span className="hidden sm:block text-sm font-medium text-gray-700 max-w-[120px] truncate">
                     {profile?.display_name || profile?.restaurant_name || 'User'}
@@ -115,9 +118,11 @@ export function Navbar({ currentPage, onNavigate, onAuthClick }: NavbarProps) {
       {user && (
         <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 z-50 px-2 pb-safe">
           <div className="flex justify-around py-2">
-            <MobileNavButton active={currentPage === 'browse'} onClick={() => onNavigate('browse')} icon={<Search className="w-5 h-5" />} label={t('nav.explore')} />
-            <MobileNavButton active={currentPage === 'create'} onClick={() => onNavigate('create')} icon={<Plus className="w-5 h-5" />} label={t('nav.create')} />
-            <MobileNavButton active={currentPage === 'my-tables'} onClick={() => onNavigate('my-tables')} icon={<CalendarDays className="w-5 h-5" />} label={t('nav.myTables')} />
+            <MobileNavButton active={currentPage === 'browse' || currentPage === 'restaurant-profile'} onClick={() => onNavigate('browse')} icon={<Search className="w-5 h-5" />} label={profile?.role === 'restaurant' ? t('nav.explore') : 'Restaurantes'} />
+            {profile?.role === 'restaurant' && (
+              <MobileNavButton active={currentPage === 'create'} onClick={() => onNavigate('create')} icon={<Plus className="w-5 h-5" />} label={t('nav.create')} />
+            )}
+            <MobileNavButton active={currentPage === 'my-tables'} onClick={() => onNavigate('my-tables')} icon={<CalendarDays className="w-5 h-5" />} label={profile?.role === 'restaurant' ? t('nav.myTables') : 'Reservas'} />
             <MobileNavButton active={currentPage === 'profile'} onClick={() => onNavigate('profile')} icon={<User className="w-5 h-5" />} label={t('nav.profile')} />
           </div>
         </nav>

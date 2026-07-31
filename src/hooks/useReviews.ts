@@ -40,3 +40,24 @@ export function useReviews(tableId: string | null) {
 
   return { reviews, loading, submitReview, refresh: fetchReviews }
 }
+
+export function useRestaurantReviews(hostId: string | null) {
+  const [reviews, setReviews] = useState<Review[]>([])
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    if (!hostId) return
+    setLoading(true)
+    supabase
+      .from('reviews')
+      .select('*')
+      .eq('host_id', hostId)
+      .order('created_at', { ascending: false })
+      .then(({ data }) => {
+        if (data) setReviews(data as Review[])
+        setLoading(false)
+      })
+  }, [hostId])
+
+  return { reviews, loading }
+}

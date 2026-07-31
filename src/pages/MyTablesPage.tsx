@@ -16,10 +16,11 @@ type Tab = 'hosting' | 'reservations' | 'invitations'
 
 export function MyTablesPage({ onNavigate, onAuthClick }: MyTablesPageProps) {
   const { t, language } = useLanguage()
-  const { user } = useAuth()
+  const { user, profile } = useAuth()
+  const isRestaurant = profile?.role === 'restaurant'
   const { hosting, reservations, loading, error, cancelHostedTable, cancelReservation } = useMyTables(user?.id ?? null)
   const { invitations, respondInvitation } = useInvitations(user?.id ?? null)
-  const [tab, setTab] = useState<Tab>('hosting')
+  const [tab, setTab] = useState<Tab>(isRestaurant ? 'hosting' : 'reservations')
   const [cancelTableId, setCancelTableId] = useState<string | null>(null)
   const [cancelReservationTarget, setCancelReservationTarget] = useState<{ id: string; joinType: 'word' | 'deposit' } | null>(null)
 
@@ -33,12 +34,14 @@ export function MyTablesPage({ onNavigate, onAuthClick }: MyTablesPageProps) {
       <main className="max-w-4xl mx-auto px-4 py-6 pb-24 md:pb-8">
         <div className="flex items-center justify-between mb-6">
           <div>
-            <h1 className="text-2xl font-display font-bold text-gray-900">{t('myTables.title')}</h1>
-            <p className="text-gray-500 text-sm mt-1">{t('myTables.subtitle')}</p>
+            <h1 className="text-2xl font-display font-bold text-gray-900">{isRestaurant ? t('myTables.title') : 'Mis reservas'}</h1>
+            <p className="text-gray-500 text-sm mt-1">{isRestaurant ? t('myTables.subtitle') : 'Tus cenas y mesas reservadas'}</p>
           </div>
-          <button onClick={() => onNavigate('create')} className="px-4 py-2.5 bg-[#e94560] text-white rounded-xl font-medium text-sm hover:bg-[#d63d56] transition-colors flex items-center gap-2">
-            <Plus className="w-4 h-4" /> {t('myTables.create')}
-          </button>
+          {isRestaurant && (
+            <button onClick={() => onNavigate('create')} className="px-4 py-2.5 bg-[#e94560] text-white rounded-xl font-medium text-sm hover:bg-[#d63d56] transition-colors flex items-center gap-2">
+              <Plus className="w-4 h-4" /> {t('myTables.create')}
+            </button>
+          )}
         </div>
 
         {error && (
@@ -46,25 +49,29 @@ export function MyTablesPage({ onNavigate, onAuthClick }: MyTablesPageProps) {
         )}
 
         {/* Stat cards */}
-        <div className="grid grid-cols-3 gap-4 mb-6">
-          <div className="bg-white rounded-xl border border-gray-200 p-4 flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full bg-teal-100 flex items-center justify-center flex-shrink-0">
-              <UtensilsCrossed className="w-5 h-5 text-teal-600" />
+        <div className={`grid gap-4 mb-6 ${isRestaurant ? 'grid-cols-3' : 'grid-cols-2'}`}>
+          {isRestaurant && (
+            <div className="bg-white rounded-xl border border-gray-200 p-4 flex items-center gap-3">
+              <div className="w-10 h-10 rounded-full bg-teal-100 flex items-center justify-center flex-shrink-0">
+                <UtensilsCrossed className="w-5 h-5 text-teal-600" />
+              </div>
+              <div>
+                <p className="text-xl font-bold text-gray-900">{hosting.length}</p>
+                <p className="text-xs text-gray-500">{t('myTables.activeTables')}</p>
+              </div>
             </div>
-            <div>
-              <p className="text-xl font-bold text-gray-900">{hosting.length}</p>
-              <p className="text-xs text-gray-500">{t('myTables.activeTables')}</p>
+          )}
+          {isRestaurant && (
+            <div className="bg-white rounded-xl border border-gray-200 p-4 flex items-center gap-3">
+              <div className="w-10 h-10 rounded-full bg-orange-100 flex items-center justify-center flex-shrink-0">
+                <Users className="w-5 h-5 text-orange-600" />
+              </div>
+              <div>
+                <p className="text-xl font-bold text-gray-900">{totalDiners}</p>
+                <p className="text-xs text-gray-500">{t('myTables.diners')}</p>
+              </div>
             </div>
-          </div>
-          <div className="bg-white rounded-xl border border-gray-200 p-4 flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full bg-orange-100 flex items-center justify-center flex-shrink-0">
-              <Users className="w-5 h-5 text-orange-600" />
-            </div>
-            <div>
-              <p className="text-xl font-bold text-gray-900">{totalDiners}</p>
-              <p className="text-xs text-gray-500">{t('myTables.diners')}</p>
-            </div>
-          </div>
+          )}
           <div className="bg-white rounded-xl border border-gray-200 p-4 flex items-center gap-3">
             <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0">
               <CalendarDays className="w-5 h-5 text-blue-600" />
@@ -74,11 +81,22 @@ export function MyTablesPage({ onNavigate, onAuthClick }: MyTablesPageProps) {
               <p className="text-xs text-gray-500">{t('myTables.joined')}</p>
             </div>
           </div>
+          {!isRestaurant && (
+            <div className="bg-white rounded-xl border border-gray-200 p-4 flex items-center gap-3">
+              <div className="w-10 h-10 rounded-full bg-primary-100 flex items-center justify-center flex-shrink-0">
+                <Users className="w-5 h-5 text-primary-600" />
+              </div>
+              <div>
+                <p className="text-xl font-bold text-gray-900">{invitations.length}</p>
+                <p className="text-xs text-gray-500">Invitaciones</p>
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Tabs */}
         <div className="flex border-b border-gray-200 mb-6">
-          {(['hosting', 'reservations', 'invitations'] as Tab[]).map(t2 => (
+          {(isRestaurant ? (['hosting', 'reservations', 'invitations'] as Tab[]) : (['reservations', 'invitations'] as Tab[])).map(t2 => (
             <button
               key={t2}
               onClick={() => setTab(t2)}

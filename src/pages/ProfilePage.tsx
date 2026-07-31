@@ -121,6 +121,26 @@ export function ProfilePage({ onNavigate, onAuthClick }: ProfilePageProps) {
     setUploading(false)
   }
 
+  const handleAvatarUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file || !user) return
+    setUploading(true)
+    setError(null)
+    const ext = file.name.split('.').pop()
+    const path = `${user.id}/avatar_${Date.now()}.${ext}`
+    const { error: uploadErr } = await supabase.storage.from('restaurant-photos').upload(path, file, { upsert: true })
+    if (uploadErr) {
+      setError(uploadErr.message)
+      setUploading(false)
+      return
+    }
+    const { data } = supabase.storage.from('restaurant-photos').getPublicUrl(path)
+    const { error: updateErr } = await supabase.from('profiles').update({ avatar_url: data.publicUrl }).eq('id', user.id)
+    if (updateErr) setError(updateErr.message)
+    else await refreshProfile()
+    setUploading(false)
+  }
+
   const handleRemovePhoto = async (photoUrl: string) => {
     if (!user) return
     setError(null)
@@ -153,6 +173,22 @@ export function ProfilePage({ onNavigate, onAuthClick }: ProfilePageProps) {
         {error && <ErrorBanner message={error} className="mb-4" />}
 
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 space-y-5">
+          {!isRestaurant && (
+            <div className="flex flex-col items-center mb-2">
+              <label className="relative w-24 h-24 rounded-full border-2 border-dashed border-gray-300 hover:border-primary-400 transition-colors cursor-pointer flex items-center justify-center overflow-hidden bg-gray-50">
+                {profile?.avatar_url ? (
+                  <img src={profile.avatar_url} alt="Foto de perfil" className="w-full h-full object-cover" />
+                ) : uploading ? (
+                  <Loader2 className="w-6 h-6 text-gray-400 animate-spin" />
+                ) : (
+                  <Camera className="w-7 h-7 text-gray-400" />
+                )}
+                <input type="file" accept="image/jpeg,image/png,image/webp" onChange={handleAvatarUpload} disabled={uploading} className="hidden" />
+              </label>
+              <p className="text-xs text-gray-500 mt-2">Foto de perfil</p>
+            </div>
+          )}
+
           <FormInput label={isRestaurant ? t('auth.restaurantName') : t('auth.name')} value={isRestaurant ? restaurantName : displayName} onChange={isRestaurant ? setRestaurantName : setDisplayName} />
 
           {!isRestaurant && (

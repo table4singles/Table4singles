@@ -1,135 +1,68 @@
-# CONTEXTO PROYECTO - Table4Singles
+# CONTEXTO Table4Singles (modo caveman, ahorro tokens)
 
 ## QUE ES
-App cenas compartidas. Singles van a restaurante, conocen gente. React+Vite+TS+Tailwind+Supabase.
+App cenas compartidas singles. React+Vite+TS+Tailwind+Supabase.
 
-## DONDE ESTA EL PROYECTO
-`/Users/joseangles/Desktop/Proyectos/Table4singles`
-GitHub: https://github.com/airtifexlab/Table4singles
-Dominio: table4singles.online (apunta build viejo Bolt en Netlify)
+## RUTAS
+Proyecto: `/Users/joseangles/Desktop/Proyectos/Table4singles`
+GitHub: airtifexlab/Table4singles
+Supabase: zocrwanhcschmydczgeh.supabase.co
+Dominio: table4singles.online (aun apunta build vieja, deploy pendiente)
+Deploy futuro: VERCEL (no Netlify)
+Dev local: `npm run dev` → localhost:5173 (si puerto ocupado, matar procesos viejos: `lsof -i :5173`, `kill -9 <pid>`)
 
-## SUPABASE
-URL: `https://zocrwanhcschmydczgeh.supabase.co`
-Anon key: en `.env` del proyecto
+## MIGRACIONES SQL
+001 schema.sql, 002 lifecycle+notifs, 003 onboarding, 004 settings, 005 avatar → EJECUTADAS ✅
+006 geolocation (lat/lng en profiles, para busqueda por radio km) → ⚠️ PENDIENTE DE EJECUTAR EN SUPABASE (MCP no tiene acceso al proyecto zocrwanhcschmydczgeh, hay que correrla a mano en el SQL Editor)
 
-## BUILD
-`npm run build` → OK sin errores. Bundle en `dist/`.
-Servidor local: `npm run dev` → http://localhost:5173
+## HECHO ✅
+- Reconstrucción código fuente completo desde build Bolt vieja
+- Auth email+password+magic link. Google/Apple: código listo, falta config externa (OAuth apps + Supabase dashboard)
+- Ciclo mesa completo: crear, unir (RPC), invitar, cancelar (RPC), reseña, notifs automáticas (triggers SQL)
+- RLS en todo, 0 errores seguridad Supabase
+- Logo oficial (gradiente azul→naranja) en Navbar+footer
+- ONBOARDING obligatorio tras signup: nombre completo, foto perfil (obligatoria excepto joseviangles@gmail.com=admin), dirección completa (calle/ciudad/provincia/país), fecha nacimiento, bio, telefono (selector pais+bandera), instagram opcional. Bloquea navegación hasta completar.
+- AJUSTES (pagina nueva): suscripcion(placeholder), notif email/push, modo oscuro(parcial-solo Ajustes), idioma, privacidad/legal, ayuda soporte, cerrar sesion
+- MODELO DIFERENCIADO POR ROL:
+  - Usuario normal: ve "Restaurantes" (listado con foto/nombre/direccion/cocina, filtro ciudad+cocina) en vez de mesas planas. Click→ficha restaurante (foto grande+datos+sus mesas disponibles). Ya NO ve "Crear mesa". "Mis mesas"→"Mis reservas" (solo reservas+invitaciones)
+  - Restaurante: igual que antes - Explorar(mesas), Crear mesa, Mis Mesas, Dashboard
+- Archivos nuevos clave: OnboardingPage.tsx, SettingsPage.tsx, RestaurantsBrowsePage.tsx, RestaurantProfilePage.tsx, ThemeContext.tsx, hooks/useRestaurants.ts
+- Avatar visible en Navbar (icono usuario)
+- BUSQUEDA POR RADIO KM en RestaurantsBrowsePage: al escribir ciudad en el buscador, dentro de "Filtros" aparece un slider con pasos fijos (5/10/25/50/100/200/500 km). Al mover el slider se geocodifica el texto escrito (Nominatim/OSM, sin API key, `src/lib/geocoding.ts`) y se calcula distancia Haversine contra cada restaurante (se geocodifica su city/province/country y se cachea lat/lng en `profiles` para no repetir). Sin radio seleccionado, se mantiene el comportamiento anterior (texto ilike). Requiere migracion 006 (ver arriba)
+- 5+ commits pusheados a GitHub
 
-## LO QUE YA ESTA HECHO ✅
-- Reconstrucción completa desde 0 (original era build minificado de Bolt.new)
-- Supabase schema ejecutado (`supabase/schema.sql`)
-- Auth (email+password, magic link) — Google/Apple código listo pero falta config manual
-- Páginas: Landing, Browse, Create, TableDetail, MyTables, Profile, PrivacyPolicy, AvisoLegal
-- **RestaurantDashboardPage** (nueva, ruteada en App.tsx)
-- Hooks: useTables, useInvitations, useNotifications, useReviews, useMessages
-- Componentes: Navbar, AuthModal, TableCard, ShareButton, StarRating
-- Componentes nuevos: InviteModal, CancelModal, LoadingSpinner, ErrorBanner
-- i18n: ES / EN / DE completo
-- PWA: manifest, service worker, iconos
-- Ciclo de vida mesa completo: crear → unirse (RPC atómico) → invitar → cancelar → reseña (por fecha)
-- Estados de error/carga/vacío en todas las páginas
-- Perfil: editar, subir fotos, eliminar fotos, cambiar rol user↔restaurante
-- Navbar: fondo blanco, logo degradado azul, "Explorar" visible sin login, "Entrar"/"Registro" azul
-- Hero landing: gradiente azul saturado, imagen copas vino tinto (pexels 19721743)
-- Notificaciones automáticas: triggers SQL en `supabase/migrations/002_lifecycle_and_notifications.sql`
-- Migración 002 ejecutada en Supabase ✅
-- RLS activado en vip_cards, referrals, restaurant_terms_acceptance ✅
-- search_path fijado en todas las funciones SQL ✅
-- 0 errores seguridad Supabase (17 warnings aceptables) ✅
-- Logo oficial (PNG con degradado azul→naranja) en navbar y footer ✅
-- Logos en `public/icons/logo-full.png` y `public/icons/logo-icon.png` ✅
-- 3 commits pusheados a GitHub (airtifexlab/Table4singles) ✅
+## PENDIENTE ⚠️
+1. PROBAR flujo completo en local: onboarding+foto, listado restaurantes, ficha restaurante, unirse mesa, chat, reseña
+2. STRIPE: crear Edge Functions (create-checkout, stripe-webhook), conectar deposito. Falta cuenta Stripe+keys
+3. LOGIN SOCIAL: solo falta config externa (Google Cloud Console + Apple Developer + pegar keys en Supabase dashboard). Código ya OK.
+4. DEPLOY VERCEL: importar repo, env vars (VITE_SUPABASE_URL, VITE_SUPABASE_ANON_KEY), esperar cliente de dominio table4singles.online
+5. Modo oscuro solo aplicado en pantalla Ajustes, resto app sin dark mode (decidir si se extiende)
 
-## LO QUE FALTA ⚠️
-
-### 1. EJECUTAR MIGRACIÓN SQL (usuario debe hacer esto en Supabase SQL Editor)
-Archivo: `supabase/migrations/002_lifecycle_and_notifications.sql`
-Añade: campo email en profiles, triggers notificaciones, RPC join_table, RPC cancel_reservation, fix RLS invitaciones.
-
-### 2. STRIPE (código listo, falta credentials + deploy)
-- Falta crear: `supabase/functions/create-checkout/index.ts`
-- Falta crear: `supabase/functions/stripe-webhook/index.ts`
-- Botón "Reservar con depósito" tiene badge "Próximamente" hasta que Stripe esté activo
-- Necesita: cuenta Stripe, STRIPE_SECRET_KEY, STRIPE_WEBHOOK_SECRET, VITE_STRIPE_PUBLISHABLE_KEY
-
-### 3. LOGIN SOCIAL (código listo, falta config externa)
-Para Google: Google Cloud Console → OAuth 2.0 Client ID
-  - Authorized JS origins: https://table4singles.online
-  - Redirect URI: https://zocrwanhcschmydczgeh.supabase.co/auth/v1/callback
-  - Luego en Supabase Dashboard → Auth → Providers → Google → pegar Client ID + Secret
-
-Para Apple: Apple Developer → Services ID → Sign in with Apple
-  - Luego en Supabase Dashboard → Auth → Providers → Apple
-
-### 4. DESPLIEGUE PRODUCCIÓN (usar Vercel, no Netlify)
-- Vercel → New Project → importar repo airtifexlab/Table4singles
-- Variables de entorno en Vercel:
-  - VITE_SUPABASE_URL = https://zocrwanhcschmydczgeh.supabase.co
-  - VITE_SUPABASE_ANON_KEY = (del .env local)
-- Cliente da credenciales dominio table4singles.online → apuntar DNS a Vercel
-- Old build de Netlify quedará obsoleta (dominio se redirige a Vercel)
-- Netlify antiguo: conectar repo, publish dir = `dist`, variables de entorno:
-  - VITE_SUPABASE_URL
-  - VITE_SUPABASE_ANON_KEY
-  - VITE_STRIPE_PUBLISHABLE_KEY (cuando tengas Stripe)
-- Dominio table4singles.online ya apunta a Netlify, solo cambiar el deploy target
-
-### 5. PARIDAD VISUAL PENDIENTE (pantallas sin captura de referencia)
-Browse, Create, TableDetail, MyTables, Profile, AuthModal — visualmente coherentes
-pero sin comparar pixel a pixel con original. El usuario debe mandar capturas para ajustar.
-
-## ESTRUCTURA ARCHIVOS CLAVE
+## ESTRUCTURA CLAVE
 ```
-src/
-  App.tsx                    ← routing principal + casos de navegación
-  contexts/
-    AuthContext.tsx           ← auth, profile, signIn/Up/Out/Google/Apple
-    LanguageContext.tsx        ← ES/EN/DE
-  hooks/
-    useTables.ts             ← useTables, useTableDetail (joinTable RPC), useMyTables (cancel)
-    useInvitations.ts        ← searchUsers, sendInvitation, respondInvitation (RPC)
-    useMessages.ts           ← chat realtime Supabase
-    useNotifications.ts      ← leer notifs, marcar leídas
-    useReviews.ts            ← submitReview
-  pages/
-    LandingPage.tsx          ← con Navbar incluida
-    BrowsePage.tsx
-    CreateTablePage.tsx
-    TableDetailPage.tsx      ← InviteModal, CancelModal, paymentSuccess banner
-    MyTablesPage.tsx         ← cancelar mesa propia, cancelar reserva
-    ProfilePage.tsx          ← editar, fotos, cambio rol
-    RestaurantDashboardPage.tsx ← NUEVA
-    PrivacyPolicyPage.tsx
-    AvisoLegalPage.tsx
-  components/
-    Navbar.tsx               ← blanco, logo grad azul, Explorar siempre visible
-    AuthModal.tsx
-    TableCard.tsx
-    InviteModal.tsx          ← NUEVO: host invita por nombre/email
-    CancelModal.tsx          ← NUEVO: cancelar reserva/mesa con lógica depósito
-    LoadingSpinner.tsx       ← NUEVO
-    ErrorBanner.tsx          ← NUEVO
-    ShareButton.tsx
-    StarRating.tsx
-    LanguageSwitcher.tsx
-    NotificationsPanel.tsx
-  i18n/ es.ts / en.ts / de.ts  ← incluye restaurantDashboard, invite, cancel, etc.
-  types/database.ts          ← Profile ahora incluye email
-  lib/supabase.ts / security.ts
-supabase/
-  schema.sql                 ← ejecutado ✅
-  migrations/
-    002_lifecycle_and_notifications.sql  ← PENDIENTE ejecutar en Supabase
+src/App.tsx              routing principal (switch por 'page' string)
+src/contexts/            AuthContext, LanguageContext, ThemeContext
+src/hooks/                useTables, useMyTables, useTableDetail, useInvitations,
+                          useMessages, useNotifications, useReviews, useRestaurants
+src/pages/
+  LandingPage, BrowsePage(mesas-solo restaurantes), RestaurantsBrowsePage(nuevo, usuarios),
+  RestaurantProfilePage(nuevo, ficha), CreateTablePage, TableDetailPage, MyTablesPage,
+  RestaurantDashboardPage, OnboardingPage(nuevo), SettingsPage(nuevo), ProfilePage,
+  PrivacyPolicyPage, AvisoLegalPage
+src/components/
+  Navbar(diferenciado por rol), AuthModal, TableCard, InviteModal, CancelModal,
+  LoadingSpinner, ErrorBanner, ShareButton, StarRating, LanguageSwitcher, NotificationsPanel
+src/lib/geocoding.ts     geocodeQuery (Nominatim/OSM) + haversineDistanceKm + RADIUS_STEPS_KM
+src/types/database.ts    tipos+Profile con todos los campos nuevos (incluye latitude/longitude)
+supabase/schema.sql       schema base
+supabase/migrations/      002 a 006 (ver arriba)
 ```
 
-## COLORES PRINCIPALES
-- Azul nav: blue-600 (#2563eb)
-- Coral CTA: #e94560 (primary-500 en tailwind.config)
-- Teal accents: teal-600
-- Gradiente hero: sky-500 → sky-400 → orange-300
+## OJO / GOTCHAS
+- Tailwind config cambia (darkMode:class) requiere reiniciar Vite completo, no solo HMR
+- Si Chrome/macOS en modo oscuro del sistema y no se reinicia Vite tras tocar tailwind.config, sale todo oscuro por error
+- Bucket storage `restaurant-photos` se reutiliza tambien para avatares de usuario normal (path distinto: `{user_id}/avatar_*`)
+- reviews: hook `useReviews(tableId)` es por mesa, `useRestaurantReviews(hostId)` es por restaurante completo
 
-## PRÓXIMO PASO INMEDIATO
-1. Probar flujo completo en local (registro, crear mesa, unirse, chat, reseña)
-2. Crear Edge Functions Stripe
-3. Deploy en Vercel (cliente da credenciales dominio)
+## SIGUIENTE PASO
+Probar flujo completo app en local. Luego Stripe. Luego deploy Vercel.

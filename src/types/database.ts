@@ -9,11 +9,14 @@ export interface Profile {
   email: string | null
   display_name: string | null
   full_name: string | null
+  avatar_url: string | null
   bio: string | null
   street_address: string | null
   city: string | null
   province: string | null
   country: string | null
+  latitude: number | null
+  longitude: number | null
   date_of_birth: string | null
   phone: string | null
   instagram: string | null

@@ -1,14 +1,19 @@
 import { useState } from 'react'
-import { Loader2, ArrowRight } from 'lucide-react'
+import { Loader2, ArrowRight, Camera } from 'lucide-react'
 import PhoneInput from 'react-phone-number-input'
 import 'react-phone-number-input/style.css'
 import { useAuth } from '@/contexts/AuthContext'
 import { supabase } from '@/lib/supabase'
 import { ErrorBanner } from '@/components/ErrorBanner'
 
+const ADMIN_EMAIL = 'joseviangles@gmail.com'
+
 export function OnboardingPage({ onNavigate }: { onNavigate: (page: string) => void }) {
   const { user, profile, refreshProfile } = useAuth()
+  const isAdmin = user?.email === ADMIN_EMAIL
 
+  const [avatarUrl, setAvatarUrl] = useState(profile?.avatar_url || '')
+  const [uploadingAvatar, setUploadingAvatar] = useState(false)
   const [fullName, setFullName] = useState(profile?.full_name || profile?.display_name || '')
   const [streetAddress, setStreetAddress] = useState('')
   const [city, setCity] = useState('')
@@ -21,13 +26,32 @@ export function OnboardingPage({ onNavigate }: { onNavigate: (page: string) => v
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
-  const isValid = fullName.trim() && streetAddress.trim() && city.trim() && province.trim() && country.trim() && dateOfBirth && bio.trim() && phone.trim()
+  const isValid = (isAdmin || avatarUrl) && fullName.trim() && streetAddress.trim() && city.trim() && province.trim() && country.trim() && dateOfBirth && bio.trim() && phone.trim()
+
+  const handleAvatarUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file || !user) return
+    setUploadingAvatar(true)
+    setError(null)
+    const ext = file.name.split('.').pop()
+    const path = `${user.id}/avatar_${Date.now()}.${ext}`
+    const { error: uploadErr } = await supabase.storage.from('restaurant-photos').upload(path, file, { upsert: true })
+    if (uploadErr) {
+      setError(uploadErr.message)
+      setUploadingAvatar(false)
+      return
+    }
+    const { data } = supabase.storage.from('restaurant-photos').getPublicUrl(path)
+    setAvatarUrl(data.publicUrl)
+    setUploadingAvatar(false)
+  }
 
   const handleSubmit = async () => {
     if (!user || !isValid) return
     setSaving(true)
     setError(null)
     const { error: err } = await supabase.from('profiles').update({
+      avatar_url: avatarUrl || null,
       full_name: fullName.trim(),
       display_name: fullName.trim(),
       street_address: streetAddress.trim(),
@@ -62,6 +86,22 @@ export function OnboardingPage({ onNavigate }: { onNavigate: (page: string) => v
         {error && <ErrorBanner message={error} className="mb-4" />}
 
         <div className="space-y-4">
+          <div className="flex flex-col items-center mb-2">
+            <label className="relative w-24 h-24 rounded-full border-2 border-dashed border-gray-300 hover:border-primary-400 transition-colors cursor-pointer flex items-center justify-center overflow-hidden bg-gray-50">
+              {avatarUrl ? (
+                <img src={avatarUrl} alt="Foto de perfil" className="w-full h-full object-cover" />
+              ) : uploadingAvatar ? (
+                <Loader2 className="w-6 h-6 text-gray-400 animate-spin" />
+              ) : (
+                <Camera className="w-7 h-7 text-gray-400" />
+              )}
+              <input type="file" accept="image/jpeg,image/png,image/webp" onChange={handleAvatarUpload} disabled={uploadingAvatar} className="hidden" />
+            </label>
+            <p className="text-xs text-gray-500 mt-2">
+              {isAdmin ? 'Foto de perfil (opcional)' : 'Foto de perfil (obligatoria)'}
+            </p>
+          </div>
+
           <Field label="Nombre completo" value={fullName} onChange={setFullName} placeholder="Jose Angles" />
 
           <div>

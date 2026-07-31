@@ -6,6 +6,8 @@ import { Navbar } from '@/components/Navbar'
 import { AuthModal } from '@/components/AuthModal'
 import { LandingPage } from '@/pages/LandingPage'
 import { BrowsePage } from '@/pages/BrowsePage'
+import { RestaurantsBrowsePage } from '@/pages/RestaurantsBrowsePage'
+import { RestaurantProfilePage } from '@/pages/RestaurantProfilePage'
 import { CreateTablePage } from '@/pages/CreateTablePage'
 import { TableDetailPage } from '@/pages/TableDetailPage'
 import { MyTablesPage } from '@/pages/MyTablesPage'
@@ -79,7 +81,11 @@ function AppRouter() {
       case 'landing':
         return <LandingPage onNavigate={navigate} onAuthClick={openAuth} />
       case 'browse':
-        return <BrowsePage onNavigate={navigate} onAuthClick={openAuth} />
+        return profile?.role === 'restaurant'
+          ? <BrowsePage onNavigate={navigate} onAuthClick={openAuth} />
+          : <RestaurantsBrowsePage onNavigate={navigate} onAuthClick={openAuth} />
+      case 'restaurant-profile':
+        return selectedId ? <RestaurantProfilePage restaurantId={selectedId} onNavigate={navigate} onAuthClick={openAuth} /> : null
       case 'create':
         return <CreateTablePage onNavigate={navigate} onAuthClick={openAuth} />
       case 'table-detail':
@@ -97,7 +103,7 @@ function AppRouter() {
       case 'aviso-legal':
         return <AvisoLegalPage onNavigate={navigate} />
       default:
-        return <BrowsePage onNavigate={navigate} onAuthClick={openAuth} />
+        return <RestaurantsBrowsePage onNavigate={navigate} onAuthClick={openAuth} />
     }
   }
 

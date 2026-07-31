@@ -1,6 +1,8 @@
 // Script puntual para crear cuentas de prueba (2 usuarios + 2 restaurantes) con
 // onboarding ya completado, para poder probar "Comensales" e "Invitar" sin tener
-// que rellenar el onboarding a mano. Uso: node scripts/seed-test-accounts.mjs
+// que rellenar el onboarding a mano.
+// Usa la Secret Key (API admin, bypassa confirmación de email y RLS).
+// Uso: node scripts/seed-test-accounts.mjs
 import { readFileSync } from 'node:fs'
 import { createClient } from '@supabase/supabase-js'
 
@@ -16,7 +18,7 @@ function loadEnv() {
 
 const env = loadEnv()
 const SUPABASE_URL = env.VITE_SUPABASE_URL
-const SUPABASE_ANON_KEY = env.VITE_SUPABASE_ANON_KEY
+const SECRET_KEY = env.SUPABASE_SECRET_KEY
 const PASSWORD = 'Test1234!'
 
 const users = [
@@ -103,33 +105,47 @@ function futureDateTime(daysAhead) {
   return { date: d.toISOString().slice(0, 10), time: '21:00:00' }
 }
 
-async function ensureSession(client, email) {
-  const { data: signUpData, error: signUpErr } = await client.auth.signUp({
-    email,
-    password: PASSWORD,
-    options: { data: { role: email.includes('taberna') || email.includes('sakura') ? 'restaurant' : 'user' } },
-  })
-
-  if (signUpErr) console.log(`  signUp error para ${email}: ${signUpErr.message}`)
-  if (signUpData?.user) console.log(`  signUp ok, session=${signUpData.session ? 'si' : 'no'} (confirmado=${!!signUpData.user.email_confirmed_at})`)
-
-  if (!signUpErr && signUpData.session) return signUpData.user
-
-  const { data: signInData, error: signInErr } = await client.auth.signInWithPassword({ email, password: PASSWORD })
-  if (signInErr) {
-    throw new Error(
-      `No se pudo crear ni iniciar sesión con ${email}: ${signInErr.message}. ` +
-      `Probablemente el proyecto exige confirmar el email antes de poder iniciar sesión.`
-    )
+async function findUserByEmail(admin, email) {
+  let page = 1
+  const perPage = 200
+  while (true) {
+    const { data, error } = await admin.auth.admin.listUsers({ page, perPage })
+    if (error) throw new Error(`listUsers error: ${error.message}`)
+    const found = data.users.find(u => u.email?.toLowerCase() === email.toLowerCase())
+    if (found) return found
+    if (data.users.length < perPage) return null
+    page += 1
   }
-  return signInData.user
 }
 
-async function seedUser(def) {
-  const client = createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
-  const user = await ensureSession(client, def.email)
+async function ensureAuthUser(admin, email, role) {
+  const existing = await findUserByEmail(admin, email)
+  if (existing) {
+    const { data, error } = await admin.auth.admin.updateUserById(existing.id, {
+      password: PASSWORD,
+      email_confirm: true,
+      user_metadata: { ...existing.user_metadata, role },
+    })
+    if (error) throw new Error(`updateUserById error para ${email}: ${error.message}`)
+    console.log(`  usuario ya existia, actualizado+confirmado: ${email}`)
+    return data.user
+  }
 
-  const { error: updErr } = await client.from('profiles').update({
+  const { data, error } = await admin.auth.admin.createUser({
+    email,
+    password: PASSWORD,
+    email_confirm: true,
+    user_metadata: { role },
+  })
+  if (error) throw new Error(`createUser error para ${email}: ${error.message}`)
+  console.log(`  usuario creado+confirmado: ${email}`)
+  return data.user
+}
+
+async function seedUser(admin, def) {
+  const user = await ensureAuthUser(admin, def.email, def.role)
+
+  const { error: updErr } = await admin.from('profiles').update({
     display_name: def.display_name,
     full_name: def.full_name,
     avatar_url: `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(def.display_name)}`,
@@ -147,15 +163,13 @@ async function seedUser(def) {
 
   if (updErr) throw new Error(`Error actualizando perfil de ${def.email}: ${updErr.message}`)
   console.log(`OK usuario: ${def.email} (${def.display_name}) id=${user.id}`)
-  await client.auth.signOut()
   return user.id
 }
 
-async function seedRestaurant(def, dayOffset) {
-  const client = createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
-  const user = await ensureSession(client, def.email)
+async function seedRestaurant(admin, def, dayOffset) {
+  const user = await ensureAuthUser(admin, def.email, def.role)
 
-  const { error: updErr } = await client.from('profiles').update({
+  const { error: updErr } = await admin.from('profiles').update({
     display_name: def.display_name,
     restaurant_name: def.restaurant_name,
     restaurant_cuisine: def.restaurant_cuisine,
@@ -171,8 +185,21 @@ async function seedRestaurant(def, dayOffset) {
 
   if (updErr) throw new Error(`Error actualizando perfil de ${def.email}: ${updErr.message}`)
 
+  const { data: existingTables, error: findErr } = await admin
+    .from('dining_tables')
+    .select('id')
+    .eq('host_id', user.id)
+    .eq('status', 'open')
+
+  if (findErr) console.warn(`Aviso: no se pudo comprobar mesas existentes de ${def.restaurant_name}: ${findErr.message}`)
+
+  if (existingTables && existingTables.length > 0) {
+    console.log(`OK restaurante: ${def.email} (${def.restaurant_name}) id=${user.id} (ya tenia mesa abierta, no se crea otra)`)
+    return user.id
+  }
+
   const { date, time } = futureDateTime(dayOffset)
-  const { error: tableErr } = await client.from('dining_tables').insert({
+  const { error: tableErr } = await admin.from('dining_tables').insert({
     host_id: user.id,
     restaurant_name: def.restaurant_name,
     restaurant_address: def.table.restaurant_address,
@@ -193,19 +220,22 @@ async function seedRestaurant(def, dayOffset) {
   if (tableErr) console.warn(`Aviso: no se pudo crear mesa de prueba para ${def.restaurant_name}: ${tableErr.message}`)
   else console.log(`OK restaurante: ${def.email} (${def.restaurant_name}) id=${user.id} + mesa creada (${date} ${time})`)
 
-  await client.auth.signOut()
   return user.id
 }
 
 async function main() {
-  if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
-    console.error('Faltan VITE_SUPABASE_URL / VITE_SUPABASE_ANON_KEY en .env')
+  if (!SUPABASE_URL || !SECRET_KEY) {
+    console.error('Faltan VITE_SUPABASE_URL / SUPABASE_SECRET_KEY en .env')
     process.exit(1)
   }
 
-  for (const u of users) await seedUser(u)
-  await seedRestaurant(restaurants[0], 3)
-  await seedRestaurant(restaurants[1], 5)
+  const admin = createClient(SUPABASE_URL, SECRET_KEY, {
+    auth: { autoRefreshToken: false, persistSession: false },
+  })
+
+  for (const u of users) await seedUser(admin, u)
+  await seedRestaurant(admin, restaurants[0], 3)
+  await seedRestaurant(admin, restaurants[1], 5)
 
   console.log('\nListo. Contraseña de todas las cuentas de prueba:', PASSWORD)
 }

@@ -18,16 +18,16 @@ export function LanguageSwitcher() {
 
   return (
     <div className="relative" ref={ref}>
-      <button onClick={() => setOpen(!open)} className="flex items-center gap-1.5 px-2 py-1.5 rounded-lg hover:bg-gray-100 transition-colors text-lg" title={current?.label}>
+      <button onClick={() => setOpen(!open)} className="flex items-center gap-1.5 px-2 py-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors text-lg" title={current?.label}>
         <span className="text-xl leading-none">{current?.emoji}</span>
       </button>
       {open && (
-        <div className="absolute right-0 top-full mt-1 bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden z-50 min-w-[140px] animate-fade-in">
+        <div className="absolute right-0 top-full mt-1 bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 overflow-hidden z-50 min-w-[140px] animate-fade-in">
           {languageOptions.map(l => (
             <button
               key={l.code}
               onClick={() => { setLanguage(l.code); setOpen(false) }}
-              className={`w-full px-4 py-2.5 flex items-center gap-2 text-sm hover:bg-gray-50 transition-colors ${l.code === language ? 'bg-primary-50 text-primary-600 font-medium' : 'text-gray-700'}`}
+              className={`w-full px-4 py-2.5 flex items-center gap-2 text-sm hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors ${l.code === language ? 'bg-primary-50 dark:bg-primary-900/30 text-primary-600 dark:text-primary-400 font-medium' : 'text-gray-700 dark:text-gray-200'}`}
             >
               <span className="text-lg">{l.emoji}</span>
               {l.label}

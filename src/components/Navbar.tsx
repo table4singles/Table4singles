@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react'
-import { LayoutGrid, Search, Plus, CalendarDays, User, LogOut, Bell, LayoutDashboard, FileText } from 'lucide-react'
+import { LayoutGrid, Search, Plus, CalendarDays, User, LogOut, Bell, LayoutDashboard, FileText, Settings } from 'lucide-react'
 import { useAuth } from '@/contexts/AuthContext'
 import { useLanguage } from '@/contexts/LanguageContext'
 import { useNotifications } from '@/hooks/useNotifications'
@@ -87,6 +87,9 @@ export function Navbar({ currentPage, onNavigate, onAuthClick }: NavbarProps) {
                   <div className="absolute right-0 top-full mt-1 bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden z-50 w-48 animate-fade-in">
                     <button onClick={() => { onNavigate('profile'); setShowMenu(false) }} className="w-full px-4 py-3 text-left text-sm hover:bg-gray-50 flex items-center gap-2">
                       <User className="w-4 h-4" /> {t('nav.profile')}
+                    </button>
+                    <button onClick={() => { onNavigate('settings'); setShowMenu(false) }} className="w-full px-4 py-3 text-left text-sm hover:bg-gray-50 flex items-center gap-2">
+                      <Settings className="w-4 h-4" /> Ajustes
                     </button>
                     <button onClick={() => { signOut(); setShowMenu(false) }} className="w-full px-4 py-3 text-left text-sm hover:bg-gray-50 flex items-center gap-2 text-red-600 border-t border-gray-100">
                       <LogOut className="w-4 h-4" /> {t('nav.signOut')}

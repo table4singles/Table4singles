@@ -8,9 +8,19 @@ export interface Profile {
   id: string
   email: string | null
   display_name: string | null
+  full_name: string | null
   bio: string | null
+  street_address: string | null
   city: string | null
+  province: string | null
   country: string | null
+  date_of_birth: string | null
+  phone: string | null
+  instagram: string | null
+  onboarding_completed: boolean
+  email_notifications: boolean
+  push_notifications: boolean
+  theme_preference: 'light' | 'dark'
   languages: string[] | null
   interests: string[] | null
   role: UserRole

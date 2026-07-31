@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { LanguageProvider } from '@/contexts/LanguageContext'
 import { AuthProvider, useAuth } from '@/contexts/AuthContext'
+import { ThemeProvider } from '@/contexts/ThemeContext'
 import { Navbar } from '@/components/Navbar'
 import { AuthModal } from '@/components/AuthModal'
 import { LandingPage } from '@/pages/LandingPage'
@@ -9,12 +10,14 @@ import { CreateTablePage } from '@/pages/CreateTablePage'
 import { TableDetailPage } from '@/pages/TableDetailPage'
 import { MyTablesPage } from '@/pages/MyTablesPage'
 import { RestaurantDashboardPage } from '@/pages/RestaurantDashboardPage'
+import { OnboardingPage } from '@/pages/OnboardingPage'
 import { ProfilePage } from '@/pages/ProfilePage'
+import { SettingsPage } from '@/pages/SettingsPage'
 import { PrivacyPolicyPage } from '@/pages/PrivacyPolicyPage'
 import { AvisoLegalPage } from '@/pages/AvisoLegalPage'
 
 function AppRouter() {
-  const { user, loading } = useAuth()
+  const { user, profile, loading } = useAuth()
   const [page, setPage] = useState('landing')
   const [selectedId, setSelectedId] = useState<string | null>(null)
   const [authModal, setAuthModal] = useState(false)
@@ -69,6 +72,9 @@ function AppRouter() {
   }
 
   const renderPage = () => {
+    if (user && profile && !profile.onboarding_completed) {
+      return <OnboardingPage onNavigate={navigate} />
+    }
     switch (page) {
       case 'landing':
         return <LandingPage onNavigate={navigate} onAuthClick={openAuth} />
@@ -84,6 +90,8 @@ function AppRouter() {
         return <RestaurantDashboardPage onNavigate={navigate} onAuthClick={openAuth} />
       case 'profile':
         return <ProfilePage onNavigate={navigate} onAuthClick={openAuth} />
+      case 'settings':
+        return <SettingsPage onNavigate={navigate} onAuthClick={openAuth} />
       case 'politica-privacidad':
         return <PrivacyPolicyPage onNavigate={navigate} />
       case 'aviso-legal':
@@ -108,10 +116,12 @@ function AppRouter() {
 
 export default function App() {
   return (
-    <LanguageProvider>
-      <AuthProvider>
-        <AppRouter />
-      </AuthProvider>
-    </LanguageProvider>
+    <ThemeProvider>
+      <LanguageProvider>
+        <AuthProvider>
+          <AppRouter />
+        </AuthProvider>
+      </LanguageProvider>
+    </ThemeProvider>
   )
 }

@@ -17,3 +17,31 @@ body {
     font-family: 'Playfair Display', Georgia, serif;
   }
 }
+
+.phone-input-custom {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  width: 100%;
+  padding: 0.4rem 1rem;
+  border: 1px solid #d1d5db;
+  border-radius: 0.75rem;
+}
+.phone-input-custom:focus-within {
+  outline: none;
+  box-shadow: 0 0 0 2px #e94560;
+  border-color: transparent;
+}
+.phone-input-custom .PhoneInputInput {
+  border: none;
+  outline: none;
+  font-size: 0.875rem;
+  flex: 1;
+  padding: 0.35rem 0;
+}
+.phone-input-custom .PhoneInputCountry {
+  margin-right: 0.25rem;
+}
+.phone-input-custom .PhoneInputCountrySelectArrow {
+  opacity: 0.6;
+}

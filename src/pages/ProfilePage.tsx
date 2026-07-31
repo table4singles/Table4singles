@@ -1,5 +1,7 @@
 import { useState, useEffect } from 'react'
 import { Save, Loader2, Check, Camera, X } from 'lucide-react'
+import PhoneInput from 'react-phone-number-input'
+import 'react-phone-number-input/style.css'
 import { Navbar } from '@/components/Navbar'
 import { ErrorBanner } from '@/components/ErrorBanner'
 import { useLanguage } from '@/contexts/LanguageContext'
@@ -20,9 +22,15 @@ export function ProfilePage({ onNavigate, onAuthClick }: ProfilePageProps) {
   const isRestaurant = profile?.role === 'restaurant'
 
   const [displayName, setDisplayName] = useState('')
+  const [fullName, setFullName] = useState('')
   const [bio, setBio] = useState('')
+  const [streetAddress, setStreetAddress] = useState('')
   const [city, setCity] = useState('')
+  const [province, setProvince] = useState('')
   const [country, setCountry] = useState('')
+  const [dateOfBirth, setDateOfBirth] = useState('')
+  const [phone, setPhone] = useState('')
+  const [instagram, setInstagram] = useState('')
   const [restaurantName, setRestaurantName] = useState('')
   const [restaurantCuisine, setRestaurantCuisine] = useState('')
   const [restaurantDescription, setRestaurantDescription] = useState('')
@@ -37,9 +45,15 @@ export function ProfilePage({ onNavigate, onAuthClick }: ProfilePageProps) {
   useEffect(() => {
     if (profile) {
       setDisplayName(profile.display_name || '')
+      setFullName(profile.full_name || '')
       setBio(profile.bio || '')
+      setStreetAddress(profile.street_address || '')
       setCity(profile.city || '')
+      setProvince(profile.province || '')
       setCountry(profile.country || '')
+      setDateOfBirth(profile.date_of_birth || '')
+      setPhone(profile.phone || '')
+      setInstagram(profile.instagram || '')
       setRestaurantName(profile.restaurant_name || '')
       setRestaurantCuisine(profile.restaurant_cuisine || '')
       setRestaurantDescription(profile.restaurant_description || '')
@@ -55,9 +69,15 @@ export function ProfilePage({ onNavigate, onAuthClick }: ProfilePageProps) {
     setError(null)
     const updates: Record<string, unknown> = {
       display_name: displayName,
+      full_name: fullName,
       bio,
+      street_address: streetAddress,
       city,
+      province,
       country,
+      date_of_birth: dateOfBirth || null,
+      phone,
+      instagram: instagram || null,
     }
     if (isRestaurant) {
       Object.assign(updates, {
@@ -136,16 +156,39 @@ export function ProfilePage({ onNavigate, onAuthClick }: ProfilePageProps) {
           <FormInput label={isRestaurant ? t('auth.restaurantName') : t('auth.name')} value={isRestaurant ? restaurantName : displayName} onChange={isRestaurant ? setRestaurantName : setDisplayName} />
 
           {!isRestaurant && (
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Bio</label>
-              <textarea value={bio} onChange={e => setBio(e.target.value)} rows={3} className="w-full px-4 py-2.5 border border-gray-300 rounded-xl text-sm focus:ring-2 focus:ring-primary-500 outline-none resize-none" />
-            </div>
+            <>
+              <FormInput label="Nombre completo" value={fullName} onChange={setFullName} />
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Sobre ti</label>
+                <textarea value={bio} onChange={e => setBio(e.target.value)} rows={3} className="w-full px-4 py-2.5 border border-gray-300 rounded-xl text-sm focus:ring-2 focus:ring-primary-500 outline-none resize-none" />
+              </div>
+
+              <FormInput label="Calle y número" value={streetAddress} onChange={setStreetAddress} />
+
+              <div className="grid grid-cols-2 gap-4">
+                <FormInput label="Ciudad" value={city} onChange={setCity} />
+                <FormInput label="Provincia" value={province} onChange={setProvince} />
+              </div>
+              <FormInput label="País" value={country} onChange={setCountry} />
+
+              <FormInput label="Fecha de nacimiento" value={dateOfBirth} onChange={setDateOfBirth} type="date" />
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Teléfono</label>
+                <PhoneInput international defaultCountry="ES" value={phone} onChange={v => setPhone(v || '')} className="phone-input-custom" />
+              </div>
+
+              <FormInput label="Instagram (opcional)" value={instagram} onChange={setInstagram} />
+            </>
           )}
 
-          <div className="grid grid-cols-2 gap-4">
-            <FormInput label="City" value={city} onChange={setCity} />
-            <FormInput label="Country" value={country} onChange={setCountry} />
-          </div>
+          {isRestaurant && (
+            <div className="grid grid-cols-2 gap-4">
+              <FormInput label="City" value={city} onChange={setCity} />
+              <FormInput label="Country" value={country} onChange={setCountry} />
+            </div>
+          )}
 
           {isRestaurant && (
             <>
@@ -216,11 +259,11 @@ export function ProfilePage({ onNavigate, onAuthClick }: ProfilePageProps) {
   )
 }
 
-function FormInput({ label, value, onChange }: { label: string; value: string; onChange: (v: string) => void }) {
+function FormInput({ label, value, onChange, type = 'text' }: { label: string; value: string; onChange: (v: string) => void; type?: string }) {
   return (
     <div>
       <label className="block text-sm font-medium text-gray-700 mb-1">{label}</label>
-      <input type="text" value={value} onChange={e => onChange(e.target.value)} className="w-full px-4 py-2.5 border border-gray-300 rounded-xl text-sm focus:ring-2 focus:ring-primary-500 outline-none" />
+      <input type={type} value={value} onChange={e => onChange(e.target.value)} className="w-full px-4 py-2.5 border border-gray-300 rounded-xl text-sm focus:ring-2 focus:ring-primary-500 outline-none" />
     </div>
   )
 }

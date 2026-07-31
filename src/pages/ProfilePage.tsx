@@ -150,17 +150,6 @@ export function ProfilePage({ onNavigate, onAuthClick }: ProfilePageProps) {
     else await refreshProfile()
   }
 
-  const handleRoleSwitch = async () => {
-    if (!user || !profile) return
-    const newRole = profile.role === 'restaurant' ? 'user' : 'restaurant'
-    setSaving(true)
-    setError(null)
-    const { error: err } = await supabase.from('profiles').update({ role: newRole }).eq('id', user.id)
-    if (err) setError(err.message)
-    else await refreshProfile()
-    setSaving(false)
-  }
-
   return (
     <div className="min-h-screen bg-gray-50">
       <Navbar currentPage="profile" onNavigate={onNavigate} onAuthClick={onAuthClick} />
@@ -286,10 +275,6 @@ export function ProfilePage({ onNavigate, onAuthClick }: ProfilePageProps) {
              <><Save className="w-4 h-4" /> {t('profile.save')}</>}
           </button>
         </div>
-
-        <button onClick={handleRoleSwitch} disabled={saving} className="mt-4 w-full py-3 border border-gray-200 bg-white text-gray-700 rounded-xl font-medium text-sm hover:bg-gray-50 disabled:opacity-50 transition-colors">
-          {isRestaurant ? 'Cambiar a cuenta personal' : 'Cambiar a cuenta de restaurante'}
-        </button>
       </main>
     </div>
   )

@@ -12,7 +12,7 @@ Deploy futuro: VERCEL (no Netlify)
 Dev local: `npm run dev` → localhost:5173 (si puerto ocupado, matar procesos viejos: `lsof -i :5173`, `kill -9 <pid>`)
 
 ## MIGRACIONES SQL — TODAS EJECUTADAS ✅
-001 schema.sql, 002 lifecycle+notifs, 003 onboarding, 004 settings, 005 avatar, 006 geolocation (lat/lng en profiles).
+001 schema.sql, 002 lifecycle+notifs, 003 onboarding, 004 settings, 005 avatar, 006 geolocation, 007 lock_role (bloquea cambio de profiles.role tras creacion).
 Todas en `supabase/migrations/`. Ninguna pendiente ahora mismo.
 
 ## HECHO ✅
@@ -29,6 +29,9 @@ Todas en `supabase/migrations/`. Ninguna pendiente ahora mismo.
 - Archivos nuevos clave: OnboardingPage.tsx, SettingsPage.tsx, RestaurantsBrowsePage.tsx, RestaurantProfilePage.tsx, ThemeContext.tsx, hooks/useRestaurants.ts
 - Avatar visible en Navbar (icono usuario)
 - BUSQUEDA POR RADIO KM en RestaurantsBrowsePage: al escribir ciudad en el buscador, dentro de "Filtros" aparece un slider con pasos fijos (5/10/25/50/100/200/500 km). Al mover el slider se geocodifica el texto escrito (Nominatim/OSM, sin API key, `src/lib/geocoding.ts`) y se calcula distancia Haversine contra cada restaurante (se geocodifica su city/province/country y se cachea lat/lng en `profiles` para no repetir). Sin radio seleccionado, se mantiene el comportamiento anterior (texto ilike). Requiere migracion 006 (ver arriba)
+- Pestaña "Invitaciones" en barra inferior movil (junto a Reservas), abre directamente esa sub-pestaña en MyTablesPage
+- Filtros de tipo de cocina (Restaurantes y Mesas) ahora son multiseleccion (antes solo 1)
+- ROL INMUTABLE: usuario y restaurante son cuentas distintas, el rol se elige solo al registrarse (AuthModal) y ya NO se puede cambiar despues. Se quito el boton "Cambiar a cuenta de restaurante/personal" de ProfilePage. Ademas bloqueado a nivel BD con trigger (migracion 007, ver arriba) para que ni siquiera se pueda cambiar manipulando la API directamente
 - 5+ commits pusheados a GitHub
 
 ## PENDIENTE ⚠️

@@ -12,8 +12,9 @@ Deploy futuro: VERCEL (no Netlify)
 Dev local: `npm run dev` → localhost:5173 (si puerto ocupado, matar procesos viejos: `lsof -i :5173`, `kill -9 <pid>`)
 
 ## MIGRACIONES SQL — TODAS EJECUTADAS ✅
-001 schema.sql, 002 lifecycle+notifs, 003 onboarding, 004 settings, 005 avatar, 006 geolocation, 007 lock_role, 008 referrals, 009 favorites, 010 diner_reviews, 011 reminders (pg_cron habilitado, job `send_dinner_reminders_hourly` programado con id 1, `0 * * * *`).
+001 schema.sql, 002 lifecycle+notifs, 003 onboarding, 004 settings, 005 avatar, 006 geolocation, 007 lock_role, 008 referrals, 009 favorites, 010 diner_reviews, 011 reminders (pg_cron habilitado, job `send_dinner_reminders_hourly` programado con id 1, `0 * * * *`), 012 participant_invites (participantes con reserva aprobada tambien pueden crear invitaciones, no solo el host).
 Todas en `supabase/migrations/`. Ninguna pendiente ahora mismo.
+OJO: MCP de Supabase conectado en este entorno NO es el proyecto Table4singles (ve otros proyectos: ComandIAvoz, QuieroBailar). Migraciones se ejecutan a mano en SQL Editor del dashboard real (zocrwanhcschmydczgeh).
 
 ## HECHO ✅
 - Reconstrucción código fuente completo desde build Bolt vieja
@@ -46,34 +47,46 @@ Todas en `supabase/migrations/`. Ninguna pendiente ahora mismo.
 9. **Estadisticas de perfil**: seccion "Mi actividad" en ProfilePage (cenas asistidas, confianza, miembro desde)
 10. **Referidos**: enlace `?ref={user_id}` compartible desde ProfilePage (ShareButton), capturado en `App.tsx` (localStorage) y aplicado en `AuthContext.signUp` -> `profiles.referred_by` (migracion 008, via `handle_new_user()` actualizado). Contador de invitados en ProfilePage
 
+### PESTAÑA COMENSALES + INVITAR DESDE COMENSALES (feature nueva, codigo completo, migracion 012 ejecutada)
+- **Comensales** (`pages/CompanionsPage.tsx`, ruta `'companions'`): directorio de usuarios rol=user (solo lectura de perfiles). Hook `hooks/useCompanions.ts` (columnas publicas explicitas, nunca email/phone/street_address/lat/lng; filtro nombre+ciudad+idiomas+intereses; paginacion `.range()` + "cargar mas"). Tarjeta `components/CompanionCard.tsx`. Click abre `components/CompanionProfileModal.tsx` (ficha completa: bio, idiomas, intereses, confianza via `useDinerTrustScore`, miembro desde). Pestaña en Navbar (desktop+movil) solo visible role=user, entre Restaurantes y Mis reservas.
+- **Invitar desde Comensales**: hallazgo clave -> las mesas SIEMPRE las crea un restaurante (`host_id` nunca es usuario normal), asi que se abrio la politica RLS de `invitations` (migracion 012) para permitir tambien a participantes con `status='approved'`, no solo al host.
+  - `hooks/useInvitableTables.ts`: mesas desde las que el usuario puede invitar ya mismo (host o participante aprobado, `status='open'`, plazas libres, fecha futura)
+  - `components/InviteToTableModal.tsx`: boton "Invitar a una cena" en `CompanionProfileModal`. Si 1 mesa invitable -> elegir tipo ("Yo invito"/"Cada uno paga") y enviar. Si varias -> elegir mesa primero. Si 0 -> boton "Buscar restaurante para invitar"
+  - Fase 2 (invitar sin tener mesa aun): `contexts/PendingInviteContext.tsx` (persiste intencion `{inviteeId,inviteeName}` en localStorage `t4s_pending_invite`, provider montado en `App.tsx`), `components/PendingInviteBanner.tsx` (banner fijo global "Buscando mesa para invitar a X"). En `TableDetailPage`, tras unirse ("doy mi palabra" o volviendo de pago con deposito exitoso), si hay invitacion pendiente se ofrece enviarla al instante y se limpia el estado
+  - No se toca `InviteModal.tsx` (flujo host clasico) ni reglas de `diner_reviews`
+
 ## PENDIENTE ⚠️
-1. PROBAR flujo completo en local: onboarding+foto, listado restaurantes, ficha restaurante, unirse mesa, chat, reseña, favoritos, mapa, resenas entre comensales, referidos
-2. STRIPE: crear Edge Functions (create-checkout, stripe-webhook), conectar deposito. Falta cuenta Stripe+keys
-3. LOGIN SOCIAL: solo falta config externa (Google Cloud Console + Apple Developer + pegar keys en Supabase dashboard). Código ya OK.
-4. DEPLOY VERCEL: importar repo, env vars (VITE_SUPABASE_URL, VITE_SUPABASE_ANON_KEY), esperar cliente de dominio table4singles.online
-5. Modo oscuro: completo en todo el lado usuario. Lado restaurante (CreateTablePage, RestaurantDashboardPage, BrowsePage) sigue sin dark mode, fuera de alcance de este plan
+1. PROBAR flujo completo en local: onboarding+foto, listado restaurantes, ficha restaurante, unirse mesa, chat, reseña, favoritos, mapa, resenas entre comensales, referidos, Comensales+Invitar
+2. CUENTAS DE PRUEBA: script `scripts/seed-test-accounts.mjs` (2 users + 2 restaurantes + mesa por restaurante, password `Test1234!`) creado pero BLOQUEADO: proyecto Supabase exige confirmar email, signUp no devuelve sesion y no se puede terminar el perfil por script. Ademas ya se agoto el rate limit de emails de confirmacion (esperar o desactivar). Para desbloquear: desactivar temporalmente "Confirm email" en Supabase dashboard (Authentication > Providers > Email) y volver a correr el script, o dar service_role key para usar auth admin API. Luego re-activar confirm email si se queria.
+3. STRIPE: crear Edge Functions (create-checkout, stripe-webhook), conectar deposito. Falta cuenta Stripe+keys
+4. LOGIN SOCIAL: solo falta config externa (Google Cloud Console + Apple Developer + pegar keys en Supabase dashboard). Código ya OK.
+5. DEPLOY VERCEL: importar repo, env vars (VITE_SUPABASE_URL, VITE_SUPABASE_ANON_KEY), esperar cliente de dominio table4singles.online
+6. Modo oscuro: completo en todo el lado usuario. Lado restaurante (CreateTablePage, RestaurantDashboardPage, BrowsePage) sigue sin dark mode, fuera de alcance de este plan
 
 ## ESTRUCTURA CLAVE
 ```
-src/App.tsx              routing principal (switch por 'page' string) + captura ?ref= para referidos
-src/contexts/            AuthContext(signUp con referred_by), LanguageContext, ThemeContext
+src/App.tsx              routing principal (switch por 'page' string) + captura ?ref= + PendingInviteProvider+Banner global
+src/contexts/            AuthContext(signUp con referred_by), LanguageContext, ThemeContext, PendingInviteContext(nuevo)
 src/hooks/                useTables, useMyTables, useTableDetail(+hostProfile), useInvitations,
                           useMessages, useNotifications, useReviews, useRestaurants(+ensureCoordinates),
-                          useFavorites(nuevo), useDinerReviews(nuevo, trust score + envio ratings)
+                          useFavorites, useDinerReviews(trust score + envio ratings),
+                          useCompanions(nuevo, directorio), useInvitableTables(nuevo, mesas desde las que invitar)
 src/pages/
   LandingPage, BrowsePage(mesas-solo restaurantes), RestaurantsBrowsePage(usuarios, +mapa+favoritos),
-  RestaurantProfilePage(ficha, +favorito+filtros mesas), CreateTablePage, TableDetailPage(+mini-perfiles+resenas comensales),
+  RestaurantProfilePage(ficha, +favorito+filtros mesas), CreateTablePage, TableDetailPage(+mini-perfiles+resenas comensales+auto-invitar tras reservar),
   RestaurantDashboardPage, OnboardingPage(+idiomas/intereses), SettingsPage, ProfilePage(+stats+referidos+idiomas/intereses),
-  PrivacyPolicyPage, AvisoLegalPage
+  CompanionsPage(nuevo, pestaña Comensales), PrivacyPolicyPage, AvisoLegalPage
 src/components/
-  Navbar(diferenciado por rol), AuthModal, TableCard, InviteModal, CancelModal,
+  Navbar(diferenciado por rol, +tab Comensales), AuthModal, TableCard, InviteModal, CancelModal,
   LoadingSpinner, ErrorBanner, ShareButton, StarRating, LanguageSwitcher, NotificationsPanel,
-  ParticipantCard(nuevo), DinerReviewModal(nuevo), RestaurantsMap(nuevo, Leaflet)
+  ParticipantCard, DinerReviewModal, RestaurantsMap(Leaflet),
+  CompanionCard(nuevo), CompanionProfileModal(nuevo, +boton Invitar), InviteToTableModal(nuevo), PendingInviteBanner(nuevo)
 src/lib/geocoding.ts     geocodeQuery (Nominatim/OSM) + haversineDistanceKm + RADIUS_STEPS_KM
 src/lib/options.ts       LANGUAGE_OPTIONS + INTEREST_OPTIONS (chips)
 src/types/database.ts    tipos+Profile con todos los campos nuevos (incluye referred_by, created_at)
 supabase/schema.sql       schema base
-supabase/migrations/      002 a 011, todas ejecutadas (ver arriba)
+supabase/migrations/      002 a 012, todas ejecutadas (ver arriba)
+scripts/seed-test-accounts.mjs  crea 2 users+2 restaurantes+mesa de prueba via signUp/update (BLOQUEADO, ver pendientes)
 ```
 
 ## OJO / GOTCHAS
@@ -83,4 +96,4 @@ supabase/migrations/      002 a 011, todas ejecutadas (ver arriba)
 - reviews: hook `useReviews(tableId)` es por mesa, `useRestaurantReviews(hostId)` es por restaurante completo
 
 ## SIGUIENTE PASO
-Probar flujo completo app en local. Luego Stripe. Luego deploy Vercel.
+Desbloquear cuentas de prueba (desactivar Confirm email o dar service_role key) y correr `scripts/seed-test-accounts.mjs`. Luego probar flujo completo en local (incluye Comensales+Invitar). Luego Stripe. Luego deploy Vercel.

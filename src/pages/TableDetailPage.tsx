@@ -1,5 +1,5 @@
-import { useState } from 'react'
-import { ArrowLeft, MapPin, Clock, Users, Calendar, Loader2, MessageSquare, Star, Download, UserPlus, XCircle, PartyPopper } from 'lucide-react'
+import { useState, useEffect } from 'react'
+import { ArrowLeft, MapPin, Clock, Users, Calendar, Loader2, MessageSquare, Star, Download, UserPlus, XCircle, PartyPopper, Check, Mail } from 'lucide-react'
 import { Navbar } from '@/components/Navbar'
 import { ShareButton } from '@/components/ShareButton'
 import { StarRating } from '@/components/StarRating'
@@ -9,9 +9,11 @@ import { ParticipantCard } from '@/components/ParticipantCard'
 import { DinerReviewModal } from '@/components/DinerReviewModal'
 import { useLanguage } from '@/contexts/LanguageContext'
 import { useAuth } from '@/contexts/AuthContext'
+import { usePendingInvite } from '@/contexts/PendingInviteContext'
 import { useTableDetail } from '@/hooks/useTables'
 import { useReviews } from '@/hooks/useReviews'
 import { useMessages } from '@/hooks/useMessages'
+import { useInvitations } from '@/hooks/useInvitations'
 import { supabase } from '@/lib/supabase'
 
 interface TableDetailPageProps {
@@ -27,6 +29,8 @@ export function TableDetailPage({ tableId, paymentSuccess, onNavigate, onAuthCli
   const { table, participants, hostProfile, loading, error, joinTable, cancelTable, refresh } = useTableDetail(tableId)
   const { reviews, submitReview } = useReviews(tableId)
   const { messages, sendMessage } = useMessages(tableId)
+  const { sendInvitation } = useInvitations(null)
+  const { pendingInvite, clearPendingInvite } = usePendingInvite()
   const [joining, setJoining] = useState(false)
   const [joinError, setJoinError] = useState<string | null>(null)
   const [showChat, setShowChat] = useState(false)
@@ -38,6 +42,17 @@ export function TableDetailPage({ tableId, paymentSuccess, onNavigate, onAuthCli
   const [chatInput, setChatInput] = useState('')
   const [reviewRating, setReviewRating] = useState(0)
   const [reviewComment, setReviewComment] = useState('')
+  const [showAutoInvite, setShowAutoInvite] = useState(false)
+  const [autoInvitePaymentCovered, setAutoInvitePaymentCovered] = useState(true)
+  const [autoInviteSending, setAutoInviteSending] = useState(false)
+  const [autoInviteError, setAutoInviteError] = useState<string | null>(null)
+  const [autoInviteSuccess, setAutoInviteSuccess] = useState(false)
+
+  // Si venias de "Comensales" con la intencion de invitar a alguien y aun no tenias mesa,
+  // en cuanto confirmas el pago con deposito (redirect de Stripe) ofrecemos enviar la invitacion.
+  useEffect(() => {
+    if (paymentSuccess && pendingInvite) setShowAutoInvite(true)
+  }, [paymentSuccess, pendingInvite])
 
   const locale = language === 'de' ? 'de-DE' : language === 'en' ? 'en-GB' : 'es-ES'
   const myParticipation = participants.find(p => p.user_id === user?.id)
@@ -60,10 +75,25 @@ export function TableDetailPage({ tableId, paymentSuccess, onNavigate, onAuthCli
     setJoinError(null)
     try {
       await joinTable('word')
+      if (pendingInvite) setShowAutoInvite(true)
     } catch (err: any) {
       setJoinError(err.message || 'Error')
     }
     setJoining(false)
+  }
+
+  const handleSendAutoInvite = async () => {
+    if (!pendingInvite || !table) return
+    setAutoInviteSending(true)
+    setAutoInviteError(null)
+    try {
+      await sendInvitation(table.id, pendingInvite.inviteeId, autoInvitePaymentCovered)
+      setAutoInviteSuccess(true)
+      clearPendingInvite()
+    } catch {
+      setAutoInviteError('No se ha podido enviar la invitación. Inténtalo de nuevo.')
+    }
+    setAutoInviteSending(false)
   }
 
   const handleJoinDeposit = async () => {
@@ -412,6 +442,57 @@ export function TableDetailPage({ tableId, paymentSuccess, onNavigate, onAuthCli
             onClose={() => setShowCancelTable(false)}
             onConfirm={handleCancelTable}
           />
+        )}
+
+        {showAutoInvite && pendingInvite && (
+          <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4" onClick={() => setShowAutoInvite(false)}>
+            <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl w-full max-w-md p-6" onClick={e => e.stopPropagation()}>
+              {autoInviteSuccess ? (
+                <div className="text-center py-2">
+                  <div className="w-14 h-14 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                    <Check className="w-7 h-7 text-green-600" />
+                  </div>
+                  <p className="font-medium text-gray-900 dark:text-white mb-1">Invitación enviada</p>
+                  <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">{pendingInvite.inviteeName} recibirá tu invitación a esta mesa.</p>
+                  <button onClick={() => setShowAutoInvite(false)} className="w-full py-3 bg-primary-500 text-white rounded-xl font-medium hover:bg-primary-600 transition-colors">
+                    Cerrar
+                  </button>
+                </div>
+              ) : (
+                <>
+                  <div className="flex items-center gap-2 mb-1">
+                    <Mail className="w-5 h-5 text-primary-500" />
+                    <h3 className="text-lg font-display font-bold text-gray-900 dark:text-gray-100">Ya tienes tu mesa</h3>
+                  </div>
+                  <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
+                    ¿Invitas ahora a <strong>{pendingInvite.inviteeName}</strong> a esta cena?
+                  </p>
+
+                  <div className="space-y-2 mb-4">
+                    <button onClick={() => setAutoInvitePaymentCovered(true)} className={`w-full text-left p-3 rounded-xl border-2 transition-all ${autoInvitePaymentCovered ? 'border-primary-500 bg-primary-50' : 'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-500'}`}>
+                      <p className={`font-medium text-sm ${autoInvitePaymentCovered ? 'text-primary-700' : 'text-gray-700 dark:text-gray-200'}`}>Yo invito</p>
+                      <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">Te haces cargo del depósito de {pendingInvite.inviteeName}</p>
+                    </button>
+                    <button onClick={() => setAutoInvitePaymentCovered(false)} className={`w-full text-left p-3 rounded-xl border-2 transition-all ${!autoInvitePaymentCovered ? 'border-primary-500 bg-primary-50' : 'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-500'}`}>
+                      <p className={`font-medium text-sm ${!autoInvitePaymentCovered ? 'text-primary-700' : 'text-gray-700 dark:text-gray-200'}`}>Cada uno paga su parte</p>
+                      <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">{pendingInvite.inviteeName} paga su propio depósito si acepta</p>
+                    </button>
+                  </div>
+
+                  {autoInviteError && <p className="text-sm text-red-600 bg-red-50 px-3 py-2 rounded-lg mb-4">{autoInviteError}</p>}
+
+                  <div className="flex gap-2">
+                    <button onClick={() => setShowAutoInvite(false)} className="flex-1 py-3 border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-200 rounded-xl font-medium hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+                      Más tarde
+                    </button>
+                    <button onClick={handleSendAutoInvite} disabled={autoInviteSending} className="flex-1 py-3 bg-primary-500 text-white rounded-xl font-medium hover:bg-primary-600 disabled:opacity-50 transition-colors">
+                      {autoInviteSending ? 'Enviando...' : 'Enviar invitación'}
+                    </button>
+                  </div>
+                </>
+              )}
+            </div>
+          </div>
         )}
       </main>
     </div>

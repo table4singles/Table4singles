@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react'
-import { LayoutGrid, Search, Plus, CalendarDays, Mail, User, LogOut, Bell, LayoutDashboard, FileText, Settings } from 'lucide-react'
+import { LayoutGrid, Search, Plus, CalendarDays, Mail, User, LogOut, Bell, LayoutDashboard, FileText, Settings, Users } from 'lucide-react'
 import { useAuth } from '@/contexts/AuthContext'
 import { useLanguage } from '@/contexts/LanguageContext'
 import { useNotifications } from '@/hooks/useNotifications'
@@ -46,7 +46,10 @@ export function Navbar({ currentPage, onNavigate, onAuthClick }: NavbarProps) {
             </>
           )}
           {user && profile?.role === 'user' && (
-            <NavLink active={currentPage === 'my-tables'} onClick={() => onNavigate('my-tables')} icon={<CalendarDays className="w-4 h-4" />} label="Mis reservas" />
+            <>
+              <NavLink active={currentPage === 'companions'} onClick={() => onNavigate('companions')} icon={<Users className="w-4 h-4" />} label="Comensales" />
+              <NavLink active={currentPage === 'my-tables'} onClick={() => onNavigate('my-tables')} icon={<CalendarDays className="w-4 h-4" />} label="Mis reservas" />
+            </>
           )}
         </nav>
 
@@ -121,6 +124,9 @@ export function Navbar({ currentPage, onNavigate, onAuthClick }: NavbarProps) {
             <MobileNavButton active={currentPage === 'browse' || currentPage === 'restaurant-profile'} onClick={() => onNavigate('browse')} icon={<Search className="w-5 h-5" />} label={profile?.role === 'restaurant' ? t('nav.explore') : 'Restaurantes'} />
             {profile?.role === 'restaurant' && (
               <MobileNavButton active={currentPage === 'create'} onClick={() => onNavigate('create')} icon={<Plus className="w-5 h-5" />} label={t('nav.create')} />
+            )}
+            {profile?.role === 'user' && (
+              <MobileNavButton active={currentPage === 'companions'} onClick={() => onNavigate('companions')} icon={<Users className="w-5 h-5" />} label="Comensales" />
             )}
             <MobileNavButton active={currentPage === 'my-tables'} onClick={() => onNavigate('my-tables')} icon={<CalendarDays className="w-5 h-5" />} label={profile?.role === 'restaurant' ? t('nav.myTables') : 'Reservas'} />
             <MobileNavButton active={currentPage === 'my-tables'} onClick={() => onNavigate('my-tables', 'invitations')} icon={<Mail className="w-5 h-5" />} label="Invitaciones" />

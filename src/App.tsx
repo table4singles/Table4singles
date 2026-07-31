@@ -2,12 +2,15 @@ import { useState, useEffect } from 'react'
 import { LanguageProvider } from '@/contexts/LanguageContext'
 import { AuthProvider, useAuth } from '@/contexts/AuthContext'
 import { ThemeProvider } from '@/contexts/ThemeContext'
+import { PendingInviteProvider } from '@/contexts/PendingInviteContext'
 import { Navbar } from '@/components/Navbar'
 import { AuthModal } from '@/components/AuthModal'
+import { PendingInviteBanner } from '@/components/PendingInviteBanner'
 import { LandingPage } from '@/pages/LandingPage'
 import { BrowsePage } from '@/pages/BrowsePage'
 import { RestaurantsBrowsePage } from '@/pages/RestaurantsBrowsePage'
 import { RestaurantProfilePage } from '@/pages/RestaurantProfilePage'
+import { CompanionsPage } from '@/pages/CompanionsPage'
 import { CreateTablePage } from '@/pages/CreateTablePage'
 import { TableDetailPage } from '@/pages/TableDetailPage'
 import { MyTablesPage } from '@/pages/MyTablesPage'
@@ -98,6 +101,8 @@ function AppRouter() {
           : <RestaurantsBrowsePage onNavigate={navigate} onAuthClick={openAuth} />
       case 'restaurant-profile':
         return selectedId ? <RestaurantProfilePage restaurantId={selectedId} onNavigate={navigate} onAuthClick={openAuth} /> : null
+      case 'companions':
+        return <CompanionsPage onNavigate={navigate} onAuthClick={openAuth} />
       case 'create':
         return <CreateTablePage onNavigate={navigate} onAuthClick={openAuth} />
       case 'table-detail':
@@ -126,6 +131,7 @@ function AppRouter() {
 
   return (
     <>
+      {user && <PendingInviteBanner />}
       {renderPage()}
       <AuthModal
         isOpen={authModal}
@@ -142,7 +148,9 @@ export default function App() {
     <ThemeProvider>
       <LanguageProvider>
         <AuthProvider>
-          <AppRouter />
+          <PendingInviteProvider>
+            <AppRouter />
+          </PendingInviteProvider>
         </AuthProvider>
       </LanguageProvider>
     </ThemeProvider>

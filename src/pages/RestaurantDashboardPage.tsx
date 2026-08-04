@@ -141,37 +141,23 @@ export function RestaurantDashboardPage({ onNavigate, onAuthClick }: RestaurantD
 
         {loading ? (
           <div className="flex justify-center py-16"><Loader2 className="w-8 h-8 text-primary-500 animate-spin" /></div>
-        ) : hosting.length === 0 ? (
+        ) : upcoming.length === 0 ? (
           <div className="text-center py-16">
             <div className="w-16 h-16 rounded-full bg-gray-100 dark:bg-gray-700 flex items-center justify-center mx-auto mb-4 text-gray-400 dark:text-gray-500">
               <UtensilsCrossed className="w-10 h-10" />
             </div>
             <h3 className="font-semibold text-gray-900 dark:text-white mb-1">{t('restaurantDashboard.noTables')}</h3>
             <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">{t('restaurantDashboard.noTablesDesc')}</p>
-            <button onClick={() => onNavigate('create')} className="px-6 py-2.5 bg-[#e94560] text-white rounded-xl text-sm font-medium hover:bg-[#d63d56]">{t('restaurantDashboard.newTable')}</button>
+            <button onClick={() => onNavigate('my-tables')} className="px-6 py-2.5 bg-[#e94560] text-white rounded-xl text-sm font-medium hover:bg-[#d63d56]">{t('restaurantDashboard.newTable')}</button>
           </div>
         ) : (
-          <div className="space-y-8">
-            {upcoming.length > 0 && (
-              <div>
-                <h2 className="text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-3">{t('restaurantDashboard.upcoming')}</h2>
-                <div className="space-y-3">
-                  {upcoming.map(table => (
-                    <TableRow key={table.id} table={table} locale={locale} t={t} onNavigate={onNavigate} onCancel={() => setCancelTableId(table.id)} />
-                  ))}
-                </div>
-              </div>
-            )}
-            {past.length > 0 && (
-              <div>
-                <h2 className="text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-3">{t('restaurantDashboard.past')}</h2>
-                <div className="space-y-3">
-                  {past.map(table => (
-                    <TableRow key={table.id} table={table} locale={locale} t={t} onNavigate={onNavigate} />
-                  ))}
-                </div>
-              </div>
-            )}
+          <div>
+            <h2 className="text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-3">{t('restaurantDashboard.upcoming')}</h2>
+            <div className="space-y-3">
+              {upcoming.map(table => (
+                <TableRow key={table.id} table={table} locale={locale} t={t} onNavigate={onNavigate} onCancel={() => setCancelTableId(table.id)} />
+              ))}
+            </div>
           </div>
         )}
 

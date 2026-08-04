@@ -3,7 +3,7 @@ export const es = {
     explore: 'Explorar',
     create: 'Crear mesa',
     myTables: 'Mis mesas',
-    dashboard: 'Dashboard',
+    dashboard: 'Inicio',
     agenda: 'Agenda',
     profile: 'Perfil',
     signIn: 'Entrar',

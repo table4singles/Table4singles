@@ -3,7 +3,7 @@ export const en = {
     explore: 'Explore',
     create: 'Create table',
     myTables: 'My tables',
-    dashboard: 'Dashboard',
+    dashboard: 'Home',
     agenda: 'Agenda',
     profile: 'Profile',
     signIn: 'Sign in',

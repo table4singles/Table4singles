@@ -3,7 +3,7 @@ export const de = {
     explore: 'Entdecken',
     create: 'Tisch erstellen',
     myTables: 'Meine Tische',
-    dashboard: 'Dashboard',
+    dashboard: 'Startseite',
     agenda: 'Agenda',
     profile: 'Profil',
     signIn: 'Anmelden',

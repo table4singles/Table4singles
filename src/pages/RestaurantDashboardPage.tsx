@@ -1,5 +1,5 @@
 import { useState, useMemo, useEffect } from 'react'
-import { Plus, UtensilsCrossed, Users, Star, Loader2, XCircle, Calendar, Clock } from 'lucide-react'
+import { UtensilsCrossed, Users, Star, Loader2, XCircle, Calendar, Clock, CalendarClock, CalendarDays } from 'lucide-react'
 import { Navbar } from '@/components/Navbar'
 import { CancelModal } from '@/components/CancelModal'
 import { useLanguage } from '@/contexts/LanguageContext'
@@ -63,14 +63,9 @@ export function RestaurantDashboardPage({ onNavigate, onAuthClick }: RestaurantD
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       <Navbar currentPage="restaurant-dashboard" onNavigate={onNavigate} onAuthClick={onAuthClick} />
       <main className="max-w-5xl mx-auto px-4 py-6 pb-24 md:pb-8">
-        <div className="flex items-center justify-between mb-6">
-          <div>
-            <h1 className="text-2xl font-display font-bold text-gray-900 dark:text-white">{t('restaurantDashboard.title')}</h1>
-            <p className="text-gray-500 dark:text-gray-400 text-sm mt-1">{profile?.restaurant_name || t('restaurantDashboard.subtitle')}</p>
-          </div>
-          <button onClick={() => onNavigate('create')} className="px-4 py-2.5 bg-[#e94560] text-white rounded-xl font-medium text-sm hover:bg-[#d63d56] transition-colors flex items-center gap-2">
-            <Plus className="w-4 h-4" /> {t('restaurantDashboard.newTable')}
-          </button>
+        <div className="mb-6">
+          <h1 className="text-2xl font-display font-bold text-gray-900 dark:text-white">{t('restaurantDashboard.title')}</h1>
+          <p className="text-gray-500 dark:text-gray-400 text-sm mt-1">{profile?.restaurant_name || t('restaurantDashboard.subtitle')}</p>
         </div>
 
         {error && <div className="bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-300 text-sm rounded-xl p-3 mb-4">{error}</div>}
@@ -103,6 +98,45 @@ export function RestaurantDashboardPage({ onNavigate, onAuthClick }: RestaurantD
               <p className="text-xs text-gray-500 dark:text-gray-400">{t('restaurantDashboard.avgRating')}</p>
             </div>
           </div>
+        </div>
+
+        {/* Quick access shortcuts */}
+        <div className="grid grid-cols-2 gap-4 mb-8">
+          <button
+            onClick={() => onNavigate('agenda')}
+            className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-4 text-left hover:shadow-md hover:border-[#e94560]/40 transition-all group"
+          >
+            <div className="flex items-center gap-2 mb-2">
+              <div className="w-8 h-8 rounded-lg bg-[#e94560]/10 flex items-center justify-center">
+                <CalendarClock className="w-4 h-4 text-[#e94560]" />
+              </div>
+              <span className="font-semibold text-sm text-gray-900 dark:text-white">{t('nav.agenda')}</span>
+            </div>
+            <p className="text-xs text-gray-500 dark:text-gray-400">
+              {upcoming.length > 0
+                ? `${upcoming.length} mesa${upcoming.length !== 1 ? 's' : ''} próxima${upcoming.length !== 1 ? 's' : ''}`
+                : 'Ver sala en vivo'}
+            </p>
+            <span className="text-[#e94560] text-xs font-medium mt-2 inline-block group-hover:underline">Ir a Agenda →</span>
+          </button>
+
+          <button
+            onClick={() => onNavigate('my-tables')}
+            className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-4 text-left hover:shadow-md hover:border-[#e94560]/40 transition-all group"
+          >
+            <div className="flex items-center gap-2 mb-2">
+              <div className="w-8 h-8 rounded-lg bg-blue-50 dark:bg-blue-900/30 flex items-center justify-center">
+                <CalendarDays className="w-4 h-4 text-blue-600 dark:text-blue-400" />
+              </div>
+              <span className="font-semibold text-sm text-gray-900 dark:text-white">{t('nav.myTables')}</span>
+            </div>
+            <p className="text-xs text-gray-500 dark:text-gray-400">
+              {hosting.length > 0
+                ? `${hosting.length} mesa${hosting.length !== 1 ? 's' : ''} publicada${hosting.length !== 1 ? 's' : ''}`
+                : 'Crea tu primera mesa'}
+            </p>
+            <span className="text-blue-600 dark:text-blue-400 text-xs font-medium mt-2 inline-block group-hover:underline">Ir a Mis mesas →</span>
+          </button>
         </div>
 
         {loading ? (

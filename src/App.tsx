@@ -15,6 +15,7 @@ import { CreateTablePage } from '@/pages/CreateTablePage'
 import { TableDetailPage } from '@/pages/TableDetailPage'
 import { MyTablesPage } from '@/pages/MyTablesPage'
 import { RestaurantDashboardPage } from '@/pages/RestaurantDashboardPage'
+import { RestaurantAgendaPage } from '@/pages/RestaurantAgendaPage'
 import { OnboardingPage } from '@/pages/OnboardingPage'
 import { ProfilePage } from '@/pages/ProfilePage'
 import { SettingsPage } from '@/pages/SettingsPage'
@@ -116,6 +117,8 @@ function AppRouter() {
       }
       case 'restaurant-dashboard':
         return <RestaurantDashboardPage onNavigate={navigate} onAuthClick={openAuth} />
+      case 'agenda':
+        return <RestaurantAgendaPage onNavigate={navigate} onAuthClick={openAuth} />
       case 'profile':
         return <ProfilePage onNavigate={navigate} onAuthClick={openAuth} />
       case 'settings':

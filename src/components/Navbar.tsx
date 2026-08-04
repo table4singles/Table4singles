@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react'
-import { LayoutGrid, Search, Plus, CalendarDays, Mail, User, LogOut, Bell, LayoutDashboard, FileText, Settings, Users } from 'lucide-react'
+import { LayoutGrid, Search, Plus, CalendarDays, CalendarClock, Mail, User, LogOut, Bell, LayoutDashboard, Settings, Users, FileText } from 'lucide-react'
 import { useAuth } from '@/contexts/AuthContext'
 import { useLanguage } from '@/contexts/LanguageContext'
 import { useNotifications } from '@/hooks/useNotifications'
@@ -39,10 +39,9 @@ export function Navbar({ currentPage, onNavigate, onAuthClick }: NavbarProps) {
           <NavLink active={currentPage === 'browse' || currentPage === 'restaurant-profile'} onClick={() => onNavigate('browse')} icon={<LayoutGrid className="w-4 h-4" />} label={profile?.role === 'restaurant' ? t('nav.explore') : 'Restaurantes'} />
           {user && profile?.role === 'restaurant' && (
             <>
-              <NavLink active={currentPage === 'create'} onClick={() => onNavigate('create')} icon={<Plus className="w-4 h-4" />} label={t('nav.create')} />
-              <NavLink active={currentPage === 'my-tables'} onClick={() => onNavigate('my-tables')} icon={<CalendarDays className="w-4 h-4" />} label={t('nav.myTables')} />
               <NavLink active={currentPage === 'restaurant-dashboard'} onClick={() => onNavigate('restaurant-dashboard')} icon={<LayoutDashboard className="w-4 h-4" />} label={t('nav.dashboard')} />
-              <NavLink active={currentPage === 'aviso-legal'} onClick={() => onNavigate('aviso-legal')} icon={<FileText className="w-4 h-4" />} label="Contrato" />
+              <NavLink active={currentPage === 'agenda'} onClick={() => onNavigate('agenda')} icon={<CalendarClock className="w-4 h-4" />} label={t('nav.agenda')} />
+              <NavLink active={currentPage === 'my-tables'} onClick={() => onNavigate('my-tables')} icon={<CalendarDays className="w-4 h-4" />} label={t('nav.myTables')} />
             </>
           )}
           {user && profile?.role === 'user' && (
@@ -97,6 +96,11 @@ export function Navbar({ currentPage, onNavigate, onAuthClick }: NavbarProps) {
                     <button onClick={() => { onNavigate('settings'); setShowMenu(false) }} className="w-full px-4 py-3 text-left text-sm hover:bg-gray-50 dark:hover:bg-gray-700 flex items-center gap-2">
                       <Settings className="w-4 h-4" /> Ajustes
                     </button>
+                    {profile?.role === 'restaurant' && (
+                      <button onClick={() => { onNavigate('aviso-legal'); setShowMenu(false) }} className="w-full px-4 py-3 text-left text-sm hover:bg-gray-50 dark:hover:bg-gray-700 flex items-center gap-2">
+                        <FileText className="w-4 h-4" /> Contrato
+                      </button>
+                    )}
                     <button onClick={() => { signOut(); setShowMenu(false) }} className="w-full px-4 py-3 text-left text-sm hover:bg-gray-50 dark:hover:bg-gray-700 flex items-center gap-2 text-red-600 border-t border-gray-100 dark:border-gray-700">
                       <LogOut className="w-4 h-4" /> {t('nav.signOut')}
                     </button>
@@ -121,15 +125,20 @@ export function Navbar({ currentPage, onNavigate, onAuthClick }: NavbarProps) {
       {user && (
         <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 z-50 px-2 pb-safe">
           <div className="flex justify-around py-2">
-            <MobileNavButton active={currentPage === 'browse' || currentPage === 'restaurant-profile'} onClick={() => onNavigate('browse')} icon={<Search className="w-5 h-5" />} label={profile?.role === 'restaurant' ? t('nav.explore') : 'Restaurantes'} />
-            {profile?.role === 'restaurant' && (
-              <MobileNavButton active={currentPage === 'create'} onClick={() => onNavigate('create')} icon={<Plus className="w-5 h-5" />} label={t('nav.create')} />
+            <MobileNavButton active={currentPage === 'browse' || currentPage === 'restaurant-profile'} onClick={() => onNavigate('browse')} icon={<Search className="w-5 h-5" />} label="Explorar" />
+            {profile?.role === 'restaurant' ? (
+              <>
+                <MobileNavButton active={currentPage === 'restaurant-dashboard'} onClick={() => onNavigate('restaurant-dashboard')} icon={<LayoutDashboard className="w-5 h-5" />} label={t('nav.dashboard')} />
+                <MobileNavButton active={currentPage === 'agenda'} onClick={() => onNavigate('agenda')} icon={<CalendarClock className="w-5 h-5" />} label={t('nav.agenda')} />
+                <MobileNavButton active={currentPage === 'my-tables'} onClick={() => onNavigate('my-tables')} icon={<CalendarDays className="w-5 h-5" />} label={t('nav.myTables')} />
+              </>
+            ) : (
+              <>
+                <MobileNavButton active={currentPage === 'companions'} onClick={() => onNavigate('companions')} icon={<Users className="w-5 h-5" />} label="Comensales" />
+                <MobileNavButton active={currentPage === 'my-tables'} onClick={() => onNavigate('my-tables')} icon={<CalendarDays className="w-5 h-5" />} label="Reservas" />
+                <MobileNavButton active={currentPage === 'my-tables'} onClick={() => onNavigate('my-tables', 'invitations')} icon={<Mail className="w-5 h-5" />} label="Invitaciones" />
+              </>
             )}
-            {profile?.role === 'user' && (
-              <MobileNavButton active={currentPage === 'companions'} onClick={() => onNavigate('companions')} icon={<Users className="w-5 h-5" />} label="Comensales" />
-            )}
-            <MobileNavButton active={currentPage === 'my-tables'} onClick={() => onNavigate('my-tables')} icon={<CalendarDays className="w-5 h-5" />} label={profile?.role === 'restaurant' ? t('nav.myTables') : 'Reservas'} />
-            <MobileNavButton active={currentPage === 'my-tables'} onClick={() => onNavigate('my-tables', 'invitations')} icon={<Mail className="w-5 h-5" />} label="Invitaciones" />
             <MobileNavButton active={currentPage === 'profile'} onClick={() => onNavigate('profile')} icon={<User className="w-5 h-5" />} label={t('nav.profile')} />
           </div>
         </nav>

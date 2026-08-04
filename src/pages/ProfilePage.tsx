@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react'
-import { Save, Loader2, Check, Camera, X, UtensilsCrossed, ShieldCheck, CalendarDays, Gift } from 'lucide-react'
+import React, { useState, useEffect } from 'react'
+import { Save, Loader2, Check, Camera, X, UtensilsCrossed, ShieldCheck, CalendarDays, Gift, Clock, Hash, Link, Tag, MapPin, Phone, Globe, Plus } from 'lucide-react'
 import PhoneInput from 'react-phone-number-input'
 import 'react-phone-number-input/style.css'
 import { Navbar } from '@/components/Navbar'
@@ -12,8 +12,8 @@ import { LANGUAGE_OPTIONS, INTEREST_OPTIONS } from '@/lib/options'
 import { useMyTables } from '@/hooks/useTables'
 import { useDinerTrustScore } from '@/hooks/useDinerReviews'
 
-const CUISINE_TYPES = ['Italian', 'Japanese', 'Mexican', 'French', 'Thai', 'Indian', 'Chinese', 'Spanish', 'Mediterranean', 'American', 'Korean', 'Vietnamese', 'Greek', 'Turkish', 'Other']
-const PRICE_RANGES = ['$', '$$', '$$$', '$$$$']
+const CUISINE_TYPES = ['Italiana', 'Japonesa', 'Mexicana', 'Francesa', 'Tailandesa', 'India', 'China', 'Española', 'Mediterránea', 'Americana', 'Coreana', 'Vietnamita', 'Griega', 'Turca', 'Fusión', 'Otra']
+const PRICE_RANGES = ['€', '€€', '€€€', '€€€€']
 
 interface ProfilePageProps {
   onNavigate: (page: string, id?: string) => void
@@ -40,11 +40,18 @@ export function ProfilePage({ onNavigate, onAuthClick }: ProfilePageProps) {
   const [languages, setLanguages] = useState<string[]>([])
   const [interests, setInterests] = useState<string[]>([])
   const [restaurantName, setRestaurantName] = useState('')
+  const [restaurantAddress, setRestaurantAddress] = useState('')
   const [restaurantCuisine, setRestaurantCuisine] = useState('')
   const [restaurantDescription, setRestaurantDescription] = useState('')
   const [restaurantPhone, setRestaurantPhone] = useState('')
   const [restaurantWebsite, setRestaurantWebsite] = useState('')
-  const [restaurantPriceRange, setRestaurantPriceRange] = useState('$$')
+  const [restaurantPriceRange, setRestaurantPriceRange] = useState('€€')
+  const [restaurantHours, setRestaurantHours] = useState('')
+  const [restaurantTotalTables, setRestaurantTotalTables] = useState<number | ''>('' )
+  const [restaurantMenuUrl, setRestaurantMenuUrl] = useState('')
+  const [restaurantOffers, setRestaurantOffers] = useState('')
+  const [restaurantSpecialties, setRestaurantSpecialties] = useState<string[]>([])
+  const [specialtyInput, setSpecialtyInput] = useState('')
   const [saving, setSaving] = useState(false)
   const [saved, setSaved] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -66,11 +73,17 @@ export function ProfilePage({ onNavigate, onAuthClick }: ProfilePageProps) {
       setLanguages(profile.languages || [])
       setInterests(profile.interests || [])
       setRestaurantName(profile.restaurant_name || '')
+      setRestaurantAddress(profile.restaurant_address || '')
       setRestaurantCuisine(profile.restaurant_cuisine || '')
       setRestaurantDescription(profile.restaurant_description || '')
       setRestaurantPhone(profile.restaurant_phone || '')
       setRestaurantWebsite(profile.restaurant_website || '')
-      setRestaurantPriceRange(profile.restaurant_price_range || '$$')
+      setRestaurantPriceRange(profile.restaurant_price_range || '€€')
+      setRestaurantHours(profile.restaurant_hours || '')
+      setRestaurantTotalTables(profile.restaurant_total_tables ?? '')
+      setRestaurantMenuUrl(profile.restaurant_menu_url || '')
+      setRestaurantOffers(profile.restaurant_offers || '')
+      setRestaurantSpecialties(profile.restaurant_specialties || [])
     }
   }, [profile])
 
@@ -84,30 +97,37 @@ export function ProfilePage({ onNavigate, onAuthClick }: ProfilePageProps) {
     if (!user) return
     setSaving(true)
     setError(null)
-    const updates: Record<string, unknown> = {
-      display_name: displayName,
-      full_name: fullName,
-      bio,
-      street_address: streetAddress,
-      city,
-      province,
-      country,
-      date_of_birth: dateOfBirth || null,
-      phone,
-      instagram: instagram || null,
-      languages: languages.length > 0 ? languages : null,
-      interests: interests.length > 0 ? interests : null,
-    }
-    if (isRestaurant) {
-      Object.assign(updates, {
-        restaurant_name: restaurantName,
-        restaurant_cuisine: restaurantCuisine,
-        restaurant_description: restaurantDescription,
-        restaurant_phone: restaurantPhone,
-        restaurant_website: restaurantWebsite,
-        restaurant_price_range: restaurantPriceRange,
-      })
-    }
+    const updates: Record<string, unknown> = isRestaurant
+      ? {
+          restaurant_name: restaurantName,
+          restaurant_address: restaurantAddress,
+          city,
+          country,
+          restaurant_phone: restaurantPhone,
+          restaurant_website: restaurantWebsite,
+          restaurant_cuisine: restaurantCuisine,
+          restaurant_price_range: restaurantPriceRange,
+          restaurant_specialties: restaurantSpecialties.length > 0 ? restaurantSpecialties : null,
+          restaurant_description: restaurantDescription,
+          restaurant_hours: restaurantHours || null,
+          restaurant_total_tables: restaurantTotalTables !== '' ? Number(restaurantTotalTables) : null,
+          restaurant_menu_url: restaurantMenuUrl || null,
+          restaurant_offers: restaurantOffers || null,
+        }
+      : {
+          display_name: displayName,
+          full_name: fullName,
+          bio,
+          street_address: streetAddress,
+          city,
+          province,
+          country,
+          date_of_birth: dateOfBirth || null,
+          phone,
+          instagram: instagram || null,
+          languages: languages.length > 0 ? languages : null,
+          interests: interests.length > 0 ? interests : null,
+        }
     const { error: err } = await supabase.from('profiles').update(updates).eq('id', user.id)
     if (err) {
       setError(err.message)
@@ -309,62 +329,121 @@ export function ProfilePage({ onNavigate, onAuthClick }: ProfilePageProps) {
           )}
 
           {isRestaurant && (
-            <div className="grid grid-cols-2 gap-4">
-              <FormInput label="City" value={city} onChange={setCity} />
-              <FormInput label="Country" value={country} onChange={setCountry} />
-            </div>
-          )}
-
-          {isRestaurant && (
             <>
+              {/* ── Información básica ── */}
+              <SectionTitle icon={<MapPin className="w-4 h-4" />} label="Información básica" />
+              <FormInput label="Dirección" value={restaurantAddress} onChange={setRestaurantAddress} placeholder="Calle Mayor 12, Barcelona" />
+              <div className="grid grid-cols-2 gap-4">
+                <FormInput label="Ciudad" value={city} onChange={setCity} placeholder="Barcelona" />
+                <FormInput label="País" value={country} onChange={setCountry} placeholder="España" />
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1.5 flex items-center gap-1.5"><Phone className="w-3.5 h-3.5 text-gray-400" /> Teléfono</label>
+                  <input value={restaurantPhone} onChange={e => setRestaurantPhone(e.target.value)} placeholder="+34 600 000 000" className="w-full px-4 py-2.5 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 dark:text-white rounded-xl text-sm focus:ring-2 focus:ring-[#e94560] outline-none" />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1.5 flex items-center gap-1.5"><Globe className="w-3.5 h-3.5 text-gray-400" /> Web</label>
+                  <input value={restaurantWebsite} onChange={e => setRestaurantWebsite(e.target.value)} placeholder="www.mirestaurante.com" className="w-full px-4 py-2.5 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 dark:text-white rounded-xl text-sm focus:ring-2 focus:ring-[#e94560] outline-none" />
+                </div>
+              </div>
+
+              {/* ── Identidad ── */}
+              <SectionTitle icon={<UtensilsCrossed className="w-4 h-4" />} label="Identidad del restaurante" />
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">{t('profile.cuisineType')}</label>
-                <select value={restaurantCuisine} onChange={e => setRestaurantCuisine(e.target.value)} className="w-full px-4 py-2.5 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 dark:text-white rounded-xl text-sm focus:ring-2 focus:ring-primary-500 outline-none">
-                  <option value="">{t('profile.selectCuisine')}</option>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1.5">Tipo de cocina</label>
+                <select value={restaurantCuisine} onChange={e => setRestaurantCuisine(e.target.value)} className="w-full px-4 py-2.5 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 dark:text-white rounded-xl text-sm focus:ring-2 focus:ring-[#e94560] outline-none">
+                  <option value="">Seleccionar...</option>
                   {CUISINE_TYPES.map(c => <option key={c} value={c}>{c}</option>)}
                 </select>
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">{t('profile.priceRange')}</label>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1.5">Rango de precios</label>
                 <div className="flex gap-2">
                   {PRICE_RANGES.map(p => (
-                    <button key={p} onClick={() => setRestaurantPriceRange(p)} className={`flex-1 py-2 rounded-xl text-sm font-medium transition-colors ${restaurantPriceRange === p ? 'bg-primary-500 text-white' : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-600'}`}>
+                    <button key={p} type="button" onClick={() => setRestaurantPriceRange(p)}
+                      className={`flex-1 py-2.5 rounded-xl text-sm font-semibold transition-colors ${restaurantPriceRange === p ? 'bg-[#e94560] text-white' : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'}`}>
                       {p}
                     </button>
                   ))}
                 </div>
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Description</label>
-                <textarea value={restaurantDescription} onChange={e => setRestaurantDescription(e.target.value)} rows={3} className="w-full px-4 py-2.5 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 dark:text-white rounded-xl text-sm focus:ring-2 focus:ring-primary-500 outline-none resize-none" />
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1.5 flex items-center gap-1.5"><Tag className="w-3.5 h-3.5 text-gray-400" /> Especialidades</label>
+                <div className="flex flex-wrap gap-2 mb-2">
+                  {restaurantSpecialties.map(s => (
+                    <span key={s} className="flex items-center gap-1 px-3 py-1 bg-[#e94560]/10 text-[#e94560] rounded-full text-sm font-medium">
+                      {s}
+                      <button type="button" onClick={() => setRestaurantSpecialties(prev => prev.filter(x => x !== s))}><X className="w-3 h-3" /></button>
+                    </span>
+                  ))}
+                </div>
+                <div className="flex gap-2">
+                  <input
+                    value={specialtyInput}
+                    onChange={e => setSpecialtyInput(e.target.value)}
+                    onKeyDown={e => { if (e.key === 'Enter' && specialtyInput.trim()) { setRestaurantSpecialties(prev => [...prev, specialtyInput.trim()]); setSpecialtyInput('') } }}
+                    placeholder="Ej: Paella, Chuletón, Sushi... (Enter para añadir)"
+                    className="flex-1 px-4 py-2.5 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 dark:text-white rounded-xl text-sm focus:ring-2 focus:ring-[#e94560] outline-none"
+                  />
+                  <button type="button"
+                    onClick={() => { if (specialtyInput.trim()) { setRestaurantSpecialties(prev => [...prev, specialtyInput.trim()]); setSpecialtyInput('') } }}
+                    className="px-3 py-2.5 bg-[#e94560] text-white rounded-xl hover:bg-[#d63d56] transition-colors">
+                    <Plus className="w-4 h-4" />
+                  </button>
+                </div>
               </div>
-              <div className="grid grid-cols-2 gap-4">
-                <FormInput label={t('profile.phone')} value={restaurantPhone} onChange={setRestaurantPhone} />
-                <FormInput label={t('profile.website')} value={restaurantWebsite} onChange={setRestaurantWebsite} />
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1.5">Descripción</label>
+                <textarea value={restaurantDescription} onChange={e => setRestaurantDescription(e.target.value)} rows={3}
+                  placeholder="Cuéntanos qué hace especial a tu restaurante..."
+                  className="w-full px-4 py-2.5 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 dark:text-white rounded-xl text-sm focus:ring-2 focus:ring-[#e94560] outline-none resize-none" />
               </div>
 
-              {/* Photos */}
+              {/* ── Horarios y capacidad ── */}
+              <SectionTitle icon={<Clock className="w-4 h-4" />} label="Horarios y capacidad" />
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-2">Photos</label>
-                <div className="flex flex-wrap gap-3">
-                  {(profile?.restaurant_photos || []).map((photo, i) => (
-                    <div key={i} className="relative w-24 h-24 rounded-xl overflow-hidden group">
-                      <img src={photo} alt="" className="w-full h-full object-cover" />
-                      <button
-                        onClick={() => handleRemovePhoto(photo)}
-                        className="absolute top-1 right-1 w-6 h-6 bg-black/60 hover:bg-black/80 rounded-full flex items-center justify-center text-white opacity-0 group-hover:opacity-100 transition-opacity"
-                      >
-                        <X className="w-3.5 h-3.5" />
-                      </button>
-                    </div>
-                  ))}
-                  {(profile?.restaurant_photos?.length || 0) < 6 && (
-                    <label className="w-24 h-24 rounded-xl border-2 border-dashed border-gray-300 dark:border-gray-600 flex items-center justify-center cursor-pointer hover:border-primary-400 transition-colors">
-                      {uploading ? <Loader2 className="w-5 h-5 text-gray-400 dark:text-gray-500 animate-spin" /> : <Camera className="w-6 h-6 text-gray-400 dark:text-gray-500" />}
-                      <input type="file" accept="image/jpeg,image/png,image/webp" onChange={handlePhotoUpload} disabled={uploading} className="hidden" />
-                    </label>
-                  )}
-                </div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1.5">Horarios de apertura</label>
+                <textarea value={restaurantHours} onChange={e => setRestaurantHours(e.target.value)} rows={2}
+                  placeholder="Ej: Lun-Vie 13:00-16:00 / 20:00-24:00. Sáb-Dom 12:00-24:00"
+                  className="w-full px-4 py-2.5 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 dark:text-white rounded-xl text-sm focus:ring-2 focus:ring-[#e94560] outline-none resize-none" />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1.5 flex items-center gap-1.5"><Hash className="w-3.5 h-3.5 text-gray-400" /> Total de mesas en el local</label>
+                <input type="number" min={1} max={200} value={restaurantTotalTables}
+                  onChange={e => setRestaurantTotalTables(e.target.value === '' ? '' : Number(e.target.value))}
+                  placeholder="Ej: 20"
+                  className="w-full px-4 py-2.5 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 dark:text-white rounded-xl text-sm focus:ring-2 focus:ring-[#e94560] outline-none" />
+              </div>
+
+              {/* ── Carta y ofertas ── */}
+              <SectionTitle icon={<Link className="w-4 h-4" />} label="Carta y ofertas" />
+              <FormInput label="Enlace a la carta / menú" value={restaurantMenuUrl} onChange={setRestaurantMenuUrl} placeholder="https://mirestaurante.com/carta" />
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1.5">Ofertas especiales</label>
+                <textarea value={restaurantOffers} onChange={e => setRestaurantOffers(e.target.value)} rows={2}
+                  placeholder="Ej: Menú del día 14€, 2x1 en cócteles los jueves, Brunch domingos..."
+                  className="w-full px-4 py-2.5 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 dark:text-white rounded-xl text-sm focus:ring-2 focus:ring-[#e94560] outline-none resize-none" />
+              </div>
+
+              {/* ── Fotos ── */}
+              <SectionTitle icon={<Camera className="w-4 h-4" />} label="Fotos del restaurante" />
+              <div className="flex flex-wrap gap-3">
+                {(profile?.restaurant_photos || []).map((photo, i) => (
+                  <div key={i} className="relative w-24 h-24 rounded-xl overflow-hidden group">
+                    <img src={photo} alt="" className="w-full h-full object-cover" />
+                    <button type="button" onClick={() => handleRemovePhoto(photo)}
+                      className="absolute top-1 right-1 w-6 h-6 bg-black/60 hover:bg-black/80 rounded-full flex items-center justify-center text-white opacity-0 group-hover:opacity-100 transition-opacity">
+                      <X className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                ))}
+                {(profile?.restaurant_photos?.length || 0) < 8 && (
+                  <label className="w-24 h-24 rounded-xl border-2 border-dashed border-gray-300 dark:border-gray-600 flex flex-col items-center justify-center cursor-pointer hover:border-[#e94560] transition-colors gap-1">
+                    {uploading ? <Loader2 className="w-5 h-5 text-gray-400 animate-spin" /> : <><Camera className="w-5 h-5 text-gray-400" /><span className="text-xs text-gray-400">Añadir</span></>}
+                    <input type="file" accept="image/jpeg,image/png,image/webp" onChange={handlePhotoUpload} disabled={uploading} className="hidden" />
+                  </label>
+                )}
               </div>
             </>
           )}
@@ -380,11 +459,21 @@ export function ProfilePage({ onNavigate, onAuthClick }: ProfilePageProps) {
   )
 }
 
-function FormInput({ label, value, onChange, type = 'text' }: { label: string; value: string; onChange: (v: string) => void; type?: string }) {
+function FormInput({ label, value, onChange, type = 'text', placeholder }: { label: string; value: string; onChange: (v: string) => void; type?: string; placeholder?: string }) {
   return (
     <div>
-      <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">{label}</label>
-      <input type={type} value={value} onChange={e => onChange(e.target.value)} className="w-full px-4 py-2.5 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 dark:text-white rounded-xl text-sm focus:ring-2 focus:ring-primary-500 outline-none" />
+      <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1.5">{label}</label>
+      <input type={type} value={value} onChange={e => onChange(e.target.value)} placeholder={placeholder}
+        className="w-full px-4 py-2.5 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 dark:text-white rounded-xl text-sm focus:ring-2 focus:ring-[#e94560] outline-none" />
+    </div>
+  )
+}
+
+function SectionTitle({ icon, label }: { icon: React.ReactNode; label: string }) {
+  return (
+    <div className="flex items-center gap-2 pt-2 pb-0.5 border-b border-gray-100 dark:border-gray-700">
+      <span className="text-[#e94560]">{icon}</span>
+      <span className="text-sm font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wide">{label}</span>
     </div>
   )
 }

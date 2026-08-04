@@ -36,6 +36,12 @@ export interface Profile {
   restaurant_phone: string | null
   restaurant_price_range: string | null
   restaurant_photos: string[] | null
+  restaurant_hours: string | null
+  restaurant_total_tables: number | null
+  restaurant_menu_url: string | null
+  restaurant_offers: string | null
+  restaurant_specialties: string[] | null
+  restaurant_address: string | null
   referred_by: string | null
   created_at: string
 }

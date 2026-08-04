@@ -163,6 +163,25 @@ export interface DinerTrustScore {
   review_count: number
 }
 
+export interface RestaurantReview {
+  id: string
+  user_id: string
+  restaurant_id: string
+  rating: number
+  comment: string | null
+  created_at: string
+  profiles?: Pick<Profile, 'id' | 'display_name' | 'avatar_url'>
+  restaurant_review_replies?: RestaurantReviewReply[]
+}
+
+export interface RestaurantReviewReply {
+  id: string
+  review_id: string
+  restaurant_id: string
+  reply: string
+  created_at: string
+}
+
 export interface Database {
   public: {
     Tables: {

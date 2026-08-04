@@ -1,14 +1,15 @@
 import { useMemo, useState } from 'react'
-import { MapPin, UtensilsCrossed, Star, ChevronLeft, Heart, Filter } from 'lucide-react'
+import { MapPin, UtensilsCrossed, Star, ChevronLeft, Heart, Filter, MessageSquare, Loader2, User, Send } from 'lucide-react'
 import { Navbar } from '@/components/Navbar'
 import { TableCard } from '@/components/TableCard'
 import { LoadingSpinner } from '@/components/LoadingSpinner'
 import { ErrorBanner } from '@/components/ErrorBanner'
 import { useRestaurantProfile } from '@/hooks/useRestaurants'
-import { useRestaurantReviews } from '@/hooks/useReviews'
+import { useRestaurantPublicReviews } from '@/hooks/useReviews'
 import { useFavorites } from '@/hooks/useFavorites'
 import { useAuth } from '@/contexts/AuthContext'
 import { LANGUAGE_OPTIONS } from '@/lib/options'
+import type { RestaurantReview } from '@/types/database'
 
 interface RestaurantProfilePageProps {
   restaurantId: string
@@ -17,15 +18,32 @@ interface RestaurantProfilePageProps {
 }
 
 export function RestaurantProfilePage({ restaurantId, onNavigate, onAuthClick }: RestaurantProfilePageProps) {
-  const { user } = useAuth()
+  const { user, profile: myProfile } = useAuth()
   const { restaurant, tables, loading, error } = useRestaurantProfile(restaurantId)
-  const { reviews } = useRestaurantReviews(restaurantId)
+  const { reviews, avgRating, submitReview, submitReply, submitting } = useRestaurantPublicReviews(restaurantId)
   const { isFavorite, toggleFavorite } = useFavorites()
   const [dateFrom, setDateFrom] = useState('')
   const [language, setLanguage] = useState('')
   const [minSeats, setMinSeats] = useState(0)
+  const [reviewRating, setReviewRating] = useState(0)
+  const [reviewHover, setReviewHover] = useState(0)
+  const [reviewComment, setReviewComment] = useState('')
+  const [reviewDone, setReviewDone] = useState(false)
+  const [reviewError, setReviewError] = useState<string | null>(null)
 
-  const avgRating = reviews.length > 0 ? reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length : null
+  const isRestaurant = myProfile?.role === 'restaurant'
+  const myReview = user ? reviews.find(r => r.user_id === user.id) : null
+
+  const handleSubmitReview = async () => {
+    if (!reviewRating) return
+    try {
+      setReviewError(null)
+      await submitReview(reviewRating, reviewComment)
+      setReviewDone(true)
+    } catch (e) {
+      setReviewError((e as Error).message)
+    }
+  }
 
   const filteredTables = useMemo(() => {
     return tables.filter(t => {
@@ -192,7 +210,138 @@ export function RestaurantProfilePage({ restaurantId, onNavigate, onAuthClick }:
             </div>
           )}
         </div>
+
+        {/* ── Reseñas ─────────────────────────────────────────────── */}
+        <div className="mt-10">
+          <div className="flex items-center gap-2 mb-5">
+            <h2 className="text-lg font-display font-bold text-gray-900 dark:text-white">Reseñas</h2>
+            {avgRating !== null && (
+              <span className="flex items-center gap-1 text-sm text-yellow-600 font-medium">
+                <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" /> {avgRating.toFixed(1)} <span className="text-gray-400 font-normal">({reviews.length})</span>
+              </span>
+            )}
+          </div>
+
+          {/* Form for logged-in non-restaurant users */}
+          {user && !isRestaurant && !reviewDone && !myReview && (
+            <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-sm p-5 mb-5">
+              <p className="text-sm font-semibold text-gray-800 dark:text-white mb-3">Deja tu opinión</p>
+              {reviewError && <p className="text-xs text-red-500 mb-3">{reviewError}</p>}
+              <div className="flex gap-1 mb-3">
+                {[1,2,3,4,5].map(s => (
+                  <button key={s} type="button"
+                    onMouseEnter={() => setReviewHover(s)}
+                    onMouseLeave={() => setReviewHover(0)}
+                    onClick={() => setReviewRating(s)}
+                    className="p-0.5 transition-transform hover:scale-110">
+                    <Star className={`w-7 h-7 transition-colors ${s <= (reviewHover || reviewRating) ? 'fill-yellow-400 text-yellow-400' : 'text-gray-200 dark:text-gray-600'}`} />
+                  </button>
+                ))}
+              </div>
+              <textarea
+                value={reviewComment}
+                onChange={e => setReviewComment(e.target.value)}
+                rows={3}
+                placeholder="Cuéntanos tu experiencia (opcional)..."
+                className="w-full px-4 py-2.5 border border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-900 dark:text-white rounded-xl text-sm focus:ring-2 focus:ring-[#e94560] outline-none resize-none"
+              />
+              <button
+                onClick={handleSubmitReview}
+                disabled={!reviewRating || submitting}
+                className="mt-3 flex items-center gap-2 px-5 py-2 bg-[#e94560] text-white text-sm font-semibold rounded-xl hover:bg-[#d63d56] disabled:opacity-40 transition-colors"
+              >
+                {submitting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
+                Publicar reseña
+              </button>
+            </div>
+          )}
+
+          {reviewDone && (
+            <div className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-2xl p-5 mb-5 text-center">
+              <p className="text-green-700 dark:text-green-300 font-medium">¡Gracias por tu reseña!</p>
+            </div>
+          )}
+
+          {myReview && !reviewDone && (
+            <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-2xl p-4 mb-5 text-sm text-blue-700 dark:text-blue-300">
+              Ya has dejado una reseña para este restaurante.
+            </div>
+          )}
+
+          {/* Reviews list */}
+          {reviews.length === 0 ? (
+            <div className="text-center py-12 bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700">
+              <MessageSquare className="w-8 h-8 text-gray-200 dark:text-gray-600 mx-auto mb-2" />
+              <p className="text-gray-500 dark:text-gray-400 text-sm">Sin reseñas todavía. ¡Sé el primero!</p>
+            </div>
+          ) : (
+            <div className="space-y-4">
+              {reviews.map(r => <PublicReviewCard key={r.id} review={r} isRestaurant={isRestaurant} onReply={submitReply} />)}
+            </div>
+          )}
+        </div>
       </main>
+    </div>
+  )
+}
+
+function PublicReviewCard({ review, isRestaurant, onReply }: { review: RestaurantReview; isRestaurant: boolean; onReply: (reviewId: string, reply: string) => Promise<void> }) {
+  const existingReply = review.restaurant_review_replies?.[0]
+  const [showReplyBox, setShowReplyBox] = useState(false)
+  const [replyText, setReplyText] = useState('')
+  const [saving, setSaving] = useState(false)
+  const profile = review.profiles
+  const date = new Date(review.created_at).toLocaleDateString('es-ES', { day: 'numeric', month: 'short', year: 'numeric' })
+
+  const handleSave = async () => {
+    if (!replyText.trim()) return
+    setSaving(true)
+    try { await onReply(review.id, replyText.trim()); setShowReplyBox(false) }
+    finally { setSaving(false) }
+  }
+
+  return (
+    <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-sm p-5">
+      <div className="flex items-start gap-3">
+        <div className="w-9 h-9 rounded-full bg-gray-100 dark:bg-gray-700 flex items-center justify-center overflow-hidden flex-shrink-0">
+          {profile?.avatar_url ? <img src={profile.avatar_url} alt="" className="w-full h-full object-cover" /> : <User className="w-4 h-4 text-gray-400" />}
+        </div>
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center justify-between gap-2">
+            <p className="font-semibold text-sm text-gray-900 dark:text-white truncate">{profile?.display_name || 'Usuario'}</p>
+            <p className="text-xs text-gray-400 flex-shrink-0">{date}</p>
+          </div>
+          <div className="flex gap-0.5 mt-0.5">
+            {[1,2,3,4,5].map(s => <Star key={s} className={`w-3.5 h-3.5 ${s <= review.rating ? 'fill-yellow-400 text-yellow-400' : 'text-gray-200 dark:text-gray-600'}`} />)}
+          </div>
+        </div>
+      </div>
+      {review.comment && <p className="mt-3 text-sm text-gray-700 dark:text-gray-300 leading-relaxed">{review.comment}</p>}
+
+      {existingReply && (
+        <div className="mt-4 pl-4 border-l-2 border-[#e94560]/30">
+          <p className="text-xs font-semibold text-[#e94560] mb-1">Respuesta del restaurante</p>
+          <p className="text-sm text-gray-600 dark:text-gray-300">{existingReply.reply}</p>
+        </div>
+      )}
+
+      {isRestaurant && !existingReply && !showReplyBox && (
+        <button onClick={() => setShowReplyBox(true)} className="mt-3 flex items-center gap-1.5 text-xs text-[#e94560] hover:text-[#d63d56] font-medium transition-colors">
+          <MessageSquare className="w-3.5 h-3.5" /> Responder
+        </button>
+      )}
+
+      {isRestaurant && showReplyBox && (
+        <div className="mt-4">
+          <textarea value={replyText} onChange={e => setReplyText(e.target.value)} rows={2} placeholder="Tu respuesta..." className="w-full px-4 py-2.5 border border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-900 dark:text-white rounded-xl text-sm focus:ring-2 focus:ring-[#e94560] outline-none resize-none" />
+          <div className="flex justify-end gap-2 mt-2">
+            <button onClick={() => setShowReplyBox(false)} className="px-3 py-1.5 text-sm text-gray-500">Cancelar</button>
+            <button onClick={handleSave} disabled={saving || !replyText.trim()} className="flex items-center gap-1.5 px-4 py-1.5 bg-[#e94560] text-white text-sm font-medium rounded-lg hover:bg-[#d63d56] disabled:opacity-50 transition-colors">
+              {saving ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Send className="w-3.5 h-3.5" />} Guardar
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

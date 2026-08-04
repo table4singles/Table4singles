@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react'
-import { LayoutGrid, Search, Plus, CalendarDays, CalendarClock, Mail, User, LogOut, Bell, LayoutDashboard, Settings, Users, FileText } from 'lucide-react'
+import { LayoutGrid, Search, Plus, CalendarDays, CalendarClock, Mail, User, LogOut, Bell, LayoutDashboard, Settings, Users, FileText, Star } from 'lucide-react'
 import { useAuth } from '@/contexts/AuthContext'
 import { useLanguage } from '@/contexts/LanguageContext'
 import { useNotifications } from '@/hooks/useNotifications'
@@ -44,6 +44,7 @@ export function Navbar({ currentPage, onNavigate, onAuthClick }: NavbarProps) {
               <NavLink active={currentPage === 'restaurant-dashboard'} onClick={() => onNavigate('restaurant-dashboard')} icon={<LayoutDashboard className="w-4 h-4" />} label={t('nav.dashboard')} />
               <NavLink active={currentPage === 'agenda'} onClick={() => onNavigate('agenda')} icon={<CalendarClock className="w-4 h-4" />} label={t('nav.agenda')} />
               <NavLink active={currentPage === 'my-tables'} onClick={() => onNavigate('my-tables')} icon={<CalendarDays className="w-4 h-4" />} label={t('nav.myTables')} />
+              <NavLink active={currentPage === 'reviews'} onClick={() => onNavigate('reviews')} icon={<Star className="w-4 h-4" />} label="Reseñas" />
             </>
           )}
           {user && profile?.role === 'user' && (
@@ -135,6 +136,7 @@ export function Navbar({ currentPage, onNavigate, onAuthClick }: NavbarProps) {
                 <MobileNavButton active={currentPage === 'restaurant-dashboard'} onClick={() => onNavigate('restaurant-dashboard')} icon={<LayoutDashboard className="w-5 h-5" />} label={t('nav.dashboard')} />
                 <MobileNavButton active={currentPage === 'agenda'} onClick={() => onNavigate('agenda')} icon={<CalendarClock className="w-5 h-5" />} label={t('nav.agenda')} />
                 <MobileNavButton active={currentPage === 'my-tables'} onClick={() => onNavigate('my-tables')} icon={<CalendarDays className="w-5 h-5" />} label={t('nav.myTables')} />
+                <MobileNavButton active={currentPage === 'reviews'} onClick={() => onNavigate('reviews')} icon={<Star className="w-5 h-5" />} label="Reseñas" />
               </>
             ) : (
               <>

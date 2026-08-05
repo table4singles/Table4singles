@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { ArrowLeft, MapPin, Clock, Users, Calendar, Loader2, MessageSquare, Star, Download, UserPlus, XCircle, PartyPopper, Check, Mail } from 'lucide-react'
+import { ArrowLeft, MapPin, Clock, Users, Calendar, Loader2, MessageSquare, Star, Download, UserPlus, XCircle, PartyPopper, Check, Mail, Pencil, Save } from 'lucide-react'
 import { Navbar } from '@/components/Navbar'
 import { ShareButton } from '@/components/ShareButton'
 import { StarRating } from '@/components/StarRating'
@@ -25,7 +25,8 @@ interface TableDetailPageProps {
 
 export function TableDetailPage({ tableId, paymentSuccess, onNavigate, onAuthClick }: TableDetailPageProps) {
   const { t, language } = useLanguage()
-  const { user } = useAuth()
+  const { user, profile } = useAuth()
+  const isRestaurantUser = profile?.role === 'restaurant'
   const { table, participants, hostProfile, loading, error, joinTable, cancelTable, refresh } = useTableDetail(tableId)
   const { reviews, submitReview } = useReviews(tableId)
   const { messages, sendMessage } = useMessages(tableId)
@@ -47,6 +48,13 @@ export function TableDetailPage({ tableId, paymentSuccess, onNavigate, onAuthCli
   const [autoInviteSending, setAutoInviteSending] = useState(false)
   const [autoInviteError, setAutoInviteError] = useState<string | null>(null)
   const [autoInviteSuccess, setAutoInviteSuccess] = useState(false)
+  const [showEdit, setShowEdit] = useState(false)
+  const [editDate, setEditDate] = useState('')
+  const [editTime, setEditTime] = useState('')
+  const [editMaxSeats, setEditMaxSeats] = useState(0)
+  const [editZone, setEditZone] = useState('')
+  const [editSaving, setEditSaving] = useState(false)
+  const [editError, setEditError] = useState<string | null>(null)
 
   // Si venias de "Comensales" con la intencion de invitar a alguien y aun no tenias mesa,
   // en cuanto confirmas el pago con deposito (redirect de Stripe) ofrecemos enviar la invitacion.
@@ -123,6 +131,44 @@ export function TableDetailPage({ tableId, paymentSuccess, onNavigate, onAuthCli
   const handleCancelTable = async () => {
     await cancelTable()
     setShowCancelTable(false)
+  }
+
+  const openEdit = () => {
+    if (!table) return
+    setEditDate(table.date)
+    setEditTime(table.time.slice(0, 5))
+    setEditMaxSeats(table.max_seats)
+    setEditZone(table.description || '')
+    setEditError(null)
+    setShowEdit(true)
+  }
+
+  const handleSaveEdit = async () => {
+    if (!table) return
+    const occupied = table.max_seats - table.available_seats
+    if (editMaxSeats < occupied) {
+      setEditError(`Ya hay ${occupied} comensales apuntados. El máximo no puede ser menor.`)
+      return
+    }
+    setEditSaving(true)
+    setEditError(null)
+    const { error: err } = await supabase
+      .from('dining_tables')
+      .update({
+        date: editDate,
+        time: editTime,
+        max_seats: editMaxSeats,
+        available_seats: editMaxSeats - occupied,
+        description: editZone || null,
+      })
+      .eq('id', table.id)
+    if (err) {
+      setEditError(err.message)
+    } else {
+      setShowEdit(false)
+      await refresh()
+    }
+    setEditSaving(false)
   }
 
   const handleSendMessage = async () => {
@@ -327,6 +373,11 @@ export function TableDetailPage({ tableId, paymentSuccess, onNavigate, onAuthCli
 
               {isHost && !isCancelled && (
                 <>
+                  {!isPast && (
+                    <button onClick={openEdit} className="w-full py-2.5 bg-[#e94560] text-white rounded-xl text-sm font-medium hover:bg-[#d63d56] flex items-center justify-center gap-2">
+                      <Pencil className="w-4 h-4" /> Editar mesa
+                    </button>
+                  )}
                   {!isFull && !isPast && (
                     <button onClick={() => setShowInvite(true)} className="w-full py-2.5 bg-blue-50 text-blue-700 border border-blue-200 rounded-xl text-sm font-medium hover:bg-blue-100 flex items-center justify-center gap-2">
                       <UserPlus className="w-4 h-4" /> {t('invite.title')}
@@ -340,11 +391,13 @@ export function TableDetailPage({ tableId, paymentSuccess, onNavigate, onAuthCli
                 </>
               )}
 
-              <button onClick={downloadICS} className="w-full py-2.5 border border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300 rounded-xl text-sm font-medium hover:bg-gray-50 dark:hover:bg-gray-700 flex items-center justify-center gap-2">
-                <Download className="w-4 h-4" /> Add to calendar
-              </button>
+              {!isRestaurantUser && (
+                <button onClick={downloadICS} className="w-full py-2.5 border border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300 rounded-xl text-sm font-medium hover:bg-gray-50 dark:hover:bg-gray-700 flex items-center justify-center gap-2">
+                  <Download className="w-4 h-4" /> Añadir al calendario
+                </button>
+              )}
 
-              {(isParticipant || isHost) && (
+              {(isParticipant || (isHost && !isRestaurantUser)) && (
                 <button onClick={() => setShowChat(!showChat)} className="w-full py-2.5 border border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300 rounded-xl text-sm font-medium hover:bg-gray-50 dark:hover:bg-gray-700 flex items-center justify-center gap-2">
                   <MessageSquare className="w-4 h-4" /> {t('chat.title')} ({messages.length})
                 </button>
@@ -442,6 +495,49 @@ export function TableDetailPage({ tableId, paymentSuccess, onNavigate, onAuthCli
             onClose={() => setShowCancelTable(false)}
             onConfirm={handleCancelTable}
           />
+        )}
+
+        {/* Edit table modal */}
+        {showEdit && (
+          <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4" onClick={() => setShowEdit(false)}>
+            <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl w-full max-w-md p-6" onClick={e => e.stopPropagation()}>
+              <h3 className="text-lg font-display font-bold text-gray-900 dark:text-white mb-5">Editar mesa</h3>
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1.5">Fecha</label>
+                  <input type="date" value={editDate} onChange={e => setEditDate(e.target.value)} className="w-full px-4 py-2.5 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 dark:text-white rounded-xl text-sm focus:ring-2 focus:ring-[#e94560] outline-none" />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1.5">Hora</label>
+                  <input type="time" value={editTime} onChange={e => setEditTime(e.target.value)} className="w-full px-4 py-2.5 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 dark:text-white rounded-xl text-sm focus:ring-2 focus:ring-[#e94560] outline-none" />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1.5">Máximo de comensales</label>
+                  <div className="flex items-center gap-3">
+                    <button type="button" onClick={() => setEditMaxSeats(v => Math.max(1, v - 1))} className="w-10 h-10 rounded-xl border border-gray-300 dark:border-gray-600 flex items-center justify-center text-lg font-medium hover:bg-gray-50 dark:hover:bg-gray-700">−</button>
+                    <span className="text-xl font-bold text-gray-900 dark:text-white w-8 text-center">{editMaxSeats}</span>
+                    <button type="button" onClick={() => setEditMaxSeats(v => Math.min(20, v + 1))} className="w-10 h-10 rounded-xl border border-gray-300 dark:border-gray-600 flex items-center justify-center text-lg font-medium hover:bg-gray-50 dark:hover:bg-gray-700">+</button>
+                  </div>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1.5">Zona</label>
+                  <div className="flex flex-wrap gap-2">
+                    {['Salón', 'Salón VIP', 'Terraza'].map(z => (
+                      <button key={z} type="button" onClick={() => setEditZone(z)} className={`px-3 py-1.5 rounded-full text-sm font-medium transition-colors ${editZone === z ? 'bg-[#e94560] text-white' : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200'}`}>{z}</button>
+                    ))}
+                  </div>
+                  <input value={editZone} onChange={e => setEditZone(e.target.value)} placeholder="O escribe una zona específica..." className="mt-2 w-full px-4 py-2.5 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 dark:text-white rounded-xl text-sm focus:ring-2 focus:ring-[#e94560] outline-none" />
+                </div>
+                {editError && <p className="text-sm text-red-600 bg-red-50 px-3 py-2 rounded-lg">{editError}</p>}
+              </div>
+              <div className="flex gap-3 mt-6">
+                <button onClick={() => setShowEdit(false)} className="flex-1 py-2.5 border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-200 rounded-xl text-sm font-medium hover:bg-gray-50 dark:hover:bg-gray-700">Cancelar</button>
+                <button onClick={handleSaveEdit} disabled={editSaving} className="flex-1 py-2.5 bg-[#e94560] text-white rounded-xl text-sm font-semibold hover:bg-[#d63d56] disabled:opacity-50 flex items-center justify-center gap-2">
+                  {editSaving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />} Guardar
+                </button>
+              </div>
+            </div>
+          </div>
         )}
 
         {showAutoInvite && pendingInvite && (

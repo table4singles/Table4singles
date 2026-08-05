@@ -32,10 +32,8 @@ function AppRouter() {
   const [paymentSuccess, setPaymentSuccess] = useState(false)
 
   useEffect(() => {
-    if (!loading && user && profile) {
-      if (['landing', 'browse'].includes(page)) {
-        setPage(profile.role === 'restaurant' ? 'restaurant-dashboard' : 'browse')
-      }
+    if (!loading && user && profile && page === 'landing') {
+      setPage(profile.role === 'restaurant' ? 'restaurant-dashboard' : 'browse')
     }
     if (!loading && !user && !['landing', 'politica-privacidad', 'aviso-legal'].includes(page)) setPage('landing')
   }, [user, loading, profile])

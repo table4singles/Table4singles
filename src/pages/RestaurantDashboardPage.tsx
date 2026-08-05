@@ -18,18 +18,23 @@ export function RestaurantDashboardPage({ onNavigate, onAuthClick }: RestaurantD
   const { hosting, loading, error, cancelHostedTable, refresh } = useMyTables(user?.id ?? null)
   const [cancelTableId, setCancelTableId] = useState<string | null>(null)
   const [avgRating, setAvgRating] = useState<number | null>(null)
+  const [reviewCount, setReviewCount] = useState(0)
 
   const locale = language === 'de' ? 'de-DE' : language === 'en' ? 'en-GB' : 'es-ES'
 
   useEffect(() => {
     if (!user) return
     supabase
-      .from('reviews')
+      .from('restaurant_reviews')
       .select('rating')
-      .eq('host_id', user.id)
+      .eq('restaurant_id', user.id)
       .then(({ data }) => {
         if (data && data.length > 0) {
           setAvgRating(data.reduce((sum, r) => sum + r.rating, 0) / data.length)
+          setReviewCount(data.length)
+        } else {
+          setAvgRating(null)
+          setReviewCount(0)
         }
       })
   }, [user])
@@ -89,15 +94,23 @@ export function RestaurantDashboardPage({ onNavigate, onAuthClick }: RestaurantD
               <p className="text-xs text-gray-500 dark:text-gray-400">{t('restaurantDashboard.totalDiners')}</p>
             </div>
           </div>
-          <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-4 flex items-center gap-3">
+          <button
+            type="button"
+            onClick={() => onNavigate('reviews')}
+            className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-4 flex items-center gap-3 text-left hover:shadow-md hover:border-yellow-300 dark:hover:border-yellow-600 transition-all"
+          >
             <div className="w-10 h-10 rounded-full bg-yellow-100 flex items-center justify-center flex-shrink-0">
               <Star className="w-5 h-5 text-yellow-600" />
             </div>
             <div>
               <p className="text-xl font-bold text-gray-900 dark:text-white">{avgRating ? avgRating.toFixed(1) : '-'}</p>
-              <p className="text-xs text-gray-500 dark:text-gray-400">{t('restaurantDashboard.avgRating')}</p>
+              <p className="text-xs text-gray-500 dark:text-gray-400">
+                {reviewCount > 0
+                  ? `${reviewCount} ${reviewCount === 1 ? 'reseña' : 'reseñas'}`
+                  : t('restaurantDashboard.avgRating')}
+              </p>
             </div>
-          </div>
+          </button>
         </div>
 
         {/* Quick access shortcuts */}

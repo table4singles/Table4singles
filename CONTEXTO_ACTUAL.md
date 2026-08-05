@@ -12,8 +12,7 @@ DEPLOY: hecho en VERCEL (no Netlify). Proyecto `table4singles` en team `jai-a359
 Dev local: `npm run dev` → localhost:5173 (si puerto ocupado, matar procesos viejos: `lsof -i :5173`, `kill -9 <pid>`). OJO: si tras HMR algo raro persiste (ej. cambios que no aparecen), puede haber un proceso vite zombie en el puerto sirviendo codigo viejo desde una sesion anterior — matar y arrancar limpio.
 
 ## MIGRACIONES SQL — TODAS EJECUTADAS ✅
-001 schema.sql, 002 lifecycle+notifs, 003 onboarding, 004 settings, 005 avatar, 006 geolocation, 007 lock_role, 008 referrals, 009 favorites, 010 diner_reviews, 011 reminders (pg_cron habilitado, job `send_dinner_reminders_hourly` programado con id 1, `0 * * * *`), 012 participant_invites (participantes con reserva aprobada tambien pueden crear invitaciones, no solo el host).
-Todas en `supabase/migrations/`. Ninguna pendiente ahora mismo.
+001–016 ejecutadas ✅ (incluye 015 restaurant_reviews + 016 notify_restaurant_reviews).
 OJO: MCP de Supabase conectado en este entorno NO es el proyecto Table4singles (ve otros proyectos: ComandIAvoz, QuieroBailar). Migraciones se ejecutan a mano en SQL Editor del dashboard real (zocrwanhcschmydczgeh).
 
 ## HECHO ✅
@@ -70,11 +69,17 @@ Ya cubre el 100% de paginas y componentes (antes faltaba el lado restaurante y l
 - Verificado visualmente con capturas en local (Crear mesa, Dashboard, Politica de Privacidad, Aviso Legal) via CDP (`document.documentElement.classList.add('dark')`), sin bloques blancos ni texto ilegible
 - BONUS fix: el boton "Politica de Privacidad" del footer de LandingPage llamaba a `onNavigate('privacy')` pero la ruta real en App.tsx es `'politica-privacidad'` -> nunca navegaba. Corregido (bug pre-existente, no relacionado con dark mode)
 
+### RESEÑAS UNIFICADAS (local) ✅ codigo
+- Fuente unica de media del local: `restaurant_reviews` (perfil usuario + pagina Reseñas restaurante + media del Dashboard).
+- Dashboard ya NO lee `reviews` (post-cena de mesa); lee `restaurant_reviews` por `restaurant_id`. Card de estrellas clicable → pagina Reseñas.
+- Notifs: migracion 016 ejecutada ✅ (triggers INSERT/UPDATE → `notifications` tipo `new_restaurant_review` / `updated_restaurant_review`).
+- Siguen aparte: `reviews` (post-cena por mesa) y `diner_reviews` (confianza entre comensales).
+
 ## PENDIENTE ⚠️
-1. PROBAR flujo completo (local o en Vercel) con las cuentas de prueba de arriba: unirse a mesa, chat, reseña, favoritos, mapa, resenas entre comensales, referidos, Comensales+Invitar
-2. STRIPE: crear Edge Functions (create-checkout, stripe-webhook), conectar deposito. Falta cuenta Stripe+keys
-3. LOGIN SOCIAL: solo falta config externa (Google Cloud Console + Apple Developer + pegar keys en Supabase dashboard). Código ya OK.
-4. DOMINIO: conectar table4singles.online al proyecto de Vercel (cambiar DNS/nameservers)
+1. PROBAR flujo completo con cuentas de prueba: unirse a mesa, chat, reseña de local (+ notif al restaurante), favoritos, mapa, referidos, Comensales+Invitar
+2. STRIPE: Edge Functions + deposito. Falta cuenta Stripe+keys
+3. LOGIN SOCIAL: solo config externa (Google/Apple + Supabase dashboard). Código ya OK.
+4. DOMINIO: conectar table4singles.online a Vercel
 
 ## ESTRUCTURA CLAVE
 ```
@@ -98,7 +103,7 @@ src/lib/geocoding.ts     geocodeQuery (Nominatim/OSM) + haversineDistanceKm + RA
 src/lib/options.ts       LANGUAGE_OPTIONS + INTEREST_OPTIONS (chips)
 src/types/database.ts    tipos+Profile con todos los campos nuevos (incluye referred_by, created_at)
 supabase/schema.sql       schema base
-supabase/migrations/      002 a 012, todas ejecutadas (ver arriba)
+supabase/migrations/      002–016, todas ejecutadas
 scripts/seed-test-accounts.mjs  crea/actualiza 2 users+2 restaurantes+mesa de prueba via API admin (SUPABASE_SECRET_KEY). Ya ejecutado, ver cuentas arriba
 ```
 

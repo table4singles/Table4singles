@@ -32,9 +32,13 @@ function AppRouter() {
   const [paymentSuccess, setPaymentSuccess] = useState(false)
 
   useEffect(() => {
-    if (!loading && user && page === 'landing') setPage('browse')
+    if (!loading && user && profile) {
+      if (['landing', 'browse'].includes(page)) {
+        setPage(profile.role === 'restaurant' ? 'restaurant-dashboard' : 'browse')
+      }
+    }
     if (!loading && !user && !['landing', 'politica-privacidad', 'aviso-legal'].includes(page)) setPage('landing')
-  }, [user, loading])
+  }, [user, loading, profile])
 
   // Capture referral code (?ref=<user_id>) for use during sign up
   useEffect(() => {
@@ -99,7 +103,7 @@ function AppRouter() {
         return <LandingPage onNavigate={navigate} onAuthClick={openAuth} />
       case 'browse':
         return profile?.role === 'restaurant'
-          ? <BrowsePage onNavigate={navigate} onAuthClick={openAuth} />
+          ? <RestaurantDashboardPage onNavigate={navigate} onAuthClick={openAuth} />
           : <RestaurantsBrowsePage onNavigate={navigate} onAuthClick={openAuth} />
       case 'restaurant-profile':
         return selectedId ? <RestaurantProfilePage restaurantId={selectedId} onNavigate={navigate} onAuthClick={openAuth} /> : null

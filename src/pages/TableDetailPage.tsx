@@ -397,9 +397,10 @@ export function TableDetailPage({ tableId, paymentSuccess, onNavigate, onAuthCli
                 </button>
               )}
 
-              {(isParticipant || (isHost && !isRestaurantUser)) && (
+              {(isParticipant || isHost) && (
                 <button onClick={() => setShowChat(!showChat)} className="w-full py-2.5 border border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300 rounded-xl text-sm font-medium hover:bg-gray-50 dark:hover:bg-gray-700 flex items-center justify-center gap-2">
-                  <MessageSquare className="w-4 h-4" /> {t('chat.title')} ({messages.length})
+                  <MessageSquare className="w-4 h-4" />
+                  {isRestaurantUser ? `Mensajes a comensales (${messages.length})` : `${t('chat.title')} (${messages.length})`}
                 </button>
               )}
 

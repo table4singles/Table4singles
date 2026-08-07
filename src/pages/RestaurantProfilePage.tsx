@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react'
-import { MapPin, UtensilsCrossed, Star, ChevronLeft, Heart, Filter, MessageSquare, Loader2, User, Send } from 'lucide-react'
+import { MapPin, UtensilsCrossed, Star, ChevronLeft, Heart, Filter, MessageSquare, Loader2, User, Send, Clock, Tag, Link, Sparkles } from 'lucide-react'
 import { Navbar } from '@/components/Navbar'
 import { TableCard } from '@/components/TableCard'
 import { LoadingSpinner } from '@/components/LoadingSpinner'
@@ -135,6 +135,43 @@ export function RestaurantProfilePage({ restaurantId, onNavigate, onAuthClick }:
               {restaurant.restaurant_description && (
                 <p className="text-sm text-gray-600 dark:text-gray-300 mt-4 leading-relaxed">{restaurant.restaurant_description}</p>
               )}
+
+              {/* Campos extra de la migración 014 */}
+              <div className="mt-4 space-y-2">
+                {restaurant.restaurant_hours && (
+                  <p className="flex items-start gap-2 text-sm text-gray-600 dark:text-gray-300">
+                    <Clock className="w-4 h-4 flex-shrink-0 mt-0.5 text-gray-400" />
+                    <span>{restaurant.restaurant_hours}</span>
+                  </p>
+                )}
+                {restaurant.restaurant_offers && (
+                  <p className="flex items-start gap-2 text-sm text-gray-600 dark:text-gray-300">
+                    <Tag className="w-4 h-4 flex-shrink-0 mt-0.5 text-gray-400" />
+                    <span>{restaurant.restaurant_offers}</span>
+                  </p>
+                )}
+                {restaurant.restaurant_menu_url && (
+                  <a
+                    href={restaurant.restaurant_menu_url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-2 text-sm text-primary-600 dark:text-primary-400 hover:underline"
+                  >
+                    <Link className="w-4 h-4 flex-shrink-0" />
+                    Ver menú
+                  </a>
+                )}
+                {restaurant.restaurant_specialties && restaurant.restaurant_specialties.length > 0 && (
+                  <div className="flex items-start gap-2">
+                    <Sparkles className="w-4 h-4 flex-shrink-0 mt-0.5 text-gray-400" />
+                    <div className="flex flex-wrap gap-1">
+                      {restaurant.restaurant_specialties.map(s => (
+                        <span key={s} className="text-xs px-2 py-0.5 rounded-full bg-primary-50 dark:bg-primary-900/30 text-primary-700 dark:text-primary-300">{s}</span>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         </div>

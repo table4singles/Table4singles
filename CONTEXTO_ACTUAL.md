@@ -11,8 +11,10 @@ Dominio: table4singles.online (aun apunta build vieja, dominio personalizado en 
 DEPLOY: hecho en VERCEL (no Netlify). Proyecto `table4singles` en team `jai-a359`. URL producción: https://table4singles.vercel.app (verificado OK: carga, estilos Tailwind, sin errores consola/red/Supabase). Env vars `VITE_SUPABASE_URL`/`VITE_SUPABASE_ANON_KEY` configuradas en Production+Preview. Cada push a `main` dispara redeploy automático (Git integration).
 Dev local: `npm run dev` → localhost:5173 (si puerto ocupado, matar procesos viejos: `lsof -i :5173`, `kill -9 <pid>`). OJO: si tras HMR algo raro persiste (ej. cambios que no aparecen), puede haber un proceso vite zombie en el puerto sirviendo codigo viejo desde una sesion anterior — matar y arrancar limpio.
 
-## MIGRACIONES SQL — TODAS EJECUTADAS ✅
-001–016 ejecutadas ✅ (incluye 015 restaurant_reviews + 016 notify_restaurant_reviews).
+## MIGRACIONES SQL
+001–016 ejecutadas ✅
+017 notify_participant_left_and_reply — **PENDIENTE ejecutar** (SQL Editor zocrwanhcschmydczgeh): trigger notify cuando participante cancela (→ restaurante), trigger notify cuando restaurante responde reseña (→ usuario), RPC `remove_participant` (host elimina comensal).
+018 realtime_notifications — **PENDIENTE ejecutar**: `ALTER PUBLICATION supabase_realtime ADD TABLE public.notifications`.
 OJO: MCP de Supabase conectado en este entorno NO es el proyecto Table4singles (ve otros proyectos: ComandIAvoz, QuieroBailar). Migraciones se ejecutan a mano en SQL Editor del dashboard real (zocrwanhcschmydczgeh).
 
 ## HECHO ✅
@@ -75,11 +77,21 @@ Ya cubre el 100% de paginas y componentes (antes faltaba el lado restaurante y l
 - Notifs: migracion 016 ejecutada ✅ (triggers INSERT/UPDATE → `notifications` tipo `new_restaurant_review` / `updated_restaurant_review`).
 - Siguen aparte: `reviews` (post-cena por mesa) y `diner_reviews` (confianza entre comensales).
 
+### SYNC USUARIO↔RESTAURANTE — GAPS CERRADOS ✅ codigo
+Todos los flujos bidireccionales corregidos (migraciones 017-018 pendientes de ejecutar):
+- **B (participante cancela)**: trigger `notify_participant_left` (017) → notif al restaurante. Agenda live ahora también refresca participantes cuando suben las plazas (no solo al bajar).
+- **D (reseñas post-cena)**: `RestaurantReviewsPage` tiene dos pestañas: "Reseñas del local" (`restaurant_reviews`) y "Valoraciones de cenas" (`reviews` por `host_id`).
+- **J (approve/reject)**: RPC `remove_participant` (017) → el restaurante puede eliminar un comensal desde el detalle de mesa (botón aparece al hacer hover sobre cada participante, solo si es host y la mesa no ha pasado).
+- **K (campos extra perfil)**: `RestaurantProfilePage` muestra `restaurant_hours`, `restaurant_offers`, `restaurant_menu_url`, `restaurant_specialties` si tienen valor.
+- **L (respuesta a reseña)**: trigger `notify_review_reply` (017) → notifica al usuario cuando el restaurante responde.
+- **Transversal (notifs Realtime)**: `useNotifications` suscrito a `postgres_changes INSERT` filtrado por `user_id`. Requiere habilitar `notifications` en publicación Realtime (migración 018).
+
 ## PENDIENTE ⚠️
-1. PROBAR flujo completo con cuentas de prueba: unirse a mesa, chat, reseña de local (+ notif al restaurante), favoritos, mapa, referidos, Comensales+Invitar
-2. STRIPE: Edge Functions + deposito. Falta cuenta Stripe+keys
-3. LOGIN SOCIAL: solo config externa (Google/Apple + Supabase dashboard). Código ya OK.
-4. DOMINIO: conectar table4singles.online a Vercel
+1. EJECUTAR migraciones 017 y 018 en SQL Editor (zocrwanhcschmydczgeh)
+2. PROBAR flujo completo con cuentas de prueba: unirse a mesa, chat, reseñas (local + cena), favoritos, mapa, referidos, Comensales+Invitar, notifs en tiempo real
+3. STRIPE: Edge Functions + deposito. Falta cuenta Stripe+keys
+4. LOGIN SOCIAL: solo config externa (Google/Apple + Supabase dashboard). Código ya OK.
+5. DOMINIO: conectar table4singles.online a Vercel
 
 ## ESTRUCTURA CLAVE
 ```

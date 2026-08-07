@@ -91,9 +91,9 @@ export function useRestaurantAgenda(hostId: string | null) {
             current.map(t => (t.id === updated.id ? { ...t, ...updated } : t))
           )
 
-          // Detect a new join: available_seats went down
+          // Refetch participants on any seat change (join OR cancellation)
           const prevSeats = prevTable?.available_seats ?? updated.available_seats
-          if (prevTable && updated.available_seats < prevSeats) {
+          if (prevTable && updated.available_seats !== prevSeats) {
             const { data: partsData } = await supabase
               .from('table_participants')
               .select('*, profiles(*)')
@@ -106,32 +106,33 @@ export function useRestaurantAgenda(hostId: string | null) {
                 )
               )
 
-              // Find the participant that wasn't there before
-              const prevIds = new Set((prevTable.participants || []).map(p => p.id))
-              const newPart = partsData.find(p => !prevIds.has(p.id))
+              // New join: available_seats went DOWN → show live toast + push
+              if (updated.available_seats < prevSeats) {
+                const prevIds = new Set((prevTable.participants || []).map(p => p.id))
+                const newPart = partsData.find(p => !prevIds.has(p.id))
 
-              if (newPart?.profiles) {
-                const notifId = `${newPart.id}-${Date.now()}`
-                setNotifications(current => [
-                  ...current,
-                  {
-                    id: notifId,
-                    participant: newPart as TableParticipant & { profiles: Profile },
-                    table: { ...updated, participants: partsData },
-                    timestamp: Date.now(),
-                  },
-                ])
-
-                // Fire push notification via Edge Function (best-effort, no await)
-                supabase.functions
-                  .invoke('send-push-notification', {
-                    body: {
-                      host_id: hostId,
-                      participant_profile: newPart.profiles,
+                if (newPart?.profiles) {
+                  const notifId = `${newPart.id}-${Date.now()}`
+                  setNotifications(current => [
+                    ...current,
+                    {
+                      id: notifId,
+                      participant: newPart as TableParticipant & { profiles: Profile },
                       table: { ...updated, participants: partsData },
+                      timestamp: Date.now(),
                     },
-                  })
-                  .catch(() => { /* silent — push is best-effort */ })
+                  ])
+
+                  supabase.functions
+                    .invoke('send-push-notification', {
+                      body: {
+                        host_id: hostId,
+                        participant_profile: newPart.profiles,
+                        table: { ...updated, participants: partsData },
+                      },
+                    })
+                    .catch(() => { /* silent — push is best-effort */ })
+                }
               }
             }
           }

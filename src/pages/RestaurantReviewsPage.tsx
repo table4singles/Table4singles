@@ -1,10 +1,13 @@
 import { useState } from 'react'
-import { Star, MessageSquare, Send, User, Loader2, BarChart2 } from 'lucide-react'
+import { Star, MessageSquare, Send, User, Loader2, BarChart2, UtensilsCrossed } from 'lucide-react'
 import { Navbar } from '@/components/Navbar'
 import { LoadingSpinner } from '@/components/LoadingSpinner'
+import { StarRating } from '@/components/StarRating'
 import { useAuth } from '@/contexts/AuthContext'
-import { useRestaurantPublicReviews } from '@/hooks/useReviews'
+import { useRestaurantPublicReviews, useRestaurantReviews } from '@/hooks/useReviews'
 import type { RestaurantReview } from '@/types/database'
+
+type Tab = 'venue' | 'dinner'
 
 interface RestaurantReviewsPageProps {
   onNavigate: (page: string, id?: string) => void
@@ -14,8 +17,10 @@ interface RestaurantReviewsPageProps {
 export function RestaurantReviewsPage({ onNavigate, onAuthClick }: RestaurantReviewsPageProps) {
   const { user } = useAuth()
   const { reviews, loading, avgRating, submitReply } = useRestaurantPublicReviews(user?.id ?? null)
+  const { reviews: dinnerReviews, loading: dinnerLoading } = useRestaurantReviews(user?.id ?? null)
+  const [tab, setTab] = useState<Tab>('venue')
 
-  if (loading) {
+  if (loading && tab === 'venue') {
     return (
       <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
         <Navbar currentPage="reviews" onNavigate={onNavigate} onAuthClick={onAuthClick} />
@@ -29,6 +34,10 @@ export function RestaurantReviewsPage({ onNavigate, onAuthClick }: RestaurantRev
     count: reviews.filter(r => r.rating === s).length,
   }))
 
+  const dinnerAvg = dinnerReviews.length > 0
+    ? dinnerReviews.reduce((s, r) => s + r.rating, 0) / dinnerReviews.length
+    : null
+
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       <Navbar currentPage="reviews" onNavigate={onNavigate} onAuthClick={onAuthClick} />
@@ -39,55 +48,135 @@ export function RestaurantReviewsPage({ onNavigate, onAuthClick }: RestaurantRev
           <p className="text-sm text-gray-500 dark:text-gray-400 mt-0.5">Lo que opinan tus clientes</p>
         </div>
 
-        {/* Summary card */}
-        <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-sm p-6">
-          <div className="flex items-center gap-6">
-            <div className="text-center">
-              <p className="text-5xl font-bold text-gray-900 dark:text-white">
-                {avgRating !== null ? avgRating.toFixed(1) : '—'}
-              </p>
-              <div className="flex justify-center gap-0.5 mt-1">
-                {[1,2,3,4,5].map(s => (
-                  <Star key={s} className={`w-4 h-4 ${avgRating && s <= Math.round(avgRating) ? 'fill-yellow-400 text-yellow-400' : 'text-gray-200 dark:text-gray-600'}`} />
-                ))}
-              </div>
-              <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">{reviews.length} {reviews.length === 1 ? 'reseña' : 'reseñas'}</p>
-            </div>
-            <div className="flex-1 space-y-1.5">
-              {dist.map(({ star, count }) => (
-                <div key={star} className="flex items-center gap-2">
-                  <span className="text-xs text-gray-500 dark:text-gray-400 w-3 text-right">{star}</span>
-                  <Star className="w-3 h-3 text-yellow-400 fill-yellow-400 flex-shrink-0" />
-                  <div className="flex-1 h-1.5 bg-gray-100 dark:bg-gray-700 rounded-full overflow-hidden">
-                    <div
-                      className="h-full bg-yellow-400 rounded-full transition-all"
-                      style={{ width: reviews.length > 0 ? `${(count / reviews.length) * 100}%` : '0%' }}
-                    />
-                  </div>
-                  <span className="text-xs text-gray-400 w-4">{count}</span>
-                </div>
-              ))}
-            </div>
-            <div className="text-center">
-              <BarChart2 className="w-8 h-8 text-[#e94560] mx-auto mb-1" />
-              <p className="text-xs text-gray-500 dark:text-gray-400">Puntuación<br />media</p>
-            </div>
-          </div>
+        {/* Tabs */}
+        <div className="flex gap-1 bg-gray-100 dark:bg-gray-800 rounded-xl p-1">
+          <button
+            onClick={() => setTab('venue')}
+            className={`flex-1 py-2 text-sm font-medium rounded-lg transition-colors ${tab === 'venue' ? 'bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700'}`}
+          >
+            Reseñas del local
+            {reviews.length > 0 && <span className="ml-1.5 text-xs text-gray-400">({reviews.length})</span>}
+          </button>
+          <button
+            onClick={() => setTab('dinner')}
+            className={`flex-1 py-2 text-sm font-medium rounded-lg transition-colors ${tab === 'dinner' ? 'bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700'}`}
+          >
+            Valoraciones de cenas
+            {dinnerReviews.length > 0 && <span className="ml-1.5 text-xs text-gray-400">({dinnerReviews.length})</span>}
+          </button>
         </div>
 
-        {/* Reviews list */}
-        {reviews.length === 0 ? (
-          <div className="text-center py-16 bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700">
-            <Star className="w-10 h-10 text-gray-200 dark:text-gray-600 mx-auto mb-3" />
-            <p className="text-gray-500 dark:text-gray-400 font-medium">Aún no tienes reseñas</p>
-            <p className="text-sm text-gray-400 dark:text-gray-500 mt-1">Las reseñas de tus clientes aparecerán aquí</p>
-          </div>
-        ) : (
-          <div className="space-y-4">
-            {reviews.map(review => (
-              <ReviewCard key={review.id} review={review} onReply={submitReply} />
-            ))}
-          </div>
+        {/* ── Tab: Reseñas del local ──────────────────────────── */}
+        {tab === 'venue' && (
+          <>
+            {/* Summary card */}
+            <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-sm p-6">
+              <div className="flex items-center gap-6">
+                <div className="text-center">
+                  <p className="text-5xl font-bold text-gray-900 dark:text-white">
+                    {avgRating !== null ? avgRating.toFixed(1) : '—'}
+                  </p>
+                  <div className="flex justify-center gap-0.5 mt-1">
+                    {[1,2,3,4,5].map(s => (
+                      <Star key={s} className={`w-4 h-4 ${avgRating && s <= Math.round(avgRating) ? 'fill-yellow-400 text-yellow-400' : 'text-gray-200 dark:text-gray-600'}`} />
+                    ))}
+                  </div>
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">{reviews.length} {reviews.length === 1 ? 'reseña' : 'reseñas'}</p>
+                </div>
+                <div className="flex-1 space-y-1.5">
+                  {dist.map(({ star, count }) => (
+                    <div key={star} className="flex items-center gap-2">
+                      <span className="text-xs text-gray-500 dark:text-gray-400 w-3 text-right">{star}</span>
+                      <Star className="w-3 h-3 text-yellow-400 fill-yellow-400 flex-shrink-0" />
+                      <div className="flex-1 h-1.5 bg-gray-100 dark:bg-gray-700 rounded-full overflow-hidden">
+                        <div
+                          className="h-full bg-yellow-400 rounded-full transition-all"
+                          style={{ width: reviews.length > 0 ? `${(count / reviews.length) * 100}%` : '0%' }}
+                        />
+                      </div>
+                      <span className="text-xs text-gray-400 w-4">{count}</span>
+                    </div>
+                  ))}
+                </div>
+                <div className="text-center">
+                  <BarChart2 className="w-8 h-8 text-[#e94560] mx-auto mb-1" />
+                  <p className="text-xs text-gray-500 dark:text-gray-400">Puntuación<br />media</p>
+                </div>
+              </div>
+            </div>
+
+            {reviews.length === 0 ? (
+              <div className="text-center py-16 bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700">
+                <Star className="w-10 h-10 text-gray-200 dark:text-gray-600 mx-auto mb-3" />
+                <p className="text-gray-500 dark:text-gray-400 font-medium">Aún no tienes reseñas del local</p>
+                <p className="text-sm text-gray-400 dark:text-gray-500 mt-1">Las reseñas de tus clientes aparecerán aquí</p>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                {reviews.map(review => (
+                  <ReviewCard key={review.id} review={review} onReply={submitReply} />
+                ))}
+              </div>
+            )}
+          </>
+        )}
+
+        {/* ── Tab: Valoraciones de cenas ─────────────────────── */}
+        {tab === 'dinner' && (
+          <>
+            {dinnerLoading ? (
+              <LoadingSpinner className="py-16" />
+            ) : dinnerReviews.length === 0 ? (
+              <div className="text-center py-16 bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700">
+                <UtensilsCrossed className="w-10 h-10 text-gray-200 dark:text-gray-600 mx-auto mb-3" />
+                <p className="text-gray-500 dark:text-gray-400 font-medium">Sin valoraciones de cenas todavía</p>
+                <p className="text-sm text-gray-400 dark:text-gray-500 mt-1">Los comensales pueden valorar cada cena tras asistir</p>
+              </div>
+            ) : (
+              <>
+                {dinnerAvg !== null && (
+                  <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-sm p-5 flex items-center gap-4">
+                    <p className="text-4xl font-bold text-gray-900 dark:text-white">{dinnerAvg.toFixed(1)}</p>
+                    <div>
+                      <div className="flex gap-0.5">
+                        {[1,2,3,4,5].map(s => (
+                          <Star key={s} className={`w-4 h-4 ${s <= Math.round(dinnerAvg) ? 'fill-yellow-400 text-yellow-400' : 'text-gray-200 dark:text-gray-600'}`} />
+                        ))}
+                      </div>
+                      <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">{dinnerReviews.length} valoraciones de cenas</p>
+                    </div>
+                  </div>
+                )}
+                <div className="space-y-3">
+                  {dinnerReviews.map(r => (
+                    <div key={r.id} className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-sm p-4">
+                      <div className="flex items-start gap-3">
+                        <div className="w-9 h-9 rounded-full bg-gray-100 dark:bg-gray-700 flex items-center justify-center overflow-hidden flex-shrink-0">
+                          {r.profiles?.avatar_url ? (
+                            <img src={r.profiles.avatar_url} alt="" className="w-full h-full object-cover" />
+                          ) : (
+                            <User className="w-4 h-4 text-gray-400" />
+                          )}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center justify-between gap-2">
+                            <p className="text-sm font-semibold text-gray-900 dark:text-white truncate">
+                              {r.profiles?.display_name || 'Usuario'}
+                            </p>
+                            <p className="text-xs text-gray-400 flex-shrink-0">
+                              {new Date(r.created_at).toLocaleDateString('es-ES', { day: 'numeric', month: 'short', year: 'numeric' })}
+                            </p>
+                          </div>
+                          <StarRating rating={r.rating} readonly size="sm" />
+                          {r.comment && <p className="text-sm text-gray-600 dark:text-gray-300 mt-1.5 leading-relaxed">{r.comment}</p>}
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </>
+            )}
+          </>
         )}
       </main>
     </div>

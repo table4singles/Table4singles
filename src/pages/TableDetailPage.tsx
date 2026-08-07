@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { ArrowLeft, MapPin, Clock, Users, Calendar, Loader2, MessageSquare, Star, Download, UserPlus, XCircle, PartyPopper, Check, Mail, Pencil, Save } from 'lucide-react'
+import { ArrowLeft, MapPin, Clock, Users, Calendar, Loader2, MessageSquare, Star, Download, UserPlus, XCircle, PartyPopper, Check, Mail, Pencil, Save, UserMinus } from 'lucide-react'
 import { Navbar } from '@/components/Navbar'
 import { ShareButton } from '@/components/ShareButton'
 import { StarRating } from '@/components/StarRating'
@@ -55,6 +55,7 @@ export function TableDetailPage({ tableId, paymentSuccess, onNavigate, onAuthCli
   const [editZone, setEditZone] = useState('')
   const [editSaving, setEditSaving] = useState(false)
   const [editError, setEditError] = useState<string | null>(null)
+  const [removingParticipantId, setRemovingParticipantId] = useState<string | null>(null)
 
   // Si venias de "Comensales" con la intencion de invitar a alguien y aun no tenias mesa,
   // en cuanto confirmas el pago con deposito (redirect de Stripe) ofrecemos enviar la invitacion.
@@ -169,6 +170,17 @@ export function TableDetailPage({ tableId, paymentSuccess, onNavigate, onAuthCli
       await refresh()
     }
     setEditSaving(false)
+  }
+
+  const handleRemoveParticipant = async (participantId: string) => {
+    setRemovingParticipantId(participantId)
+    try {
+      const { error: err } = await supabase.rpc('remove_participant', { p_participant_id: participantId })
+      if (err) throw err
+      await refresh()
+    } finally {
+      setRemovingParticipantId(null)
+    }
   }
 
   const handleSendMessage = async () => {
@@ -304,15 +316,28 @@ export function TableDetailPage({ tableId, paymentSuccess, onNavigate, onAuthCli
                     />
                   )}
                   {participants.map(p => p.profiles && (
-                    <ParticipantCard
-                      key={p.id}
-                      profile={p.profiles}
-                      badge={
-                        <span className={`text-xs px-2 py-1 rounded-full flex-shrink-0 ${p.join_type === 'deposit' ? 'bg-green-50 text-green-600' : 'bg-blue-50 text-blue-600'}`}>
-                          {p.join_type === 'deposit' ? t('card.depositBadge') : t('card.wordBadge')}
-                        </span>
-                      }
-                    />
+                    <div key={p.id} className="relative group">
+                      <ParticipantCard
+                        profile={p.profiles}
+                        badge={
+                          <span className={`text-xs px-2 py-1 rounded-full flex-shrink-0 ${p.join_type === 'deposit' ? 'bg-green-50 text-green-600' : 'bg-blue-50 text-blue-600'}`}>
+                            {p.join_type === 'deposit' ? t('card.depositBadge') : t('card.wordBadge')}
+                          </span>
+                        }
+                      />
+                      {isHost && !isPast && !isCancelled && (
+                        <button
+                          onClick={() => handleRemoveParticipant(p.id)}
+                          disabled={removingParticipantId === p.id}
+                          className="absolute top-3 right-0 opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1 text-xs text-red-500 hover:text-red-700 font-medium px-2 py-1 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/20"
+                          title="Eliminar comensal"
+                        >
+                          {removingParticipantId === p.id
+                            ? <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                            : <UserMinus className="w-3.5 h-3.5" />}
+                        </button>
+                      )}
+                    </div>
                   ))}
                 </div>
               )}

@@ -22,6 +22,31 @@ export function useNotifications(userId: string | null) {
 
   useEffect(() => { fetchNotifications() }, [fetchNotifications])
 
+  // Realtime: insertar nuevas notificaciones en tiempo real
+  useEffect(() => {
+    if (!userId) return
+
+    const channel = supabase
+      .channel(`notifications-${userId}`)
+      .on(
+        'postgres_changes',
+        {
+          event: 'INSERT',
+          schema: 'public',
+          table: 'notifications',
+          filter: `user_id=eq.${userId}`,
+        },
+        (payload) => {
+          const newNotif = payload.new as Notification
+          setNotifications(prev => [newNotif, ...prev].slice(0, 50))
+          setUnreadCount(prev => prev + 1)
+        }
+      )
+      .subscribe()
+
+    return () => { supabase.removeChannel(channel) }
+  }, [userId])
+
   const markAllRead = useCallback(async () => {
     if (!userId) return
     await supabase

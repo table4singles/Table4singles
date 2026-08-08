@@ -22,6 +22,7 @@ import { ProfilePage } from '@/pages/ProfilePage'
 import { SettingsPage } from '@/pages/SettingsPage'
 import { PrivacyPolicyPage } from '@/pages/PrivacyPolicyPage'
 import { AvisoLegalPage } from '@/pages/AvisoLegalPage'
+import { AmbassadorPage } from '@/pages/AmbassadorPage'
 
 function AppRouter() {
   const { user, profile, loading } = useAuth()
@@ -132,6 +133,8 @@ function AppRouter() {
         return <PrivacyPolicyPage onNavigate={navigate} />
       case 'aviso-legal':
         return <AvisoLegalPage onNavigate={navigate} />
+      case 'ambassador':
+        return <AmbassadorPage onNavigate={navigate} onAuthClick={openAuth} />
       default:
         return <RestaurantsBrowsePage onNavigate={navigate} onAuthClick={openAuth} />
     }

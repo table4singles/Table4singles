@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { X, Apple, Mail, Lock } from 'lucide-react'
+import { X, Apple, Mail, Lock, ChevronLeft } from 'lucide-react'
 import { useAuth } from '@/contexts/AuthContext'
 import { useLanguage } from '@/contexts/LanguageContext'
 import { checkPasswordBreach } from '@/lib/security'
@@ -57,13 +57,18 @@ export function AuthModal({ isOpen, onClose, mode, onSwitchMode }: AuthModalProp
       <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4" onClick={onClose}>
         <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl w-full max-w-md max-h-[90vh] overflow-y-auto" onClick={e => e.stopPropagation()}>
           <div className="flex items-center justify-between p-6 pb-4">
-            <div>
-              <h2 className="text-2xl font-serif font-bold text-gray-900 dark:text-white">
-                {mode === 'signup' ? t('auth.createAccount') : t('auth.welcomeBack')}
-              </h2>
-              <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-                {mode === 'signup' ? t('auth.joinCommunity') : t('auth.signInContinue')}
-              </p>
+            <div className="flex items-center gap-2">
+              <button onClick={onClose} className="p-1.5 hover:bg-gray-100 dark:hover:bg-gray-600 rounded-full transition-colors" aria-label="Volver">
+                <ChevronLeft className="w-5 h-5 text-gray-500 dark:text-gray-400" />
+              </button>
+              <div>
+                <h2 className="text-2xl font-serif font-bold text-gray-900 dark:text-white">
+                  {mode === 'signup' ? t('auth.createAccount') : t('auth.welcomeBack')}
+                </h2>
+                <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                  {mode === 'signup' ? t('auth.joinCommunity') : t('auth.signInContinue')}
+                </p>
+              </div>
             </div>
             <button onClick={onClose} className="p-2 hover:bg-gray-100 dark:hover:bg-gray-600 rounded-full">
               <X className="w-5 h-5" />

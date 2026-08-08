@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { Save, Loader2, Check, Camera, X, UtensilsCrossed, ShieldCheck, CalendarDays, Gift, Clock, Hash, Link, Tag, MapPin, Phone, Globe, Plus } from 'lucide-react'
+import { Save, Loader2, Check, Camera, X, UtensilsCrossed, ShieldCheck, CalendarDays, Gift, Clock, Hash, Link, Tag, MapPin, Phone, Globe, Plus, Award } from 'lucide-react'
 import PhoneInput from 'react-phone-number-input'
 import 'react-phone-number-input/style.css'
 import { Navbar } from '@/components/Navbar'
@@ -246,6 +246,24 @@ export function ProfilePage({ onNavigate, onAuthClick }: ProfilePageProps) {
               Comparte tu enlace y descubre juntos nuevas cenas. Llevas <span className="font-semibold text-gray-700 dark:text-gray-200">{referredCount}</span> {referredCount === 1 ? 'persona invitada' : 'personas invitadas'}.
             </p>
             <ShareButton url={`${window.location.origin}/?ref=${user.id}`} />
+          </div>
+        )}
+
+        {!isRestaurant && (
+          <div className="bg-gradient-to-br from-primary-50 to-primary-100 dark:from-primary-900/20 dark:to-primary-800/20 rounded-2xl border border-primary-200 dark:border-primary-800/40 p-6 mb-6">
+            <div className="flex items-center gap-2 mb-1">
+              <Award className="w-5 h-5 text-primary-600 dark:text-primary-400" />
+              <h2 className="font-semibold text-gray-900 dark:text-white">Programa de Embajadores</h2>
+            </div>
+            <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
+              Presenta Table4Singles a restaurantes y gana el <strong>5%</strong> de sus ingresos de forma indefinida.
+            </p>
+            <button
+              onClick={() => onNavigate('ambassador')}
+              className="flex items-center gap-2 px-4 py-2.5 bg-primary-500 text-white rounded-xl text-sm font-semibold hover:bg-primary-600 transition-colors"
+            >
+              <Award className="w-4 h-4" /> Ver programa
+            </button>
           </div>
         )}
 

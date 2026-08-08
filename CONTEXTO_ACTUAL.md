@@ -6,16 +6,14 @@ App cenas compartidas singles. React+Vite+TS+Tailwind+Supabase.
 ## RUTAS
 Proyecto: `/Users/joseangles/Desktop/Proyectos/Table4singles`
 GitHub: airtifexlab/Table4singles
-Supabase: zocrwanhcschmydczgeh.supabase.co
+Supabase: jcuonaxmworztegolvyf.supabase.co (proyecto NUEVO recreado 2026-08-07; el anterior zocrwanhcschmydczgeh desapareció)
 Dominio: table4singles.online (aun apunta build vieja, dominio personalizado en Vercel pendiente de conectar)
 DEPLOY: hecho en VERCEL (no Netlify). Proyecto `table4singles` en team `jai-a359`. URL producción: https://table4singles.vercel.app (verificado OK: carga, estilos Tailwind, sin errores consola/red/Supabase). Env vars `VITE_SUPABASE_URL`/`VITE_SUPABASE_ANON_KEY` configuradas en Production+Preview. Cada push a `main` dispara redeploy automático (Git integration).
 Dev local: `npm run dev` → localhost:5173 (si puerto ocupado, matar procesos viejos: `lsof -i :5173`, `kill -9 <pid>`). OJO: si tras HMR algo raro persiste (ej. cambios que no aparecen), puede haber un proceso vite zombie en el puerto sirviendo codigo viejo desde una sesion anterior — matar y arrancar limpio.
 
-## MIGRACIONES SQL
-001–016 ejecutadas ✅
-017 notify_participant_left_and_reply — **PENDIENTE ejecutar** (SQL Editor zocrwanhcschmydczgeh): trigger notify cuando participante cancela (→ restaurante), trigger notify cuando restaurante responde reseña (→ usuario), RPC `remove_participant` (host elimina comensal).
-018 realtime_notifications — **PENDIENTE ejecutar**: `ALTER PUBLICATION supabase_realtime ADD TABLE public.notifications`.
-OJO: MCP de Supabase conectado en este entorno NO es el proyecto Table4singles (ve otros proyectos: ComandIAvoz, QuieroBailar). Migraciones se ejecutan a mano en SQL Editor del dashboard real (zocrwanhcschmydczgeh).
+## MIGRACIONES SQL — TODAS EJECUTADAS ✅
+001–018 ejecutadas ✅ en proyecto nuevo `jcuonaxmworztegolvyf` (2026-08-07).
+OJO: MCP de Supabase conectado en este entorno puede no ver este proyecto (cuenta distinta: table4singles@gmail.com). Migraciones se ejecutan a mano en SQL Editor.
 
 ## HECHO ✅
 - Reconstrucción código fuente completo desde build Bolt vieja

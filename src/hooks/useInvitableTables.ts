@@ -7,12 +7,15 @@ export interface InvitableTable {
   restaurant_name: string
   restaurant_city: string
   date: string
-  time: string
+  time: string | null
   available_seats: number
 }
 
-function isFutureTable(t: Pick<DiningTable, 'date' | 'time'>): boolean {
-  return new Date(`${t.date}T${t.time}`) >= new Date()
+function isFutureTable(t: Pick<DiningTable, 'date' | 'time' | 'available_until' | 'is_active'>): boolean {
+  if (!t.is_active) return false
+  if (t.available_until) return new Date(`${t.available_until}T23:59:59`) >= new Date()
+  if (t.time) return new Date(`${t.date}T${t.time}`) >= new Date()
+  return new Date(`${t.date}T00:00:00`) <= new Date()
 }
 
 function toInvitable(t: DiningTable): InvitableTable {

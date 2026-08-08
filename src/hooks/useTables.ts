@@ -23,6 +23,7 @@ export function useTables(options: UseTablesOptions = {}) {
       .from('dining_tables')
       .select('*')
       .eq('status', options.status || 'open')
+      .eq('is_active', true)
       .order('date', { ascending: true })
 
     if (options.city) query = query.eq('restaurant_city', options.city)

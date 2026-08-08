@@ -181,9 +181,13 @@ export function ProfilePage({ onNavigate, onAuthClick }: ProfilePageProps) {
   }
 
   const now = Date.now()
+  const tableEndMs = (date: string, time: string | null, until: string | null | undefined) => {
+    if (until) return new Date(`${until}T23:59:59`).getTime()
+    return new Date(`${date}T${time || '23:59:59'}`).getTime()
+  }
   const dinnersAttended =
-    hosting.filter(t => new Date(`${t.date}T${t.time}`).getTime() < now).length +
-    reservations.filter(r => new Date(`${r.dining_tables.date}T${r.dining_tables.time}`).getTime() < now).length
+    hosting.filter(t => tableEndMs(t.date, t.time, t.available_until) < now).length +
+    reservations.filter(r => tableEndMs(r.dining_tables.date, r.dining_tables.time, r.dining_tables.available_until) < now).length
   const memberSince = profile?.created_at
     ? new Date(profile.created_at).toLocaleDateString('es-ES', { month: 'long', year: 'numeric' })
     : null

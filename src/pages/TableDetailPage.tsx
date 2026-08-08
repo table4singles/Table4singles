@@ -69,7 +69,13 @@ export function TableDetailPage({ tableId, paymentSuccess, onNavigate, onAuthCli
   const isHost = table?.host_id === user?.id
   const isFull = table?.status === 'full' || (table?.available_seats ?? 0) <= 0
   const isCancelled = table?.status === 'cancelled'
-  const isPast = table ? new Date(`${table.date}T${table.time}`) < new Date() : false
+  const isPast = table
+    ? (table.available_until
+        ? new Date(`${table.available_until}T23:59:59`) < new Date()
+        : table.time
+          ? new Date(`${table.date}T${table.time}`) < new Date()
+          : false)
+    : false
   const canReview = isParticipant && isPast && !isCancelled && !reviews.some(r => (r as any).reviewer_id === user?.id)
   const avgRating = reviews.length > 0 ? (reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length).toFixed(1) : null
 
@@ -137,7 +143,7 @@ export function TableDetailPage({ tableId, paymentSuccess, onNavigate, onAuthCli
   const openEdit = () => {
     if (!table) return
     setEditDate(table.date)
-    setEditTime(table.time.slice(0, 5))
+    setEditTime(table.time ? table.time.slice(0, 5) : '')
     setEditMaxSeats(table.max_seats)
     setEditZone(table.description || '')
     setEditError(null)
@@ -204,7 +210,8 @@ export function TableDetailPage({ tableId, paymentSuccess, onNavigate, onAuthCli
 
   const downloadICS = () => {
     if (!table) return
-    const dtStart = `${table.date.replace(/-/g, '')}T${table.time.replace(/:/g, '')}00`
+    const timePart = (table.time || '20:00').replace(/:/g, '')
+    const dtStart = `${table.date.replace(/-/g, '')}T${timePart}00`
     const ics = `BEGIN:VCALENDAR\nVERSION:2.0\nBEGIN:VEVENT\nDTSTART:${dtStart}\nSUMMARY:Dinner at ${table.restaurant_name}\nLOCATION:${table.restaurant_address || table.restaurant_city}\nEND:VEVENT\nEND:VCALENDAR`
     const blob = new Blob([ics], { type: 'text/calendar' })
     const url = URL.createObjectURL(blob)
@@ -291,7 +298,7 @@ export function TableDetailPage({ tableId, paymentSuccess, onNavigate, onAuthCli
 
               <div className="grid grid-cols-3 gap-4 mb-4">
                 <InfoBox icon={<Calendar className="w-4 h-4" />} label={new Date(table.date).toLocaleDateString(locale, { weekday: 'long', month: 'long', day: 'numeric' })} />
-                <InfoBox icon={<Clock className="w-4 h-4" />} label={table.time.slice(0, 5)} />
+                {table.time && <InfoBox icon={<Clock className="w-4 h-4" />} label={table.time.slice(0, 5)} />}
                 <InfoBox icon={<Users className="w-4 h-4" />} label={`${table.available_seats}/${table.max_seats} ${t('card.seats')}`} />
               </div>
 

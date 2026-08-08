@@ -129,7 +129,7 @@ export function useRestaurantProfile(restaurantId: string | null) {
         .select('*')
         .eq('host_id', restaurantId)
         .eq('status', 'open')
-        .gte('date', new Date().toISOString().split('T')[0])
+        .eq('is_active', true)
         .order('date', { ascending: true }),
     ])
 

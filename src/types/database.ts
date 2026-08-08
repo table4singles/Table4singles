@@ -55,7 +55,7 @@ export interface DiningTable {
   restaurant_country: string
   restaurant_image_url: string | null
   date: string
-  time: string
+  time: string | null
   max_seats: number
   available_seats: number
   status: TableStatus
@@ -64,6 +64,8 @@ export interface DiningTable {
   languages: string[] | null
   deposit_amount: number
   host_reminder_sent: boolean
+  is_active: boolean
+  available_until: string | null
   created_at: string
 }
 

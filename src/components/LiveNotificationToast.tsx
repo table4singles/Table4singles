@@ -135,7 +135,7 @@ export function LiveNotificationToast({ notification, onDismiss, t }: LiveNotifi
         {/* Table info */}
         <div className="mt-3 pt-3 border-t border-gray-100 dark:border-gray-700 flex items-center justify-between">
           <span className="text-xs text-gray-500 dark:text-gray-400">
-            {t('agenda.joinedTable')} · <span className="font-medium text-gray-700 dark:text-gray-300">{table.time.slice(0, 5)}</span>
+            {t('agenda.joinedTable')}{table.time ? <> · <span className="font-medium text-gray-700 dark:text-gray-300">{table.time.slice(0, 5)}</span></> : null}
           </span>
           <span className="text-xs font-bold text-[#e94560] bg-[#e94560]/10 px-2.5 py-1 rounded-full">
             {occupied}/{table.max_seats}

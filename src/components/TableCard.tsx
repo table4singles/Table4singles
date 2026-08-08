@@ -18,7 +18,7 @@ export function TableCard({ table, onClick }: TableCardProps) {
     day: 'numeric',
   })
 
-  const formattedTime = table.time.slice(0, 5)
+  const formattedTime = table.time ? table.time.slice(0, 5) : null
 
   return (
     <button onClick={onClick} className="w-full bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden hover:shadow-md hover:border-gray-200 dark:hover:border-gray-500 transition-all text-left group">
@@ -52,7 +52,7 @@ export function TableCard({ table, onClick }: TableCardProps) {
           <div className="flex items-center gap-3 text-sm text-gray-600 dark:text-gray-300">
             <span className="flex items-center gap-1">
               <Clock className="w-3.5 h-3.5" />
-              {formattedDate} · {formattedTime}
+              {formattedDate}{formattedTime ? ` · ${formattedTime}` : ''}
             </span>
             <span className="flex items-center gap-1">
               <Users className="w-3.5 h-3.5" />

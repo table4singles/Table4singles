@@ -13,9 +13,10 @@ interface InviteToTableModalProps {
 }
 
 function formatTableDate(t: InvitableTable): string {
-  const date = new Date(`${t.date}T${t.time}`)
+  const date = new Date(`${t.date}T${t.time || '12:00'}`)
   if (Number.isNaN(date.getTime())) return t.date
-  return date.toLocaleDateString('es-ES', { weekday: 'long', day: 'numeric', month: 'short' }) + ' ' + t.time.slice(0, 5)
+  const label = date.toLocaleDateString('es-ES', { weekday: 'long', day: 'numeric', month: 'short' })
+  return t.time ? `${label} ${t.time.slice(0, 5)}` : label
 }
 
 export function InviteToTableModal({ inviteeId, inviteeName, onClose, onNavigate }: InviteToTableModalProps) {

@@ -1,13 +1,10 @@
-import { useMemo, useState } from 'react'
-import { CalendarDays, List, Loader2, CalendarX, Tv2, Plus, Clock, Bell, BellOff } from 'lucide-react'
+import { useState } from 'react'
+import { Loader2, CalendarX, Plus, Bell, BellOff, Users, MapPin, CalendarDays, ToggleLeft, ToggleRight, ChevronRight } from 'lucide-react'
 import { Navbar } from '@/components/Navbar'
-import { AgendaCalendar } from '@/components/AgendaCalendar'
-import { AgendaTableCard } from '@/components/AgendaTableCard'
-import { LiveTableCard } from '@/components/LiveTableCard'
 import { LiveNotificationStack } from '@/components/LiveNotificationToast'
 import { useLanguage } from '@/contexts/LanguageContext'
 import { useAuth } from '@/contexts/AuthContext'
-import { useRestaurantAgenda } from '@/hooks/useRestaurantAgenda'
+import { useRestaurantAgenda, type AgendaTable } from '@/hooks/useRestaurantAgenda'
 import { usePushSubscription } from '@/hooks/usePushSubscription'
 
 interface RestaurantAgendaPageProps {
@@ -15,195 +12,120 @@ interface RestaurantAgendaPageProps {
   onAuthClick: (mode?: 'signin' | 'signup') => void
 }
 
-type AgendaView = 'live' | 'list' | 'calendar'
+type AgendaTab = 'active' | 'inactive'
 
-function todayStr() {
-  const d = new Date()
-  return `${d.getFullYear()}-${(d.getMonth() + 1).toString().padStart(2, '0')}-${d.getDate().toString().padStart(2, '0')}`
-}
-
-function formatDateHeading(dateStr: string, locale: string) {
+function formatDate(dateStr: string) {
+  if (!dateStr) return ''
   const [y, m, d] = dateStr.split('-').map(Number)
-  const date = new Date(y, m - 1, d)
-  const label = date.toLocaleDateString(locale, { weekday: 'long', day: 'numeric', month: 'long' })
-  return label.charAt(0).toUpperCase() + label.slice(1)
+  return new Date(y, m - 1, d).toLocaleDateString('es-ES', { day: 'numeric', month: 'short', year: 'numeric' })
 }
 
-// ─── Live Room Tab ────────────────────────────────────────────────────────────
+// ─── Table card with toggle ───────────────────────────────────────────────────
 
-interface LiveRoomProps {
-  tables: ReturnType<typeof useRestaurantAgenda>['tables']
+interface TableCardProps {
+  table: AgendaTable
   onNavigate: (page: string, id?: string) => void
-  t: (key: string) => string
+  onToggle: (id: string, active: boolean) => void
+  toggling: string | null
 }
 
-function LiveRoom({ tables, onNavigate, t }: LiveRoomProps) {
-  const today = todayStr()
-  const todayTables = tables.filter(tb => tb.date === today)
-  const activeTables = todayTables.filter(tb => tb.status === 'open' || tb.status === 'full')
+function TableCard({ table, onNavigate, onToggle, toggling }: TableCardProps) {
+  const occupied = table.max_seats - table.available_seats
+  const isBusy = toggling === table.id
+  const isActive = table.is_active
 
   return (
-    <div>
-      {/* Live header */}
-      <div className="flex items-center gap-2 mb-5">
-        <span className="relative flex h-3 w-3">
-          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#e94560] opacity-60" />
-          <span className="relative inline-flex rounded-full h-3 w-3 bg-[#e94560]" />
-        </span>
-        <span className="text-sm font-bold text-[#e94560] uppercase tracking-wider">{t('agenda.liveNow')}</span>
-        <span className="text-sm text-gray-400 dark:text-gray-500">·</span>
-        <span className="text-sm text-gray-500 dark:text-gray-400">{t('agenda.todayDate')}</span>
-      </div>
+    <div className={`bg-white dark:bg-gray-800 rounded-2xl border transition-all ${
+      isActive
+        ? 'border-gray-100 dark:border-gray-700 shadow-sm'
+        : 'border-gray-200 dark:border-gray-700 opacity-60'
+    }`}>
+      <div className="p-4">
+        <div className="flex items-start justify-between gap-3">
+          {/* Info */}
+          <button
+            onClick={() => onNavigate('table-detail', table.id)}
+            className="flex-1 text-left min-w-0"
+          >
+            <div className="flex items-center gap-2 mb-1">
+              <MapPin className="w-3.5 h-3.5 text-gray-400 flex-shrink-0" />
+              <span className="text-sm font-semibold text-gray-900 dark:text-white truncate">
+                {table.description || 'Sin zona especificada'}
+              </span>
+              <ChevronRight className="w-3.5 h-3.5 text-gray-400 flex-shrink-0 ml-auto" />
+            </div>
 
-      {todayTables.length === 0 ? (
-        <div className="text-center py-14 bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700">
-          <div className="w-16 h-16 rounded-full bg-gray-100 dark:bg-gray-700 flex items-center justify-center mx-auto mb-4">
-            <Tv2 className="w-8 h-8 text-gray-400" />
-          </div>
-          <h3 className="font-semibold text-gray-900 dark:text-white mb-1">{t('agenda.noTablesToday')}</h3>
-          <p className="text-sm text-gray-500 dark:text-gray-400 mb-5">{t('agenda.noTablesTodayDesc')}</p>
+            <div className="flex items-center gap-4 text-xs text-gray-500 dark:text-gray-400 mt-1.5 flex-wrap">
+              <span className="flex items-center gap-1">
+                <Users className="w-3 h-3" />
+                {occupied}/{table.max_seats} comensales
+              </span>
+              <span className="flex items-center gap-1">
+                <CalendarDays className="w-3 h-3" />
+                Desde {formatDate(table.date)}
+              </span>
+              {table.available_until && (
+                <span className="text-amber-600 dark:text-amber-400 flex items-center gap-1">
+                  hasta {formatDate(table.available_until)}
+                </span>
+              )}
+            </div>
+
+            {/* Occupancy bar */}
+            <div className="mt-2 h-1.5 bg-gray-100 dark:bg-gray-700 rounded-full overflow-hidden">
+              <div
+                className={`h-full rounded-full transition-all ${
+                  occupied >= table.max_seats ? 'bg-blue-500' :
+                  occupied / table.max_seats > 0.75 ? 'bg-amber-500' :
+                  'bg-green-500'
+                }`}
+                style={{ width: `${Math.max(4, (occupied / table.max_seats) * 100)}%` }}
+              />
+            </div>
+          </button>
+
+          {/* Toggle */}
+          <button
+            onClick={() => onToggle(table.id, !isActive)}
+            disabled={isBusy}
+            className="flex flex-col items-center gap-1 flex-shrink-0 pt-0.5"
+            title={isActive ? 'Desactivar mesa' : 'Activar mesa'}
+          >
+            {isBusy ? (
+              <Loader2 className="w-7 h-7 animate-spin text-gray-400" />
+            ) : isActive ? (
+              <ToggleRight className="w-8 h-8 text-green-500" />
+            ) : (
+              <ToggleLeft className="w-8 h-8 text-gray-300 dark:text-gray-600" />
+            )}
+            <span className={`text-[10px] font-medium leading-none ${isActive ? 'text-green-600 dark:text-green-400' : 'text-gray-400 dark:text-gray-500'}`}>
+              {isActive ? 'Activa' : 'Inactiva'}
+            </span>
+          </button>
         </div>
-      ) : (
-        <div className="space-y-4">
-          {activeTables.length > 0 && (
-            <div className="space-y-3">
-              {activeTables.map(table => (
-                <LiveTableCard key={table.id} table={table} onNavigate={onNavigate} t={t} />
+
+        {/* Participants */}
+        {table.participants.length > 0 && (
+          <div className="flex items-center gap-1.5 mt-3 pt-3 border-t border-gray-50 dark:border-gray-700">
+            <div className="flex -space-x-2">
+              {table.participants.slice(0, 5).map(p => (
+                <div key={p.id} className="w-7 h-7 rounded-full bg-gray-200 dark:bg-gray-600 border-2 border-white dark:border-gray-800 overflow-hidden flex-shrink-0">
+                  {p.profiles?.avatar_url ? (
+                    <img src={p.profiles.avatar_url} alt="" className="w-full h-full object-cover" />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center text-[10px] font-bold text-gray-500 dark:text-gray-400">
+                      {(p.profiles?.display_name ?? '?').charAt(0).toUpperCase()}
+                    </div>
+                  )}
+                </div>
               ))}
             </div>
-          )}
-          {/* Completed / cancelled tables for today */}
-          {todayTables.filter(tb => tb.status === 'completed' || tb.status === 'cancelled').length > 0 && (
-            <div>
-              <p className="text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wide mb-2 mt-4">{t('agenda.past')}</p>
-              <div className="space-y-2">
-                {todayTables
-                  .filter(tb => tb.status === 'completed' || tb.status === 'cancelled')
-                  .map(table => (
-                    <AgendaTableCard key={table.id} table={table} onNavigate={onNavigate} t={t} />
-                  ))}
-              </div>
-            </div>
-          )}
-        </div>
-      )}
-    </div>
-  )
-}
-
-// ─── Hourly List Tab ──────────────────────────────────────────────────────────
-
-interface HourlyListProps {
-  byDate: ReturnType<typeof useRestaurantAgenda>['byDate']
-  datesWithTables: string[]
-  locale: string
-  onNavigate: (page: string, id?: string) => void
-  t: (key: string) => string
-}
-
-function TimelineSlot({ time, count, max, status, onClick }: {
-  time: string
-  count: number
-  max: number
-  status: string
-  onClick: () => void
-}) {
-  const pct = max > 0 ? (count / max) * 100 : 0
-  const barColor =
-    status === 'full' ? 'bg-blue-500' :
-    status === 'cancelled' ? 'bg-gray-300 dark:bg-gray-600' :
-    pct > 75 ? 'bg-amber-500' :
-    'bg-green-500'
-
-  const statusLabel: Record<string, string> = {
-    open: 'bg-green-50 text-green-600 dark:bg-green-900/30 dark:text-green-400',
-    full: 'bg-blue-50 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400',
-    completed: 'bg-gray-100 text-gray-500 dark:bg-gray-700 dark:text-gray-400',
-    cancelled: 'bg-red-50 text-red-600 dark:bg-red-900/30 dark:text-red-400',
-  }
-
-  return (
-    <button
-      onClick={onClick}
-      className="w-full flex items-center gap-4 py-3 px-4 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors group text-left"
-    >
-      {/* Time */}
-      <div className="flex items-center gap-2 w-16 flex-shrink-0">
-        <Clock className="w-3.5 h-3.5 text-gray-400" />
-        <span className="text-sm font-bold text-gray-700 dark:text-gray-200">{time}</span>
+            <span className="text-xs text-gray-500 dark:text-gray-400 ml-1">
+              {table.participants.length} {table.participants.length === 1 ? 'comensal' : 'comensales'} apuntado{table.participants.length !== 1 ? 's' : ''}
+            </span>
+          </div>
+        )}
       </div>
-
-      {/* Occupancy bar */}
-      <div className="flex-1 min-w-0">
-        <div className="flex items-center justify-between mb-1">
-          <span className="text-xs text-gray-500 dark:text-gray-400 truncate">{count}/{max} plazas</span>
-        </div>
-        <div className="h-2 bg-gray-100 dark:bg-gray-700 rounded-full overflow-hidden">
-          <div
-            className={`h-full ${barColor} rounded-full transition-all duration-500`}
-            style={{ width: `${pct}%` }}
-          />
-        </div>
-      </div>
-
-      {/* Status chip */}
-      <span className={`text-xs px-2.5 py-1 rounded-full font-medium flex-shrink-0 ${statusLabel[status] || ''}`}>
-        {count}/{max}
-      </span>
-    </button>
-  )
-}
-
-function HourlyList({ byDate, datesWithTables, locale, onNavigate, t }: HourlyListProps) {
-  const today = todayStr()
-  const upcoming = datesWithTables.filter(d => d >= today)
-  const past = datesWithTables.filter(d => d < today).reverse()
-
-  function renderDate(date: string) {
-    const tables = byDate[date]
-    return (
-      <div key={date} className="mb-6">
-        <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2 px-1">
-          {formatDateHeading(date, locale)}
-          {date === today && (
-            <span className="ml-2 text-xs text-[#e94560] font-bold">{t('agenda.today')}</span>
-          )}
-        </h3>
-        <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-gray-700 overflow-hidden divide-y divide-gray-50 dark:divide-gray-700">
-          {tables.map(table => {
-            const occupied = table.max_seats - table.available_seats
-            return (
-              <TimelineSlot
-                key={table.id}
-                time={table.time.slice(0, 5)}
-                count={occupied}
-                max={table.max_seats}
-                status={table.status}
-                onClick={() => onNavigate('table-detail', table.id)}
-              />
-            )
-          })}
-        </div>
-      </div>
-    )
-  }
-
-  if (datesWithTables.length === 0) return null
-
-  return (
-    <div>
-      {upcoming.length > 0 && (
-        <div>
-          <p className="text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wide mb-3">{t('agenda.upcoming')}</p>
-          {upcoming.map(renderDate)}
-        </div>
-      )}
-      {past.length > 0 && (
-        <div>
-          <p className="text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wide mb-3 mt-6">{t('agenda.past')}</p>
-          {past.map(renderDate)}
-        </div>
-      )}
     </div>
   )
 }
@@ -211,22 +133,18 @@ function HourlyList({ byDate, datesWithTables, locale, onNavigate, t }: HourlyLi
 // ─── Main Page ────────────────────────────────────────────────────────────────
 
 export function RestaurantAgendaPage({ onNavigate, onAuthClick }: RestaurantAgendaPageProps) {
-  const { t, language } = useLanguage()
+  const { t } = useLanguage()
   const { user, profile } = useAuth()
-  const { tables, byDate, datesWithTables, loading, error, notifications, dismissNotification } =
+  const { tables, loading, error, notifications, dismissNotification, toggleActive } =
     useRestaurantAgenda(user?.id ?? null)
 
   const push = usePushSubscription()
+  const [tab, setTab] = useState<AgendaTab>('active')
+  const [toggling, setToggling] = useState<string | null>(null)
 
-  const [view, setView] = useState<AgendaView>('live')
-  const [month, setMonth] = useState(() => new Date())
-  const [selectedDate, setSelectedDate] = useState<string>(todayStr())
-
-  const locale = language === 'de' ? 'de-DE' : language === 'en' ? 'en-GB' : 'es-ES'
-
-  const selectedDayTables = byDate[selectedDate] || []
-
-  const isEmpty = datesWithTables.length === 0
+  const activeTables = tables.filter(t => t.is_active)
+  const inactiveTables = tables.filter(t => !t.is_active)
+  const shownTables = tab === 'active' ? activeTables : inactiveTables
 
   if (profile && profile.role !== 'restaurant') {
     return (
@@ -234,87 +152,91 @@ export function RestaurantAgendaPage({ onNavigate, onAuthClick }: RestaurantAgen
         <Navbar currentPage="agenda" onNavigate={onNavigate} onAuthClick={onAuthClick} />
         <div className="text-center py-20">
           <p className="text-gray-500 dark:text-gray-400">{t('agenda.restaurantOnly')}</p>
-          <button onClick={() => onNavigate('profile')} className="mt-4 text-primary-600 dark:text-primary-400 font-medium text-sm">
-            {t('agenda.goToProfile')}
-          </button>
         </div>
       </div>
     )
   }
 
-  const tabs: { id: AgendaView; label: string; icon: React.ReactNode }[] = [
-    { id: 'live', label: t('agenda.liveTab'), icon: <Tv2 className="w-4 h-4" /> },
-    { id: 'list', label: t('agenda.listTab'), icon: <List className="w-4 h-4" /> },
-    { id: 'calendar', label: t('agenda.calendarTab'), icon: <CalendarDays className="w-4 h-4" /> },
-  ]
+  const handleToggle = async (id: string, active: boolean) => {
+    setToggling(id)
+    await toggleActive(id, active)
+    setToggling(null)
+  }
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       <Navbar currentPage="agenda" onNavigate={onNavigate} onAuthClick={onAuthClick} />
 
-      {/* Live notification toasts */}
       <LiveNotificationStack notifications={notifications} onDismiss={dismissNotification} t={t} />
 
-      <main className="max-w-3xl mx-auto px-4 py-6 pb-24 md:pb-8">
+      <main className="max-w-2xl mx-auto px-4 py-6 pb-24 md:pb-8">
         {/* Header */}
         <div className="flex items-center justify-between mb-5">
           <div>
-            <h1 className="text-2xl font-display font-bold text-gray-900 dark:text-white">{t('agenda.title')}</h1>
-            <p className="text-gray-500 dark:text-gray-400 text-sm mt-0.5">{t('agenda.subtitle')}</p>
+            <h1 className="text-2xl font-display font-bold text-gray-900 dark:text-white">Mis mesas</h1>
+            <p className="text-gray-500 dark:text-gray-400 text-sm mt-0.5">
+              {activeTables.length} activa{activeTables.length !== 1 ? 's' : ''} · {inactiveTables.length} inactiva{inactiveTables.length !== 1 ? 's' : ''}
+            </p>
           </div>
           <div className="flex items-center gap-2">
-            {/* Push notification toggle */}
             {push.isSupported && push.permission !== 'denied' && (
               <button
                 onClick={push.subscribed ? push.unsubscribe : push.subscribe}
                 disabled={push.loading}
-                title={push.subscribed ? t('agenda.pushDisable') : t('agenda.pushEnable')}
-                className={`flex items-center gap-1.5 px-3 py-2 rounded-xl text-sm font-medium transition-colors flex-shrink-0 ${
+                title={push.subscribed ? 'Desactivar notificaciones push' : 'Activar notificaciones push'}
+                className={`p-2 rounded-xl text-sm font-medium transition-colors ${
                   push.subscribed
                     ? 'bg-green-50 dark:bg-green-900/30 text-green-600 dark:text-green-400 border border-green-200 dark:border-green-800'
-                    : 'bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700'
+                    : 'bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300'
                 }`}
               >
-                {push.loading
-                  ? <Loader2 className="w-4 h-4 animate-spin" />
-                  : push.subscribed
-                    ? <Bell className="w-4 h-4" />
-                    : <BellOff className="w-4 h-4" />
-                }
-                <span className="hidden sm:inline">
-                  {push.subscribed ? t('agenda.pushActive') : t('agenda.pushEnable')}
-                </span>
+                {push.loading ? <Loader2 className="w-4 h-4 animate-spin" /> : push.subscribed ? <Bell className="w-4 h-4" /> : <BellOff className="w-4 h-4" />}
               </button>
             )}
             <button
               onClick={() => onNavigate('create')}
-              className="flex items-center gap-1.5 px-3 py-2 bg-[#e94560] text-white rounded-xl text-sm font-medium hover:bg-[#d63d56] transition-colors flex-shrink-0"
+              className="flex items-center gap-1.5 px-3 py-2 bg-[#e94560] text-white rounded-xl text-sm font-medium hover:bg-[#d63d56] transition-colors"
             >
               <Plus className="w-4 h-4" />
-              <span className="hidden sm:inline">{t('agenda.newTable')}</span>
+              <span className="hidden sm:inline">Nueva mesa</span>
             </button>
           </div>
         </div>
 
-        {/* Tab selector */}
-        <div className="flex bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-1 mb-6">
-          {tabs.map(tab => (
-            <button
-              key={tab.id}
-              onClick={() => setView(tab.id)}
-              className={`flex-1 flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
-                view === tab.id
-                  ? 'bg-[#e94560] text-white shadow-sm'
-                  : 'text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700'
-              }`}
-            >
-              {tab.icon}
-              <span>{tab.label}</span>
-              {tab.id === 'live' && notifications.length > 0 && (
-                <span className="w-2 h-2 rounded-full bg-white/80 ml-0.5" />
-              )}
-            </button>
-          ))}
+        {/* Tabs */}
+        <div className="flex bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-1 mb-5">
+          <button
+            onClick={() => setTab('active')}
+            className={`flex-1 flex items-center justify-center gap-2 py-2 rounded-lg text-sm font-medium transition-colors ${
+              tab === 'active'
+                ? 'bg-[#e94560] text-white shadow-sm'
+                : 'text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700'
+            }`}
+          >
+            <ToggleRight className="w-4 h-4" />
+            Activas
+            {activeTables.length > 0 && (
+              <span className={`text-xs px-1.5 py-0.5 rounded-full font-bold ${tab === 'active' ? 'bg-white/20' : 'bg-gray-100 dark:bg-gray-700'}`}>
+                {activeTables.length}
+              </span>
+            )}
+          </button>
+          <button
+            onClick={() => setTab('inactive')}
+            className={`flex-1 flex items-center justify-center gap-2 py-2 rounded-lg text-sm font-medium transition-colors ${
+              tab === 'inactive'
+                ? 'bg-[#e94560] text-white shadow-sm'
+                : 'text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700'
+            }`}
+          >
+            <ToggleLeft className="w-4 h-4" />
+            Inactivas
+            {inactiveTables.length > 0 && (
+              <span className={`text-xs px-1.5 py-0.5 rounded-full font-bold ${tab === 'inactive' ? 'bg-white/20' : 'bg-gray-100 dark:bg-gray-700'}`}>
+                {inactiveTables.length}
+              </span>
+            )}
+          </button>
         </div>
 
         {/* Error */}
@@ -324,62 +246,45 @@ export function RestaurantAgendaPage({ onNavigate, onAuthClick }: RestaurantAgen
           </div>
         )}
 
-        {/* Loading */}
+        {/* Content */}
         {loading ? (
           <div className="flex justify-center py-16">
             <Loader2 className="w-8 h-8 text-[#e94560] animate-spin" />
           </div>
-        ) : isEmpty && view !== 'live' ? (
+        ) : shownTables.length === 0 ? (
           <div className="text-center py-16">
-            <div className="w-16 h-16 rounded-full bg-gray-100 dark:bg-gray-700 flex items-center justify-center mx-auto mb-4 text-gray-400 dark:text-gray-500">
+            <div className="w-16 h-16 rounded-full bg-gray-100 dark:bg-gray-700 flex items-center justify-center mx-auto mb-4 text-gray-400">
               <CalendarX className="w-9 h-9" />
             </div>
-            <h3 className="font-semibold text-gray-900 dark:text-white mb-1">{t('agenda.noTables')}</h3>
-            <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">{t('agenda.noTablesDesc')}</p>
-            <button
-              onClick={() => onNavigate('create')}
-              className="px-6 py-2.5 bg-[#e94560] text-white rounded-xl text-sm font-medium hover:bg-[#d63d56]"
-            >
-              {t('agenda.newTable')}
-            </button>
+            {tab === 'active' ? (
+              <>
+                <h3 className="font-semibold text-gray-900 dark:text-white mb-1">Sin mesas activas</h3>
+                <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">Crea una nueva mesa para que los comensales puedan unirse.</p>
+                <button
+                  onClick={() => onNavigate('create')}
+                  className="px-6 py-2.5 bg-[#e94560] text-white rounded-xl text-sm font-medium hover:bg-[#d63d56]"
+                >
+                  Crear primera mesa
+                </button>
+              </>
+            ) : (
+              <>
+                <h3 className="font-semibold text-gray-900 dark:text-white mb-1">Sin mesas inactivas</h3>
+                <p className="text-sm text-gray-500 dark:text-gray-400">Todas tus mesas están activas.</p>
+              </>
+            )}
           </div>
-        ) : view === 'live' ? (
-          <LiveRoom tables={tables} onNavigate={onNavigate} t={t} />
-        ) : view === 'list' ? (
-          <HourlyList
-            byDate={byDate}
-            datesWithTables={datesWithTables}
-            locale={locale}
-            onNavigate={onNavigate}
-            t={t}
-          />
         ) : (
-          /* Calendar view */
-          <div className="space-y-4">
-            <AgendaCalendar
-              month={month}
-              onMonthChange={setMonth}
-              selectedDate={selectedDate}
-              onSelectDate={setSelectedDate}
-              byDate={byDate}
-              locale={locale}
-            />
-            <div>
-              <h2 className="text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-3 px-1">
-                {formatDateHeading(selectedDate, locale)}
-              </h2>
-              {selectedDayTables.length === 0 ? (
-                <p className="text-sm text-gray-400 dark:text-gray-500 py-6 text-center">
-                  {t('agenda.noTablesThisDay')}
-                </p>
-              ) : (
-                <div className="space-y-3">
-                  {selectedDayTables.map(table => (
-                    <AgendaTableCard key={table.id} table={table} onNavigate={onNavigate} t={t} />
-                  ))}
-                </div>
-              )}
-            </div>
+          <div className="space-y-3">
+            {shownTables.map(table => (
+              <TableCard
+                key={table.id}
+                table={table}
+                onNavigate={onNavigate}
+                onToggle={handleToggle}
+                toggling={toggling}
+              />
+            ))}
           </div>
         )}
       </main>

@@ -32,8 +32,8 @@ export function useRestaurantAgenda(hostId: string | null) {
       .from('dining_tables')
       .select('*')
       .eq('host_id', hostId)
+      .order('is_active', { ascending: false })
       .order('date', { ascending: true })
-      .order('time', { ascending: true })
 
     if (tablesErr) {
       setError(tablesErr.message)
@@ -147,6 +147,22 @@ export function useRestaurantAgenda(hostId: string | null) {
     setNotifications(prev => prev.filter(n => n.id !== id))
   }, [])
 
+  const toggleActive = useCallback(async (tableId: string, newActive: boolean) => {
+    setTables(current =>
+      current.map(t => (t.id === tableId ? { ...t, is_active: newActive } : t))
+    )
+    const { error: err } = await supabase
+      .from('dining_tables')
+      .update({ is_active: newActive })
+      .eq('id', tableId)
+    if (err) {
+      // Revert on error
+      setTables(current =>
+        current.map(t => (t.id === tableId ? { ...t, is_active: !newActive } : t))
+      )
+    }
+  }, [])
+
   const byDate = useMemo(() => {
     const map: Record<string, AgendaTable[]> = {}
     for (const table of tables) {
@@ -167,5 +183,6 @@ export function useRestaurantAgenda(hostId: string | null) {
     refresh: fetchAgenda,
     notifications,
     dismissNotification,
+    toggleActive,
   }
 }

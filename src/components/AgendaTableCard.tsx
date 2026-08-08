@@ -34,7 +34,7 @@ export function AgendaTableCard({ table, onNavigate, t }: AgendaTableCardProps) 
       <button onClick={() => setExpanded(!expanded)} className="w-full text-left p-4 flex items-center justify-between gap-3">
         <div className="min-w-0 flex-1">
           <div className="flex items-center gap-3 text-sm text-gray-900 dark:text-white font-semibold">
-            <span className="flex items-center gap-1"><Clock className="w-3.5 h-3.5 text-gray-400" />{table.time.slice(0, 5)}</span>
+            {table.time && <span className="flex items-center gap-1"><Clock className="w-3.5 h-3.5 text-gray-400" />{table.time.slice(0, 5)}</span>}
             <span className="flex items-center gap-1 text-gray-500 dark:text-gray-400 font-normal">
               <Users className="w-3.5 h-3.5" />{occupied}/{table.max_seats} {t('agenda.seats')}
             </span>

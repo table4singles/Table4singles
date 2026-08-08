@@ -92,7 +92,13 @@ export function TableDetailPage({ tableId, paymentSuccess, onNavigate, onAuthCli
       await joinTable('word')
       if (pendingInvite) setShowAutoInvite(true)
     } catch (err: any) {
-      setJoinError(err.message || 'Error')
+      const msg = err.message || ''
+      setJoinError(
+        msg.includes('No seats available') ? 'No quedan plazas en esta mesa.'
+          : msg.includes('Already joined') ? 'Ya tienes una plaza en esta mesa.'
+          : msg.includes('not open') || msg.includes('Not open') ? 'Esta mesa no está disponible.'
+          : msg || 'No se ha podido reservar la plaza. Inténtalo de nuevo.'
+      )
     }
     setJoining(false)
   }
@@ -372,20 +378,28 @@ export function TableDetailPage({ tableId, paymentSuccess, onNavigate, onAuthCli
           {/* Sidebar actions */}
           <div className="space-y-4">
             <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 p-6 space-y-3">
-              {user && !isHost && !isParticipant && !isFull && !isCancelled && !isPast && (
+              {!user && !isFull && !isCancelled && !isPast && table?.is_active !== false && (
+                <button onClick={() => onAuthClick('signin')} className="w-full py-3 bg-primary-500 text-white rounded-xl font-medium hover:bg-primary-600 transition-colors text-sm">
+                  Inicia sesión para reservar plaza
+                </button>
+              )}
+              {user && !isHost && !isParticipant && !isFull && !isCancelled && !isPast && table?.is_active !== false && !isRestaurantUser && (
                 <>
+                  <button onClick={handleJoinWord} disabled={joining} className="w-full py-3 bg-primary-500 text-white rounded-xl font-medium hover:bg-primary-600 disabled:opacity-50 transition-colors text-sm">
+                    {joining ? t('card.registering') : t('card.giveWord')}
+                  </button>
                   <div className="relative">
-                    <button onClick={handleJoinDeposit} disabled={joining} className="w-full py-3 bg-primary-500 text-white rounded-xl font-medium hover:bg-primary-600 disabled:opacity-50 transition-colors text-sm">
+                    <button onClick={handleJoinDeposit} disabled={joining} className="w-full py-3 border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-200 rounded-xl font-medium hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50 transition-colors text-sm">
                       {joining ? t('card.redirecting') : t('card.reserveDeposit')}
                     </button>
                     <span className="absolute -top-2 -right-2 text-[10px] font-semibold bg-gray-800 text-white px-2 py-0.5 rounded-full">Próximamente</span>
                   </div>
-                  <button onClick={handleJoinWord} disabled={joining} className="w-full py-3 border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-200 rounded-xl font-medium hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50 transition-colors text-sm">
-                    {joining ? t('card.registering') : t('card.giveWord')}
-                  </button>
                   <p className="text-xs text-gray-400 dark:text-gray-500 text-center">{t('card.depositNote')}</p>
                   {joinError && <p className="text-xs text-red-600 text-center">{joinError}</p>}
                 </>
+              )}
+              {user && !isHost && !isParticipant && table?.is_active === false && (
+                <p className="text-center text-sm font-medium text-gray-500 dark:text-gray-400 py-2">Esta mesa no está disponible ahora</p>
               )}
               {isParticipant && (
                 <div className="text-center py-2 space-y-2">

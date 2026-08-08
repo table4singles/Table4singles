@@ -98,9 +98,9 @@ export function OnboardingPage({ onNavigate }: { onNavigate: (page: string) => v
           city: city.trim(),
           province: province.trim(),
           country: country.trim(),
-          date_of_birth: dateOfBirth,
-          bio: bio.trim(),
-          phone: phone.trim(),
+          date_of_birth: dateOfBirth || null,
+          bio: bio.trim() || null,
+          phone: phone.trim() || null,
           instagram: instagram.trim() || null,
           languages: languages.length > 0 ? languages : null,
           interests: interests.length > 0 ? interests : null,
@@ -109,7 +109,12 @@ export function OnboardingPage({ onNavigate }: { onNavigate: (page: string) => v
 
     const { error: err } = await supabase.from('profiles').update(updates).eq('id', user.id)
     if (err) {
-      setError(err.message)
+      const msg = err.message || ''
+      setError(
+        msg.includes('invalid input syntax for type date')
+          ? 'La fecha de nacimiento no es válida. Elígela en el calendario o déjala vacía.'
+          : msg
+      )
       setSaving(false)
       return
     }

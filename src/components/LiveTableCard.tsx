@@ -101,18 +101,19 @@ export function LiveTableCard({ table, onNavigate, t }: LiveTableCardProps) {
   const profiles = table.participants
     .map(p => p.profiles)
     .filter((p): p is Profile => Boolean(p))
+  const isActive = table.is_active !== false
 
   return (
     <div
       onClick={() => onNavigate('table-detail', table.id)}
-      className={`bg-white dark:bg-gray-800 rounded-2xl border-2 ${STATUS_BORDER[table.status]} cursor-pointer hover:shadow-lg transition-all duration-200 group`}
+      className={`bg-white dark:bg-gray-800 rounded-2xl border-2 ${isActive ? STATUS_BORDER[table.status] : 'border-gray-200 dark:border-gray-700'} cursor-pointer hover:shadow-lg transition-all duration-200 group ${!isActive ? 'opacity-60' : ''}`}
     >
       <div className="p-5">
         {/* Top row: time + status + occupancy */}
         <div className="flex items-start justify-between gap-3 mb-5">
           <div className="min-w-0">
             <div className="flex items-center gap-2.5 mb-1">
-              {table.status === 'open' && (
+              {isActive && table.status === 'open' && (
                 <span className="relative flex h-2.5 w-2.5 flex-shrink-0">
                   <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75" />
                   <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-green-500" />
@@ -121,15 +122,17 @@ export function LiveTableCard({ table, onNavigate, t }: LiveTableCardProps) {
               <span className="text-3xl font-black text-gray-900 dark:text-white tracking-tight">
                 {table.time ? table.time.slice(0, 5) : (table.description || '—')}
               </span>
-              <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${STATUS_LABEL_COLOR[table.status]}`}>
-                {t(`agenda.status${table.status.charAt(0).toUpperCase() + table.status.slice(1)}`)}
+              <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${isActive ? STATUS_LABEL_COLOR[table.status] : 'text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-gray-700'}`}>
+                {isActive
+                  ? t(`agenda.status${table.status.charAt(0).toUpperCase() + table.status.slice(1)}`)
+                  : 'Inactiva'}
               </span>
             </div>
             {table.description && (
               <p className="text-sm text-gray-500 dark:text-gray-400 line-clamp-1">{table.description}</p>
             )}
           </div>
-          <OccupancyFill occupied={occupied} max={table.max_seats} status={table.status} />
+          <OccupancyFill occupied={occupied} max={table.max_seats} status={isActive ? table.status : 'cancelled'} />
         </div>
 
         {/* Avatar area */}

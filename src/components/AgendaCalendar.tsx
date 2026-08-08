@@ -19,8 +19,8 @@ function toDateStr(year: number, month: number, day: number) {
 }
 
 function dotColor(dayTables: AgendaTable[]): string {
-  if (dayTables.some(t => t.status === 'open')) return 'bg-green-500'
-  if (dayTables.some(t => t.status === 'full')) return 'bg-blue-500'
+  if (dayTables.some(t => t.status === 'open' && t.is_active !== false)) return 'bg-green-500'
+  if (dayTables.some(t => t.status === 'full' && t.is_active !== false)) return 'bg-blue-500'
   return 'bg-gray-400'
 }
 

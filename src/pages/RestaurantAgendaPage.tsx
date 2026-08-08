@@ -39,8 +39,15 @@ interface LiveRoomProps {
 
 function LiveRoom({ tables, onNavigate, t }: LiveRoomProps) {
   const today = todayStr()
-  const todayTables = tables.filter(tb => tb.date === today)
-  const activeTables = todayTables.filter(tb => tb.status === 'open' || tb.status === 'full')
+  // Mesas cuya disponibilidad incluye hoy (desde date, hasta available_until o sin fin)
+  const todayTables = tables.filter(tb => {
+    if (tb.date > today) return false
+    if (tb.available_until && tb.available_until < today) return false
+    return tb.date === today || !tb.time || (tb.date <= today && (!tb.available_until || tb.available_until >= today))
+  })
+  const activeTables = todayTables.filter(tb => (tb.status === 'open' || tb.status === 'full') && tb.is_active !== false)
+  const inactiveTables = todayTables.filter(tb => (tb.status === 'open' || tb.status === 'full') && tb.is_active === false)
+  const pastTables = todayTables.filter(tb => tb.status === 'completed' || tb.status === 'cancelled')
 
   return (
     <div>
@@ -72,16 +79,23 @@ function LiveRoom({ tables, onNavigate, t }: LiveRoomProps) {
               ))}
             </div>
           )}
-          {/* Completed / cancelled tables for today */}
-          {todayTables.filter(tb => tb.status === 'completed' || tb.status === 'cancelled').length > 0 && (
+          {inactiveTables.length > 0 && (
+            <div>
+              <p className="text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wide mb-2 mt-2">Desactivadas</p>
+              <div className="space-y-2">
+                {inactiveTables.map(table => (
+                  <AgendaTableCard key={table.id} table={table} onNavigate={onNavigate} t={t} />
+                ))}
+              </div>
+            </div>
+          )}
+          {pastTables.length > 0 && (
             <div>
               <p className="text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wide mb-2 mt-4">{t('agenda.past')}</p>
               <div className="space-y-2">
-                {todayTables
-                  .filter(tb => tb.status === 'completed' || tb.status === 'cancelled')
-                  .map(table => (
-                    <AgendaTableCard key={table.id} table={table} onNavigate={onNavigate} t={t} />
-                  ))}
+                {pastTables.map(table => (
+                  <AgendaTableCard key={table.id} table={table} onNavigate={onNavigate} t={t} />
+                ))}
               </div>
             </div>
           )}
@@ -101,15 +115,17 @@ interface HourlyListProps {
   t: (key: string) => string
 }
 
-function TimelineSlot({ time, count, max, status, onClick }: {
+function TimelineSlot({ time, count, max, status, isActive, onClick }: {
   time: string
   count: number
   max: number
   status: string
+  isActive: boolean
   onClick: () => void
 }) {
   const pct = max > 0 ? (count / max) * 100 : 0
   const barColor =
+    !isActive ? 'bg-gray-300 dark:bg-gray-600' :
     status === 'full' ? 'bg-blue-500' :
     status === 'cancelled' ? 'bg-gray-300 dark:bg-gray-600' :
     pct > 75 ? 'bg-amber-500' :
@@ -125,7 +141,7 @@ function TimelineSlot({ time, count, max, status, onClick }: {
   return (
     <button
       onClick={onClick}
-      className="w-full flex items-center gap-4 py-3 px-4 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors group text-left"
+      className={`w-full flex items-center gap-4 py-3 px-4 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors group text-left ${!isActive ? 'opacity-55' : ''}`}
     >
       {/* Time */}
       <div className="flex items-center gap-2 w-16 flex-shrink-0">
@@ -147,9 +163,15 @@ function TimelineSlot({ time, count, max, status, onClick }: {
       </div>
 
       {/* Status chip */}
-      <span className={`text-xs px-2.5 py-1 rounded-full font-medium flex-shrink-0 ${statusLabel[status] || ''}`}>
-        {count}/{max}
-      </span>
+      {!isActive ? (
+        <span className="text-xs px-2.5 py-1 rounded-full font-medium flex-shrink-0 bg-gray-100 text-gray-500 dark:bg-gray-700 dark:text-gray-400">
+          Inactiva
+        </span>
+      ) : (
+        <span className={`text-xs px-2.5 py-1 rounded-full font-medium flex-shrink-0 ${statusLabel[status] || ''}`}>
+          {count}/{max}
+        </span>
+      )}
     </button>
   )
 }
@@ -179,6 +201,7 @@ function HourlyList({ byDate, datesWithTables, locale, onNavigate, t }: HourlyLi
                 count={occupied}
                 max={table.max_seats}
                 status={table.status}
+                isActive={table.is_active !== false}
                 onClick={() => onNavigate('table-detail', table.id)}
               />
             )

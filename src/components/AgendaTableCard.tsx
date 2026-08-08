@@ -9,7 +9,10 @@ interface AgendaTableCardProps {
   t: (key: string) => string
 }
 
-function StatusBadge({ status, t }: { status: AgendaTable['status']; t: (key: string) => string }) {
+function StatusBadge({ status, isActive, t }: { status: AgendaTable['status']; isActive: boolean; t: (key: string) => string }) {
+  if (!isActive && status !== 'cancelled' && status !== 'completed') {
+    return <span className="text-xs px-2 py-1 rounded-full flex-shrink-0 bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400">Inactiva</span>
+  }
   const map: Record<AgendaTable['status'], string> = {
     open: 'bg-green-50 dark:bg-green-900/30 text-green-600 dark:text-green-400',
     full: 'bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400',
@@ -28,9 +31,10 @@ function StatusBadge({ status, t }: { status: AgendaTable['status']; t: (key: st
 export function AgendaTableCard({ table, onNavigate, t }: AgendaTableCardProps) {
   const [expanded, setExpanded] = useState(false)
   const occupied = table.max_seats - table.available_seats
+  const isActive = table.is_active !== false
 
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-gray-700 overflow-hidden">
+    <div className={`bg-white dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-gray-700 overflow-hidden ${!isActive ? 'opacity-60' : ''}`}>
       <button onClick={() => setExpanded(!expanded)} className="w-full text-left p-4 flex items-center justify-between gap-3">
         <div className="min-w-0 flex-1">
           <div className="flex items-center gap-3 text-sm text-gray-900 dark:text-white font-semibold">
@@ -43,7 +47,7 @@ export function AgendaTableCard({ table, onNavigate, t }: AgendaTableCardProps) 
             <p className="text-xs text-gray-400 dark:text-gray-500 mt-1 truncate">{table.description}</p>
           )}
         </div>
-        <StatusBadge status={table.status} t={t} />
+        <StatusBadge status={table.status} isActive={isActive} t={t} />
         <ChevronDown className={`w-4 h-4 text-gray-400 flex-shrink-0 transition-transform ${expanded ? 'rotate-180' : ''}`} />
       </button>
 

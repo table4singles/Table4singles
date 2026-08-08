@@ -119,7 +119,7 @@ export function LiveTableCard({ table, onNavigate, t }: LiveTableCardProps) {
                 </span>
               )}
               <span className="text-3xl font-black text-gray-900 dark:text-white tracking-tight">
-                {table.time ? table.time.slice(0, 5) : '—'}
+                {table.time ? table.time.slice(0, 5) : (table.description || '—')}
               </span>
               <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${STATUS_LABEL_COLOR[table.status]}`}>
                 {t(`agenda.status${table.status.charAt(0).toUpperCase() + table.status.slice(1)}`)}

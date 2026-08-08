@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { Plus, CalendarDays, Users, Clock, Loader2, UtensilsCrossed, XCircle } from 'lucide-react'
+import { Plus, CalendarDays, Users, Clock, Loader2, UtensilsCrossed, XCircle, ToggleLeft, ToggleRight } from 'lucide-react'
 import { Navbar } from '@/components/Navbar'
 import { CancelModal } from '@/components/CancelModal'
 import { useLanguage } from '@/contexts/LanguageContext'
@@ -19,7 +19,7 @@ export function MyTablesPage({ onNavigate, onAuthClick, initialTab }: MyTablesPa
   const { t, language } = useLanguage()
   const { user, profile } = useAuth()
   const isRestaurant = profile?.role === 'restaurant'
-  const { hosting, reservations, loading, error, cancelHostedTable, cancelReservation } = useMyTables(user?.id ?? null)
+  const { hosting, reservations, loading, error, cancelHostedTable, cancelReservation, toggleActive } = useMyTables(user?.id ?? null)
   const { invitations, respondInvitation } = useInvitations(user?.id ?? null)
   const [tab, setTab] = useState<Tab>(initialTab ?? (isRestaurant ? 'hosting' : 'reservations'))
 
@@ -28,10 +28,22 @@ export function MyTablesPage({ onNavigate, onAuthClick, initialTab }: MyTablesPa
   }, [initialTab])
   const [cancelTableId, setCancelTableId] = useState<string | null>(null)
   const [cancelReservationTarget, setCancelReservationTarget] = useState<{ id: string; joinType: 'word' | 'deposit' } | null>(null)
+  const [togglingId, setTogglingId] = useState<string | null>(null)
 
   const locale = language === 'de' ? 'de-DE' : language === 'en' ? 'en-GB' : 'es-ES'
 
   const totalDiners = hosting.reduce((sum, t) => sum + (t.max_seats - t.available_seats), 0)
+  const activeCount = hosting.filter(t => t.is_active !== false && t.status !== 'cancelled').length
+
+  const handleToggle = async (tableId: string, next: boolean) => {
+    setTogglingId(tableId)
+    try {
+      await toggleActive(tableId, next)
+    } catch {
+      // revert already handled in hook
+    }
+    setTogglingId(null)
+  }
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
@@ -61,7 +73,7 @@ export function MyTablesPage({ onNavigate, onAuthClick, initialTab }: MyTablesPa
                 <UtensilsCrossed className="w-5 h-5 text-teal-600" />
               </div>
               <div>
-                <p className="text-xl font-bold text-gray-900 dark:text-white">{hosting.length}</p>
+                <p className="text-xl font-bold text-gray-900 dark:text-white">{activeCount}</p>
                 <p className="text-xs text-gray-500 dark:text-gray-400">{t('myTables.activeTables')}</p>
               </div>
             </div>
@@ -126,28 +138,63 @@ export function MyTablesPage({ onNavigate, onAuthClick, initialTab }: MyTablesPa
                 <EmptyState icon={<UtensilsCrossed className="w-10 h-10" />} title={t('myTables.empty.hosting')} desc={t('myTables.empty.hostingDesc')} action={t('myTables.create')} onAction={() => onNavigate('create')} />
               ) : (
                 <div className="space-y-4">
-                  {hosting.map(table => (
-                    <div key={table.id} className="bg-white dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-gray-700 p-4 hover:shadow-md transition-all">
-                      <button onClick={() => onNavigate('table-detail', table.id)} className="w-full text-left">
-                        <div className="flex items-center justify-between">
-                          <div>
-                            <h3 className="font-semibold text-gray-900 dark:text-white">{table.restaurant_name}</h3>
-                            <p className="text-sm text-gray-500 dark:text-gray-400">{table.restaurant_city}</p>
-                            {table.status === 'cancelled' && <span className="inline-block mt-1 text-xs px-2 py-0.5 bg-red-50 text-red-600 rounded-full">Cancelada</span>}
-                          </div>
-                          <div className="text-right">
-                            <p className="text-sm text-gray-700 dark:text-gray-200">{new Date(table.date).toLocaleDateString(locale, { month: 'short', day: 'numeric' })}</p>
-                            <p className="text-xs text-gray-400 dark:text-gray-500 flex items-center gap-1 justify-end"><Users className="w-3 h-3" />{table.max_seats - table.available_seats}/{table.max_seats}</p>
-                          </div>
+                  {hosting.map(table => {
+                    const isActive = table.is_active !== false
+                    return (
+                      <div key={table.id} className={`bg-white dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-gray-700 p-4 hover:shadow-md transition-all ${!isActive ? 'opacity-70' : ''}`}>
+                        <div className="flex items-start gap-3">
+                          <button onClick={() => onNavigate('table-detail', table.id)} className="flex-1 text-left min-w-0">
+                            <div className="flex items-center justify-between gap-2">
+                              <div className="min-w-0">
+                                <h3 className="font-semibold text-gray-900 dark:text-white truncate">
+                                  {table.description || table.restaurant_name}
+                                </h3>
+                                <p className="text-sm text-gray-500 dark:text-gray-400">
+                                  Desde {new Date(table.date).toLocaleDateString(locale, { month: 'short', day: 'numeric' })}
+                                  {table.available_until ? ` · hasta ${new Date(table.available_until).toLocaleDateString(locale, { month: 'short', day: 'numeric' })}` : ''}
+                                </p>
+                                <div className="flex items-center gap-2 mt-1.5 flex-wrap">
+                                  {table.status === 'cancelled' && <span className="text-xs px-2 py-0.5 bg-red-50 text-red-600 rounded-full">Cancelada</span>}
+                                  <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${isActive ? 'bg-green-50 text-green-700 dark:bg-green-900/30 dark:text-green-400' : 'bg-gray-100 text-gray-500 dark:bg-gray-700 dark:text-gray-400'}`}>
+                                    {isActive ? 'Disponible' : 'No disponible'}
+                                  </span>
+                                  <span className="text-xs text-gray-400 dark:text-gray-500 flex items-center gap-1">
+                                    <Users className="w-3 h-3" />{table.max_seats - table.available_seats}/{table.max_seats}
+                                  </span>
+                                </div>
+                              </div>
+                            </div>
+                          </button>
+
+                          {table.status !== 'cancelled' && table.status !== 'completed' && (
+                            <button
+                              onClick={() => handleToggle(table.id, !isActive)}
+                              disabled={togglingId === table.id}
+                              className="flex flex-col items-center gap-0.5 flex-shrink-0 pt-0.5"
+                              title={isActive ? 'Marcar como no disponible' : 'Marcar como disponible'}
+                            >
+                              {togglingId === table.id ? (
+                                <Loader2 className="w-7 h-7 animate-spin text-gray-400" />
+                              ) : isActive ? (
+                                <ToggleRight className="w-8 h-8 text-green-500" />
+                              ) : (
+                                <ToggleLeft className="w-8 h-8 text-gray-300 dark:text-gray-600" />
+                              )}
+                              <span className={`text-[10px] font-medium ${isActive ? 'text-green-600' : 'text-gray-400'}`}>
+                                {isActive ? 'Activa' : 'Inactiva'}
+                              </span>
+                            </button>
+                          )}
                         </div>
-                      </button>
-                      {table.status !== 'cancelled' && table.status !== 'completed' && new Date(`${table.date}T${table.time}`) > new Date() && (
-                        <button onClick={() => setCancelTableId(table.id)} className="mt-3 text-xs text-red-500 hover:text-red-600 font-medium flex items-center gap-1">
-                          <XCircle className="w-3.5 h-3.5" /> {t('myTables.cancel')}
-                        </button>
-                      )}
-                    </div>
-                  ))}
+
+                        {table.status !== 'cancelled' && table.status !== 'completed' && (
+                          <button onClick={() => setCancelTableId(table.id)} className="mt-3 text-xs text-red-500 hover:text-red-600 font-medium flex items-center gap-1">
+                            <XCircle className="w-3.5 h-3.5" /> {t('myTables.cancel')}
+                          </button>
+                        )}
+                      </div>
+                    )
+                  })}
                 </div>
               )
             )}

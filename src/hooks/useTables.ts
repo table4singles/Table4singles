@@ -128,5 +128,14 @@ export function useMyTables(userId: string | null) {
     await fetchMyTables()
   }, [fetchMyTables])
 
-  return { hosting, reservations, loading, error, refresh: fetchMyTables, cancelHostedTable, cancelReservation }
+  const toggleActive = useCallback(async (tableId: string, isActive: boolean) => {
+    setHosting(current => current.map(t => (t.id === tableId ? { ...t, is_active: isActive } : t)))
+    const { error: err } = await supabase.from('dining_tables').update({ is_active: isActive }).eq('id', tableId)
+    if (err) {
+      setHosting(current => current.map(t => (t.id === tableId ? { ...t, is_active: !isActive } : t)))
+      throw err
+    }
+  }, [])
+
+  return { hosting, reservations, loading, error, refresh: fetchMyTables, cancelHostedTable, cancelReservation, toggleActive }
 }

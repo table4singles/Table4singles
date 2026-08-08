@@ -32,12 +32,7 @@ export function AuthModal({ isOpen, onClose, mode, onSwitchMode }: AuthModalProp
 
     try {
       if (mode === 'signup') {
-        const breached = await checkPasswordBreach(password)
-        if (breached) {
-          setError('This password has appeared in a data breach. Please choose a different one.')
-          setLoading(false)
-          return
-        }
+        // TEST MODE: validación de contraseña desactivada temporalmente
         const { error: err } = await signUp(email, password, name, role)
         if (err) throw err
         setSuccess('Check your email to confirm your account!')

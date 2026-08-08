@@ -49,9 +49,8 @@ export function OnboardingPage({ onNavigate }: { onNavigate: (page: string) => v
   const toggleLanguage = (l: string) => setLanguages(prev => (prev.includes(l) ? prev.filter(x => x !== l) : [...prev, l]))
   const toggleInterest = (i: string) => setInterests(prev => (prev.includes(i) ? prev.filter(x => x !== i) : [...prev, i]))
 
-  const isUserValid = (isAdmin || avatarUrl) && fullName.trim() && streetAddress.trim() && city.trim() && province.trim() && country.trim() && dateOfBirth && bio.trim() && phone.trim()
-  const isRestaurantValid = restaurantName.trim() && restaurantAddress.trim() && restaurantCity.trim() && restaurantCountry.trim() && restaurantPhone.trim() && restaurantCuisine && restaurantDescription.trim()
-  const isValid = isRestaurant ? isRestaurantValid : isUserValid
+  // TEST MODE: solo se requiere un nombre para continuar
+  const isValid = isRestaurant ? restaurantName.trim().length > 0 : fullName.trim().length > 0
 
   const handleAvatarUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]

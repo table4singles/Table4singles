@@ -1,0 +1,17 @@
+{
+  "name": "Table4Singles",
+  "install": "npm ci",
+  "terminals": [
+    {
+      "name": "vite-dev",
+      "command": "npm run dev",
+      "description": "Vite dev server (React + TS) on http://localhost:5173. Needs VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY as secrets for Supabase-backed features."
+    }
+  ],
+  "ports": [
+    {
+      "name": "vite",
+      "port": 5173
+    }
+  ]
+}

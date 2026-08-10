@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react'
-import { LayoutGrid, Search, Plus, CalendarDays, CalendarClock, Mail, User, LogOut, Bell, LayoutDashboard, Settings, Users, FileText, Star, Award } from 'lucide-react'
+import { LayoutGrid, Search, Plus, CalendarDays, CalendarClock, Mail, User, LogOut, Bell, LayoutDashboard, Settings, Users, FileText, Star, Award, CreditCard } from 'lucide-react'
 import { useAuth } from '@/contexts/AuthContext'
 import { useLanguage } from '@/contexts/LanguageContext'
 import { useNotifications } from '@/hooks/useNotifications'
@@ -45,6 +45,13 @@ export function Navbar({ currentPage, onNavigate, onAuthClick }: NavbarProps) {
               <NavLink active={currentPage === 'agenda'} onClick={() => onNavigate('agenda')} icon={<CalendarClock className="w-4 h-4" />} label={t('nav.agenda')} />
               <NavLink active={currentPage === 'my-tables'} onClick={() => onNavigate('my-tables')} icon={<CalendarDays className="w-4 h-4" />} label={t('nav.myTables')} />
               <NavLink active={currentPage === 'reviews'} onClick={() => onNavigate('reviews')} icon={<Star className="w-4 h-4" />} label="Reseñas" />
+              <NavLink
+                active={currentPage === 'subscription'}
+                onClick={() => onNavigate('subscription')}
+                icon={<CreditCard className="w-4 h-4" />}
+                label="Suscripción"
+                alert={!profile?.subscription_status || profile.subscription_status === 'canceled' || profile.subscription_status === 'past_due'}
+              />
             </>
           )}
           {user && profile?.role === 'user' && (
@@ -100,9 +107,18 @@ export function Navbar({ currentPage, onNavigate, onAuthClick }: NavbarProps) {
                       <Settings className="w-4 h-4" /> Ajustes
                     </button>
                     {profile?.role === 'restaurant' && (
-                      <button onClick={() => { onNavigate('aviso-legal'); setShowMenu(false) }} className="w-full px-4 py-3 text-left text-sm hover:bg-gray-50 dark:hover:bg-gray-700 flex items-center gap-2">
-                        <FileText className="w-4 h-4" /> Términos y condiciones
-                      </button>
+                      <>
+                        <button onClick={() => { onNavigate('subscription'); setShowMenu(false) }} className="w-full px-4 py-3 text-left text-sm hover:bg-gray-50 dark:hover:bg-gray-700 flex items-center gap-2">
+                          <CreditCard className="w-4 h-4" />
+                          <span className="flex-1">Suscripción</span>
+                          {(!profile.subscription_status || profile.subscription_status === 'canceled' || profile.subscription_status === 'past_due') && (
+                            <span className="w-2 h-2 rounded-full bg-orange-400 flex-shrink-0" />
+                          )}
+                        </button>
+                        <button onClick={() => { onNavigate('aviso-legal'); setShowMenu(false) }} className="w-full px-4 py-3 text-left text-sm hover:bg-gray-50 dark:hover:bg-gray-700 flex items-center gap-2">
+                          <FileText className="w-4 h-4" /> Términos y condiciones
+                        </button>
+                      </>
                     )}
                     {profile?.role === 'user' && (
                       <button onClick={() => { onNavigate('ambassador'); setShowMenu(false) }} className="w-full px-4 py-3 text-left text-sm hover:bg-gray-50 dark:hover:bg-gray-700 flex items-center gap-2 text-primary-600 dark:text-primary-400">
@@ -158,10 +174,11 @@ export function Navbar({ currentPage, onNavigate, onAuthClick }: NavbarProps) {
   )
 }
 
-function NavLink({ active, onClick, icon, label }: { active: boolean; onClick: () => void; icon: React.ReactNode; label: string }) {
+function NavLink({ active, onClick, icon, label, alert }: { active: boolean; onClick: () => void; icon: React.ReactNode; label: string; alert?: boolean }) {
   return (
-    <button onClick={onClick} className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-semibold transition-colors ${active ? 'text-blue-600 bg-blue-50' : 'text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-600'}`}>
+    <button onClick={onClick} className={`relative flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-semibold transition-colors ${active ? 'text-blue-600 bg-blue-50' : 'text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-600'}`}>
       {icon} {label}
+      {alert && <span className="absolute top-1 right-1 w-2 h-2 rounded-full bg-orange-400" />}
     </button>
   )
 }

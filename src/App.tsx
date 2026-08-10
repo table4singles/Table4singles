@@ -3,7 +3,7 @@ import { LanguageProvider } from '@/contexts/LanguageContext'
 import { AuthProvider, useAuth } from '@/contexts/AuthContext'
 import { ThemeProvider } from '@/contexts/ThemeContext'
 import { PendingInviteProvider } from '@/contexts/PendingInviteContext'
-import { Navbar } from '@/components/Navbar'
+import { ViewModeProvider, useViewMode } from '@/contexts/ViewModeContext'
 import { AuthModal } from '@/components/AuthModal'
 import { PendingInviteBanner } from '@/components/PendingInviteBanner'
 import { LandingPage } from '@/pages/LandingPage'
@@ -26,8 +26,12 @@ import { AmbassadorPage } from '@/pages/AmbassadorPage'
 import { SubscriptionPage } from '@/pages/SubscriptionPage'
 import { AdminPage } from '@/pages/AdminPage'
 
+// Suppress unused import warning – BrowsePage kept for future use
+void BrowsePage
+
 function AppRouter() {
   const { user, profile, loading } = useAuth()
+  const { effectiveRole } = useViewMode()
   const [page, setPage] = useState('landing')
   const [selectedId, setSelectedId] = useState<string | null>(null)
   const [authModal, setAuthModal] = useState(false)
@@ -36,7 +40,10 @@ function AppRouter() {
 
   useEffect(() => {
     if (!loading && user && profile && page === 'landing') {
-      setPage(profile.role === 'restaurant' ? 'restaurant-dashboard' : 'browse')
+      const savedMode = profile.is_admin
+        ? (localStorage.getItem('t4s_admin_view') as 'user' | 'restaurant' | null) ?? 'user'
+        : profile.role
+      setPage(savedMode === 'restaurant' ? 'restaurant-dashboard' : 'browse')
     }
     if (!loading && !user && !['landing', 'politica-privacidad', 'aviso-legal'].includes(page)) setPage('landing')
   }, [user, loading, profile])
@@ -110,7 +117,7 @@ function AppRouter() {
       case 'landing':
         return <LandingPage onNavigate={navigate} onAuthClick={openAuth} />
       case 'browse':
-        return profile?.role === 'restaurant'
+        return effectiveRole === 'restaurant'
           ? <RestaurantDashboardPage onNavigate={navigate} onAuthClick={openAuth} />
           : <RestaurantsBrowsePage onNavigate={navigate} onAuthClick={openAuth} />
       case 'restaurant-profile':
@@ -173,7 +180,9 @@ export default function App() {
       <LanguageProvider>
         <AuthProvider>
           <PendingInviteProvider>
-            <AppRouter />
+            <ViewModeProvider>
+              <AppRouter />
+            </ViewModeProvider>
           </PendingInviteProvider>
         </AuthProvider>
       </LanguageProvider>

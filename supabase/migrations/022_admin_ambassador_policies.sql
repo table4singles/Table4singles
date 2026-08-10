@@ -2,40 +2,110 @@
 -- + funciones RPC para stats agregados
 
 -- ── RLS: embajador ve los restaurantes que ha captado ─────────────────────────
-create policy if not exists "Embajador ve restaurantes referidos"
-  on public.profiles for select
-  using (referred_by = auth.uid());
+do $$
+begin
+  if not exists (
+    select 1 from pg_policies
+    where schemaname = 'public' and tablename = 'profiles'
+      and policyname = 'Embajador ve restaurantes referidos'
+  ) then
+    execute $p$
+      create policy "Embajador ve restaurantes referidos"
+        on public.profiles for select
+        using (referred_by = auth.uid())
+    $p$;
+  end if;
+end $$;
 
--- ── RLS: admin ve todo ────────────────────────────────────────────────────────
-create policy if not exists "Admin ve todos los perfiles"
-  on public.profiles for select
-  using ((select is_admin from public.profiles where id = auth.uid() limit 1) = true);
+-- ── RLS: admin ve todos los perfiles ─────────────────────────────────────────
+do $$
+begin
+  if not exists (
+    select 1 from pg_policies
+    where schemaname = 'public' and tablename = 'profiles'
+      and policyname = 'Admin ve todos los perfiles'
+  ) then
+    execute $p$
+      create policy "Admin ve todos los perfiles"
+        on public.profiles for select
+        using ((select is_admin from public.profiles where id = auth.uid() limit 1) = true)
+    $p$;
+  end if;
+end $$;
 
-create policy if not exists "Admin ve todas las mesas"
-  on public.dining_tables for select
-  using ((select is_admin from public.profiles where id = auth.uid() limit 1) = true);
+-- ── RLS: admin ve todas las mesas ─────────────────────────────────────────────
+do $$
+begin
+  if not exists (
+    select 1 from pg_policies
+    where schemaname = 'public' and tablename = 'dining_tables'
+      and policyname = 'Admin ve todas las mesas'
+  ) then
+    execute $p$
+      create policy "Admin ve todas las mesas"
+        on public.dining_tables for select
+        using ((select is_admin from public.profiles where id = auth.uid() limit 1) = true)
+    $p$;
+  end if;
+end $$;
 
-create policy if not exists "Admin ve todos los participantes"
-  on public.table_participants for select
-  using ((select is_admin from public.profiles where id = auth.uid() limit 1) = true);
+-- ── RLS: admin ve todos los participantes ────────────────────────────────────
+do $$
+begin
+  if not exists (
+    select 1 from pg_policies
+    where schemaname = 'public' and tablename = 'table_participants'
+      and policyname = 'Admin ve todos los participantes'
+  ) then
+    execute $p$
+      create policy "Admin ve todos los participantes"
+        on public.table_participants for select
+        using ((select is_admin from public.profiles where id = auth.uid() limit 1) = true)
+    $p$;
+  end if;
+end $$;
 
-create policy if not exists "Admin ve todos los pagos"
-  on public.reservation_payments for select
-  using ((select is_admin from public.profiles where id = auth.uid() limit 1) = true);
+-- ── RLS: admin ve todos los pagos ────────────────────────────────────────────
+do $$
+begin
+  if not exists (
+    select 1 from pg_policies
+    where schemaname = 'public' and tablename = 'reservation_payments'
+      and policyname = 'Admin ve todos los pagos'
+  ) then
+    execute $p$
+      create policy "Admin ve todos los pagos"
+        on public.reservation_payments for select
+        using ((select is_admin from public.profiles where id = auth.uid() limit 1) = true)
+    $p$;
+  end if;
+end $$;
 
-create policy if not exists "Admin ve todos los embajadores"
-  on public.ambassadors for select
-  using ((select is_admin from public.profiles where id = auth.uid() limit 1) = true);
+-- ── RLS: admin ve todos los embajadores ──────────────────────────────────────
+do $$
+begin
+  if not exists (
+    select 1 from pg_policies
+    where schemaname = 'public' and tablename = 'ambassadors'
+      and policyname = 'Admin ve todos los embajadores'
+  ) then
+    execute $p$
+      create policy "Admin ve todos los embajadores"
+        on public.ambassadors for select
+        using ((select is_admin from public.profiles where id = auth.uid() limit 1) = true)
+    $p$;
+  end if;
+end $$;
 
 -- ── RPC: stats de restaurantes captados por un embajador ─────────────────────
 create or replace function get_ambassador_restaurants(p_ambassador_id uuid)
 returns table(
-  restaurant_id      uuid,
-  restaurant_name    text,
+  restaurant_id       uuid,
+  restaurant_name     text,
   subscription_status text,
-  active_tables      bigint,
-  total_reservations bigint,
-  joined_at          timestamptz
+  active_tables       bigint,
+  total_reservations  bigint,
+  joined_at           timestamptz
 )
 language sql
 security definer
@@ -95,14 +165,14 @@ $$;
 -- ── RPC: lista completa de restaurantes para admin ────────────────────────────
 create or replace function get_admin_restaurants()
 returns table(
-  restaurant_id      uuid,
-  restaurant_name    text,
-  email              text,
+  restaurant_id       uuid,
+  restaurant_name     text,
+  email               text,
   subscription_status text,
-  active_tables      bigint,
-  total_reservations bigint,
-  ambassador_name    text,
-  joined_at          timestamptz
+  active_tables       bigint,
+  total_reservations  bigint,
+  ambassador_name     text,
+  joined_at           timestamptz
 )
 language plpgsql
 security definer

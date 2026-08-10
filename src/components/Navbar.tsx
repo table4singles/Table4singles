@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react'
-import { LayoutGrid, Search, Plus, CalendarDays, CalendarClock, Mail, User, LogOut, Bell, LayoutDashboard, Settings, Users, FileText, Star, Award, CreditCard } from 'lucide-react'
+import { LayoutGrid, Search, Plus, CalendarDays, CalendarClock, Mail, User, LogOut, Bell, LayoutDashboard, Settings, Users, FileText, Star, Award, CreditCard, ShieldCheck } from 'lucide-react'
 import { useAuth } from '@/contexts/AuthContext'
 import { useLanguage } from '@/contexts/LanguageContext'
 import { useNotifications } from '@/hooks/useNotifications'
@@ -123,6 +123,11 @@ export function Navbar({ currentPage, onNavigate, onAuthClick }: NavbarProps) {
                     {profile?.role === 'user' && (
                       <button onClick={() => { onNavigate('ambassador'); setShowMenu(false) }} className="w-full px-4 py-3 text-left text-sm hover:bg-gray-50 dark:hover:bg-gray-700 flex items-center gap-2 text-primary-600 dark:text-primary-400">
                         <Award className="w-4 h-4" /> Ser embajador
+                      </button>
+                    )}
+                    {profile?.is_admin && (
+                      <button onClick={() => { onNavigate('admin'); setShowMenu(false) }} className="w-full px-4 py-3 text-left text-sm hover:bg-gray-50 dark:hover:bg-gray-700 flex items-center gap-2 text-purple-600 dark:text-purple-400 border-t border-gray-100 dark:border-gray-700">
+                        <ShieldCheck className="w-4 h-4" /> Panel Admin
                       </button>
                     )}
                     <button onClick={() => { signOut(); setShowMenu(false) }} className="w-full px-4 py-3 text-left text-sm hover:bg-gray-50 dark:hover:bg-gray-700 flex items-center gap-2 text-red-600 border-t border-gray-100 dark:border-gray-700">

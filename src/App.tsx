@@ -23,6 +23,7 @@ import { SettingsPage } from '@/pages/SettingsPage'
 import { PrivacyPolicyPage } from '@/pages/PrivacyPolicyPage'
 import { AvisoLegalPage } from '@/pages/AvisoLegalPage'
 import { AmbassadorPage } from '@/pages/AmbassadorPage'
+import { SubscriptionPage } from '@/pages/SubscriptionPage'
 
 function AppRouter() {
   const { user, profile, loading } = useAuth()
@@ -54,7 +55,9 @@ function AppRouter() {
   // Handle payment success redirect
   useEffect(() => {
     const params = new URLSearchParams(window.location.search)
-    if (params.get('payment') === 'success') {
+    const payment = params.get('payment')
+
+    if (payment === 'success') {
       const tableId = params.get('table')
       if (tableId) {
         setSelectedId(tableId)
@@ -62,6 +65,11 @@ function AppRouter() {
         setPaymentSuccess(true)
       }
       window.history.replaceState({}, '', window.location.pathname)
+    }
+
+    if (payment === 'subscription-success') {
+      window.history.replaceState({}, '', window.location.pathname)
+      setPage('subscription')
     }
   }, [])
 
@@ -135,6 +143,8 @@ function AppRouter() {
         return <AvisoLegalPage onNavigate={navigate} />
       case 'ambassador':
         return <AmbassadorPage onNavigate={navigate} onAuthClick={openAuth} />
+      case 'subscription':
+        return <SubscriptionPage onNavigate={navigate} onAuthClick={openAuth} />
       default:
         return <RestaurantsBrowsePage onNavigate={navigate} onAuthClick={openAuth} />
     }

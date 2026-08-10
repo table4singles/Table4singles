@@ -1,5 +1,5 @@
 import { useState, useMemo, useEffect } from 'react'
-import { UtensilsCrossed, Users, Star, Loader2, XCircle, Calendar, Clock, CalendarClock, CalendarDays } from 'lucide-react'
+import { UtensilsCrossed, Users, Star, Loader2, XCircle, Calendar, Clock, CalendarClock, CalendarDays, AlertCircle, CheckCircle, CreditCard } from 'lucide-react'
 import { Navbar } from '@/components/Navbar'
 import { CancelModal } from '@/components/CancelModal'
 import { useLanguage } from '@/contexts/LanguageContext'
@@ -74,6 +74,35 @@ export function RestaurantDashboardPage({ onNavigate, onAuthClick }: RestaurantD
         </div>
 
         {error && <div className="bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-300 text-sm rounded-xl p-3 mb-4">{error}</div>}
+
+        {/* Banner de suscripción */}
+        {profile?.subscription_status === 'active' || profile?.subscription_status === 'trialing' ? (
+          <div className="flex items-center gap-3 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-xl px-4 py-3 mb-6 text-sm">
+            <CheckCircle className="w-4 h-4 text-green-600 flex-shrink-0" />
+            <span className="text-green-800 dark:text-green-300 font-medium">Suscripción activa — Plan Restaurante · 10 €/mes</span>
+            <button onClick={() => onNavigate('subscription')} className="ml-auto text-xs text-green-700 dark:text-green-400 hover:underline font-medium">Gestionar</button>
+          </div>
+        ) : profile?.subscription_status === 'past_due' ? (
+          <div className="flex items-center gap-3 bg-orange-50 dark:bg-orange-900/20 border border-orange-200 dark:border-orange-800 rounded-xl px-4 py-3 mb-6 text-sm">
+            <AlertCircle className="w-4 h-4 text-orange-600 flex-shrink-0" />
+            <span className="text-orange-800 dark:text-orange-300 font-medium">Pago pendiente — actualiza tu método de pago</span>
+            <button onClick={() => onNavigate('subscription')} className="ml-auto text-xs text-orange-700 dark:text-orange-400 hover:underline font-medium">Ver</button>
+          </div>
+        ) : (
+          <div className="flex items-center gap-3 bg-[#e94560]/5 border border-[#e94560]/20 rounded-xl px-4 py-3 mb-6">
+            <CreditCard className="w-4 h-4 text-[#e94560] flex-shrink-0" />
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-medium text-gray-900 dark:text-white">Activa tu suscripción por <strong>10 €/mes</strong></p>
+              <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">Accede a todas las funciones de restaurante en Table4Singles</p>
+            </div>
+            <button
+              onClick={() => onNavigate('subscription')}
+              className="flex-shrink-0 px-3 py-1.5 bg-[#e94560] text-white rounded-lg text-xs font-semibold hover:bg-[#d63d56] transition-colors"
+            >
+              Suscribirse
+            </button>
+          </div>
+        )}
 
         <div className="grid grid-cols-3 gap-4 mb-8">
           <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-4 flex items-center gap-3">

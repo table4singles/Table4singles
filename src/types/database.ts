@@ -43,6 +43,9 @@ export interface Profile {
   restaurant_specialties: string[] | null
   restaurant_address: string | null
   referred_by: string | null
+  stripe_customer_id: string | null
+  subscription_status: 'active' | 'trialing' | 'past_due' | 'canceled' | 'incomplete' | 'incomplete_expired' | 'unpaid' | null
+  subscription_id: string | null
   created_at: string
 }
 

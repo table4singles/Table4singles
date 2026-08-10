@@ -122,13 +122,17 @@ export function TableDetailPage({ tableId, paymentSuccess, onNavigate, onAuthCli
     setJoining(true)
     setJoinError(null)
     try {
-      const { data, error: fnError } = await supabase.functions.invoke('create-checkout', {
-        body: { tableId: table.id, userId: user.id },
+      const { data, error: fnError } = await supabase.functions.invoke('create-reservation-checkout', {
+        body: { tableId: table.id },
       })
       if (fnError) throw fnError
-      if (data?.url) window.location.href = data.url
-    } catch {
-      setJoinError('El pago con depósito estará disponible próximamente.')
+      if (data?.url) {
+        window.location.href = data.url
+      } else {
+        throw new Error(data?.error || 'No se recibió la URL de pago')
+      }
+    } catch (err: any) {
+      setJoinError(err.message || 'Error al procesar el pago. Inténtalo de nuevo.')
     }
     setJoining(false)
   }
@@ -388,12 +392,9 @@ export function TableDetailPage({ tableId, paymentSuccess, onNavigate, onAuthCli
                   <button onClick={handleJoinWord} disabled={joining} className="w-full py-3 bg-primary-500 text-white rounded-xl font-medium hover:bg-primary-600 disabled:opacity-50 transition-colors text-sm">
                     {joining ? t('card.registering') : t('card.giveWord')}
                   </button>
-                  <div className="relative">
-                    <button onClick={handleJoinDeposit} disabled={joining} className="w-full py-3 border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-200 rounded-xl font-medium hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50 transition-colors text-sm">
-                      {joining ? t('card.redirecting') : t('card.reserveDeposit')}
-                    </button>
-                    <span className="absolute -top-2 -right-2 text-[10px] font-semibold bg-gray-800 text-white px-2 py-0.5 rounded-full">Próximamente</span>
-                  </div>
+                  <button onClick={handleJoinDeposit} disabled={joining} className="w-full py-3 border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-200 rounded-xl font-medium hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50 transition-colors text-sm flex items-center justify-center gap-1.5">
+                    {joining ? t('card.redirecting') : <>{t('card.reserveDeposit')} <span className="font-semibold text-[#e94560]">· 2 €</span></>}
+                  </button>
                   <p className="text-xs text-gray-400 dark:text-gray-500 text-center">{t('card.depositNote')}</p>
                   {joinError && <p className="text-xs text-red-600 text-center">{joinError}</p>}
                 </>

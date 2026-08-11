@@ -6,7 +6,7 @@ import { StarRating } from '@/components/StarRating'
 import { InviteModal } from '@/components/InviteModal'
 import { CancelModal } from '@/components/CancelModal'
 import { ParticipantCard } from '@/components/ParticipantCard'
-import { DinerReviewModal } from '@/components/DinerReviewModal'
+import { PostDinnerReviewModal } from '@/components/PostDinnerReviewModal'
 import { useLanguage } from '@/contexts/LanguageContext'
 import { useAuth } from '@/contexts/AuthContext'
 import { usePendingInvite } from '@/contexts/PendingInviteContext'
@@ -36,14 +36,11 @@ export function TableDetailPage({ tableId, paymentSuccess, paymentCancelled, onN
   const [joining, setJoining] = useState(false)
   const [joinError, setJoinError] = useState<string | null>(null)
   const [showChat, setShowChat] = useState(false)
-  const [showReview, setShowReview] = useState(false)
-  const [showDinerReview, setShowDinerReview] = useState(false)
+  const [showPostDinnerReview, setShowPostDinnerReview] = useState(false)
   const [showInvite, setShowInvite] = useState(false)
   const [showCancel, setShowCancel] = useState(false)
   const [showCancelTable, setShowCancelTable] = useState(false)
   const [chatInput, setChatInput] = useState('')
-  const [reviewRating, setReviewRating] = useState(0)
-  const [reviewComment, setReviewComment] = useState('')
   const [showAutoInvite, setShowAutoInvite] = useState(false)
   const [autoInvitePaymentCovered, setAutoInvitePaymentCovered] = useState(true)
   const [autoInviteSending, setAutoInviteSending] = useState(false)
@@ -217,17 +214,14 @@ export function TableDetailPage({ tableId, paymentSuccess, paymentCancelled, onN
     setChatInput('')
   }
 
-  const handleSubmitReview = async () => {
-    if (!table || reviewRating === 0) return
+  const handleSubmitRestaurantReview = async (rating: number, comment: string) => {
+    if (!table) return
     await submitReview({
       table_id: table.id,
       host_id: table.host_id,
-      rating: reviewRating,
-      comment: reviewComment || undefined,
+      rating,
+      comment: comment || undefined,
     })
-    setShowReview(false)
-    setReviewRating(0)
-    setReviewComment('')
   }
 
   const downloadICS = () => {
@@ -473,15 +467,12 @@ export function TableDetailPage({ tableId, paymentSuccess, paymentCancelled, onN
                 </button>
               )}
 
-              {canReview && (
-                <button onClick={() => setShowReview(true)} className="w-full py-2.5 bg-yellow-50 text-yellow-700 border border-yellow-200 rounded-xl text-sm font-medium hover:bg-yellow-100">
-                  <Star className="w-4 h-4 inline mr-1" /> {t('review.title')}
-                </button>
-              )}
-
-              {canReviewDiners && (
-                <button onClick={() => setShowDinerReview(true)} className="w-full py-2.5 bg-teal-50 text-teal-700 border border-teal-200 rounded-xl text-sm font-medium hover:bg-teal-100">
-                  Puntúa a tus comensales
+              {(canReview || canReviewDiners) && (
+                <button
+                  onClick={() => setShowPostDinnerReview(true)}
+                  className="w-full py-2.5 bg-yellow-50 dark:bg-yellow-900/20 text-yellow-700 dark:text-yellow-400 border border-yellow-200 dark:border-yellow-800 rounded-xl text-sm font-medium hover:bg-yellow-100 dark:hover:bg-yellow-900/30 flex items-center justify-center gap-1.5 transition-colors"
+                >
+                  <Star className="w-4 h-4" /> Valorar experiencia
                 </button>
               )}
             </div>
@@ -521,31 +512,17 @@ export function TableDetailPage({ tableId, paymentSuccess, paymentCancelled, onN
           </div>
         )}
 
-        {/* Review modal */}
-        {showReview && (
-          <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4" onClick={() => setShowReview(false)}>
-            <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl w-full max-w-md p-6" onClick={e => e.stopPropagation()}>
-              <h3 className="text-lg font-display font-bold text-gray-900 dark:text-white mb-4">{t('review.title')}</h3>
-              <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">{t('review.dinnerAt')} {table.restaurant_name}</p>
-              <div className="space-y-4">
-                <div>
-                  <label className="text-sm font-medium text-gray-700 dark:text-gray-200 block mb-1">{t('review.overallRating')}</label>
-                  <StarRating rating={reviewRating} onChange={setReviewRating} size="lg" />
-                </div>
-                <div>
-                  <label className="text-sm font-medium text-gray-700 dark:text-gray-200 block mb-1">{t('review.comment')}</label>
-                  <textarea value={reviewComment} onChange={e => setReviewComment(e.target.value)} placeholder={t('review.commentPlaceholder')} rows={3} className="w-full px-4 py-2.5 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 dark:text-white rounded-xl text-sm focus:ring-2 focus:ring-primary-500 outline-none resize-none" />
-                </div>
-                <button onClick={handleSubmitReview} disabled={reviewRating === 0} className="w-full py-3 bg-primary-500 text-white rounded-xl font-medium hover:bg-primary-600 disabled:opacity-50">
-                  {t('review.submit')}
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {showDinerReview && (
-          <DinerReviewModal tableId={table.id} coDiners={coDiners} onClose={() => setShowDinerReview(false)} />
+        {showPostDinnerReview && (
+          <PostDinnerReviewModal
+            tableId={table.id}
+            restaurantName={table.restaurant_name}
+            hostId={table.host_id}
+            coDiners={coDiners}
+            alreadyReviewedRestaurant={!canReview}
+            isHostOnly={!canReview && canReviewDiners}
+            onSubmitRestaurant={handleSubmitRestaurantReview}
+            onClose={() => setShowPostDinnerReview(false)}
+          />
         )}
 
         {showInvite && <InviteModal tableId={table.id} onClose={() => setShowInvite(false)} />}

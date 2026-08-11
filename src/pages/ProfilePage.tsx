@@ -7,6 +7,7 @@ import { ErrorBanner } from '@/components/ErrorBanner'
 import { ShareButton } from '@/components/ShareButton'
 import { useLanguage } from '@/contexts/LanguageContext'
 import { useAuth } from '@/contexts/AuthContext'
+import { useViewMode } from '@/contexts/ViewModeContext'
 import { supabase } from '@/lib/supabase'
 import { LANGUAGE_OPTIONS, INTEREST_OPTIONS } from '@/lib/options'
 import { useMyTables } from '@/hooks/useTables'
@@ -23,7 +24,8 @@ interface ProfilePageProps {
 export function ProfilePage({ onNavigate, onAuthClick }: ProfilePageProps) {
   const { t } = useLanguage()
   const { profile, refreshProfile, user } = useAuth()
-  const isRestaurant = profile?.role === 'restaurant'
+  const { effectiveRole } = useViewMode()
+  const isRestaurant = effectiveRole === 'restaurant'
   const { hosting, reservations } = useMyTables(!isRestaurant ? user?.id ?? null : null)
   const { score: trustScore } = useDinerTrustScore(!isRestaurant ? user?.id ?? null : null)
 

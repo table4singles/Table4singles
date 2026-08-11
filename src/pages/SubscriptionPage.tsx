@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { ArrowLeft, CheckCircle, AlertCircle, Clock, XCircle, CreditCard, Loader2, Zap } from 'lucide-react'
 import { Navbar } from '@/components/Navbar'
 import { useAuth } from '@/contexts/AuthContext'
+import { useViewMode } from '@/contexts/ViewModeContext'
 import { supabase } from '@/lib/supabase'
 
 interface SubscriptionPageProps {
@@ -53,10 +54,11 @@ const FEATURES = [
 
 export function SubscriptionPage({ onNavigate, onAuthClick }: SubscriptionPageProps) {
   const { profile, refreshProfile } = useAuth()
+  const { effectiveRole } = useViewMode()
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
-  if (!profile || profile.role !== 'restaurant') {
+  if (!profile || effectiveRole !== 'restaurant') {
     return (
       <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
         <Navbar currentPage="subscription" onNavigate={onNavigate} onAuthClick={onAuthClick} />

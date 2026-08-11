@@ -7,6 +7,7 @@ import { CompanionCard } from '@/components/CompanionCard'
 import { CompanionProfileModal } from '@/components/CompanionProfileModal'
 import { useCompanions, type CompanionProfile } from '@/hooks/useCompanions'
 import { useAuth } from '@/contexts/AuthContext'
+import { useViewMode } from '@/contexts/ViewModeContext'
 import { LANGUAGE_OPTIONS, INTEREST_OPTIONS } from '@/lib/options'
 
 interface CompanionsPageProps {
@@ -16,6 +17,7 @@ interface CompanionsPageProps {
 
 export function CompanionsPage({ onNavigate, onAuthClick }: CompanionsPageProps) {
   const { user, profile } = useAuth()
+  const { effectiveRole } = useViewMode()
   const [search, setSearch] = useState('')
   const [city, setCity] = useState('')
   const [languages, setLanguages] = useState<string[]>([])
@@ -40,7 +42,7 @@ export function CompanionsPage({ onNavigate, onAuthClick }: CompanionsPageProps)
 
   const hasFilters = search || city || languages.length > 0 || interests.length > 0
 
-  if (profile && profile.role !== 'user') {
+  if (profile && effectiveRole !== 'user') {
     return (
       <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
         <Navbar currentPage="companions" onNavigate={onNavigate} onAuthClick={onAuthClick} />

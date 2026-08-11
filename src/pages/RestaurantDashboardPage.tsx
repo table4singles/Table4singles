@@ -4,6 +4,7 @@ import { Navbar } from '@/components/Navbar'
 import { CancelModal } from '@/components/CancelModal'
 import { useLanguage } from '@/contexts/LanguageContext'
 import { useAuth } from '@/contexts/AuthContext'
+import { useViewMode } from '@/contexts/ViewModeContext'
 import { useMyTables } from '@/hooks/useTables'
 import { supabase } from '@/lib/supabase'
 
@@ -15,6 +16,7 @@ interface RestaurantDashboardPageProps {
 export function RestaurantDashboardPage({ onNavigate, onAuthClick }: RestaurantDashboardPageProps) {
   const { t, language } = useLanguage()
   const { user, profile } = useAuth()
+  const { effectiveRole } = useViewMode()
   const { hosting, loading, error, cancelHostedTable, refresh } = useMyTables(user?.id ?? null)
   const [cancelTableId, setCancelTableId] = useState<string | null>(null)
   const [avgRating, setAvgRating] = useState<number | null>(null)
@@ -52,7 +54,7 @@ export function RestaurantDashboardPage({ onNavigate, onAuthClick }: RestaurantD
 
   const totalDiners = hosting.reduce((sum, tbl) => sum + (tbl.max_seats - tbl.available_seats), 0)
 
-  if (profile && profile.role !== 'restaurant') {
+  if (profile && effectiveRole !== 'restaurant') {
     return (
       <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
         <Navbar currentPage="restaurant-dashboard" onNavigate={onNavigate} onAuthClick={onAuthClick} />

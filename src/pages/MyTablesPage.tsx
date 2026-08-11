@@ -4,6 +4,7 @@ import { Navbar } from '@/components/Navbar'
 import { CancelModal } from '@/components/CancelModal'
 import { useLanguage } from '@/contexts/LanguageContext'
 import { useAuth } from '@/contexts/AuthContext'
+import { useViewMode } from '@/contexts/ViewModeContext'
 import { useMyTables } from '@/hooks/useTables'
 import { useInvitations } from '@/hooks/useInvitations'
 
@@ -17,8 +18,9 @@ type Tab = 'hosting' | 'reservations' | 'invitations'
 
 export function MyTablesPage({ onNavigate, onAuthClick, initialTab }: MyTablesPageProps) {
   const { t, language } = useLanguage()
-  const { user, profile } = useAuth()
-  const isRestaurant = profile?.role === 'restaurant'
+  const { user } = useAuth()
+  const { effectiveRole } = useViewMode()
+  const isRestaurant = effectiveRole === 'restaurant'
   const { hosting, reservations, loading, error, cancelHostedTable, cancelReservation, toggleActive } = useMyTables(user?.id ?? null)
   const { invitations, respondInvitation } = useInvitations(user?.id ?? null)
   const [tab, setTab] = useState<Tab>(initialTab ?? (isRestaurant ? 'hosting' : 'reservations'))

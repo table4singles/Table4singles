@@ -5,6 +5,7 @@ import {
 } from 'lucide-react'
 import { Navbar } from '@/components/Navbar'
 import { useAuth } from '@/contexts/AuthContext'
+import { useViewMode } from '@/contexts/ViewModeContext'
 import { supabase } from '@/lib/supabase'
 import { useAmbassadorStats } from '@/hooks/useAmbassadorStats'
 
@@ -29,7 +30,8 @@ const SUB_STATUS: Record<string, { label: string; icon: React.ReactNode; color: 
 }
 
 export function AmbassadorPage({ onNavigate, onAuthClick }: AmbassadorPageProps) {
-  const { user, profile } = useAuth()
+  const { user } = useAuth()
+  const { effectiveRole } = useViewMode()
   const [ambassador, setAmbassador] = useState<AmbassadorRecord | null>(null)
   const [loadingAmb, setLoadingAmb] = useState(true)
   const [applying, setApplying] = useState(false)
@@ -75,7 +77,7 @@ export function AmbassadorPage({ onNavigate, onAuthClick }: AmbassadorPageProps)
     )
   }
 
-  if (profile?.role === 'restaurant') {
+  if (effectiveRole === 'restaurant') {
     return (
       <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
         <Navbar currentPage="ambassador" onNavigate={onNavigate} onAuthClick={onAuthClick} />

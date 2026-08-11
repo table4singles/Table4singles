@@ -9,6 +9,7 @@ import { ParticipantCard } from '@/components/ParticipantCard'
 import { PostDinnerReviewModal } from '@/components/PostDinnerReviewModal'
 import { useLanguage } from '@/contexts/LanguageContext'
 import { useAuth } from '@/contexts/AuthContext'
+import { useViewMode } from '@/contexts/ViewModeContext'
 import { usePendingInvite } from '@/contexts/PendingInviteContext'
 import { useTableDetail } from '@/hooks/useTables'
 import { useReviews } from '@/hooks/useReviews'
@@ -27,7 +28,8 @@ interface TableDetailPageProps {
 export function TableDetailPage({ tableId, paymentSuccess, paymentCancelled, onNavigate, onAuthClick }: TableDetailPageProps) {
   const { t, language } = useLanguage()
   const { user, profile } = useAuth()
-  const isRestaurantUser = profile?.role === 'restaurant'
+  const { effectiveRole } = useViewMode()
+  const isRestaurantUser = effectiveRole === 'restaurant'
   const { table, participants, hostProfile, loading, error, joinTable, cancelTable, refresh } = useTableDetail(tableId)
   const { reviews, submitReview } = useReviews(tableId)
   const { messages, sendMessage } = useMessages(tableId)

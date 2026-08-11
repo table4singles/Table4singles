@@ -7,6 +7,7 @@ import { LiveTableCard } from '@/components/LiveTableCard'
 import { LiveNotificationStack } from '@/components/LiveNotificationToast'
 import { useLanguage } from '@/contexts/LanguageContext'
 import { useAuth } from '@/contexts/AuthContext'
+import { useViewMode } from '@/contexts/ViewModeContext'
 import { useRestaurantAgenda } from '@/hooks/useRestaurantAgenda'
 import { usePushSubscription } from '@/hooks/usePushSubscription'
 
@@ -236,6 +237,7 @@ function HourlyList({ byDate, datesWithTables, locale, onNavigate, t }: HourlyLi
 export function RestaurantAgendaPage({ onNavigate, onAuthClick }: RestaurantAgendaPageProps) {
   const { t, language } = useLanguage()
   const { user, profile } = useAuth()
+  const { effectiveRole } = useViewMode()
   const { tables, byDate, datesWithTables, loading, error, notifications, dismissNotification } =
     useRestaurantAgenda(user?.id ?? null)
 
@@ -251,7 +253,7 @@ export function RestaurantAgendaPage({ onNavigate, onAuthClick }: RestaurantAgen
 
   const isEmpty = datesWithTables.length === 0
 
-  if (profile && profile.role !== 'restaurant') {
+  if (profile && effectiveRole !== 'restaurant') {
     return (
       <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
         <Navbar currentPage="agenda" onNavigate={onNavigate} onAuthClick={onAuthClick} />

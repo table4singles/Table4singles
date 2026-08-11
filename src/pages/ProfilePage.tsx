@@ -13,7 +13,7 @@ import { useMyTables } from '@/hooks/useTables'
 import { useDinerTrustScore } from '@/hooks/useDinerReviews'
 
 const CUISINE_TYPES = ['Italiana', 'Japonesa', 'Mexicana', 'Francesa', 'Tailandesa', 'India', 'China', 'Española', 'Mediterránea', 'Americana', 'Coreana', 'Vietnamita', 'Griega', 'Turca', 'Fusión', 'Otra']
-const PRICE_RANGES = ['€', '€€', '€€€', '€€€€']
+const PRICE_RANGES = ['0€-50€', '50€-100€', '100€-200€', '+200€']
 
 interface ProfilePageProps {
   onNavigate: (page: string, id?: string) => void
@@ -45,7 +45,7 @@ export function ProfilePage({ onNavigate, onAuthClick }: ProfilePageProps) {
   const [restaurantDescription, setRestaurantDescription] = useState('')
   const [restaurantPhone, setRestaurantPhone] = useState('')
   const [restaurantWebsite, setRestaurantWebsite] = useState('')
-  const [restaurantPriceRange, setRestaurantPriceRange] = useState('€€')
+  const [restaurantPriceRange, setRestaurantPriceRange] = useState('50€-100€')
   const [restaurantHours, setRestaurantHours] = useState('')
   const [restaurantTotalTables, setRestaurantTotalTables] = useState<number | ''>('' )
   const [restaurantMenuUrl, setRestaurantMenuUrl] = useState('')
@@ -78,7 +78,7 @@ export function ProfilePage({ onNavigate, onAuthClick }: ProfilePageProps) {
       setRestaurantDescription(profile.restaurant_description || '')
       setRestaurantPhone(profile.restaurant_phone || '')
       setRestaurantWebsite(profile.restaurant_website || '')
-      setRestaurantPriceRange(profile.restaurant_price_range || '€€')
+      setRestaurantPriceRange(profile.restaurant_price_range || '50€-100€')
       setRestaurantHours(profile.restaurant_hours || '')
       setRestaurantTotalTables(profile.restaurant_total_tables ?? '')
       setRestaurantMenuUrl(profile.restaurant_menu_url || '')

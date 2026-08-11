@@ -10,7 +10,7 @@ import { useAuth } from '@/contexts/AuthContext'
 import { RADIUS_STEPS_KM } from '@/lib/geocoding'
 
 const CUISINE_TYPES = ['Italian', 'Japanese', 'Mexican', 'French', 'Thai', 'Indian', 'Chinese', 'Spanish', 'Mediterranean', 'American', 'Korean', 'Vietnamese', 'Greek', 'Turkish', 'Other']
-const PRICE_RANGES = ['€', '€€', '€€€', '€€€€']
+const PRICE_RANGES = ['0€-50€', '50€-100€', '100€-200€', '+200€']
 
 interface RestaurantsBrowsePageProps {
   onNavigate: (page: string, id?: string) => void

@@ -379,17 +379,45 @@ export function TableDetailPage({ tableId, paymentSuccess, paymentCancelled, onN
             {/* Reviews */}
             {reviews.length > 0 && (
               <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 p-6">
-                <h3 className="font-semibold text-gray-900 dark:text-white mb-3">{t('review.title')}</h3>
-                <div className="space-y-4">
-                  {reviews.map(r => (
-                    <div key={r.id} className="border-b border-gray-50 dark:border-gray-800 pb-3 last:border-0">
-                      <div className="flex items-center justify-between">
-                        <span className="text-sm font-medium">{(r.profiles as any)?.display_name || 'User'}</span>
-                        <StarRating rating={r.rating} readonly size="sm" />
-                      </div>
-                      {r.comment && <p className="text-sm text-gray-600 dark:text-gray-300 mt-1">{r.comment}</p>}
+                <div className="flex items-center justify-between mb-3">
+                  <h3 className="font-semibold text-gray-900 dark:text-white">{t('review.title')}</h3>
+                  {avgRating && (
+                    <div className="flex items-center gap-1">
+                      <Star className="w-4 h-4 text-yellow-400 fill-yellow-400" />
+                      <span className="text-sm font-semibold text-gray-900 dark:text-white">{avgRating}</span>
                     </div>
-                  ))}
+                  )}
+                </div>
+                <div className="space-y-4">
+                  {reviews.map(r => {
+                    const reviewProfile = (r as any).profiles
+                    const reply = (r as any).review_replies?.[0]
+                    return (
+                      <div key={r.id} className="border-b border-gray-50 dark:border-gray-800 pb-4 last:border-0 last:pb-0">
+                        <div className="flex items-start gap-2.5">
+                          <div className="w-8 h-8 rounded-full bg-gray-100 dark:bg-gray-700 flex-shrink-0 overflow-hidden flex items-center justify-center">
+                            {reviewProfile?.avatar_url
+                              ? <img src={reviewProfile.avatar_url} alt="" className="w-full h-full object-cover" />
+                              : <span className="text-xs font-medium text-gray-500">{(reviewProfile?.display_name || '?').charAt(0).toUpperCase()}</span>
+                            }
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center justify-between gap-2">
+                              <span className="text-sm font-medium text-gray-900 dark:text-white">{reviewProfile?.display_name || 'Usuario'}</span>
+                              <StarRating rating={r.rating} readonly size="sm" />
+                            </div>
+                            {r.comment && <p className="text-sm text-gray-600 dark:text-gray-300 mt-1 leading-relaxed">{r.comment}</p>}
+                          </div>
+                        </div>
+                        {reply && (
+                          <div className="mt-2 ml-10 pl-3 border-l-2 border-primary-200 dark:border-primary-800">
+                            <p className="text-xs font-semibold text-primary-600 dark:text-primary-400 mb-0.5">Respuesta del restaurante</p>
+                            <p className="text-xs text-gray-600 dark:text-gray-300 leading-relaxed">{reply.reply}</p>
+                          </div>
+                        )}
+                      </div>
+                    )
+                  })}
                 </div>
               </div>
             )}

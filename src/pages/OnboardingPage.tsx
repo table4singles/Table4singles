@@ -9,7 +9,7 @@ import { LANGUAGE_OPTIONS, INTEREST_OPTIONS } from '@/lib/options'
 
 const ADMIN_EMAIL = 'joseviangles@gmail.com'
 const CUISINE_TYPES = ['Italiana', 'Japonesa', 'Mexicana', 'Francesa', 'Tailandesa', 'India', 'China', 'Española', 'Mediterránea', 'Americana', 'Coreana', 'Vietnamita', 'Griega', 'Turca', 'Fusión', 'Otra']
-const PRICE_RANGES = ['€', '€€', '€€€', '€€€€']
+const PRICE_RANGES = ['0€-50€', '50€-100€', '100€-200€', '+200€']
 
 const RESTAURANT_STEPS = [
   { label: 'Identidad', icon: UtensilsCrossed },
@@ -48,7 +48,7 @@ export function OnboardingPage({ onNavigate }: { onNavigate: (page: string) => v
   const [restaurantCountry, setRestaurantCountry] = useState('España')
   const [restaurantPhone, setRestaurantPhone] = useState('')
   const [restaurantCuisine, setRestaurantCuisine] = useState('')
-  const [restaurantPriceRange, setRestaurantPriceRange] = useState('€€')
+  const [restaurantPriceRange, setRestaurantPriceRange] = useState('50€-100€')
   const [restaurantDescription, setRestaurantDescription] = useState('')
   const [restaurantWebsite, setRestaurantWebsite] = useState('')
   const [restaurantHours, setRestaurantHours] = useState('')

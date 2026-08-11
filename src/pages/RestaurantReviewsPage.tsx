@@ -5,7 +5,7 @@ import { LoadingSpinner } from '@/components/LoadingSpinner'
 import { StarRating } from '@/components/StarRating'
 import { useAuth } from '@/contexts/AuthContext'
 import { useRestaurantPublicReviews, useRestaurantReviews } from '@/hooks/useReviews'
-import type { RestaurantReview } from '@/types/database'
+import type { RestaurantReview, Review } from '@/types/database'
 
 type Tab = 'venue' | 'dinner'
 
@@ -17,7 +17,7 @@ interface RestaurantReviewsPageProps {
 export function RestaurantReviewsPage({ onNavigate, onAuthClick }: RestaurantReviewsPageProps) {
   const { user } = useAuth()
   const { reviews, loading, avgRating, submitReply } = useRestaurantPublicReviews(user?.id ?? null)
-  const { reviews: dinnerReviews, loading: dinnerLoading } = useRestaurantReviews(user?.id ?? null)
+  const { reviews: dinnerReviews, loading: dinnerLoading, submitReply: submitDinnerReply } = useRestaurantReviews(user?.id ?? null)
   const [tab, setTab] = useState<Tab>('venue')
 
   if (loading && tab === 'venue') {
@@ -149,29 +149,7 @@ export function RestaurantReviewsPage({ onNavigate, onAuthClick }: RestaurantRev
                 )}
                 <div className="space-y-3">
                   {dinnerReviews.map(r => (
-                    <div key={r.id} className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-sm p-4">
-                      <div className="flex items-start gap-3">
-                        <div className="w-9 h-9 rounded-full bg-gray-100 dark:bg-gray-700 flex items-center justify-center overflow-hidden flex-shrink-0">
-                          {r.profiles?.avatar_url ? (
-                            <img src={r.profiles.avatar_url} alt="" className="w-full h-full object-cover" />
-                          ) : (
-                            <User className="w-4 h-4 text-gray-400" />
-                          )}
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-center justify-between gap-2">
-                            <p className="text-sm font-semibold text-gray-900 dark:text-white truncate">
-                              {r.profiles?.display_name || 'Usuario'}
-                            </p>
-                            <p className="text-xs text-gray-400 flex-shrink-0">
-                              {new Date(r.created_at).toLocaleDateString('es-ES', { day: 'numeric', month: 'short', year: 'numeric' })}
-                            </p>
-                          </div>
-                          <StarRating rating={r.rating} readonly size="sm" />
-                          {r.comment && <p className="text-sm text-gray-600 dark:text-gray-300 mt-1.5 leading-relaxed">{r.comment}</p>}
-                        </div>
-                      </div>
-                    </div>
+                    <DinnerReviewCard key={r.id} review={r} onReply={submitDinnerReply} />
                   ))}
                 </div>
               </>
@@ -179,6 +157,95 @@ export function RestaurantReviewsPage({ onNavigate, onAuthClick }: RestaurantRev
           </>
         )}
       </main>
+    </div>
+  )
+}
+
+function DinnerReviewCard({ review, onReply }: { review: Review; onReply: (reviewId: string, reply: string) => Promise<void> }) {
+  const existingReply = (review as any).review_replies?.[0]
+  const [showReplyBox, setShowReplyBox] = useState(!existingReply)
+  const [replyText, setReplyText] = useState(existingReply?.reply || '')
+  const [saving, setSaving] = useState(false)
+
+  const profile = (review as any).profiles
+
+  const handleSave = async () => {
+    if (!replyText.trim()) return
+    setSaving(true)
+    try {
+      await onReply(review.id, replyText.trim())
+      setShowReplyBox(false)
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  return (
+    <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-sm overflow-hidden">
+      <div className="p-4">
+        <div className="flex items-start gap-3">
+          <div className="w-9 h-9 rounded-full bg-gray-100 dark:bg-gray-700 flex items-center justify-center overflow-hidden flex-shrink-0">
+            {profile?.avatar_url ? (
+              <img src={profile.avatar_url} alt="" className="w-full h-full object-cover" />
+            ) : (
+              <span className="text-sm font-medium text-gray-400">{(profile?.display_name || '?').charAt(0).toUpperCase()}</span>
+            )}
+          </div>
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center justify-between gap-2">
+              <p className="text-sm font-semibold text-gray-900 dark:text-white truncate">{profile?.display_name || 'Usuario'}</p>
+              <p className="text-xs text-gray-400 flex-shrink-0">{new Date(review.created_at).toLocaleDateString('es-ES', { day: 'numeric', month: 'short', year: 'numeric' })}</p>
+            </div>
+            <StarRating rating={review.rating} readonly size="sm" />
+            {review.comment && <p className="text-sm text-gray-600 dark:text-gray-300 mt-1.5 leading-relaxed">{review.comment}</p>}
+          </div>
+        </div>
+
+        {/* Respuesta existente */}
+        {existingReply && !showReplyBox && (
+          <div className="mt-3 pl-4 border-l-2 border-[#e94560]/30">
+            <p className="text-xs font-semibold text-[#e94560] mb-1">Tu respuesta</p>
+            <p className="text-sm text-gray-600 dark:text-gray-300">{existingReply.reply}</p>
+            <button onClick={() => setShowReplyBox(true)} className="text-xs text-gray-400 hover:text-[#e94560] mt-1 transition-colors">Editar</button>
+          </div>
+        )}
+
+        {/* Caja de respuesta */}
+        {showReplyBox && (
+          <div className="mt-3">
+            <div className="flex items-center gap-1.5 mb-1.5">
+              <MessageSquare className="w-3.5 h-3.5 text-[#e94560]" />
+              <span className="text-xs font-semibold text-gray-700 dark:text-gray-200">{existingReply ? 'Editar respuesta' : 'Responder'}</span>
+            </div>
+            <textarea
+              value={replyText}
+              onChange={e => setReplyText(e.target.value)}
+              rows={2}
+              placeholder="Escribe tu respuesta..."
+              className="w-full px-3 py-2 border border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-900 dark:text-white rounded-xl text-sm focus:ring-2 focus:ring-[#e94560] outline-none resize-none"
+            />
+            <div className="flex justify-end gap-2 mt-1.5">
+              {existingReply && (
+                <button onClick={() => { setReplyText(existingReply.reply); setShowReplyBox(false) }} className="px-3 py-1 text-xs text-gray-500 hover:text-gray-700 transition-colors">Cancelar</button>
+              )}
+              <button
+                onClick={handleSave}
+                disabled={saving || !replyText.trim()}
+                className="flex items-center gap-1 px-3 py-1 bg-[#e94560] text-white text-xs font-medium rounded-lg hover:bg-[#d63d56] disabled:opacity-50 transition-colors"
+              >
+                {saving ? <Loader2 className="w-3 h-3 animate-spin" /> : <Send className="w-3 h-3" />} Guardar
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* CTA de responder si no existe */}
+        {!existingReply && !showReplyBox && (
+          <button onClick={() => setShowReplyBox(true)} className="mt-2 flex items-center gap-1 text-xs text-[#e94560] hover:text-[#d63d56] font-medium transition-colors">
+            <MessageSquare className="w-3.5 h-3.5" /> Responder
+          </button>
+        )}
+      </div>
     </div>
   )
 }

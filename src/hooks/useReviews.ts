@@ -10,7 +10,7 @@ export function useReviews(tableId: string | null) {
     if (!tableId) return
     const { data } = await supabase
       .from('reviews')
-      .select('*, profiles(display_name)')
+      .select('*, profiles(display_name, avatar_url), review_replies(*)')
       .eq('table_id', tableId)
       .order('created_at', { ascending: false })
     if (data) setReviews(data as Review[])
@@ -38,28 +38,51 @@ export function useReviews(tableId: string | null) {
     await fetchReviews()
   }, [fetchReviews])
 
-  return { reviews, loading, submitReview, refresh: fetchReviews }
+  const submitReply = useCallback(async (reviewId: string, reply: string) => {
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) throw new Error('Not authenticated')
+    const { error } = await supabase.from('review_replies').upsert({
+      review_id: reviewId,
+      restaurant_id: user.id,
+      reply: reply.trim(),
+    }, { onConflict: 'review_id' })
+    if (error) throw error
+    await fetchReviews()
+  }, [fetchReviews])
+
+  return { reviews, loading, submitReview, submitReply, refresh: fetchReviews }
 }
 
 export function useRestaurantReviews(hostId: string | null) {
   const [reviews, setReviews] = useState<Review[]>([])
   const [loading, setLoading] = useState(true)
 
-  useEffect(() => {
+  const fetchReviews = useCallback(async () => {
     if (!hostId) return
     setLoading(true)
-    supabase
+    const { data } = await supabase
       .from('reviews')
-      .select('*')
+      .select('*, profiles!reviews_reviewer_id_fkey(display_name, avatar_url), review_replies(*)')
       .eq('host_id', hostId)
       .order('created_at', { ascending: false })
-      .then(({ data }) => {
-        if (data) setReviews(data as Review[])
-        setLoading(false)
-      })
+    if (data) setReviews(data as Review[])
+    setLoading(false)
   }, [hostId])
 
-  return { reviews, loading }
+  useEffect(() => { fetchReviews() }, [fetchReviews])
+
+  const submitReply = useCallback(async (reviewId: string, reply: string) => {
+    if (!hostId) return
+    const { error } = await supabase.from('review_replies').upsert({
+      review_id: reviewId,
+      restaurant_id: hostId,
+      reply: reply.trim(),
+    }, { onConflict: 'review_id' })
+    if (error) throw error
+    await fetchReviews()
+  }, [hostId, fetchReviews])
+
+  return { reviews, loading, submitReply, refresh: fetchReviews }
 }
 
 // ─── Restaurant public reviews (users reviewing the venue) ───────────────────

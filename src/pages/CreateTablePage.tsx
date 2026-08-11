@@ -31,7 +31,6 @@ export function CreateTablePage({ onNavigate, onAuthClick }: CreateTablePageProp
   const [success, setSuccess] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
-  const depositAmount = 7
   const locationLabel = zone === 'custom' ? customZone : ZONES.find(z => z.id === zone)?.label ?? ''
 
   const canSubmit = availableFrom && maxSeats >= 2 && (zone !== 'custom' || customZone.trim().length > 0)
@@ -58,7 +57,6 @@ export function CreateTablePage({ onNavigate, onAuthClick }: CreateTablePageProp
       description: locationLabel,
       cuisine_type: profile.restaurant_cuisine ?? null,
       languages: null,
-      deposit_amount: depositAmount,
     })
 
     setLoading(false)
@@ -208,14 +206,6 @@ export function CreateTablePage({ onNavigate, onAuthClick }: CreateTablePageProp
                 className="mt-2 w-full px-4 py-2.5 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 dark:text-white rounded-xl text-sm focus:ring-2 focus:ring-[#e94560] outline-none"
               />
             )}
-          </div>
-
-          {/* Info depósito */}
-          <div className="bg-gray-50 dark:bg-gray-900 rounded-xl p-4">
-            <p className="text-sm font-medium text-gray-700 dark:text-gray-200">
-              Depósito por comensal: <span className="text-[#e94560] font-bold">{depositAmount}€</span>
-            </p>
-            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Se devuelve si el comensal asiste. Garantiza la reserva.</p>
           </div>
 
           {error && <ErrorBanner message={error} />}

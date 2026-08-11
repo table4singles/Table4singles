@@ -215,9 +215,7 @@ export function MyTablesPage({ onNavigate, onAuthClick, initialTab }: MyTablesPa
                           <div className="flex items-center justify-between">
                             <div>
                               <h3 className="font-semibold text-gray-900 dark:text-white">{dt?.restaurant_name}</h3>
-                              <span className={`text-xs px-2 py-0.5 rounded-full ${r.join_type === 'deposit' ? 'bg-green-50 text-green-600' : 'bg-blue-50 text-blue-600'}`}>
-                                {r.join_type === 'deposit' ? t('card.depositBadge') : t('card.wordBadge')}
-                              </span>
+                              <span className="text-xs px-2 py-0.5 rounded-full bg-green-50 text-green-600">Plaza reservada</span>
                             </div>
                             <p className="text-sm text-gray-500 dark:text-gray-400">{dt?.date && new Date(dt.date).toLocaleDateString(locale, { month: 'short', day: 'numeric' })}</p>
                           </div>
@@ -273,7 +271,8 @@ export function MyTablesPage({ onNavigate, onAuthClick, initialTab }: MyTablesPa
 
         {cancelReservationTarget && (
           <CancelModal
-            joinType={cancelReservationTarget.joinType}
+            joinType="deposit"
+            depositAmount={2}
             onClose={() => setCancelReservationTarget(null)}
             onConfirm={async () => {
               await cancelReservation(cancelReservationTarget.id)

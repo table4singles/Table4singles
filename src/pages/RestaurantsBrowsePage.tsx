@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Search, SlidersHorizontal, MapPin, UtensilsCrossed, ChevronRight, Navigation, Heart, List, Map as MapIcon, Calendar, X } from 'lucide-react'
+import { Search, SlidersHorizontal, MapPin, UtensilsCrossed, ChevronRight, Navigation, Heart, List, Map as MapIcon, X } from 'lucide-react'
 import { Navbar } from '@/components/Navbar'
 import { LoadingSpinner } from '@/components/LoadingSpinner'
 import { ErrorBanner } from '@/components/ErrorBanner'
@@ -23,6 +23,7 @@ export function RestaurantsBrowsePage({ onNavigate, onAuthClick }: RestaurantsBr
   const [cuisines, setCuisines] = useState<string[]>([])
   const [priceRanges, setPriceRanges] = useState<string[]>([])
   const [dateFilter, setDateFilter] = useState('')
+  const [timeFilter, setTimeFilter] = useState<'midday' | 'evening' | ''>('')
   const [showFilters, setShowFilters] = useState(false)
   const [radiusIndex, setRadiusIndex] = useState(0) // 0 = coincidencia exacta (sin radio)
   const [onlyFavorites, setOnlyFavorites] = useState(false)
@@ -43,6 +44,7 @@ export function RestaurantsBrowsePage({ onNavigate, onAuthClick }: RestaurantsBr
     setCuisines([])
     setPriceRanges([])
     setDateFilter('')
+    setTimeFilter('')
     setRadiusIndex(0)
     setOnlyFavorites(false)
   }
@@ -52,13 +54,14 @@ export function RestaurantsBrowsePage({ onNavigate, onAuthClick }: RestaurantsBr
     cuisine: cuisines,
     priceRange: priceRanges,
     dateFilter: dateFilter || undefined,
+    timeFilter: timeFilter || undefined,
     radiusKm,
     ensureCoordinates: view === 'map',
   })
   const { isFavorite, toggleFavorite } = useFavorites()
   const restaurants = onlyFavorites ? allRestaurants.filter(r => isFavorite(r.id)) : allRestaurants
-  const hasFilters = !!(search || cuisines.length > 0 || priceRanges.length > 0 || dateFilter || radiusKm || onlyFavorites)
-  const activeFilterCount = [cuisines.length > 0, priceRanges.length > 0, !!dateFilter, !!radiusKm, onlyFavorites].filter(Boolean).length
+  const hasFilters = !!(search || cuisines.length > 0 || priceRanges.length > 0 || dateFilter || timeFilter || radiusKm || onlyFavorites)
+  const activeFilterCount = [cuisines.length > 0, priceRanges.length > 0, !!radiusKm, onlyFavorites].filter(Boolean).length
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
@@ -109,6 +112,47 @@ export function RestaurantsBrowsePage({ onNavigate, onAuthClick }: RestaurantsBr
           </div>
         </div>
 
+        {/* Date + time strip — always visible */}
+        <div className="flex flex-wrap items-center gap-2 mb-4">
+          <div className="relative flex-1 min-w-[160px]">
+            <input
+              type="date"
+              value={dateFilter}
+              min={new Date().toISOString().split('T')[0]}
+              onChange={e => setDateFilter(e.target.value)}
+              className="w-full pl-3 pr-8 py-2.5 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none text-gray-700 dark:text-gray-200"
+            />
+            {dateFilter && (
+              <button
+                onClick={() => setDateFilter('')}
+                className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+              >
+                <X className="w-3.5 h-3.5" />
+              </button>
+            )}
+          </div>
+          <button
+            onClick={() => setTimeFilter(t => t === 'midday' ? '' : 'midday')}
+            className={`px-4 py-2.5 rounded-xl text-sm font-medium border transition-colors whitespace-nowrap ${timeFilter === 'midday' ? 'bg-amber-50 border-amber-300 text-amber-700 dark:bg-amber-900/30 dark:border-amber-600 dark:text-amber-300' : 'bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700'}`}
+          >
+            ☀️ Mediodía
+          </button>
+          <button
+            onClick={() => setTimeFilter(t => t === 'evening' ? '' : 'evening')}
+            className={`px-4 py-2.5 rounded-xl text-sm font-medium border transition-colors whitespace-nowrap ${timeFilter === 'evening' ? 'bg-indigo-50 border-indigo-300 text-indigo-700 dark:bg-indigo-900/30 dark:border-indigo-600 dark:text-indigo-300' : 'bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700'}`}
+          >
+            🌙 Noche
+          </button>
+          {(dateFilter || timeFilter) && (
+            <button
+              onClick={() => { setDateFilter(''); setTimeFilter('') }}
+              className="text-xs text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 flex items-center gap-0.5"
+            >
+              <X className="w-3 h-3" /> Borrar
+            </button>
+          )}
+        </div>
+
         {showFilters && (
           <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-4 mb-6 animate-fade-in space-y-5">
             {/* Header with clear button */}
@@ -121,36 +165,8 @@ export function RestaurantsBrowsePage({ onNavigate, onAuthClick }: RestaurantsBr
               )}
             </div>
 
-            {/* Filtro por fecha */}
-            <div>
-              <div className="flex items-center gap-2 mb-2">
-                <Calendar className="w-4 h-4 text-primary-500" />
-                <h3 className="font-medium text-gray-900 dark:text-white text-sm">Fecha de la cena</h3>
-              </div>
-              <div className="flex items-center gap-2">
-                <input
-                  type="date"
-                  value={dateFilter}
-                  min={new Date().toISOString().split('T')[0]}
-                  onChange={e => setDateFilter(e.target.value)}
-                  className="flex-1 px-3 py-2 border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-900 dark:text-white rounded-xl text-sm focus:ring-2 focus:ring-primary-500 outline-none"
-                />
-                {dateFilter && (
-                  <button
-                    onClick={() => setDateFilter('')}
-                    className="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
-                  >
-                    <X className="w-4 h-4" />
-                  </button>
-                )}
-              </div>
-              {dateFilter && (
-                <p className="text-xs text-primary-600 mt-1.5">Mostrando restaurantes con mesas disponibles el {new Date(dateFilter + 'T12:00:00').toLocaleDateString('es-ES', { weekday: 'long', day: 'numeric', month: 'long' })}</p>
-              )}
-            </div>
-
             {/* Filtro por precio */}
-            <div className="pt-4 border-t border-gray-100 dark:border-gray-700">
+            <div>
               <h3 className="font-medium text-gray-900 dark:text-white text-sm mb-2">Rango de precios</h3>
               <div className="flex gap-2">
                 {PRICE_RANGES.map(p => (

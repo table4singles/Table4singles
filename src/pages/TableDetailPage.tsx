@@ -354,11 +354,7 @@ export function TableDetailPage({ tableId, paymentSuccess, paymentCancelled, onN
                     <div key={p.id} className="relative group">
                       <ParticipantCard
                         profile={p.profiles}
-                        badge={
-                          <span className={`text-xs px-2 py-1 rounded-full flex-shrink-0 ${p.join_type === 'deposit' ? 'bg-green-50 text-green-600' : 'bg-blue-50 text-blue-600'}`}>
-                            {p.join_type === 'deposit' ? t('card.depositBadge') : t('card.wordBadge')}
-                          </span>
-                        }
+                        badge={null}
                       />
                       {isHost && !isPast && !isCancelled && (
                         <button
@@ -435,13 +431,10 @@ export function TableDetailPage({ tableId, paymentSuccess, paymentCancelled, onN
               )}
               {user && !isHost && !isParticipant && !isFull && !isCancelled && !isPast && table?.is_active !== false && !isRestaurantUser && (
                 <>
-                  <button onClick={handleJoinWord} disabled={joining} className="w-full py-3 bg-primary-500 text-white rounded-xl font-medium hover:bg-primary-600 disabled:opacity-50 transition-colors text-sm">
-                    {joining ? t('card.registering') : t('card.giveWord')}
+                  <button onClick={handleJoinDeposit} disabled={joining} className="w-full py-3 bg-primary-500 text-white rounded-xl font-medium hover:bg-primary-600 disabled:opacity-50 transition-colors text-sm flex items-center justify-center gap-1.5">
+                    {joining ? t('card.redirecting') : <>Reservar plaza <span className="font-semibold">· 2 €</span></>}
                   </button>
-                  <button onClick={handleJoinDeposit} disabled={joining} className="w-full py-3 border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-200 rounded-xl font-medium hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50 transition-colors text-sm flex items-center justify-center gap-1.5">
-                    {joining ? t('card.redirecting') : <>{t('card.reserveDeposit')} <span className="font-semibold text-[#e94560]">· 2 €</span></>}
-                  </button>
-                  <p className="text-xs text-gray-400 dark:text-gray-500 text-center">{t('card.depositNote')}</p>
+                  <p className="text-xs text-gray-400 dark:text-gray-500 text-center">Se cobra al confirmar. La plaza queda garantizada.</p>
                   {joinError && <p className="text-xs text-red-600 text-center">{joinError}</p>}
                 </>
               )}
@@ -450,9 +443,7 @@ export function TableDetailPage({ tableId, paymentSuccess, paymentCancelled, onN
               )}
               {isParticipant && (
                 <div className="text-center py-2 space-y-2">
-                  <p className="text-sm font-medium text-green-600">
-                    {myParticipation?.join_type === 'deposit' ? t('card.reservedDeposit') : t('card.reservedWord')}
-                  </p>
+                  <p className="text-sm font-medium text-green-600">Plaza reservada</p>
                   {!isPast && (
                     <button onClick={() => setShowCancel(true)} className="text-xs text-red-500 hover:text-red-600 font-medium">
                       {t('card.cancelReservation')}
@@ -559,8 +550,8 @@ export function TableDetailPage({ tableId, paymentSuccess, paymentCancelled, onN
 
         {showCancel && myParticipation && (
           <CancelModal
-            joinType={myParticipation.join_type}
-            depositAmount={table.deposit_amount}
+            joinType="deposit"
+            depositAmount={2}
             onClose={() => setShowCancel(false)}
             onConfirm={handleCancelReservation}
           />

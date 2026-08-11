@@ -332,7 +332,12 @@ export function RestaurantProfilePage({ restaurantId, onNavigate, onAuthClick }:
           ) : (
             <div className="grid sm:grid-cols-2 gap-6">
               {filteredTables.map(table => (
-                <TableCard key={table.id} table={table} onClick={() => onNavigate('table-detail', table.id)} />
+                <TableCard
+                  key={table.id}
+                  table={table}
+                  participants={table.table_participants}
+                  onClick={() => onNavigate('table-detail', table.id)}
+                />
               ))}
             </div>
           )}

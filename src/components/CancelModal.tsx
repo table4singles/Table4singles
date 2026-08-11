@@ -9,12 +9,9 @@ interface CancelModalProps {
   onConfirm: () => Promise<void>
 }
 
-export function CancelModal({ joinType, depositAmount = 7, onClose, onConfirm }: CancelModalProps) {
+export function CancelModal({ joinType, depositAmount = 2, onClose, onConfirm }: CancelModalProps) {
   const { t } = useLanguage()
   const [loading, setLoading] = useState(false)
-
-  const restaurantShare = (depositAmount * 0.6).toFixed(2)
-  const platformShare = (depositAmount * 0.4).toFixed(2)
 
   const handleConfirm = async () => {
     setLoading(true)
@@ -37,24 +34,11 @@ export function CancelModal({ joinType, depositAmount = 7, onClose, onConfirm }:
             <>
               <div className="flex items-start gap-2 bg-amber-50 border border-amber-200 rounded-xl p-3 mb-4">
                 <AlertTriangle className="w-5 h-5 text-amber-500 flex-shrink-0 mt-0.5" />
-                <p className="text-sm text-amber-800">{t('cancel.depositWarning')}</p>
-              </div>
-              <p className="text-sm font-medium text-gray-700 dark:text-gray-200 mb-2">{t('cancel.distribution')}</p>
-              <div className="bg-gray-50 dark:bg-gray-900 rounded-xl p-4 space-y-2 mb-4">
-                <div className="flex justify-between text-sm">
-                  <span className="text-gray-600 dark:text-gray-300">{t('cancel.restaurant')} <span className="text-xs text-gray-400 dark:text-gray-500">({t('cancel.restaurantReason')})</span></span>
-                  <span className="font-medium text-gray-900 dark:text-white">{restaurantShare}€</span>
-                </div>
-                <div className="flex justify-between text-sm">
-                  <span className="text-gray-600 dark:text-gray-300">{t('cancel.platform')} <span className="text-xs text-gray-400 dark:text-gray-500">({t('cancel.platformReason')})</span></span>
-                  <span className="font-medium text-gray-900 dark:text-white">{platformShare}€</span>
-                </div>
-                <div className="flex justify-between text-sm pt-2 border-t border-gray-200 dark:border-gray-700">
-                  <span className="font-semibold text-gray-900 dark:text-white">{t('cancel.totalRetained')}</span>
-                  <span className="font-semibold text-gray-900 dark:text-white">{depositAmount.toFixed(2)}€</span>
+                <div>
+                  <p className="text-sm font-semibold text-amber-800 mb-1">El depósito de {depositAmount.toFixed(2)}€ no será reembolsado</p>
+                  <p className="text-xs text-amber-700">Este importe es una tasa de gestión no reembolsable al cancelar.</p>
                 </div>
               </div>
-              <p className="text-xs text-gray-400 dark:text-gray-500 mb-4">{t('cancel.typeDeposit')}</p>
             </>
           ) : (
             <>

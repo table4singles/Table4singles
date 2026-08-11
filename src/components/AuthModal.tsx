@@ -1,8 +1,7 @@
 import { useState } from 'react'
-import { X, Apple, Mail, Lock, ChevronLeft } from 'lucide-react'
+import { X, Apple, Mail, Lock, Eye, EyeOff, ChevronLeft } from 'lucide-react'
 import { useAuth } from '@/contexts/AuthContext'
 import { useLanguage } from '@/contexts/LanguageContext'
-import { checkPasswordBreach } from '@/lib/security'
 
 interface AuthModalProps {
   isOpen: boolean
@@ -11,18 +10,39 @@ interface AuthModalProps {
   onSwitchMode: (mode: 'signin' | 'signup') => void
 }
 
+type Screen = 'main' | 'forgot' | 'forgot-sent'
+
 export function AuthModal({ isOpen, onClose, mode, onSwitchMode }: AuthModalProps) {
-  const { signUp, signIn, signInWithGoogle, signInWithApple } = useAuth()
+  const { signUp, signIn, signInWithGoogle, signInWithApple, resetPassword } = useAuth()
   const { t } = useLanguage()
+  const [screen, setScreen] = useState<Screen>('main')
   const [role, setRole] = useState<'user' | 'restaurant'>('user')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [name, setName] = useState('')
+  const [showPassword, setShowPassword] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [success, setSuccess] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
 
   if (!isOpen) return null
+
+  const resetState = () => {
+    setError(null)
+    setSuccess(null)
+    setLoading(false)
+  }
+
+  const handleClose = () => {
+    setScreen('main')
+    resetState()
+    onClose()
+  }
+
+  const handleBack = () => {
+    setScreen('main')
+    resetState()
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -32,102 +52,224 @@ export function AuthModal({ isOpen, onClose, mode, onSwitchMode }: AuthModalProp
 
     try {
       if (mode === 'signup') {
-        // TEST MODE: validación de contraseña desactivada temporalmente
         const { error: err } = await signUp(email, password, name, role)
         if (err) throw err
-        setSuccess('Check your email to confirm your account!')
+        setSuccess('¡Revisa tu email para confirmar tu cuenta!')
       } else {
         const { error: err } = await signIn(email, password)
         if (err) throw err
-        onClose()
+        handleClose()
       }
     } catch (err: any) {
-      setError(err.message || 'An error occurred')
+      setError(err.message || 'Ha ocurrido un error')
+    }
+    setLoading(false)
+  }
+
+  const handleForgotPassword = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setError(null)
+    setLoading(true)
+    try {
+      const { error: err } = await resetPassword(email)
+      if (err) throw err
+      setScreen('forgot-sent')
+    } catch (err: any) {
+      setError(err.message || 'Ha ocurrido un error')
     }
     setLoading(false)
   }
 
   return (
-    <>
-      <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4" onClick={onClose}>
-        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl w-full max-w-md max-h-[90vh] overflow-y-auto" onClick={e => e.stopPropagation()}>
-          <div className="flex items-center justify-between p-6 pb-4">
-            <div className="flex items-center gap-2">
-              <button onClick={onClose} className="p-1.5 hover:bg-gray-100 dark:hover:bg-gray-600 rounded-full transition-colors" aria-label="Volver">
+    <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4" onClick={handleClose}>
+      <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl w-full max-w-md max-h-[90vh] overflow-y-auto" onClick={e => e.stopPropagation()}>
+
+        {/* ── Pantalla principal ── */}
+        {screen === 'main' && (
+          <>
+            <div className="flex items-center justify-between p-6 pb-4">
+              <div className="flex items-center gap-2">
+                <button onClick={handleClose} className="p-1.5 hover:bg-gray-100 dark:hover:bg-gray-600 rounded-full transition-colors">
+                  <ChevronLeft className="w-5 h-5 text-gray-500 dark:text-gray-400" />
+                </button>
+                <div>
+                  <h2 className="text-2xl font-serif font-bold text-gray-900 dark:text-white">
+                    {mode === 'signup' ? t('auth.createAccount') : t('auth.welcomeBack')}
+                  </h2>
+                  <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                    {mode === 'signup' ? t('auth.joinCommunity') : t('auth.signInContinue')}
+                  </p>
+                </div>
+              </div>
+              <button onClick={handleClose} className="p-2 hover:bg-gray-100 dark:hover:bg-gray-600 rounded-full">
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <div className="px-6 pb-6">
+              {mode === 'signup' && (
+                <div className="mb-5">
+                  <p className="text-sm font-medium text-gray-700 dark:text-gray-200 mb-2">{t('auth.iAm')}</p>
+                  <div className="grid grid-cols-2 gap-3">
+                    <RoleButton selected={role === 'user'} onClick={() => setRole('user')} title={t('auth.privateUser')} desc={t('auth.privateUserDesc')} />
+                    <RoleButton selected={role === 'restaurant'} onClick={() => setRole('restaurant')} title={t('auth.restaurant')} desc={t('auth.restaurantDesc')} />
+                  </div>
+                </div>
+              )}
+
+              <div className="space-y-3 mb-5">
+                <button onClick={() => signInWithApple()} className="w-full flex items-center justify-center gap-3 px-4 py-3 bg-black text-white rounded-xl text-sm font-medium hover:bg-gray-800 transition-colors">
+                  <Apple className="w-5 h-5" /> {t('auth.continueWithApple')}
+                </button>
+                <button onClick={() => signInWithGoogle()} className="w-full flex items-center justify-center gap-3 px-4 py-3 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-xl text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors">
+                  <GoogleIcon /> {t('auth.continueWithGoogle')}
+                </button>
+              </div>
+
+              <div className="flex items-center gap-3 mb-5">
+                <div className="flex-1 h-px bg-gray-200 dark:bg-gray-700" />
+                <span className="text-xs text-gray-400 dark:text-gray-500">{t('auth.or')}</span>
+                <div className="flex-1 h-px bg-gray-200 dark:bg-gray-700" />
+              </div>
+
+              <form onSubmit={handleSubmit} className="space-y-4">
+                {mode === 'signup' && (
+                  <Input label={t('auth.name')} placeholder={t('auth.namePlaceholder')} value={name} onChange={setName} />
+                )}
+                <div className="relative">
+                  <div className="absolute left-3 top-1/2 -translate-y-1/2">
+                    <Mail className="w-4 h-4 text-gray-400 dark:text-gray-500" />
+                  </div>
+                  <input
+                    type="email"
+                    placeholder={t('auth.emailPlaceholder')}
+                    value={email}
+                    onChange={e => setEmail(e.target.value)}
+                    required
+                    className="w-full pl-10 pr-4 py-2.5 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 dark:text-white rounded-xl text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none transition-all"
+                  />
+                </div>
+
+                {/* Campo contraseña con toggle de visibilidad */}
+                <div className="relative">
+                  <div className="absolute left-3 top-1/2 -translate-y-1/2">
+                    <Lock className="w-4 h-4 text-gray-400 dark:text-gray-500" />
+                  </div>
+                  <input
+                    type={showPassword ? 'text' : 'password'}
+                    placeholder={t('auth.passwordPlaceholder')}
+                    value={password}
+                    onChange={e => setPassword(e.target.value)}
+                    required
+                    className="w-full pl-10 pr-11 py-2.5 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 dark:text-white rounded-xl text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none transition-all"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(v => !v)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
+                    tabIndex={-1}
+                  >
+                    {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                  </button>
+                </div>
+
+                {/* Enlace "¿Olvidaste tu contraseña?" solo en login */}
+                {mode === 'signin' && (
+                  <div className="flex justify-end">
+                    <button
+                      type="button"
+                      onClick={() => { setScreen('forgot'); setError(null) }}
+                      className="text-sm text-primary-600 hover:text-primary-700 font-medium"
+                    >
+                      ¿Olvidaste tu contraseña?
+                    </button>
+                  </div>
+                )}
+
+                {error && <p className="text-sm text-red-600 bg-red-50 dark:bg-red-900/20 px-3 py-2 rounded-lg">{error}</p>}
+                {success && <p className="text-sm text-green-600 bg-green-50 dark:bg-green-900/20 px-3 py-2 rounded-lg">{success}</p>}
+
+                <button type="submit" disabled={loading} className="w-full py-3 bg-primary-500 text-white rounded-xl font-medium hover:bg-primary-600 disabled:opacity-50 transition-colors">
+                  {loading ? '...' : mode === 'signup' ? t('auth.submit.signUp') : t('auth.submit.signIn')}
+                </button>
+              </form>
+
+              <p className="text-center text-sm text-gray-500 dark:text-gray-400 mt-4">
+                {mode === 'signup' ? t('auth.alreadyHaveAccount') : t('auth.noAccount')}{' '}
+                <button onClick={() => { onSwitchMode(mode === 'signup' ? 'signin' : 'signup'); resetState() }} className="text-primary-600 font-medium hover:text-primary-700">
+                  {mode === 'signup' ? t('auth.switchSignIn') : t('auth.switchSignUp')}
+                </button>
+              </p>
+            </div>
+          </>
+        )}
+
+        {/* ── Pantalla "olvidé mi contraseña" ── */}
+        {screen === 'forgot' && (
+          <>
+            <div className="flex items-center gap-2 p-6 pb-4">
+              <button onClick={handleBack} className="p-1.5 hover:bg-gray-100 dark:hover:bg-gray-600 rounded-full transition-colors">
                 <ChevronLeft className="w-5 h-5 text-gray-500 dark:text-gray-400" />
               </button>
               <div>
-                <h2 className="text-2xl font-serif font-bold text-gray-900 dark:text-white">
-                  {mode === 'signup' ? t('auth.createAccount') : t('auth.welcomeBack')}
-                </h2>
-                <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-                  {mode === 'signup' ? t('auth.joinCommunity') : t('auth.signInContinue')}
-                </p>
+                <h2 className="text-2xl font-serif font-bold text-gray-900 dark:text-white">Recuperar contraseña</h2>
+                <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">Te enviaremos un enlace por email</p>
               </div>
             </div>
-            <button onClick={onClose} className="p-2 hover:bg-gray-100 dark:hover:bg-gray-600 rounded-full">
-              <X className="w-5 h-5" />
+            <div className="px-6 pb-6">
+              <form onSubmit={handleForgotPassword} className="space-y-4">
+                <div className="relative">
+                  <div className="absolute left-3 top-1/2 -translate-y-1/2">
+                    <Mail className="w-4 h-4 text-gray-400 dark:text-gray-500" />
+                  </div>
+                  <input
+                    type="email"
+                    placeholder={t('auth.emailPlaceholder')}
+                    value={email}
+                    onChange={e => setEmail(e.target.value)}
+                    required
+                    autoFocus
+                    className="w-full pl-10 pr-4 py-2.5 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 dark:text-white rounded-xl text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none transition-all"
+                  />
+                </div>
+
+                {error && <p className="text-sm text-red-600 bg-red-50 dark:bg-red-900/20 px-3 py-2 rounded-lg">{error}</p>}
+
+                <button type="submit" disabled={loading} className="w-full py-3 bg-primary-500 text-white rounded-xl font-medium hover:bg-primary-600 disabled:opacity-50 transition-colors">
+                  {loading ? '...' : 'Enviar enlace de recuperación'}
+                </button>
+              </form>
+            </div>
+          </>
+        )}
+
+        {/* ── Pantalla de confirmación enviada ── */}
+        {screen === 'forgot-sent' && (
+          <div className="p-8 text-center">
+            <div className="w-16 h-16 bg-green-100 dark:bg-green-900/30 rounded-full flex items-center justify-center mx-auto mb-4">
+              <Mail className="w-8 h-8 text-green-600" />
+            </div>
+            <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-2">Email enviado</h2>
+            <p className="text-sm text-gray-500 dark:text-gray-400 mb-6">
+              Hemos enviado un enlace a <strong>{email}</strong>. Revisa tu bandeja de entrada y sigue las instrucciones para crear una nueva contraseña.
+            </p>
+            <button onClick={handleClose} className="w-full py-3 bg-primary-500 text-white rounded-xl font-medium hover:bg-primary-600 transition-colors">
+              Entendido
+            </button>
+            <button onClick={handleBack} className="mt-3 w-full py-2 text-sm text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 transition-colors">
+              Volver al inicio de sesión
             </button>
           </div>
-
-          <div className="px-6 pb-6">
-            {mode === 'signup' && (
-              <div className="mb-5">
-                <p className="text-sm font-medium text-gray-700 dark:text-gray-200 mb-2">{t('auth.iAm')}</p>
-                <div className="grid grid-cols-2 gap-3">
-                  <RoleButton selected={role === 'user'} onClick={() => setRole('user')} title={t('auth.privateUser')} desc={t('auth.privateUserDesc')} />
-                  <RoleButton selected={role === 'restaurant'} onClick={() => setRole('restaurant')} title={t('auth.restaurant')} desc={t('auth.restaurantDesc')} />
-                </div>
-              </div>
-            )}
-
-            <div className="space-y-3 mb-5">
-              <button onClick={() => signInWithApple()} className="w-full flex items-center justify-center gap-3 px-4 py-3 bg-black text-white rounded-xl text-sm font-medium hover:bg-gray-800 transition-colors">
-                <Apple className="w-5 h-5" /> {t('auth.continueWithApple')}
-              </button>
-              <button onClick={() => signInWithGoogle()} className="w-full flex items-center justify-center gap-3 px-4 py-3 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 dark:text-white rounded-xl text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
-                <GoogleIcon /> {t('auth.continueWithGoogle')}
-              </button>
-            </div>
-
-            <div className="flex items-center gap-3 mb-5">
-              <div className="flex-1 h-px bg-gray-200 dark:bg-gray-700" />
-              <span className="text-xs text-gray-400 dark:text-gray-500">{t('auth.or')}</span>
-              <div className="flex-1 h-px bg-gray-200 dark:bg-gray-700" />
-            </div>
-
-            <form onSubmit={handleSubmit} className="space-y-4">
-              {mode === 'signup' && (
-                <Input label={t('auth.name')} placeholder={t('auth.namePlaceholder')} value={name} onChange={setName} />
-              )}
-              <IconInput icon={<Mail className="w-4 h-4 text-gray-400 dark:text-gray-500" />} placeholder={t('auth.emailPlaceholder')} type="email" value={email} onChange={setEmail} />
-              <IconInput icon={<Lock className="w-4 h-4 text-gray-400 dark:text-gray-500" />} placeholder={t('auth.passwordPlaceholder')} type="password" value={password} onChange={setPassword} />
-
-              {error && <p className="text-sm text-red-600 bg-red-50 px-3 py-2 rounded-lg">{error}</p>}
-              {success && <p className="text-sm text-green-600 bg-green-50 px-3 py-2 rounded-lg">{success}</p>}
-
-              <button type="submit" disabled={loading} className="w-full py-3 bg-primary-500 text-white rounded-xl font-medium hover:bg-primary-600 disabled:opacity-50 transition-colors">
-                {loading ? '...' : mode === 'signup' ? t('auth.submit.signUp') : t('auth.submit.signIn')}
-              </button>
-            </form>
-
-            <p className="text-center text-sm text-gray-500 dark:text-gray-400 mt-4">
-              {mode === 'signup' ? t('auth.alreadyHaveAccount') : t('auth.noAccount')}{' '}
-              <button onClick={() => onSwitchMode(mode === 'signup' ? 'signin' : 'signup')} className="text-primary-600 font-medium hover:text-primary-700">
-                {mode === 'signup' ? t('auth.switchSignIn') : t('auth.switchSignUp')}
-              </button>
-            </p>
-          </div>
-        </div>
+        )}
       </div>
-    </>
+    </div>
   )
 }
 
 function RoleButton({ selected, onClick, title, desc }: { selected: boolean; onClick: () => void; title: string; desc: string }) {
   return (
-    <button onClick={onClick} className={`p-3 rounded-xl border-2 text-left transition-all ${selected ? 'border-primary-500 bg-primary-50' : 'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-500'}`}>
-      <p className={`font-medium text-sm ${selected ? 'text-primary-700' : 'text-gray-700 dark:text-gray-200'}`}>{title}</p>
+    <button onClick={onClick} className={`p-3 rounded-xl border-2 text-left transition-all ${selected ? 'border-primary-500 bg-primary-50 dark:bg-primary-900/20' : 'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-500'}`}>
+      <p className={`font-medium text-sm ${selected ? 'text-primary-700 dark:text-primary-400' : 'text-gray-700 dark:text-gray-200'}`}>{title}</p>
       <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">{desc}</p>
     </button>
   )
@@ -144,22 +286,6 @@ function Input({ label, placeholder, type = 'text', value, onChange }: { label: 
         onChange={e => onChange(e.target.value)}
         required
         className="w-full px-4 py-2.5 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 dark:text-white rounded-xl text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none transition-all"
-      />
-    </div>
-  )
-}
-
-function IconInput({ icon, placeholder, type = 'text', value, onChange }: { icon: React.ReactNode; placeholder: string; type?: string; value: string; onChange: (v: string) => void }) {
-  return (
-    <div className="relative">
-      <div className="absolute left-3 top-1/2 -translate-y-1/2">{icon}</div>
-      <input
-        type={type}
-        placeholder={placeholder}
-        value={value}
-        onChange={e => onChange(e.target.value)}
-        required
-        className="w-full pl-10 pr-4 py-2.5 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 dark:text-white rounded-xl text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none transition-all"
       />
     </div>
   )

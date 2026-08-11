@@ -6,6 +6,7 @@ import { PendingInviteProvider } from '@/contexts/PendingInviteContext'
 import { ViewModeProvider, useViewMode } from '@/contexts/ViewModeContext'
 import { AuthModal } from '@/components/AuthModal'
 import { PendingInviteBanner } from '@/components/PendingInviteBanner'
+import { InstallPrompt } from '@/components/InstallPrompt'
 import { LandingPage } from '@/pages/LandingPage'
 import { BrowsePage } from '@/pages/BrowsePage'
 import { RestaurantsBrowsePage } from '@/pages/RestaurantsBrowsePage'
@@ -193,6 +194,7 @@ export default function App() {
           <PendingInviteProvider>
             <ViewModeProvider>
               <AppRouter />
+              <InstallPrompt />
             </ViewModeProvider>
           </PendingInviteProvider>
         </AuthProvider>

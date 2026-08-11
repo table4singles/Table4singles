@@ -8,6 +8,9 @@ export type RestaurantWithDistance = Profile & { distanceKm?: number }
 interface UseRestaurantsOptions {
   city?: string
   cuisine?: string[]
+  priceRange?: string[]
+  /** Filtra restaurantes que tienen mesas disponibles en esta fecha (YYYY-MM-DD) */
+  dateFilter?: string
   search?: string
   /** Radio en km. Si esta definido junto con `search`, se busca por proximidad geografica en vez de coincidencia de texto. */
   radiusKm?: number | null
@@ -21,11 +24,32 @@ export function useRestaurants(options: UseRestaurantsOptions = {}) {
   const [error, setError] = useState<string | null>(null)
   const [locationNotFound, setLocationNotFound] = useState(false)
   const cuisineKey = options.cuisine?.join(',') ?? ''
+  const priceKey = options.priceRange?.join(',') ?? ''
 
   const fetchRestaurants = useCallback(async () => {
     setLoading(true)
     setError(null)
     setLocationNotFound(false)
+
+    // Si hay filtro de fecha, pre-obtenemos los IDs de restaurantes con mesas disponibles ese día
+    let restaurantIdsWithTables: string[] | null = null
+    if (options.dateFilter) {
+      const { data: tables } = await supabase
+        .from('dining_tables')
+        .select('host_id')
+        .eq('date', options.dateFilter)
+        .eq('status', 'open')
+        .eq('is_active', true)
+        .gt('available_seats', 0)
+      if (tables && tables.length > 0) {
+        restaurantIdsWithTables = [...new Set(tables.map((t: { host_id: string }) => t.host_id))]
+      } else {
+        // No hay mesas ese día → resultado vacío
+        setRestaurants([])
+        setLoading(false)
+        return
+      }
+    }
 
     let query = supabase
       .from('profiles')
@@ -36,6 +60,8 @@ export function useRestaurants(options: UseRestaurantsOptions = {}) {
     const useRadius = !!options.radiusKm && !!options.search?.trim()
 
     if (options.cuisine && options.cuisine.length > 0) query = query.in('restaurant_cuisine', options.cuisine)
+    if (options.priceRange && options.priceRange.length > 0) query = query.in('restaurant_price_range', options.priceRange)
+    if (restaurantIdsWithTables) query = query.in('id', restaurantIdsWithTables)
     if (!useRadius) {
       if (options.city) query = query.eq('city', options.city)
       if (options.search) {
@@ -104,7 +130,7 @@ export function useRestaurants(options: UseRestaurantsOptions = {}) {
     setRestaurants(withDistance)
     setLoading(false)
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [options.city, cuisineKey, options.search, options.radiusKm, options.ensureCoordinates])
+  }, [options.city, cuisineKey, priceKey, options.dateFilter, options.search, options.radiusKm, options.ensureCoordinates])
 
   useEffect(() => { fetchRestaurants() }, [fetchRestaurants])
 

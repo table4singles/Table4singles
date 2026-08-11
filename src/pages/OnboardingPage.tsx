@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Loader2, ArrowRight, Camera, ChevronLeft, LogOut, UtensilsCrossed, MapPin, Clock, Globe, Phone } from 'lucide-react'
+import { Loader2, ArrowRight, Camera, ChevronLeft, LogOut, UtensilsCrossed, MapPin, Clock, Globe, Phone, Check } from 'lucide-react'
 import PhoneInput from 'react-phone-number-input'
 import 'react-phone-number-input/style.css'
 import { useAuth } from '@/contexts/AuthContext'
@@ -11,10 +11,20 @@ const ADMIN_EMAIL = 'joseviangles@gmail.com'
 const CUISINE_TYPES = ['Italiana', 'Japonesa', 'Mexicana', 'Francesa', 'Tailandesa', 'India', 'China', 'Española', 'Mediterránea', 'Americana', 'Coreana', 'Vietnamita', 'Griega', 'Turca', 'Fusión', 'Otra']
 const PRICE_RANGES = ['€', '€€', '€€€', '€€€€']
 
+const RESTAURANT_STEPS = [
+  { label: 'Identidad', icon: UtensilsCrossed },
+  { label: 'Ubicación', icon: MapPin },
+  { label: 'Detalles', icon: Clock },
+  { label: 'Confirmar', icon: Check },
+]
+
 export function OnboardingPage({ onNavigate }: { onNavigate: (page: string) => void }) {
   const { user, profile, refreshProfile, signOut } = useAuth()
   const isAdmin = user?.email === ADMIN_EMAIL
   const isRestaurant = profile?.role === 'restaurant'
+
+  // Wizard step for restaurants
+  const [step, setStep] = useState(1)
 
   // User fields
   const [avatarUrl, setAvatarUrl] = useState(profile?.avatar_url || '')
@@ -49,8 +59,14 @@ export function OnboardingPage({ onNavigate }: { onNavigate: (page: string) => v
   const toggleLanguage = (l: string) => setLanguages(prev => (prev.includes(l) ? prev.filter(x => x !== l) : [...prev, l]))
   const toggleInterest = (i: string) => setInterests(prev => (prev.includes(i) ? prev.filter(x => x !== i) : [...prev, i]))
 
-  // TEST MODE: solo se requiere un nombre para continuar
-  const isValid = isRestaurant ? restaurantName.trim().length > 0 : fullName.trim().length > 0
+  // Validación por paso
+  const step1Valid = restaurantName.trim().length > 0
+  const isValid = isRestaurant ? step1Valid : fullName.trim().length > 0
+
+  const canAdvance = () => {
+    if (step === 1) return step1Valid
+    return true // steps 2 and 3 are optional
+  }
 
   const handleAvatarUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
@@ -130,6 +146,8 @@ export function OnboardingPage({ onNavigate }: { onNavigate: (page: string) => v
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center px-4 py-10">
       <div className="w-full max-w-lg bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 p-6 md:p-8">
+
+        {/* Cabecera común */}
         <div className="mb-6">
           <button
             onClick={handleBack}
@@ -155,9 +173,37 @@ export function OnboardingPage({ onNavigate }: { onNavigate: (page: string) => v
           </div>
         </div>
 
+        {/* Indicador de pasos (solo restaurante) */}
+        {isRestaurant && (
+          <div className="mb-6">
+            <div className="flex items-center justify-between mb-2">
+              {RESTAURANT_STEPS.map((s, idx) => {
+                const num = idx + 1
+                const isCompleted = num < step
+                const isCurrent = num === step
+                return (
+                  <div key={s.label} className="flex-1 flex flex-col items-center">
+                    <div className={`w-8 h-8 rounded-full flex items-center justify-center mb-1 transition-all ${isCompleted ? 'bg-primary-500 text-white' : isCurrent ? 'bg-primary-100 dark:bg-primary-900/40 border-2 border-primary-500 text-primary-600' : 'bg-gray-100 dark:bg-gray-700 text-gray-400 dark:text-gray-500'}`}>
+                      {isCompleted ? <Check className="w-4 h-4" /> : <s.icon className="w-3.5 h-3.5" />}
+                    </div>
+                    <span className={`text-[10px] font-medium ${isCurrent ? 'text-primary-600' : 'text-gray-400 dark:text-gray-500'}`}>{s.label}</span>
+                  </div>
+                )
+              })}
+            </div>
+            {/* Línea de progreso */}
+            <div className="h-1 bg-gray-100 dark:bg-gray-700 rounded-full overflow-hidden mx-4">
+              <div
+                className="h-full bg-primary-500 rounded-full transition-all duration-500"
+                style={{ width: `${((step - 1) / (RESTAURANT_STEPS.length - 1)) * 100}%` }}
+              />
+            </div>
+          </div>
+        )}
+
         {error && <ErrorBanner message={error} className="mb-4" />}
 
-        {/* ── USUARIO ── */}
+        {/* ── USUARIO (sin wizard) ── */}
         {!isRestaurant && (
           <div className="space-y-4">
             <div className="flex flex-col items-center mb-2">
@@ -251,119 +297,186 @@ export function OnboardingPage({ onNavigate }: { onNavigate: (page: string) => v
           </div>
         )}
 
-        {/* ── RESTAURANTE ── */}
+        {/* ── RESTAURANTE WIZARD ── */}
         {isRestaurant && (
           <div className="space-y-4">
-            <Field label="Nombre del restaurante *" value={restaurantName} onChange={setRestaurantName} placeholder="La Taberna del Chef" />
+            {/* Paso 1: Identidad */}
+            {step === 1 && (
+              <>
+                <Field label="Nombre del restaurante *" value={restaurantName} onChange={setRestaurantName} placeholder="La Taberna del Chef" />
 
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-2 flex items-center gap-1.5">
-                <MapPin className="w-3.5 h-3.5 text-gray-400" /> Ubicación *
-              </label>
-              <div className="space-y-3">
-                <Field label="Dirección" value={restaurantAddress} onChange={setRestaurantAddress} placeholder="Calle Mayor 12, local 1" hideLabel />
-                <div className="grid grid-cols-2 gap-3">
-                  <Field label="Ciudad" value={restaurantCity} onChange={setRestaurantCity} placeholder="Madrid" hideLabel />
-                  <Field label="País" value={restaurantCountry} onChange={setRestaurantCountry} placeholder="España" hideLabel />
-                </div>
-              </div>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1 flex items-center gap-1.5">
-                <Phone className="w-3.5 h-3.5 text-gray-400" /> Teléfono de contacto *
-              </label>
-              <input
-                value={restaurantPhone}
-                onChange={e => setRestaurantPhone(e.target.value)}
-                placeholder="+34 600 000 000"
-                className="w-full px-4 py-2.5 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 dark:text-white rounded-xl text-sm focus:ring-2 focus:ring-primary-500 outline-none"
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1.5 flex items-center gap-1.5">
-                <UtensilsCrossed className="w-3.5 h-3.5 text-gray-400" /> Tipo de cocina *
-              </label>
-              <select
-                value={restaurantCuisine}
-                onChange={e => setRestaurantCuisine(e.target.value)}
-                className="w-full px-4 py-2.5 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 dark:text-white rounded-xl text-sm focus:ring-2 focus:ring-primary-500 outline-none"
-              >
-                <option value="">Seleccionar tipo de cocina...</option>
-                {CUISINE_TYPES.map(c => <option key={c} value={c}>{c}</option>)}
-              </select>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1.5">Rango de precios *</label>
-              <div className="flex gap-2">
-                {PRICE_RANGES.map(p => (
-                  <button
-                    key={p}
-                    type="button"
-                    onClick={() => setRestaurantPriceRange(p)}
-                    className={`flex-1 py-2.5 rounded-xl text-sm font-semibold transition-colors ${restaurantPriceRange === p ? 'bg-primary-500 text-white' : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'}`}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1.5 flex items-center gap-1.5">
+                    <UtensilsCrossed className="w-3.5 h-3.5 text-gray-400" /> Tipo de cocina
+                  </label>
+                  <select
+                    value={restaurantCuisine}
+                    onChange={e => setRestaurantCuisine(e.target.value)}
+                    className="w-full px-4 py-2.5 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 dark:text-white rounded-xl text-sm focus:ring-2 focus:ring-primary-500 outline-none"
                   >
-                    {p}
-                  </button>
-                ))}
+                    <option value="">Seleccionar tipo de cocina...</option>
+                    {CUISINE_TYPES.map(c => <option key={c} value={c}>{c}</option>)}
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1.5">Rango de precios</label>
+                  <div className="flex gap-2">
+                    {PRICE_RANGES.map(p => (
+                      <button
+                        key={p}
+                        type="button"
+                        onClick={() => setRestaurantPriceRange(p)}
+                        className={`flex-1 py-2.5 rounded-xl text-sm font-semibold transition-colors ${restaurantPriceRange === p ? 'bg-primary-500 text-white' : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'}`}
+                      >
+                        {p}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Descripción del restaurante</label>
+                  <textarea
+                    value={restaurantDescription}
+                    onChange={e => setRestaurantDescription(e.target.value)}
+                    rows={3}
+                    placeholder="Cuéntanos qué hace especial a tu restaurante..."
+                    className="w-full px-4 py-2.5 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 dark:text-white rounded-xl text-sm focus:ring-2 focus:ring-primary-500 outline-none resize-none"
+                  />
+                </div>
+              </>
+            )}
+
+            {/* Paso 2: Ubicación */}
+            {step === 2 && (
+              <>
+                <div className="flex items-center gap-2 text-primary-600 mb-2">
+                  <MapPin className="w-4 h-4" />
+                  <span className="text-sm font-medium">¿Dónde está tu restaurante?</span>
+                </div>
+                <div className="space-y-3">
+                  <Field label="Dirección" value={restaurantAddress} onChange={setRestaurantAddress} placeholder="Calle Mayor 12, local 1" />
+                  <div className="grid grid-cols-2 gap-3">
+                    <Field label="Ciudad" value={restaurantCity} onChange={setRestaurantCity} placeholder="Madrid" />
+                    <Field label="País" value={restaurantCountry} onChange={setRestaurantCountry} placeholder="España" />
+                  </div>
+                </div>
+                <p className="text-xs text-gray-400 dark:text-gray-500">La ciudad se usa para que los usuarios te encuentren en el buscador.</p>
+              </>
+            )}
+
+            {/* Paso 3: Contacto y horarios */}
+            {step === 3 && (
+              <>
+                <div className="flex items-center gap-2 text-primary-600 mb-2">
+                  <Phone className="w-4 h-4" />
+                  <span className="text-sm font-medium">Datos de contacto</span>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1 flex items-center gap-1.5">
+                    <Phone className="w-3.5 h-3.5 text-gray-400" /> Teléfono de contacto
+                  </label>
+                  <input
+                    value={restaurantPhone}
+                    onChange={e => setRestaurantPhone(e.target.value)}
+                    placeholder="+34 600 000 000"
+                    className="w-full px-4 py-2.5 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 dark:text-white rounded-xl text-sm focus:ring-2 focus:ring-primary-500 outline-none"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1 flex items-center gap-1.5">
+                    <Clock className="w-3.5 h-3.5 text-gray-400" /> Horarios (opcional)
+                  </label>
+                  <textarea
+                    value={restaurantHours}
+                    onChange={e => setRestaurantHours(e.target.value)}
+                    rows={2}
+                    placeholder="Ej: Lun-Vie 13:00-16:00 / 20:00-24:00. Sáb-Dom 12:00-24:00"
+                    className="w-full px-4 py-2.5 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 dark:text-white rounded-xl text-sm focus:ring-2 focus:ring-primary-500 outline-none resize-none"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1 flex items-center gap-1.5">
+                    <Globe className="w-3.5 h-3.5 text-gray-400" /> Página web (opcional)
+                  </label>
+                  <input
+                    value={restaurantWebsite}
+                    onChange={e => setRestaurantWebsite(e.target.value)}
+                    placeholder="https://www.mirestaurante.com"
+                    className="w-full px-4 py-2.5 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 dark:text-white rounded-xl text-sm focus:ring-2 focus:ring-primary-500 outline-none"
+                  />
+                </div>
+              </>
+            )}
+
+            {/* Paso 4: Confirmar */}
+            {step === 4 && (
+              <div className="space-y-4">
+                <div className="flex items-center gap-2 text-primary-600 mb-2">
+                  <Check className="w-4 h-4" />
+                  <span className="text-sm font-medium">Revisa tu información</span>
+                </div>
+                <div className="bg-gray-50 dark:bg-gray-900 rounded-xl p-4 space-y-3 text-sm">
+                  <SummaryRow label="Nombre" value={restaurantName} />
+                  {restaurantCuisine && <SummaryRow label="Cocina" value={restaurantCuisine} />}
+                  <SummaryRow label="Precio" value={restaurantPriceRange} />
+                  {restaurantDescription && <SummaryRow label="Descripción" value={restaurantDescription} multiline />}
+                  {restaurantCity && <SummaryRow label="Ciudad" value={`${restaurantCity}${restaurantCountry ? `, ${restaurantCountry}` : ''}`} />}
+                  {restaurantPhone && <SummaryRow label="Teléfono" value={restaurantPhone} />}
+                  {restaurantWebsite && <SummaryRow label="Web" value={restaurantWebsite} />}
+                </div>
+                <p className="text-xs text-gray-400 dark:text-gray-500 text-center">
+                  Podrás editar todos estos datos y añadir fotos desde tu perfil de restaurante.
+                </p>
               </div>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Descripción del restaurante *</label>
-              <textarea
-                value={restaurantDescription}
-                onChange={e => setRestaurantDescription(e.target.value)}
-                rows={3}
-                placeholder="Cuéntanos qué hace especial a tu restaurante..."
-                className="w-full px-4 py-2.5 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 dark:text-white rounded-xl text-sm focus:ring-2 focus:ring-primary-500 outline-none resize-none"
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1 flex items-center gap-1.5">
-                <Clock className="w-3.5 h-3.5 text-gray-400" /> Horarios (opcional)
-              </label>
-              <textarea
-                value={restaurantHours}
-                onChange={e => setRestaurantHours(e.target.value)}
-                rows={2}
-                placeholder="Ej: Lun-Vie 13:00-16:00 / 20:00-24:00. Sáb-Dom 12:00-24:00"
-                className="w-full px-4 py-2.5 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 dark:text-white rounded-xl text-sm focus:ring-2 focus:ring-primary-500 outline-none resize-none"
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1 flex items-center gap-1.5">
-                <Globe className="w-3.5 h-3.5 text-gray-400" /> Página web (opcional)
-              </label>
-              <input
-                value={restaurantWebsite}
-                onChange={e => setRestaurantWebsite(e.target.value)}
-                placeholder="https://www.mirestaurante.com"
-                className="w-full px-4 py-2.5 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 dark:text-white rounded-xl text-sm focus:ring-2 focus:ring-primary-500 outline-none"
-              />
-            </div>
-
-            <p className="text-xs text-gray-400 dark:text-gray-500 text-center">
-              Podrás añadir fotos, especialidades y más desde tu perfil después del registro.
-            </p>
+            )}
           </div>
         )}
 
-        <button
-          onClick={handleSubmit}
-          disabled={!isValid || saving}
-          className="mt-6 w-full py-3 bg-primary-500 text-white rounded-xl font-medium hover:bg-primary-600 disabled:opacity-40 transition-colors flex items-center justify-center gap-2"
-        >
-          {saving
-            ? <Loader2 className="w-4 h-4 animate-spin" />
-            : <>{isRestaurant ? 'Activar mi restaurante' : 'Continuar'} <ArrowRight className="w-4 h-4" /></>
-          }
-        </button>
+        {/* Botones de navegación */}
+        <div className={`mt-6 flex gap-3 ${isRestaurant && step > 1 ? 'flex-row' : ''}`}>
+          {isRestaurant && step > 1 && (
+            <button
+              onClick={() => setStep(s => s - 1)}
+              className="px-4 py-3 border border-gray-200 dark:border-gray-600 text-gray-700 dark:text-gray-200 rounded-xl font-medium hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors flex items-center gap-1.5"
+            >
+              <ChevronLeft className="w-4 h-4" /> Atrás
+            </button>
+          )}
+          {isRestaurant && step < 4 ? (
+            <button
+              onClick={() => setStep(s => s + 1)}
+              disabled={!canAdvance()}
+              className="flex-1 py-3 bg-primary-500 text-white rounded-xl font-medium hover:bg-primary-600 disabled:opacity-40 transition-colors flex items-center justify-center gap-2"
+            >
+              Siguiente <ArrowRight className="w-4 h-4" />
+            </button>
+          ) : (
+            <button
+              onClick={handleSubmit}
+              disabled={!isValid || saving}
+              className="flex-1 py-3 bg-primary-500 text-white rounded-xl font-medium hover:bg-primary-600 disabled:opacity-40 transition-colors flex items-center justify-center gap-2"
+            >
+              {saving
+                ? <Loader2 className="w-4 h-4 animate-spin" />
+                : <>{isRestaurant ? '¡Activar mi restaurante!' : 'Continuar'} <ArrowRight className="w-4 h-4" /></>
+              }
+            </button>
+          )}
+        </div>
       </div>
+    </div>
+  )
+}
+
+function SummaryRow({ label, value, multiline }: { label: string; value: string; multiline?: boolean }) {
+  return (
+    <div className={`flex ${multiline ? 'flex-col gap-0.5' : 'items-center justify-between'}`}>
+      <span className="text-gray-500 dark:text-gray-400 text-xs font-medium uppercase tracking-wide">{label}</span>
+      <span className={`text-gray-900 dark:text-white font-medium ${multiline ? 'text-xs mt-0.5' : 'text-right'}`}>{value}</span>
     </div>
   )
 }

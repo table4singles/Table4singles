@@ -61,7 +61,7 @@ serve(async (req) => {
         if (!existing) {
           const { data: table } = await supabase
             .from('dining_tables')
-            .select('available_seats')
+            .select('available_seats, host_id, restaurant_name, time, max_seats, date')
             .eq('id', table_id)
             .single()
 
@@ -74,10 +74,31 @@ serve(async (req) => {
               deposit_paid: true,
             })
 
+            const newAvailable = table.available_seats - 1
             await supabase
               .from('dining_tables')
-              .update({ available_seats: table.available_seats - 1 })
+              .update({ available_seats: newAvailable })
               .eq('id', table_id)
+
+            // Notificación in-app al restaurante (campana)
+            const { data: dinerProfile } = await supabase
+              .from('profiles')
+              .select('display_name, full_name')
+              .eq('id', user_id)
+              .single()
+
+            const dinerName = dinerProfile?.display_name || dinerProfile?.full_name || 'Un comensal'
+            const occupied = table.max_seats - newAvailable
+            const timeStr = table.time ? table.time.slice(0, 5) : ''
+
+            await supabase.from('notifications').insert({
+              user_id: table.host_id,
+              type: 'new_reservation',
+              title: `¡Nueva reserva! ${occupied}/${table.max_seats}`,
+              body: `${dinerName} se ha apuntado a tu mesa${timeStr ? ` de las ${timeStr}` : ''} (${table.date})`,
+              metadata: { table_id, user_id, table_name: table.restaurant_name },
+              read: false,
+            })
           }
         }
 

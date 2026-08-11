@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react'
-import { MapPin, UtensilsCrossed, Star, ChevronLeft, Heart, Filter, MessageSquare, Loader2, User, Send, Clock, Tag, Link, Sparkles } from 'lucide-react'
+import { MapPin, UtensilsCrossed, Star, ChevronLeft, Heart, Filter, MessageSquare, Loader2, User, Send, Clock, Tag, Link, Sparkles, ChevronRight } from 'lucide-react'
 import { Navbar } from '@/components/Navbar'
 import { TableCard } from '@/components/TableCard'
 import { LoadingSpinner } from '@/components/LoadingSpinner'
@@ -23,6 +23,9 @@ export function RestaurantProfilePage({ restaurantId, onNavigate, onAuthClick }:
   const { reviews, avgRating, submitReview, submitReply, submitting } = useRestaurantPublicReviews(restaurantId)
   const { isFavorite, toggleFavorite } = useFavorites()
   const [dateFrom, setDateFrom] = useState('')
+  const [selectedDate, setSelectedDate] = useState('')
+  const [calYear, setCalYear] = useState(() => new Date().getFullYear())
+  const [calMonth, setCalMonth] = useState(() => new Date().getMonth())
   const [language, setLanguage] = useState('')
   const [minSeats, setMinSeats] = useState(0)
   const [reviewRating, setReviewRating] = useState(0)
@@ -45,16 +48,43 @@ export function RestaurantProfilePage({ restaurantId, onNavigate, onAuthClick }:
     }
   }
 
+  // Dates that have at least one available table
+  const availableDates = useMemo(() => {
+    const s = new Set<string>()
+    tables.forEach(t => { if (t.available_seats > 0) s.add(t.date) })
+    return s
+  }, [tables])
+
   const filteredTables = useMemo(() => {
     return tables.filter(t => {
-      if (dateFrom && t.date < dateFrom) return false
+      if (selectedDate && t.date !== selectedDate) return false
+      if (!selectedDate && dateFrom && t.date < dateFrom) return false
       if (language && !(t.languages || []).includes(language)) return false
       if (minSeats > 0 && t.available_seats < minSeats) return false
       return true
     })
-  }, [tables, dateFrom, language, minSeats])
+  }, [tables, selectedDate, dateFrom, language, minSeats])
 
-  const hasTableFilters = dateFrom || language || minSeats > 0
+  const hasTableFilters = selectedDate || dateFrom || language || minSeats > 0
+
+  // Calendar helpers
+  const calDays = useMemo(() => {
+    const firstDay = new Date(calYear, calMonth, 1).getDay() // 0=Sun
+    const startOffset = (firstDay + 6) % 7 // Mon-based
+    const daysInMonth = new Date(calYear, calMonth + 1, 0).getDate()
+    const cells: (number | null)[] = Array(startOffset).fill(null)
+    for (let d = 1; d <= daysInMonth; d++) cells.push(d)
+    return cells
+  }, [calYear, calMonth])
+
+  const todayStr = new Date().toISOString().slice(0, 10)
+  const DAY_LABELS = ['L', 'M', 'X', 'J', 'V', 'S', 'D']
+  const MONTH_NAMES = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre']
+
+  const prevMonth = () => { if (calMonth === 0) { setCalMonth(11); setCalYear(y => y - 1) } else setCalMonth(m => m - 1) }
+  const nextMonth = () => { if (calMonth === 11) { setCalMonth(0); setCalYear(y => y + 1) } else setCalMonth(m => m + 1) }
+
+  const toDateStr = (d: number) => `${calYear}-${String(calMonth + 1).padStart(2,'0')}-${String(d).padStart(2,'0')}`
 
   if (loading) {
     return (
@@ -184,46 +214,96 @@ export function RestaurantProfilePage({ restaurantId, onNavigate, onAuthClick }:
 
           {tables.length > 0 && (
             <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-gray-700 p-4 mb-5">
-              <div className="flex items-center gap-1.5 mb-3 text-gray-700 dark:text-gray-200">
-                <Filter className="w-4 h-4" />
-                <h3 className="text-sm font-medium">Filtrar mesas</h3>
-                {hasTableFilters && (
-                  <button onClick={() => { setDateFrom(''); setLanguage(''); setMinSeats(0) }} className="ml-auto text-xs text-primary-600 font-medium">
-                    Limpiar
-                  </button>
-                )}
+              {/* Calendar header */}
+              <div className="flex items-center justify-between mb-3">
+                <button onClick={prevMonth} className="p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
+                  <ChevronLeft className="w-4 h-4 text-gray-500 dark:text-gray-400" />
+                </button>
+                <span className="text-sm font-semibold text-gray-800 dark:text-white">{MONTH_NAMES[calMonth]} {calYear}</span>
+                <button onClick={nextMonth} className="p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
+                  <ChevronRight className="w-4 h-4 text-gray-500 dark:text-gray-400" />
+                </button>
               </div>
-              <div className="grid sm:grid-cols-3 gap-3">
-                <div>
-                  <label className="block text-xs text-gray-500 dark:text-gray-400 mb-1">Desde</label>
-                  <input
-                    type="date"
-                    value={dateFrom}
-                    onChange={e => setDateFrom(e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-200 dark:border-gray-700 rounded-lg text-sm focus:ring-2 focus:ring-primary-500 outline-none"
-                  />
+
+              {/* Day labels */}
+              <div className="grid grid-cols-7 mb-1">
+                {DAY_LABELS.map(l => (
+                  <div key={l} className="text-center text-xs font-medium text-gray-400 dark:text-gray-500 py-1">{l}</div>
+                ))}
+              </div>
+
+              {/* Day cells */}
+              <div className="grid grid-cols-7 gap-y-1">
+                {calDays.map((d, i) => {
+                  if (!d) return <div key={i} />
+                  const ds = toDateStr(d)
+                  const hasTable = availableDates.has(ds)
+                  const isPast = ds < todayStr
+                  const isSelected = selectedDate === ds
+                  return (
+                    <button
+                      key={i}
+                      disabled={!hasTable}
+                      onClick={() => setSelectedDate(isSelected ? '' : ds)}
+                      className={`relative mx-auto flex items-center justify-center w-8 h-8 rounded-full text-sm transition-all
+                        ${isSelected ? 'bg-[#e94560] text-white font-bold shadow' : ''}
+                        ${!isSelected && hasTable && !isPast ? 'bg-primary-50 dark:bg-primary-900/30 text-primary-700 dark:text-primary-300 font-semibold hover:bg-primary-100 dark:hover:bg-primary-800/50 cursor-pointer' : ''}
+                        ${!isSelected && hasTable && isPast ? 'bg-gray-100 dark:bg-gray-700 text-gray-400 font-semibold hover:bg-gray-200 cursor-pointer' : ''}
+                        ${!hasTable ? 'text-gray-300 dark:text-gray-600 cursor-default' : ''}
+                      `}
+                    >
+                      {d}
+                      {hasTable && !isSelected && (
+                        <span className="absolute bottom-0.5 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-[#e94560]" />
+                      )}
+                    </button>
+                  )
+                })}
+              </div>
+
+              {selectedDate && (
+                <div className="mt-3 flex items-center justify-between">
+                  <span className="text-xs text-[#e94560] font-semibold">
+                    Mesas el {new Date(selectedDate + 'T12:00:00').toLocaleDateString('es-ES', { weekday: 'long', day: 'numeric', month: 'long' })}
+                  </span>
+                  <button onClick={() => setSelectedDate('')} className="text-xs text-gray-400 hover:text-gray-600 underline">Ver todas</button>
                 </div>
-                <div>
-                  <label className="block text-xs text-gray-500 dark:text-gray-400 mb-1">Idioma</label>
-                  <select
-                    value={language}
-                    onChange={e => setLanguage(e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-200 dark:border-gray-700 rounded-lg text-sm focus:ring-2 focus:ring-primary-500 outline-none"
-                  >
-                    <option value="">Cualquiera</option>
-                    {LANGUAGE_OPTIONS.map(l => <option key={l} value={l}>{l}</option>)}
-                  </select>
+              )}
+
+              {/* Secondary filters */}
+              <div className="mt-4 pt-4 border-t border-gray-100 dark:border-gray-700">
+                <div className="flex items-center gap-1.5 mb-3 text-gray-700 dark:text-gray-200">
+                  <Filter className="w-4 h-4" />
+                  <h3 className="text-sm font-medium">Más filtros</h3>
+                  {hasTableFilters && (
+                    <button onClick={() => { setSelectedDate(''); setDateFrom(''); setLanguage(''); setMinSeats(0) }} className="ml-auto text-xs text-primary-600 font-medium">
+                      Limpiar todo
+                    </button>
+                  )}
                 </div>
-                <div>
-                  <label className="block text-xs text-gray-500 dark:text-gray-400 mb-1">Plazas libres mín.</label>
-                  <input
-                    type="number"
-                    min={0}
-                    value={minSeats || ''}
-                    onChange={e => setMinSeats(Number(e.target.value) || 0)}
-                    placeholder="0"
-                    className="w-full px-3 py-2 border border-gray-200 dark:border-gray-700 rounded-lg text-sm focus:ring-2 focus:ring-primary-500 outline-none"
-                  />
+                <div className="grid sm:grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-xs text-gray-500 dark:text-gray-400 mb-1">Idioma de la mesa</label>
+                    <select
+                      value={language}
+                      onChange={e => setLanguage(e.target.value)}
+                      className="w-full px-3 py-2 border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 dark:text-white rounded-lg text-sm focus:ring-2 focus:ring-primary-500 outline-none"
+                    >
+                      <option value="">Cualquiera</option>
+                      {LANGUAGE_OPTIONS.map(l => <option key={l} value={l}>{l}</option>)}
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-xs text-gray-500 dark:text-gray-400 mb-1">Plazas libres mínimas</label>
+                    <input
+                      type="number"
+                      min={0}
+                      value={minSeats || ''}
+                      onChange={e => setMinSeats(Number(e.target.value) || 0)}
+                      placeholder="0"
+                      className="w-full px-3 py-2 border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 dark:text-white rounded-lg text-sm focus:ring-2 focus:ring-primary-500 outline-none"
+                    />
+                  </div>
                 </div>
               </div>
             </div>

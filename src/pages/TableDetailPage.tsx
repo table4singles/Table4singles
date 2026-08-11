@@ -19,11 +19,12 @@ import { supabase } from '@/lib/supabase'
 interface TableDetailPageProps {
   tableId: string
   paymentSuccess?: boolean
+  paymentCancelled?: boolean
   onNavigate: (page: string, id?: string) => void
   onAuthClick: (mode?: 'signin' | 'signup') => void
 }
 
-export function TableDetailPage({ tableId, paymentSuccess, onNavigate, onAuthClick }: TableDetailPageProps) {
+export function TableDetailPage({ tableId, paymentSuccess, paymentCancelled, onNavigate, onAuthClick }: TableDetailPageProps) {
   const { t, language } = useLanguage()
   const { user, profile } = useAuth()
   const isRestaurantUser = profile?.role === 'restaurant'
@@ -271,6 +272,16 @@ export function TableDetailPage({ tableId, paymentSuccess, onNavigate, onAuthCli
         <button onClick={() => onNavigate('browse')} className="flex items-center gap-2 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 mb-4 text-sm">
           <ArrowLeft className="w-4 h-4" /> {t('create.back')}
         </button>
+
+        {paymentCancelled && (
+          <div className="flex items-center gap-3 bg-orange-50 dark:bg-orange-900/20 border border-orange-200 dark:border-orange-800 rounded-xl p-4 mb-4">
+            <XCircle className="w-5 h-5 text-orange-500 flex-shrink-0" />
+            <div>
+              <p className="text-sm font-semibold text-orange-800 dark:text-orange-300">Pago no completado</p>
+              <p className="text-xs text-orange-600 dark:text-orange-400">Has cancelado el proceso de pago. Tu plaza no está reservada. Puedes intentarlo de nuevo cuando quieras.</p>
+            </div>
+          </div>
+        )}
 
         {paymentSuccess && (
           <div className="flex items-center gap-3 bg-green-50 border border-green-200 rounded-xl p-4 mb-4">

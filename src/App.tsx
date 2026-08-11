@@ -37,6 +37,7 @@ function AppRouter() {
   const [authModal, setAuthModal] = useState(false)
   const [authMode, setAuthMode] = useState<'signin' | 'signup'>('signin')
   const [paymentSuccess, setPaymentSuccess] = useState(false)
+  const [paymentCancelled, setPaymentCancelled] = useState(false)
 
   useEffect(() => {
     if (!loading && user && profile && page === 'landing') {
@@ -75,6 +76,16 @@ function AppRouter() {
       window.history.replaceState({}, '', window.location.pathname)
     }
 
+    if (payment === 'cancelled') {
+      const tableId = params.get('table')
+      if (tableId) {
+        setSelectedId(tableId)
+        setPage('table-detail')
+        setPaymentCancelled(true)
+      }
+      window.history.replaceState({}, '', window.location.pathname)
+    }
+
     if (payment === 'subscription-success') {
       window.history.replaceState({}, '', window.location.pathname)
       setPage('subscription')
@@ -92,7 +103,7 @@ function AppRouter() {
   const navigate = (p: string, id?: string) => {
     setPage(p)
     setSelectedId(id ?? null)
-    if (p !== 'table-detail') setPaymentSuccess(false)
+    if (p !== 'table-detail') { setPaymentSuccess(false); setPaymentCancelled(false) }
     window.scrollTo(0, 0)
   }
 
@@ -127,7 +138,7 @@ function AppRouter() {
       case 'create':
         return <CreateTablePage onNavigate={navigate} onAuthClick={openAuth} />
       case 'table-detail':
-        return selectedId ? <TableDetailPage tableId={selectedId} paymentSuccess={paymentSuccess} onNavigate={navigate} onAuthClick={openAuth} /> : null
+        return selectedId ? <TableDetailPage tableId={selectedId} paymentSuccess={paymentSuccess} paymentCancelled={paymentCancelled} onNavigate={navigate} onAuthClick={openAuth} /> : null
       case 'my-tables': {
         const validTabs = ['hosting', 'reservations', 'invitations'] as const
         const initialTab = validTabs.includes(selectedId as typeof validTabs[number])

@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import { supabase } from '@/lib/supabase'
 import type { DiningTable, TableParticipant, Profile } from '@/types/database'
 
@@ -73,6 +73,27 @@ export function useTableDetail(tableId: string | null) {
   }, [tableId])
 
   useEffect(() => { fetchTable() }, [fetchTable])
+
+  // Realtime: actualizar participantes al instante cuando el webhook de Stripe los inserta
+  useEffect(() => {
+    if (!tableId) return
+
+    const channel = supabase
+      .channel(`table-detail-${tableId}`)
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'table_participants', filter: `table_id=eq.${tableId}` },
+        () => { fetchTable() }
+      )
+      .on(
+        'postgres_changes',
+        { event: 'UPDATE', schema: 'public', table: 'dining_tables', filter: `id=eq.${tableId}` },
+        () => { fetchTable() }
+      )
+      .subscribe()
+
+    return () => { supabase.removeChannel(channel) }
+  }, [tableId, fetchTable])
 
   const joinTable = useCallback(async (joinType: 'word' | 'deposit' = 'word') => {
     if (!tableId) throw new Error('No table selected')

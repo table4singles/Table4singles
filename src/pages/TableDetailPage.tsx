@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { ArrowLeft, MapPin, Clock, Users, Calendar, Loader2, MessageSquare, Star, Download, UserPlus, XCircle, PartyPopper, Check, Mail, Pencil, Save, UserMinus } from 'lucide-react'
 import { Navbar } from '@/components/Navbar'
 import { ShareButton } from '@/components/ShareButton'
@@ -56,6 +56,17 @@ export function TableDetailPage({ tableId, paymentSuccess, onNavigate, onAuthCli
   const [editSaving, setEditSaving] = useState(false)
   const [editError, setEditError] = useState<string | null>(null)
   const [removingParticipantId, setRemovingParticipantId] = useState<string | null>(null)
+
+  // Cuando el usuario vuelve del pago, refrescamos varias veces por si el webhook de Stripe
+  // aún no ha procesado la inserción del participante.
+  const refreshedAfterPayment = useRef(false)
+  useEffect(() => {
+    if (!paymentSuccess || refreshedAfterPayment.current) return
+    refreshedAfterPayment.current = true
+    const t1 = setTimeout(() => refresh(), 2000)
+    const t2 = setTimeout(() => refresh(), 5000)
+    return () => { clearTimeout(t1); clearTimeout(t2) }
+  }, [paymentSuccess, refresh])
 
   // Si venias de "Comensales" con la intencion de invitar a alguien y aun no tenias mesa,
   // en cuanto confirmas el pago con deposito (redirect de Stripe) ofrecemos enviar la invitacion.

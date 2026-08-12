@@ -51,7 +51,7 @@ export function AdminPage({ onNavigate, onAuthClick }: AdminPageProps) {
 
   const tabs: { id: Tab; label: string; icon: React.ReactNode }[] = [
     { id: 'resumen',      label: 'Resumen',                                          icon: <TrendingUp className="w-4 h-4" /> },
-    { id: 'usuarios',     label: `Usuarios (${users.filter(u => u.role === 'user').length})`,  icon: <Users className="w-4 h-4" /> },
+    { id: 'usuarios',     label: `Usuarios (${users.filter(u => u.role === 'user' || u.is_admin).length})`,  icon: <Users className="w-4 h-4" /> },
     { id: 'restaurantes', label: `Restaurantes (${restaurants.length})`,             icon: <UtensilsCrossed className="w-4 h-4" /> },
     { id: 'embajadores',  label: `Embajadores (${ambassadors.length})`,              icon: <Award className="w-4 h-4" /> },
     { id: 'movimientos',  label: `Movimientos (${payments.length})`,                 icon: <CreditCard className="w-4 h-4" /> },
@@ -86,7 +86,7 @@ export function AdminPage({ onNavigate, onAuthClick }: AdminPageProps) {
         ) : (
           <>
             {tab === 'resumen'      && <TabResumen stats={stats} ambassadors={ambassadors} />}
-            {tab === 'usuarios'     && <TabUsuarios users={users.filter(u => u.role === 'user')} />}
+            {tab === 'usuarios'     && <TabUsuarios users={users.filter(u => u.role === 'user' || u.is_admin)} />}
             {tab === 'restaurantes' && <TabRestaurantes restaurants={restaurants} />}
             {tab === 'embajadores'  && <TabEmbajadores ambassadors={ambassadors} />}
             {tab === 'movimientos'  && <TabMovimientos payments={payments} />}

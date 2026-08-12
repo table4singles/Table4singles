@@ -151,7 +151,7 @@ export function SubscriptionPage({ onNavigate, onAuthClick }: SubscriptionPagePr
               <>
                 <div className="flex items-baseline gap-1">
                   <span className="text-4xl font-display font-bold">10 €</span>
-                  <span className="text-sm opacity-80">/ mes</span>
+                  <span className="text-sm opacity-80">{t('subscription.perMonth')}</span>
                 </div>
                 <p className="text-sm opacity-80 mt-1">Facturación mensual · Cancela cuando quieras</p>
               </>
@@ -181,7 +181,7 @@ export function SubscriptionPage({ onNavigate, onAuthClick }: SubscriptionPagePr
 
             {isActive ? (
               <div className="space-y-3 text-center">
-                <p className="text-sm text-green-600 dark:text-green-400 font-medium">✓ Suscripción activa</p>
+                <p className="text-sm text-green-600 dark:text-green-400 font-medium">✓ {t('subscription.statusActive')}</p>
                 <button
                   onClick={async () => {
                     setLoading(true)
@@ -199,9 +199,9 @@ export function SubscriptionPage({ onNavigate, onAuthClick }: SubscriptionPagePr
                   className="w-full py-3 border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-200 rounded-xl text-sm font-medium hover:bg-gray-50 dark:hover:bg-gray-700 flex items-center justify-center gap-2 disabled:opacity-60 transition-colors"
                 >
                   {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <CreditCard className="w-4 h-4" />}
-                  Gestionar suscripción y facturación
+                  {t('subscription.manageBilling')}
                 </button>
-                <p className="text-xs text-gray-400 dark:text-gray-500">Cancela, cambia método de pago o descarga facturas</p>
+                <p className="text-xs text-gray-400 dark:text-gray-500">{t('subscription.manageDesc')}</p>
               </div>
             ) : (
               <button
@@ -212,12 +212,12 @@ export function SubscriptionPage({ onNavigate, onAuthClick }: SubscriptionPagePr
                 {loading ? (
                   <>
                     <Loader2 className="w-4 h-4 animate-spin" />
-                    Redirigiendo a la pasarela de pago...
+                    {t('subscription.processing')}
                   </>
                 ) : (
                   <>
                     <CreditCard className="w-4 h-4" />
-                    {isNewSubscriber ? 'Empezar por 10 € — 3 meses' : 'Suscribirse por 10 €/mes'}
+                    {isNewSubscriber ? t('subscription.startPromo') : t('subscription.subscribeBtn')}
                   </>
                 )}
               </button>

@@ -434,7 +434,7 @@ export function TableDetailPage({ tableId, paymentSuccess, paymentCancelled, onN
                   <button onClick={handleJoinDeposit} disabled={joining} className="w-full py-3 bg-primary-500 text-white rounded-xl font-medium hover:bg-primary-600 disabled:opacity-50 transition-colors text-sm flex items-center justify-center gap-1.5">
                     {joining ? t('card.redirecting') : t('tableDetail.reservePrice')}
                   </button>
-                  <p className="text-xs text-gray-400 dark:text-gray-500 text-center">Tu plaza queda garantizada al reservar.</p>
+                  <p className="text-xs text-gray-400 dark:text-gray-500 text-center">{t('tableDetail.guaranteedSpot')}</p>
                   {joinError && <p className="text-xs text-red-600 text-center">{joinError}</p>}
                 </>
               )}
@@ -443,7 +443,7 @@ export function TableDetailPage({ tableId, paymentSuccess, paymentCancelled, onN
               )}
               {isParticipant && (
                 <div className="text-center py-2 space-y-2">
-                  <p className="text-sm font-medium text-green-600">Plaza reservada</p>
+                  <p className="text-sm font-medium text-green-600">{t('tableDetail.spotReserved')}</p>
                   {!isPast && (
                     <button onClick={() => setShowCancel(true)} className="text-xs text-red-500 hover:text-red-600 font-medium">
                       {t('card.cancelReservation')}

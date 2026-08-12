@@ -95,7 +95,7 @@ export function RestaurantProfilePage({ restaurantId, onNavigate, onAuthClick }:
   // Available dates from tables
   const availableDates = useMemo(() => {
     const s = new Set<string>()
-    tables.forEach(t => { if (t.available_seats > 0 && t.date >= todayStr) s.add(t.date) })
+    tables.forEach(tbl => { if (tbl.available_seats > 0 && tbl.date >= todayStr) s.add(tbl.date) })
     return s
   }, [tables, todayStr])
 
@@ -103,10 +103,10 @@ export function RestaurantProfilePage({ restaurantId, onNavigate, onAuthClick }:
   const showTables = !!(selectedDate && selectedTime)
   const filteredTables = useMemo(() => {
     if (!showTables) return []
-    return tables.filter(t => {
-      if (t.date !== selectedDate) return false
-      if (t.time) {
-        const h = parseInt(t.time.slice(0, 2))
+    return tables.filter(tbl => {
+      if (tbl.date !== selectedDate) return false
+      if (tbl.time) {
+        const h = parseInt(tbl.time.slice(0, 2))
         if (selectedTime === 'midday' && (h < 12 || h >= 17)) return false
         if (selectedTime === 'evening' && (h < 17 || h >= 24)) return false
       }
@@ -337,7 +337,7 @@ export function RestaurantProfilePage({ restaurantId, onNavigate, onAuthClick }:
                   {(['midday', 'evening'] as const).map(slot => (
                     <button
                       key={slot}
-                      onClick={() => setSelectedTime(t => t === slot ? '' : slot)}
+                      onClick={() => setSelectedTime(prev => prev === slot ? '' : slot)}
                       className={`flex-1 sm:flex-none px-4 py-3 rounded-xl border text-sm font-medium transition-all whitespace-nowrap ${
                         selectedTime === slot
                           ? 'border-[#e94560] text-[#e94560] bg-red-50 dark:bg-red-900/20'

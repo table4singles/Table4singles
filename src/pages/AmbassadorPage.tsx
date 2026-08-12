@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import {
   Award, Copy, Check, Users, TrendingUp, ChevronLeft, Loader2, Handshake,
   UtensilsCrossed, CalendarDays, Euro, Info, CheckCircle, XCircle, Clock, AlertCircle,
+  Share2, Mail, MessageCircle,
 } from 'lucide-react'
 import { Navbar } from '@/components/Navbar'
 import { useAuth } from '@/contexts/AuthContext'
@@ -45,6 +46,27 @@ export function AmbassadorPage({ onNavigate, onAuthClick }: AmbassadorPageProps)
   const referralUrl = referralCode
     ? `${window.location.origin}/?ref=${referralCode}`
     : user ? `${window.location.origin}/?ref=${user.id}` : ''
+
+  const shareText = `¡Hola! Te invito a unirte a Table4Singles, la plataforma de cenas compartidas para restaurantes. Regístrate con mi código ${referralCode ?? ''} y empieza a recibir comensales nuevos: ${referralUrl}`
+
+  const handleShareWhatsApp = () => {
+    window.open(`https://wa.me/?text=${encodeURIComponent(shareText)}`, '_blank')
+  }
+
+  const handleShareEmail = () => {
+    const subject = encodeURIComponent('Únete a Table4Singles — plataforma de cenas compartidas')
+    window.open(`mailto:?subject=${subject}&body=${encodeURIComponent(shareText)}`, '_blank')
+  }
+
+  const handleShareNative = async () => {
+    if (navigator.share) {
+      try {
+        await navigator.share({ title: 'Table4Singles', text: shareText, url: referralUrl })
+      } catch { /* usuario canceló */ }
+    } else {
+      handleCopy()
+    }
+  }
 
   useEffect(() => {
     if (!user) { setLoadingAmb(false); return }
@@ -143,46 +165,81 @@ export function AmbassadorPage({ onNavigate, onAuthClick }: AmbassadorPageProps)
               </div>
             </div>
 
-            {/* Código + Enlace */}
+            {/* Código + Compartir */}
             <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 p-5">
               <h2 className="font-semibold text-gray-900 dark:text-white mb-1">Tu código de embajador</h2>
-              <p className="text-sm text-gray-500 dark:text-gray-400 mb-3">
-                Cuando un restaurante use tu código al registrarse, quedará vinculado a ti y generará comisión.
+              <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
+                Comparte este código o el enlace con restaurantes. Al registrarse con él, quedarán vinculados a ti y generarán comisión.
               </p>
+
+              {/* Código grande */}
               {referralCode && (
-                <div className="flex items-center gap-3 mb-4">
-                  <div className="px-5 py-3 bg-[#e94560]/10 dark:bg-[#e94560]/20 border border-[#e94560]/30 rounded-xl text-xl font-bold font-mono tracking-widest text-[#e94560]">
+                <div className="flex items-center gap-3 mb-5">
+                  <div className="px-6 py-3 bg-[#e94560]/10 dark:bg-[#e94560]/20 border-2 border-dashed border-[#e94560]/40 rounded-xl text-2xl font-bold font-mono tracking-widest text-[#e94560] select-all">
                     {referralCode}
                   </div>
                   <button
                     onClick={() => { navigator.clipboard.writeText(referralCode); setCopied(true); setTimeout(() => setCopied(false), 2000) }}
-                    className="px-4 py-2.5 border border-gray-200 dark:border-gray-700 rounded-xl text-sm font-medium text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 flex items-center gap-2"
+                    className="px-4 py-3 border border-gray-200 dark:border-gray-700 rounded-xl text-sm font-medium text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 flex items-center gap-2 transition-colors"
                   >
-                    {copied ? <><Check className="w-4 h-4 text-green-500" /> Copiado</> : <><Copy className="w-4 h-4" /> Copiar código</>}
+                    {copied ? <Check className="w-4 h-4 text-green-500" /> : <Copy className="w-4 h-4" />}
+                    Copiar
                   </button>
                 </div>
               )}
-              <p className="text-xs text-gray-400 dark:text-gray-500 mb-3">O comparte el enlace directo:</p>
+
+              {/* Botones de compartir */}
+              <p className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-3">Enviar a un restaurante</p>
+              <div className="grid grid-cols-3 gap-2 mb-4">
+                <button
+                  onClick={handleShareWhatsApp}
+                  className="flex flex-col items-center gap-1.5 py-3 bg-green-50 dark:bg-green-900/20 hover:bg-green-100 dark:hover:bg-green-900/40 border border-green-200 dark:border-green-800 rounded-xl transition-colors"
+                >
+                  <MessageCircle className="w-5 h-5 text-green-600 dark:text-green-400" />
+                  <span className="text-xs font-medium text-green-700 dark:text-green-400">WhatsApp</span>
+                </button>
+                <button
+                  onClick={handleShareEmail}
+                  className="flex flex-col items-center gap-1.5 py-3 bg-blue-50 dark:bg-blue-900/20 hover:bg-blue-100 dark:hover:bg-blue-900/40 border border-blue-200 dark:border-blue-800 rounded-xl transition-colors"
+                >
+                  <Mail className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+                  <span className="text-xs font-medium text-blue-700 dark:text-blue-400">Email</span>
+                </button>
+                <button
+                  onClick={handleShareNative}
+                  className="flex flex-col items-center gap-1.5 py-3 bg-gray-50 dark:bg-gray-700/50 hover:bg-gray-100 dark:hover:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-xl transition-colors"
+                >
+                  <Share2 className="w-5 h-5 text-gray-600 dark:text-gray-400" />
+                  <span className="text-xs font-medium text-gray-600 dark:text-gray-400">Más opciones</span>
+                </button>
+              </div>
+
+              {/* Enlace copiable */}
               <div className="flex gap-2">
-                <div className="flex-1 px-4 py-2.5 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl text-sm text-gray-700 dark:text-gray-300 truncate font-mono">
+                <div className="flex-1 px-3 py-2.5 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl text-xs text-gray-500 dark:text-gray-400 truncate font-mono">
                   {referralUrl}
                 </div>
-                <button onClick={handleCopy} className="px-4 py-2.5 bg-primary-500 text-white rounded-xl hover:bg-primary-600 transition-colors flex items-center gap-2 font-medium text-sm whitespace-nowrap">
-                  {copied ? <><Check className="w-4 h-4" /> Copiado</> : <><Copy className="w-4 h-4" /> Copiar</>}
+                <button onClick={handleCopy} className="px-3 py-2.5 border border-gray-200 dark:border-gray-700 rounded-xl text-xs font-medium text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 flex items-center gap-1.5 whitespace-nowrap transition-colors">
+                  {copied ? <><Check className="w-3.5 h-3.5 text-green-500" /> Copiado</> : <><Copy className="w-3.5 h-3.5" /> Copiar enlace</>}
                 </button>
               </div>
             </div>
 
             {/* Restaurantes captados */}
             <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 p-5">
-              <h2 className="font-semibold text-gray-900 dark:text-white mb-4">Tus restaurantes captados</h2>
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="font-semibold text-gray-900 dark:text-white">Restaurantes que has captado</h2>
+                {restaurants.length > 0 && (
+                  <span className="text-xs px-2.5 py-1 bg-[#e94560]/10 text-[#e94560] rounded-full font-semibold">{restaurants.length} registrado{restaurants.length !== 1 ? 's' : ''}</span>
+                )}
+              </div>
               {statsLoading ? (
                 <div className="flex justify-center py-6"><Loader2 className="w-5 h-5 animate-spin text-gray-400" /></div>
               ) : restaurants.length === 0 ? (
-                <div className="text-center py-8">
-                  <UtensilsCrossed className="w-8 h-8 text-gray-300 dark:text-gray-600 mx-auto mb-2" />
-                  <p className="text-sm text-gray-500 dark:text-gray-400">Aún no has captado ningún restaurante.</p>
-                  <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">Comparte tu enlace para empezar a ganar.</p>
+                <div className="text-center py-8 bg-gray-50 dark:bg-gray-900/50 rounded-xl">
+                  <UtensilsCrossed className="w-10 h-10 text-gray-200 dark:text-gray-600 mx-auto mb-3" />
+                  <p className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">Aún no hay restaurantes registrados</p>
+                  <p className="text-xs text-gray-400 dark:text-gray-500">Cuando un restaurante use tu código al registrarse,<br/>aparecerá aquí con sus estadísticas.</p>
                 </div>
               ) : (
                 <div className="space-y-3">
@@ -193,7 +250,7 @@ export function AmbassadorPage({ onNavigate, onAuthClick }: AmbassadorPageProps)
                       <div key={r.restaurant_id} className="border border-gray-100 dark:border-gray-700 rounded-xl p-4">
                         <div className="flex items-start justify-between gap-2 mb-3">
                           <div>
-                            <p className="font-medium text-gray-900 dark:text-white text-sm">{r.restaurant_name || 'Restaurante sin nombre'}</p>
+                            <p className="font-semibold text-gray-900 dark:text-white text-sm">{r.restaurant_name || 'Restaurante sin nombre'}</p>
                             <p className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">
                               Registrado el {new Date(r.joined_at).toLocaleDateString('es-ES', { day: 'numeric', month: 'short', year: 'numeric' })}
                             </p>
@@ -203,17 +260,24 @@ export function AmbassadorPage({ onNavigate, onAuthClick }: AmbassadorPageProps)
                               {subInfo.icon} {subInfo.label}
                             </span>
                           ) : (
-                            <span className="flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium flex-shrink-0 text-gray-500 bg-gray-100 dark:bg-gray-700 dark:text-gray-400">Sin suscripción</span>
+                            <span className="flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium flex-shrink-0 text-gray-500 bg-gray-100 dark:bg-gray-700 dark:text-gray-400">
+                              <Clock className="w-3 h-3" /> Sin suscripción
+                            </span>
                           )}
                         </div>
                         <div className="flex items-center gap-4 text-xs text-gray-500 dark:text-gray-400">
-                          <span className="flex items-center gap-1"><UtensilsCrossed className="w-3.5 h-3.5" /> {r.active_tables} mesa{r.active_tables !== 1 ? 's' : ''} activa{r.active_tables !== 1 ? 's' : ''}</span>
+                          <span className="flex items-center gap-1"><UtensilsCrossed className="w-3.5 h-3.5" /> {r.active_tables} mesa{r.active_tables !== 1 ? 's' : ''}</span>
                           <span className="flex items-center gap-1"><CalendarDays className="w-3.5 h-3.5" /> {r.total_reservations} reserva{r.total_reservations !== 1 ? 's' : ''}</span>
                           <span className={`ml-auto flex items-center gap-1 font-semibold ${isActive ? 'text-green-600 dark:text-green-400' : 'text-gray-400'}`}>
                             <TrendingUp className="w-3.5 h-3.5" />
                             {isActive ? `${(r.monthly_commission_cts / 100).toFixed(2)} €/mes` : '0,00 €/mes'}
                           </span>
                         </div>
+                        {!r.subscription_status && (
+                          <p className="text-xs text-amber-600 dark:text-amber-400 mt-2 flex items-center gap-1">
+                            <Info className="w-3 h-3" /> Recuérdale que active su suscripción para generar comisión
+                          </p>
+                        )}
                       </div>
                     )
                   })}

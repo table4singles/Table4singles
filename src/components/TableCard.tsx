@@ -11,7 +11,7 @@ interface TableCardProps {
 }
 
 export function TableCard({ table, participants, onClick }: TableCardProps) {
-  const [modalProfile, setModalProfile] = useState<{ display_name: string | null; avatar_url: string | null } | null>(null)
+  const [modalProfile, setModalProfile] = useState<{ id?: string; display_name: string | null; avatar_url: string | null } | null>(null)
 
   const isFull = table.status === 'full' || table.available_seats <= 0
   const occupied = table.max_seats - table.available_seats

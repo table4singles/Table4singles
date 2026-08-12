@@ -52,8 +52,20 @@ export function AuthModal({ isOpen, onClose, mode, onSwitchMode }: AuthModalProp
     e.preventDefault()
     setError(null)
     setSuccess(null)
-    setLoading(true)
 
+    // Validación de contraseña segura en signup
+    if (mode === 'signup') {
+      if (password.length < 8) {
+        setError('La contraseña debe tener al menos 8 caracteres')
+        return
+      }
+      if (!/[A-Z]/.test(password) && !/[0-9]/.test(password)) {
+        setError('La contraseña debe incluir al menos un número o una letra mayúscula')
+        return
+      }
+    }
+
+    setLoading(true)
     try {
       if (mode === 'signup') {
         const { error: err } = await signUp(email, password, name, role, referralCode.trim().toUpperCase() || undefined)
@@ -176,6 +188,28 @@ export function AuthModal({ isOpen, onClose, mode, onSwitchMode }: AuthModalProp
                     {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                   </button>
                 </div>
+
+                {/* Indicador de fortaleza de contraseña — solo en signup */}
+                {mode === 'signup' && password.length > 0 && (() => {
+                  const has8 = password.length >= 8
+                  const hasUpper = /[A-Z]/.test(password)
+                  const hasNumber = /[0-9]/.test(password)
+                  const strength = [has8, hasUpper || hasNumber].filter(Boolean).length
+                  const bars = [
+                    strength === 0 ? 'bg-red-400' : strength === 1 ? 'bg-yellow-400' : 'bg-green-500',
+                    strength >= 2 ? 'bg-green-500' : 'bg-gray-200 dark:bg-gray-700',
+                  ]
+                  const label = strength === 0 ? 'Muy débil' : strength === 1 ? 'Débil' : 'Segura'
+                  const labelColor = strength === 0 ? 'text-red-500' : strength === 1 ? 'text-yellow-500' : 'text-green-600'
+                  return (
+                    <div className="mt-1.5">
+                      <div className="flex gap-1 mb-1">
+                        {bars.map((c, i) => <div key={i} className={`h-1 flex-1 rounded-full transition-colors ${c}`} />)}
+                      </div>
+                      <p className={`text-xs ${labelColor}`}>{label} · mín. 8 caracteres con número o mayúscula</p>
+                    </div>
+                  )
+                })()}
 
                 {/* Enlace "¿Olvidaste tu contraseña?" solo en login */}
                 {mode === 'signin' && (

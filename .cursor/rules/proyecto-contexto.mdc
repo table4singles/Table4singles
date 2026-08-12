@@ -28,7 +28,7 @@ React + Vite + TypeScript + Tailwind + Supabase (Edge Functions, RLS, Realtime, 
 - Depósito 2€ por reserva → Edge Function `create-reservation-checkout` (precio dinámico inline)
 - Webhook `stripe-webhook` → sincroniza BD y genera notificación in-app al restaurante
 - Credenciales live ya en Supabase Secrets (`STRIPE_SECRET_KEY`, `STRIPE_PUBLISHABLE_KEY`, `STRIPE_WEBHOOK_SECRET`)
-- **Pendiente**: usuario quiere cambiar a nueva cuenta de Stripe (retomará más adelante)
+- **Pendiente**: usuario quiere cambiar a nueva cuenta de Stripe (**YA COMPLETADO** — credenciales live actualizadas en Supabase Secrets)
 - **Decisión acordada**: suscripción usará producto fijo en Stripe, reserva seguirá dinámica
 
 ### Buscador de restaurantes

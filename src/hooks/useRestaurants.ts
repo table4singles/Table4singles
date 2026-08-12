@@ -163,11 +163,12 @@ export function useRestaurantProfile(restaurantId: string | null) {
     setLoading(true)
     setError(null)
 
+    // Query 1: profile + tables (sin nested join para evitar conflictos PostgREST)
     const [profRes, tablesRes] = await Promise.all([
       supabase.from('profiles').select('*').eq('id', restaurantId).single(),
       supabase
         .from('dining_tables')
-        .select('*, table_participants(user_id, status, profiles(id, display_name, avatar_url))')
+        .select('*')
         .eq('host_id', restaurantId)
         .eq('status', 'open')
         .eq('is_active', true)
@@ -177,7 +178,37 @@ export function useRestaurantProfile(restaurantId: string | null) {
 
     if (!profRes.error) setRestaurant(profRes.data)
     else setError(profRes.error.message)
-    if (!tablesRes.error) setTables((tablesRes.data || []) as DiningTableWithParticipants[])
+
+    if (tablesRes.error) {
+      setLoading(false)
+      return
+    }
+
+    const rawTables: DiningTable[] = tablesRes.data || []
+
+    if (rawTables.length === 0) {
+      setTables([])
+      setLoading(false)
+      return
+    }
+
+    // Query 2: participantes aprobados para estas mesas
+    const tableIds = rawTables.map(t => t.id)
+    const { data: partData } = await supabase
+      .from('table_participants')
+      .select('table_id, user_id, status, profiles(id, display_name, avatar_url)')
+      .in('table_id', tableIds)
+      .eq('status', 'approved')
+
+    // Agrupar por table_id
+    const byTable: Record<string, TableParticipantBasic[]> = {}
+    for (const p of (partData ?? [])) {
+      const tid = (p as any).table_id as string
+      if (!byTable[tid]) byTable[tid] = []
+      byTable[tid].push(p as unknown as TableParticipantBasic)
+    }
+
+    setTables(rawTables.map(t => ({ ...t, table_participants: byTable[t.id] ?? [] })))
     setLoading(false)
   }, [restaurantId])
 

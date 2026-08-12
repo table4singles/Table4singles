@@ -434,7 +434,10 @@ export function TableDetailPage({ tableId, paymentSuccess, paymentCancelled, onN
                   <button onClick={handleJoinDeposit} disabled={joining} className="w-full py-3 bg-primary-500 text-white rounded-xl font-medium hover:bg-primary-600 disabled:opacity-50 transition-colors text-sm flex items-center justify-center gap-1.5">
                     {joining ? t('card.redirecting') : <>Reservar plaza <span className="font-semibold">· 2 €</span></>}
                   </button>
-                  <p className="text-xs text-gray-400 dark:text-gray-500 text-center">Se cobra al confirmar. La plaza queda garantizada.</p>
+                  <button onClick={handleJoinWord} disabled={joining} className="w-full py-2.5 border border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300 rounded-xl font-medium hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50 transition-colors text-sm">
+                    {joining ? t('card.registering') : 'Apuntarse sin pago'}
+                  </button>
+                  <p className="text-xs text-gray-400 dark:text-gray-500 text-center">Con depósito, tu plaza queda garantizada.</p>
                   {joinError && <p className="text-xs text-red-600 text-center">{joinError}</p>}
                 </>
               )}

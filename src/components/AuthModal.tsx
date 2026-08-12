@@ -1,7 +1,8 @@
 import { useState } from 'react'
-import { X, Apple, Mail, Lock, Eye, EyeOff, ChevronLeft } from 'lucide-react'
+import { X, Apple, Mail, Lock, Eye, EyeOff, ChevronLeft, Globe } from 'lucide-react'
 import { useAuth } from '@/contexts/AuthContext'
 import { useLanguage } from '@/contexts/LanguageContext'
+import { languageOptions } from '@/i18n'
 
 interface AuthModalProps {
   isOpen: boolean
@@ -14,15 +15,15 @@ type Screen = 'main' | 'forgot' | 'forgot-sent'
 
 export function AuthModal({ isOpen, onClose, mode, onSwitchMode }: AuthModalProps) {
   const { signUp, signIn, signInWithGoogle, signInWithApple, resetPassword } = useAuth()
-  const { t } = useLanguage()
+  const { t, language, setLanguage } = useLanguage()
   const [screen, setScreen] = useState<Screen>('main')
   const [role, setRole] = useState<'user' | 'restaurant'>('user')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [name, setName] = useState('')
   const [showPassword, setShowPassword] = useState(false)
+  const [showLangPicker, setShowLangPicker] = useState(false)
   const [referralCode, setReferralCode] = useState(() => {
-    // Pre-fill if URL has ?ref=
     try { return new URLSearchParams(window.location.search).get('ref') ?? '' } catch { return '' }
   })
   const [error, setError] = useState<string | null>(null)
@@ -31,36 +32,24 @@ export function AuthModal({ isOpen, onClose, mode, onSwitchMode }: AuthModalProp
 
   if (!isOpen) return null
 
-  const resetState = () => {
-    setError(null)
-    setSuccess(null)
-    setLoading(false)
-  }
+  const resetState = () => { setError(null); setSuccess(null); setLoading(false) }
 
-  const handleClose = () => {
-    setScreen('main')
-    resetState()
-    onClose()
-  }
+  const handleClose = () => { setScreen('main'); setShowLangPicker(false); resetState(); onClose() }
 
-  const handleBack = () => {
-    setScreen('main')
-    resetState()
-  }
+  const handleBack = () => { setScreen('main'); resetState() }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setError(null)
     setSuccess(null)
 
-    // Validación de contraseña segura en signup
     if (mode === 'signup') {
       if (password.length < 8) {
-        setError('La contraseña debe tener al menos 8 caracteres')
+        setError(t('auth.passwordStrength.hint'))
         return
       }
       if (!/[A-Z]/.test(password) && !/[0-9]/.test(password)) {
-        setError('La contraseña debe incluir al menos un número o una letra mayúscula')
+        setError(t('auth.passwordStrength.hint'))
         return
       }
     }
@@ -70,14 +59,14 @@ export function AuthModal({ isOpen, onClose, mode, onSwitchMode }: AuthModalProp
       if (mode === 'signup') {
         const { error: err } = await signUp(email, password, name, role, referralCode.trim().toUpperCase() || undefined)
         if (err) throw err
-        setSuccess('¡Revisa tu email para confirmar tu cuenta!')
+        setSuccess(t('auth.checkEmail'))
       } else {
         const { error: err } = await signIn(email, password)
         if (err) throw err
         handleClose()
       }
     } catch (err: any) {
-      setError(err.message || 'Ha ocurrido un error')
+      setError(err.message || t('common.error'))
     }
     setLoading(false)
   }
@@ -91,10 +80,12 @@ export function AuthModal({ isOpen, onClose, mode, onSwitchMode }: AuthModalProp
       if (err) throw err
       setScreen('forgot-sent')
     } catch (err: any) {
-      setError(err.message || 'Ha ocurrido un error')
+      setError(err.message || t('common.error'))
     }
     setLoading(false)
   }
+
+  const currentLang = languageOptions.find(l => l.code === language)
 
   return (
     <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4" onClick={handleClose}>
@@ -117,9 +108,40 @@ export function AuthModal({ isOpen, onClose, mode, onSwitchMode }: AuthModalProp
                   </p>
                 </div>
               </div>
-              <button onClick={handleClose} className="p-2 hover:bg-gray-100 dark:hover:bg-gray-600 rounded-full">
-                <X className="w-5 h-5" />
-              </button>
+              <div className="flex items-center gap-1">
+                {/* Selector de idioma compacto */}
+                <div className="relative">
+                  <button
+                    onClick={() => setShowLangPicker(v => !v)}
+                    className="flex items-center gap-1.5 px-2 py-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors text-sm text-gray-600 dark:text-gray-300"
+                    title={t('auth.selectLanguage')}
+                  >
+                    <span className="text-base leading-none">{currentLang?.emoji ?? '🌐'}</span>
+                    <Globe className="w-3.5 h-3.5 opacity-60" />
+                  </button>
+                  {showLangPicker && (
+                    <div className="absolute right-0 top-full mt-1 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-xl z-10 p-2 grid grid-cols-3 gap-1 w-44">
+                      {languageOptions.map(lng => (
+                        <button
+                          key={lng.code}
+                          onClick={() => { setLanguage(lng.code); setShowLangPicker(false) }}
+                          className={`flex items-center gap-1.5 px-2 py-1.5 rounded-lg text-xs transition-colors ${
+                            language === lng.code
+                              ? 'bg-primary-50 dark:bg-primary-900/30 text-primary-700 dark:text-primary-300 font-medium'
+                              : 'hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300'
+                          }`}
+                        >
+                          <span className="text-sm leading-none">{lng.emoji}</span>
+                          <span className="truncate">{lng.label.split(' ')[0]}</span>
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
+                <button onClick={handleClose} className="p-2 hover:bg-gray-100 dark:hover:bg-gray-600 rounded-full">
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
             </div>
 
             <div className="px-6 pb-6">
@@ -166,7 +188,6 @@ export function AuthModal({ isOpen, onClose, mode, onSwitchMode }: AuthModalProp
                   />
                 </div>
 
-                {/* Campo contraseña con toggle de visibilidad */}
                 <div className="relative">
                   <div className="absolute left-3 top-1/2 -translate-y-1/2">
                     <Lock className="w-4 h-4 text-gray-400 dark:text-gray-500" />
@@ -189,7 +210,7 @@ export function AuthModal({ isOpen, onClose, mode, onSwitchMode }: AuthModalProp
                   </button>
                 </div>
 
-                {/* Indicador de fortaleza de contraseña — solo en signup */}
+                {/* Indicador de fortaleza de contraseña */}
                 {mode === 'signup' && password.length > 0 && (() => {
                   const has8 = password.length >= 8
                   const hasUpper = /[A-Z]/.test(password)
@@ -199,19 +220,18 @@ export function AuthModal({ isOpen, onClose, mode, onSwitchMode }: AuthModalProp
                     strength === 0 ? 'bg-red-400' : strength === 1 ? 'bg-yellow-400' : 'bg-green-500',
                     strength >= 2 ? 'bg-green-500' : 'bg-gray-200 dark:bg-gray-700',
                   ]
-                  const label = strength === 0 ? 'Muy débil' : strength === 1 ? 'Débil' : 'Segura'
+                  const label = strength === 0 ? t('auth.passwordStrength.veryWeak') : strength === 1 ? t('auth.passwordStrength.weak') : t('auth.passwordStrength.strong')
                   const labelColor = strength === 0 ? 'text-red-500' : strength === 1 ? 'text-yellow-500' : 'text-green-600'
                   return (
                     <div className="mt-1.5">
                       <div className="flex gap-1 mb-1">
                         {bars.map((c, i) => <div key={i} className={`h-1 flex-1 rounded-full transition-colors ${c}`} />)}
                       </div>
-                      <p className={`text-xs ${labelColor}`}>{label} · mín. 8 caracteres con número o mayúscula</p>
+                      <p className={`text-xs ${labelColor}`}>{label} · {t('auth.passwordStrength.hint')}</p>
                     </div>
                   )
                 })()}
 
-                {/* Enlace "¿Olvidaste tu contraseña?" solo en login */}
                 {mode === 'signin' && (
                   <div className="flex justify-end">
                     <button
@@ -219,17 +239,16 @@ export function AuthModal({ isOpen, onClose, mode, onSwitchMode }: AuthModalProp
                       onClick={() => { setScreen('forgot'); setError(null) }}
                       className="text-sm text-primary-600 hover:text-primary-700 font-medium"
                     >
-                      ¿Olvidaste tu contraseña?
+                      {t('auth.forgotPassword')}
                     </button>
                   </div>
                 )}
 
-                {/* Código de referido — solo en signup */}
                 {mode === 'signup' && (
                   <div>
                     <input
                       type="text"
-                      placeholder="Código de referido (opcional)"
+                      placeholder={t('auth.referralCode')}
                       value={referralCode}
                       onChange={e => setReferralCode(e.target.value.toUpperCase())}
                       maxLength={10}
@@ -264,8 +283,8 @@ export function AuthModal({ isOpen, onClose, mode, onSwitchMode }: AuthModalProp
                 <ChevronLeft className="w-5 h-5 text-gray-500 dark:text-gray-400" />
               </button>
               <div>
-                <h2 className="text-2xl font-serif font-bold text-gray-900 dark:text-white">Recuperar contraseña</h2>
-                <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">Te enviaremos un enlace por email</p>
+                <h2 className="text-2xl font-serif font-bold text-gray-900 dark:text-white">{t('auth.forgotPasswordTitle')}</h2>
+                <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">{t('auth.forgotPasswordDesc')}</p>
               </div>
             </div>
             <div className="px-6 pb-6">
@@ -288,7 +307,7 @@ export function AuthModal({ isOpen, onClose, mode, onSwitchMode }: AuthModalProp
                 {error && <p className="text-sm text-red-600 bg-red-50 dark:bg-red-900/20 px-3 py-2 rounded-lg">{error}</p>}
 
                 <button type="submit" disabled={loading} className="w-full py-3 bg-primary-500 text-white rounded-xl font-medium hover:bg-primary-600 disabled:opacity-50 transition-colors">
-                  {loading ? '...' : 'Enviar enlace de recuperación'}
+                  {loading ? '...' : t('auth.sendRecoveryLink')}
                 </button>
               </form>
             </div>
@@ -301,15 +320,15 @@ export function AuthModal({ isOpen, onClose, mode, onSwitchMode }: AuthModalProp
             <div className="w-16 h-16 bg-green-100 dark:bg-green-900/30 rounded-full flex items-center justify-center mx-auto mb-4">
               <Mail className="w-8 h-8 text-green-600" />
             </div>
-            <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-2">Email enviado</h2>
+            <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-2">{t('auth.emailSentTitle')}</h2>
             <p className="text-sm text-gray-500 dark:text-gray-400 mb-6">
-              Hemos enviado un enlace a <strong>{email}</strong>. Revisa tu bandeja de entrada y sigue las instrucciones para crear una nueva contraseña.
+              {email && <><strong>{email}</strong> — </>}{t('auth.emailSentDesc')}
             </p>
             <button onClick={handleClose} className="w-full py-3 bg-primary-500 text-white rounded-xl font-medium hover:bg-primary-600 transition-colors">
-              Entendido
+              {t('auth.emailSentOk')}
             </button>
             <button onClick={handleBack} className="mt-3 w-full py-2 text-sm text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 transition-colors">
-              Volver al inicio de sesión
+              {t('auth.backToSignIn')}
             </button>
           </div>
         )}

@@ -1,12 +1,13 @@
 import { useState, useEffect, useCallback } from 'react'
-import { ArrowLeft, TrendingUp, Users, Star, Euro, CalendarDays, Loader2 } from 'lucide-react'
+import { ArrowLeft, TrendingUp, Users, Star, CalendarDays, Loader2 } from 'lucide-react'
 import { Navbar } from '@/components/Navbar'
 import { useAuth } from '@/contexts/AuthContext'
 import { useViewMode } from '@/contexts/ViewModeContext'
+import { useLanguage } from '@/contexts/LanguageContext'
 import { supabase } from '@/lib/supabase'
 import {
   BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer,
-  LineChart, Line, CartesianGrid, PieChart, Pie, Cell, Legend,
+  CartesianGrid, PieChart, Pie, Cell,
 } from 'recharts'
 
 interface AnalyticsPageProps {
@@ -17,8 +18,9 @@ interface AnalyticsPageProps {
 const COLORS = ['#e94560', '#f97316', '#22c55e', '#3b82f6', '#a855f7']
 
 export function AnalyticsPage({ onNavigate, onAuthClick }: AnalyticsPageProps) {
-  const { user, profile } = useAuth()
+  const { user } = useAuth()
   const { effectiveRole } = useViewMode()
+  const { t, language } = useLanguage()
   const [loading, setLoading] = useState(true)
   const [data, setData] = useState<any>(null)
   const [range, setRange] = useState<'7d' | '30d' | '90d'>('30d')
@@ -29,6 +31,7 @@ export function AnalyticsPage({ onNavigate, onAuthClick }: AnalyticsPageProps) {
 
     const days = range === '7d' ? 7 : range === '30d' ? 30 : 90
     const since = new Date(Date.now() - days * 86400000).toISOString().split('T')[0]
+    const locale = language === 'zh' ? 'zh-CN' : language === 'ja' ? 'ja-JP' : language === 'ar' ? 'ar' : language
 
     const [tablesRes, participantsRes, reviewsRes, paymentsRes] = await Promise.all([
       supabase.from('dining_tables').select('id, date, status, max_seats, available_seats, time').eq('host_id', user.id).gte('date', since).order('date'),
@@ -42,7 +45,6 @@ export function AnalyticsPage({ onNavigate, onAuthClick }: AnalyticsPageProps) {
     const reviews = reviewsRes.data || []
     const payments = paymentsRes.data || []
 
-    // Reservas por día
     const reservasByDay: Record<string, number> = {}
     participants.forEach((p: any) => {
       const day = p.created_at?.split('T')[0]
@@ -51,49 +53,43 @@ export function AnalyticsPage({ onNavigate, onAuthClick }: AnalyticsPageProps) {
     const reservasChart = Object.entries(reservasByDay)
       .sort(([a], [b]) => a.localeCompare(b))
       .map(([date, count]) => ({
-        date: new Date(date + 'T12:00:00').toLocaleDateString('es-ES', { day: 'numeric', month: 'short' }),
-        reservas: count,
+        date: new Date(date + 'T12:00:00').toLocaleDateString(locale, { day: 'numeric', month: 'short' }),
+        [t('analytics.reservationsLabel')]: count,
       }))
 
-    // Ocupación media (%)
     const ocupacion = tables.length > 0
-      ? Math.round(tables.reduce((sum, t) => sum + ((t.max_seats - t.available_seats) / t.max_seats) * 100, 0) / tables.length)
+      ? Math.round(tables.reduce((sum, tab) => sum + ((tab.max_seats - tab.available_seats) / tab.max_seats) * 100, 0) / tables.length)
       : 0
 
-    // Ingresos totales (2€ por reserva)
-    const ingresos = payments.length * 2
-
-    // Valoración media
     const avgRating = reviews.length > 0
       ? (reviews.reduce((sum: number, r: any) => sum + r.rating, 0) / reviews.length).toFixed(1)
       : null
 
-    // Distribución de ratings
     const ratingDist = [1, 2, 3, 4, 5].map(r => ({
       rating: `${r}★`,
       cantidad: reviews.filter((rv: any) => rv.rating === r).length,
     }))
 
-    // Tramos horarios
-    const midday = tables.filter(t => { const h = parseInt(t.time?.slice(0, 2) || '0'); return h >= 12 && h < 17 }).length
-    const evening = tables.filter(t => { const h = parseInt(t.time?.slice(0, 2) || '0'); return h >= 17 }).length
+    const midday = tables.filter(tab => { const h = parseInt(tab.time?.slice(0, 2) || '0'); return h >= 12 && h < 17 }).length
+    const evening = tables.filter(tab => { const h = parseInt(tab.time?.slice(0, 2) || '0'); return h >= 17 }).length
     const slotsChart = [
-      { name: 'Mediodía', value: midday },
-      { name: 'Noche', value: evening },
+      { name: t('analytics.slotMidday'), value: midday },
+      { name: t('analytics.slotEvening'), value: evening },
     ].filter(s => s.value > 0)
 
     setData({
       totalTables: tables.length,
       totalParticipants: participants.length,
       ocupacion,
-      ingresos,
+      ingresos: payments.length * 2,
       avgRating,
       reservasChart,
       ratingDist,
       slotsChart,
+      reservasKey: t('analytics.reservationsLabel'),
     })
     setLoading(false)
-  }, [user, range])
+  }, [user, range, language, t])
 
   useEffect(() => { fetchAnalytics() }, [fetchAnalytics])
 
@@ -102,7 +98,7 @@ export function AnalyticsPage({ onNavigate, onAuthClick }: AnalyticsPageProps) {
       <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
         <Navbar currentPage="analytics" onNavigate={onNavigate} onAuthClick={onAuthClick} />
         <div className="text-center py-20">
-          <p className="text-gray-500 dark:text-gray-400">Esta sección es solo para restaurantes.</p>
+          <p className="text-gray-500 dark:text-gray-400">{t('analytics.restaurantOnly')}</p>
         </div>
       </div>
     )
@@ -113,19 +109,19 @@ export function AnalyticsPage({ onNavigate, onAuthClick }: AnalyticsPageProps) {
       <Navbar currentPage="analytics" onNavigate={onNavigate} onAuthClick={onAuthClick} />
       <main className="max-w-4xl mx-auto px-4 py-6 pb-24 md:pb-8">
         <button onClick={() => onNavigate('restaurant-dashboard')} className="flex items-center gap-2 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 mb-6 text-sm">
-          <ArrowLeft className="w-4 h-4" /> Volver al dashboard
+          <ArrowLeft className="w-4 h-4" /> {t('analytics.back')}
         </button>
 
         <div className="flex items-center justify-between mb-6">
           <div>
-            <h1 className="text-2xl font-display font-bold text-gray-900 dark:text-white">Analytics</h1>
-            <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">Rendimiento de tu restaurante</p>
+            <h1 className="text-2xl font-display font-bold text-gray-900 dark:text-white">{t('analytics.title')}</h1>
+            <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">{t('analytics.subtitle')}</p>
           </div>
           <div className="flex gap-1 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-1">
             {(['7d', '30d', '90d'] as const).map(r => (
               <button key={r} onClick={() => setRange(r)}
                 className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${range === r ? 'bg-[#e94560] text-white' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'}`}>
-                {r === '7d' ? '7 días' : r === '30d' ? '30 días' : '90 días'}
+                {r === '7d' ? t('analytics.range7d') : r === '30d' ? t('analytics.range30d') : t('analytics.range90d')}
               </button>
             ))}
           </div>
@@ -135,33 +131,30 @@ export function AnalyticsPage({ onNavigate, onAuthClick }: AnalyticsPageProps) {
           <div className="flex justify-center py-20"><Loader2 className="w-8 h-8 text-[#e94560] animate-spin" /></div>
         ) : data ? (
           <div className="space-y-6">
-            {/* KPIs */}
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-              <KpiCard icon={<CalendarDays className="w-5 h-5 text-blue-500" />} label="Mesas" value={data.totalTables} bg="bg-blue-50 dark:bg-blue-900/20" />
-              <KpiCard icon={<Users className="w-5 h-5 text-green-500" />} label="Reservas" value={data.totalParticipants} bg="bg-green-50 dark:bg-green-900/20" />
-              <KpiCard icon={<TrendingUp className="w-5 h-5 text-orange-500" />} label="Ocupación" value={`${data.ocupacion}%`} bg="bg-orange-50 dark:bg-orange-900/20" />
-              <KpiCard icon={<Star className="w-5 h-5 text-yellow-500" />} label="Valoración" value={data.avgRating ?? '—'} bg="bg-yellow-50 dark:bg-yellow-900/20" />
+              <KpiCard icon={<CalendarDays className="w-5 h-5 text-blue-500" />} label={t('analytics.kpiTables')} value={data.totalTables} bg="bg-blue-50 dark:bg-blue-900/20" />
+              <KpiCard icon={<Users className="w-5 h-5 text-green-500" />} label={t('analytics.kpiReservations')} value={data.totalParticipants} bg="bg-green-50 dark:bg-green-900/20" />
+              <KpiCard icon={<TrendingUp className="w-5 h-5 text-orange-500" />} label={t('analytics.kpiOccupancy')} value={`${data.ocupacion}%`} bg="bg-orange-50 dark:bg-orange-900/20" />
+              <KpiCard icon={<Star className="w-5 h-5 text-yellow-500" />} label={t('analytics.kpiRating')} value={data.avgRating ?? '—'} bg="bg-yellow-50 dark:bg-yellow-900/20" />
             </div>
 
-            {/* Reservas por día */}
             {data.reservasChart.length > 0 && (
-              <ChartCard title="Reservas por día">
+              <ChartCard title={t('analytics.chartReservations')}>
                 <ResponsiveContainer width="100%" height={200}>
                   <BarChart data={data.reservasChart} margin={{ top: 5, right: 10, left: -20, bottom: 5 }}>
                     <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
                     <XAxis dataKey="date" tick={{ fontSize: 11 }} />
                     <YAxis tick={{ fontSize: 11 }} allowDecimals={false} />
                     <Tooltip />
-                    <Bar dataKey="reservas" fill="#e94560" radius={[4, 4, 0, 0]} />
+                    <Bar dataKey={data.reservasKey} fill="#e94560" radius={[4, 4, 0, 0]} />
                   </BarChart>
                 </ResponsiveContainer>
               </ChartCard>
             )}
 
             <div className="grid sm:grid-cols-2 gap-6">
-              {/* Distribución ratings */}
               {data.ratingDist.some((r: any) => r.cantidad > 0) && (
-                <ChartCard title="Distribución de valoraciones">
+                <ChartCard title={t('analytics.chartRatings')}>
                   <ResponsiveContainer width="100%" height={180}>
                     <BarChart data={data.ratingDist} margin={{ top: 5, right: 10, left: -20, bottom: 5 }}>
                       <XAxis dataKey="rating" tick={{ fontSize: 12 }} />
@@ -173,9 +166,8 @@ export function AnalyticsPage({ onNavigate, onAuthClick }: AnalyticsPageProps) {
                 </ChartCard>
               )}
 
-              {/* Tramos horarios */}
               {data.slotsChart.length > 0 && (
-                <ChartCard title="Mesas por tramo horario">
+                <ChartCard title={t('analytics.chartSlots')}>
                   <ResponsiveContainer width="100%" height={180}>
                     <PieChart>
                       <Pie data={data.slotsChart} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={70} label={({ name, percent }: any) => `${name} ${Math.round((percent ?? 0) * 100)}%`}>
@@ -191,8 +183,8 @@ export function AnalyticsPage({ onNavigate, onAuthClick }: AnalyticsPageProps) {
             {data.totalParticipants === 0 && data.totalTables === 0 && (
               <div className="text-center py-16 bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700">
                 <TrendingUp className="w-10 h-10 text-gray-200 dark:text-gray-600 mx-auto mb-3" />
-                <p className="text-gray-500 dark:text-gray-400 font-medium">Sin datos aún</p>
-                <p className="text-sm text-gray-400 dark:text-gray-500 mt-1">Crea mesas y recibe reservas para ver estadísticas</p>
+                <p className="text-gray-500 dark:text-gray-400 font-medium">{t('analytics.emptyTitle')}</p>
+                <p className="text-sm text-gray-400 dark:text-gray-500 mt-1">{t('analytics.emptyDesc')}</p>
               </div>
             )}
           </div>

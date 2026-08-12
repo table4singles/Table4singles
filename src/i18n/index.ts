@@ -15,7 +15,8 @@ import { ja } from './ja'
 export type Language = 'es' | 'en' | 'de' | 'fr' | 'it' | 'ru' | 'pt' | 'uk' | 'ro' | 'ar' | 'sv' | 'zh' | 'ja'
 export type Translations = typeof es
 
-const translations: Record<Language, Translations> = { es, en, de, fr, it, ru, pt, uk, ro, ar, sv, zh, ja }
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const translations: Record<Language, Translations> = { es, en, de, fr, it, ru, pt, uk, ro, ar, sv, zh, ja } as any
 
 function getNestedValue(obj: Record<string, unknown>, path: string): string {
   const keys = path.split('.')

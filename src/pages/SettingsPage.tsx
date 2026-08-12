@@ -1,11 +1,12 @@
-import { useState } from 'react'
 import { Bell, Mail, Moon, Sun, Globe, Shield, FileText, CreditCard, HelpCircle, LogOut, ChevronRight, Check, Loader2 } from 'lucide-react'
 import { Navbar } from '@/components/Navbar'
 import { ErrorBanner } from '@/components/ErrorBanner'
 import { useAuth } from '@/contexts/AuthContext'
 import { useTheme } from '@/contexts/ThemeContext'
 import { useLanguage } from '@/contexts/LanguageContext'
+import { languageOptions } from '@/i18n'
 import { supabase } from '@/lib/supabase'
+import { useState } from 'react'
 
 interface SettingsPageProps {
   onNavigate: (page: string) => void
@@ -15,7 +16,7 @@ interface SettingsPageProps {
 export function SettingsPage({ onNavigate, onAuthClick }: SettingsPageProps) {
   const { user, profile, refreshProfile, signOut } = useAuth()
   const { theme, toggleTheme } = useTheme()
-  const { language, setLanguage } = useLanguage()
+  const { language, setLanguage, t } = useLanguage()
   const [error, setError] = useState<string | null>(null)
   const [saving, setSaving] = useState<string | null>(null)
 
@@ -34,36 +35,25 @@ export function SettingsPage({ onNavigate, onAuthClick }: SettingsPageProps) {
       <Navbar currentPage="settings" onNavigate={onNavigate} onAuthClick={onAuthClick} />
       <main className="max-w-2xl mx-auto px-4 py-8 pb-24 md:pb-8">
         <div className="mb-6">
-          <h1 className="text-2xl font-display font-bold text-gray-900 dark:text-white">Ajustes</h1>
-          <p className="text-gray-500 dark:text-gray-400 text-sm mt-1">Gestiona tu cuenta y preferencias</p>
+          <h1 className="text-2xl font-display font-bold text-gray-900 dark:text-white">{t('settings.title')}</h1>
+          <p className="text-gray-500 dark:text-gray-400 text-sm mt-1">{t('settings.subtitle')}</p>
         </div>
 
         {error && <ErrorBanner message={error} className="mb-4" />}
 
         <div className="space-y-4">
-          {/* Suscripción */}
-          <SettingsSection title="Suscripción" icon={<CreditCard className="w-5 h-5" />}>
-            <div className="flex items-center justify-between px-1 py-2">
-              <div>
-                <p className="text-sm font-medium text-gray-900 dark:text-white">Plan actual: Gratuito</p>
-                <p className="text-xs text-gray-500 dark:text-gray-400">Los planes premium estarán disponibles próximamente</p>
-              </div>
-              <span className="text-xs font-medium bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-300 px-3 py-1 rounded-full">Próximamente</span>
-            </div>
-          </SettingsSection>
-
           {/* Notificaciones */}
-          <SettingsSection title="Notificaciones" icon={<Bell className="w-5 h-5" />}>
+          <SettingsSection title={t('settings.notifications.title')} icon={<Bell className="w-5 h-5" />}>
             <ToggleRow
               icon={<Mail className="w-4 h-4" />}
-              label="Notificaciones por email"
+              label={t('settings.notifications.email')}
               checked={profile?.email_notifications ?? true}
               loading={saving === 'email_notifications'}
               onChange={v => updatePref('email_notifications', v)}
             />
             <ToggleRow
               icon={<Bell className="w-4 h-4" />}
-              label="Notificaciones en la app"
+              label={t('settings.notifications.push')}
               checked={profile?.push_notifications ?? true}
               loading={saving === 'push_notifications'}
               onChange={v => updatePref('push_notifications', v)}
@@ -71,38 +61,45 @@ export function SettingsPage({ onNavigate, onAuthClick }: SettingsPageProps) {
           </SettingsSection>
 
           {/* Apariencia */}
-          <SettingsSection title="Apariencia" icon={theme === 'dark' ? <Moon className="w-5 h-5" /> : <Sun className="w-5 h-5" />}>
+          <SettingsSection title={t('settings.appearance.title')} icon={theme === 'dark' ? <Moon className="w-5 h-5" /> : <Sun className="w-5 h-5" />}>
             <div className="flex items-center justify-between px-1 py-2">
-              <span className="text-sm text-gray-700 dark:text-gray-200">Modo oscuro</span>
+              <span className="text-sm text-gray-700 dark:text-gray-200">{t('settings.appearance.darkMode')}</span>
               <Switch checked={theme === 'dark'} onChange={toggleTheme} />
             </div>
           </SettingsSection>
 
-          {/* Idioma */}
-          <SettingsSection title="Idioma" icon={<Globe className="w-5 h-5" />}>
-            <div className="flex gap-2 px-1 py-2">
-              {(['es', 'en', 'de'] as const).map(lng => (
+          {/* Idioma — grid scrollable con todos los idiomas */}
+          <SettingsSection title={t('settings.language.title')} icon={<Globe className="w-5 h-5" />}>
+            <p className="text-xs text-gray-400 dark:text-gray-500 px-1 pt-1 pb-2">{t('settings.language.subtitle')}</p>
+            <div className="grid grid-cols-2 gap-2 px-1 pb-2">
+              {languageOptions.map(lng => (
                 <button
-                  key={lng}
-                  onClick={() => setLanguage(lng)}
-                  className={`flex-1 py-2 rounded-xl text-sm font-medium transition-colors ${language === lng ? 'bg-primary-500 text-white' : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-600'}`}
+                  key={lng.code}
+                  onClick={() => setLanguage(lng.code)}
+                  className={`flex items-center gap-2 px-3 py-2.5 rounded-xl text-sm font-medium transition-colors ${
+                    language === lng.code
+                      ? 'bg-primary-500 text-white'
+                      : 'bg-gray-50 dark:bg-gray-700/50 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700'
+                  }`}
                 >
-                  {lng === 'es' ? 'Español' : lng === 'en' ? 'English' : 'Deutsch'}
+                  <span className="text-lg leading-none">{lng.emoji}</span>
+                  <span className="truncate">{lng.label}</span>
+                  {language === lng.code && <Check className="w-3.5 h-3.5 ml-auto flex-shrink-0" />}
                 </button>
               ))}
             </div>
           </SettingsSection>
 
           {/* Privacidad y legal */}
-          <SettingsSection title="Privacidad y legal" icon={<Shield className="w-5 h-5" />}>
-            <LinkRow label="Política de privacidad" onClick={() => onNavigate('politica-privacidad')} />
-            <LinkRow label="Términos y condiciones" onClick={() => onNavigate('aviso-legal')} />
+          <SettingsSection title={t('settings.privacy.title')} icon={<Shield className="w-5 h-5" />}>
+            <LinkRow label={t('settings.privacy.privacyPolicy')} onClick={() => onNavigate('politica-privacidad')} />
+            <LinkRow label={t('settings.privacy.terms')} onClick={() => onNavigate('aviso-legal')} />
           </SettingsSection>
 
           {/* Ayuda y soporte */}
-          <SettingsSection title="Ayuda y soporte" icon={<HelpCircle className="w-5 h-5" />}>
+          <SettingsSection title={t('settings.support.title')} icon={<HelpCircle className="w-5 h-5" />}>
             <a href="mailto:soporte@table4singles.online" className="flex items-center justify-between px-1 py-2 text-sm text-gray-700 dark:text-gray-200 hover:text-primary-600 transition-colors">
-              <span className="flex items-center gap-2"><FileText className="w-4 h-4" /> Contactar con soporte</span>
+              <span className="flex items-center gap-2"><FileText className="w-4 h-4" /> {t('settings.support.contact')}</span>
               <ChevronRight className="w-4 h-4 text-gray-400" />
             </a>
           </SettingsSection>
@@ -111,7 +108,7 @@ export function SettingsPage({ onNavigate, onAuthClick }: SettingsPageProps) {
             onClick={signOut}
             className="w-full py-3 border border-red-200 dark:border-red-900 bg-white dark:bg-gray-800 text-red-600 rounded-xl font-medium text-sm hover:bg-red-50 dark:hover:bg-red-950 transition-colors flex items-center justify-center gap-2"
           >
-            <LogOut className="w-4 h-4" /> Cerrar sesión
+            <LogOut className="w-4 h-4" /> {t('settings.signOut')}
           </button>
         </div>
       </main>

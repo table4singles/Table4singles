@@ -1,7 +1,8 @@
-import { MapPin, Clock, Users, ChevronRight } from 'lucide-react'
+import { Clock, Users } from 'lucide-react'
+import { useState } from 'react'
 import type { DiningTable } from '@/types/database'
 import type { TableParticipantBasic } from '@/hooks/useRestaurants'
-import { useLanguage } from '@/contexts/LanguageContext'
+import { CommensalModal } from '@/components/CommensalModal'
 
 interface TableCardProps {
   table: DiningTable
@@ -10,101 +11,102 @@ interface TableCardProps {
 }
 
 export function TableCard({ table, participants, onClick }: TableCardProps) {
-  const { t, language } = useLanguage()
+  const [modalProfile, setModalProfile] = useState<{ display_name: string | null; avatar_url: string | null } | null>(null)
+
   const isFull = table.status === 'full' || table.available_seats <= 0
-  const locale = language === 'de' ? 'de-DE' : language === 'en' ? 'en-GB' : 'es-ES'
+  const occupied = table.max_seats - table.available_seats
 
-  const formattedDate = new Date(table.date + 'T12:00:00').toLocaleDateString(locale, {
-    weekday: 'short',
-    month: 'short',
-    day: 'numeric',
+  const formattedDate = new Date(table.date + 'T12:00:00').toLocaleDateString('es-ES', {
+    weekday: 'short', day: 'numeric', month: 'short',
   })
-
   const formattedTime = table.time ? table.time.slice(0, 5) : null
 
   const approved = (participants ?? []).filter(p => p.status === 'approved')
-  const visibleAvatars = approved.slice(0, 5)
+  const visibleAvatars = approved.slice(0, 4)
   const extraCount = approved.length - visibleAvatars.length
 
-  return (
-    <button onClick={onClick} className="w-full bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden hover:shadow-md hover:border-gray-200 dark:hover:border-gray-500 transition-all text-left group">
-      <div className="relative h-40 bg-gray-100 dark:bg-gray-700">
-        <img
-          src={table.restaurant_image_url || 'https://images.pexels.com/photos/67468/pexels-photo-67468.jpeg?auto=compress&cs=tinysrgb&w=600'}
-          alt={table.restaurant_name}
-          className="w-full h-full object-cover"
-          loading="lazy"
-        />
-        <div className="absolute top-3 left-3 flex gap-2">
-          <span className={`px-2.5 py-1 rounded-full text-xs font-medium ${isFull ? 'bg-gray-900/70 text-white' : 'bg-green-500/90 text-white'}`}>
-            {isFull ? t('card.full') : t('card.available')}
-          </span>
-          {table.cuisine_type && (
-            <span className="px-2.5 py-1 rounded-full text-xs font-medium bg-white dark:bg-gray-800/90 text-gray-700 dark:text-gray-200">
-              {table.cuisine_type}
-            </span>
-          )}
-        </div>
-      </div>
-      <div className="p-4">
-        <h3 className="font-semibold text-gray-900 dark:text-white group-hover:text-primary-600 transition-colors truncate">
-          {table.restaurant_name}
-        </h3>
-        <div className="flex items-center gap-1 text-sm text-gray-500 dark:text-gray-400 mt-1">
-          <MapPin className="w-3.5 h-3.5 flex-shrink-0" />
-          <span className="truncate">{table.restaurant_city}{table.restaurant_country ? `, ${table.restaurant_country}` : ''}</span>
-        </div>
+  const handleAvatarClick = (e: React.MouseEvent, p: TableParticipantBasic) => {
+    e.stopPropagation()
+    if (p.profiles) setModalProfile(p.profiles)
+  }
 
-        {/* Comensales ya apuntados */}
-        {approved.length > 0 && (
-          <div className="flex items-center gap-2 mt-3">
-            <div className="flex -space-x-2">
-              {visibleAvatars.map((p, i) => (
-                <div
-                  key={p.user_id}
-                  style={{ zIndex: visibleAvatars.length - i }}
-                  className="relative w-7 h-7 rounded-full border-2 border-white dark:border-gray-800 bg-gray-200 dark:bg-gray-600 overflow-hidden flex items-center justify-center flex-shrink-0"
-                  title={p.profiles?.display_name ?? ''}
-                >
-                  {p.profiles?.avatar_url
-                    ? <img src={p.profiles.avatar_url} alt="" className="w-full h-full object-cover" />
-                    : <span className="text-[10px] font-semibold text-gray-500 dark:text-gray-300">
-                        {(p.profiles?.display_name ?? '?').charAt(0).toUpperCase()}
-                      </span>
-                  }
-                </div>
-              ))}
-              {extraCount > 0 && (
-                <div className="relative w-7 h-7 rounded-full border-2 border-white dark:border-gray-800 bg-gray-100 dark:bg-gray-700 flex items-center justify-center flex-shrink-0 text-[10px] font-bold text-gray-500 dark:text-gray-300">
-                  +{extraCount}
-                </div>
+  return (
+    <>
+      <button
+        onClick={onClick}
+        className="w-full text-left bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 hover:border-[#e94560]/30 hover:shadow-md transition-all group px-5 py-4"
+      >
+        <div className="flex items-start justify-between gap-3">
+          <div className="flex-1 min-w-0">
+            {/* Time + date */}
+            <div className="flex items-center gap-2 mb-2">
+              {formattedTime && (
+                <span className="text-base font-bold text-gray-900 dark:text-white">{formattedTime}</span>
+              )}
+              <span className="text-sm text-gray-500 dark:text-gray-400">{formattedDate}</span>
+            </div>
+
+            {/* Zone / description */}
+            {table.description && (
+              <p className="text-xs text-gray-400 dark:text-gray-500 mb-2">{table.description}</p>
+            )}
+
+            {/* Avatars + occupancy */}
+            <div className="flex items-center gap-2.5">
+              {approved.length > 0 ? (
+                <>
+                  <div className="flex -space-x-2">
+                    {visibleAvatars.map((p, i) => (
+                      <button
+                        key={p.user_id}
+                        onClick={e => handleAvatarClick(e, p)}
+                        style={{ zIndex: visibleAvatars.length - i }}
+                        className="relative w-7 h-7 rounded-full border-2 border-white dark:border-gray-800 bg-gray-200 dark:bg-gray-600 overflow-hidden flex items-center justify-center flex-shrink-0 hover:scale-110 transition-transform"
+                        title={p.profiles?.display_name ?? ''}
+                      >
+                        {p.profiles?.avatar_url
+                          ? <img src={p.profiles.avatar_url} alt="" className="w-full h-full object-cover" />
+                          : <span className="text-[10px] font-bold text-gray-500 dark:text-gray-300">
+                              {(p.profiles?.display_name ?? '?').charAt(0).toUpperCase()}
+                            </span>
+                        }
+                      </button>
+                    ))}
+                    {extraCount > 0 && (
+                      <div className="relative w-7 h-7 rounded-full border-2 border-white dark:border-gray-800 bg-gray-100 dark:bg-gray-700 flex items-center justify-center flex-shrink-0 text-[10px] font-bold text-gray-500 dark:text-gray-300">
+                        +{extraCount}
+                      </div>
+                    )}
+                  </div>
+                  <span className="text-xs text-gray-400 dark:text-gray-500">
+                    {approved.length === 1 ? '1 comensal' : `${approved.length} comensales`}
+                  </span>
+                </>
+              ) : (
+                <span className="text-xs text-gray-400 dark:text-gray-500 italic">Sé el primero en unirte</span>
               )}
             </div>
-            <span className="text-xs text-gray-400 dark:text-gray-500">
-              {approved.length === 1 ? '1 comensal' : `${approved.length} comensales`}
-            </span>
           </div>
-        )}
-        {approved.length === 0 && (
-          <p className="mt-3 text-xs text-gray-400 dark:text-gray-500 italic">Sé el primero en unirte</p>
-        )}
 
-        <div className="flex items-center justify-between mt-3 pt-3 border-t border-gray-100 dark:border-gray-700">
-          <div className="flex items-center gap-3 text-sm text-gray-600 dark:text-gray-300">
-            <span className="flex items-center gap-1">
-              <Clock className="w-3.5 h-3.5" />
-              {formattedDate}{formattedTime ? ` · ${formattedTime}` : ''}
+          {/* Right: status + seats */}
+          <div className="flex flex-col items-end gap-2 flex-shrink-0">
+            <span className={`text-xs px-2.5 py-1 rounded-full font-medium ${isFull ? 'bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400' : 'bg-green-50 dark:bg-green-900/30 text-green-700 dark:text-green-400'}`}>
+              {isFull ? 'Completa' : 'Disponible'}
             </span>
-            <span className="flex items-center gap-1">
+            <span className="flex items-center gap-1 text-xs text-gray-500 dark:text-gray-400">
               <Users className="w-3.5 h-3.5" />
-              {isFull
-                ? `${table.max_seats}/${table.max_seats} completa`
-                : `${table.max_seats - table.available_seats}/${table.max_seats} apuntados`}
+              {isFull ? `${table.max_seats}/${table.max_seats}` : `${occupied}/${table.max_seats}`}
             </span>
           </div>
-          <ChevronRight className="w-4 h-4 text-gray-400 dark:text-gray-500 group-hover:text-primary-500 transition-colors" />
         </div>
-      </div>
-    </button>
+      </button>
+
+      {modalProfile && (
+        <CommensalModal
+          profile={modalProfile}
+          onClose={() => setModalProfile(null)}
+        />
+      )}
+    </>
   )
 }

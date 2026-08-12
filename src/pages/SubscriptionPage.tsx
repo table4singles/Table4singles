@@ -73,7 +73,7 @@ export function SubscriptionPage({ onNavigate, onAuthClick }: SubscriptionPagePr
   const status = profile.subscription_status
   const isActive = status === 'active' || status === 'trialing'
   const statusInfo = status ? (STATUS_LABEL[status] ?? null) : null
-  const isNewSubscriber = !status || status === 'inactive' || status === 'canceled'
+  const isNewSubscriber = !status || status === 'canceled'
 
   const handleSubscribe = async () => {
     setLoading(true)

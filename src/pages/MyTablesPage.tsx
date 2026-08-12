@@ -209,15 +209,22 @@ export function MyTablesPage({ onNavigate, onAuthClick, initialTab }: MyTablesPa
                   {reservations.map(r => {
                     const dt = r.dining_tables as any
                     const isPast = dt?.date && dt?.time ? new Date(`${dt.date}T${dt.time}`) < new Date() : false
+                    const dateStr = dt?.date ? new Date(dt.date + 'T12:00:00').toLocaleDateString(locale, { weekday: 'short', day: 'numeric', month: 'short' }) : ''
+                    const timeStr = dt?.time ? dt.time.slice(0, 5) : ''
                     return (
                       <div key={r.id} className="bg-white dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-gray-700 p-4 hover:shadow-md transition-all">
-                        <button onClick={() => onNavigate('table-detail', r.table_id)} className="w-full text-left">
-                          <div className="flex items-center justify-between">
-                            <div>
-                              <h3 className="font-semibold text-gray-900 dark:text-white">{dt?.restaurant_name}</h3>
-                              <span className="text-xs px-2 py-0.5 rounded-full bg-green-50 text-green-600">Plaza reservada</span>
+                        <button onClick={() => dt?.host_id ? onNavigate('restaurant-profile', dt.host_id) : onNavigate('table-detail', r.table_id)} className="w-full text-left">
+                          <div className="flex items-start justify-between gap-3">
+                            <div className="min-w-0">
+                              <h3 className="font-semibold text-gray-900 dark:text-white truncate">{dt?.restaurant_name}</h3>
+                              <p className="text-sm text-gray-500 dark:text-gray-400 mt-0.5">
+                                {dateStr}{timeStr ? ` · ${timeStr}` : ''}
+                              </p>
+                              <span className="inline-block mt-1.5 text-xs px-2 py-0.5 rounded-full bg-green-50 dark:bg-green-900/30 text-green-600 dark:text-green-400">Plaza reservada</span>
                             </div>
-                            <p className="text-sm text-gray-500 dark:text-gray-400">{dt?.date && new Date(dt.date).toLocaleDateString(locale, { month: 'short', day: 'numeric' })}</p>
+                            {dt?.status === 'cancelled' && (
+                              <span className="text-xs px-2 py-0.5 rounded-full bg-red-50 text-red-500 flex-shrink-0">Cancelada</span>
+                            )}
                           </div>
                         </button>
                         {!isPast && dt?.status !== 'cancelled' && (

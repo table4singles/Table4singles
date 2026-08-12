@@ -59,8 +59,8 @@ export function RestaurantDashboardPage({ onNavigate, onAuthClick }: RestaurantD
       <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
         <Navbar currentPage="restaurant-dashboard" onNavigate={onNavigate} onAuthClick={onAuthClick} />
         <div className="text-center py-20">
-          <p className="text-gray-500 dark:text-gray-400">Esta sección es solo para cuentas de restaurante.</p>
-          <button onClick={() => onNavigate('profile')} className="mt-4 text-primary-600 dark:text-primary-400 font-medium text-sm">Ir a mi perfil</button>
+          <p className="text-gray-500 dark:text-gray-400">{t('restaurantDashboard.restaurantOnly')}</p>
+          <button onClick={() => onNavigate('profile')} className="mt-4 text-primary-600 dark:text-primary-400 font-medium text-sm">{t('agenda.goToProfile')}</button>
         </div>
       </div>
     )
@@ -81,27 +81,27 @@ export function RestaurantDashboardPage({ onNavigate, onAuthClick }: RestaurantD
         {profile?.subscription_status === 'active' || profile?.subscription_status === 'trialing' ? (
           <div className="flex items-center gap-3 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-xl px-4 py-3 mb-6 text-sm">
             <CheckCircle className="w-4 h-4 text-green-600 flex-shrink-0" />
-            <span className="text-green-800 dark:text-green-300 font-medium">Suscripción activa — Plan Restaurante · 10 €/mes</span>
-            <button onClick={() => onNavigate('subscription')} className="ml-auto text-xs text-green-700 dark:text-green-400 hover:underline font-medium">Gestionar</button>
+            <span className="text-green-800 dark:text-green-300 font-medium">{t('restaurantDashboard.subscriptionActive')} — Plan Restaurante · 10 €/mes</span>
+            <button onClick={() => onNavigate('subscription')} className="ml-auto text-xs text-green-700 dark:text-green-400 hover:underline font-medium">{t('restaurantDashboard.manageSubscription')}</button>
           </div>
         ) : profile?.subscription_status === 'past_due' ? (
           <div className="flex items-center gap-3 bg-orange-50 dark:bg-orange-900/20 border border-orange-200 dark:border-orange-800 rounded-xl px-4 py-3 mb-6 text-sm">
             <AlertCircle className="w-4 h-4 text-orange-600 flex-shrink-0" />
-            <span className="text-orange-800 dark:text-orange-300 font-medium">Pago pendiente — actualiza tu método de pago</span>
-            <button onClick={() => onNavigate('subscription')} className="ml-auto text-xs text-orange-700 dark:text-orange-400 hover:underline font-medium">Ver</button>
+            <span className="text-orange-800 dark:text-orange-300 font-medium">{t('restaurantDashboard.subscriptionPastDue')}</span>
+            <button onClick={() => onNavigate('subscription')} className="ml-auto text-xs text-orange-700 dark:text-orange-400 hover:underline font-medium">{t('restaurantDashboard.viewSubscription')}</button>
           </div>
         ) : (
           <div className="flex items-center gap-3 bg-[#e94560]/5 border border-[#e94560]/20 rounded-xl px-4 py-3 mb-6">
             <CreditCard className="w-4 h-4 text-[#e94560] flex-shrink-0" />
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium text-gray-900 dark:text-white">Activa tu suscripción por <strong>10 €/mes</strong></p>
-              <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">Accede a todas las funciones de restaurante en Table4Singles</p>
+              <p className="text-sm font-medium text-gray-900 dark:text-white">{t('restaurantDashboard.subscriptionInactive')}</p>
+              <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">{t('restaurantDashboard.subscriptionNote')}</p>
             </div>
             <button
               onClick={() => onNavigate('subscription')}
               className="flex-shrink-0 px-3 py-1.5 bg-[#e94560] text-white rounded-lg text-xs font-semibold hover:bg-[#d63d56] transition-colors"
             >
-              Suscribirse
+              {t('restaurantDashboard.subscribeAction')}
             </button>
           </div>
         )}
@@ -137,7 +137,7 @@ export function RestaurantDashboardPage({ onNavigate, onAuthClick }: RestaurantD
               <p className="text-xl font-bold text-gray-900 dark:text-white">{avgRating ? avgRating.toFixed(1) : '-'}</p>
               <p className="text-xs text-gray-500 dark:text-gray-400">
                 {reviewCount > 0
-                  ? `${reviewCount} ${reviewCount === 1 ? 'reseña' : 'reseñas'}`
+                  ? `${reviewCount} ${reviewCount === 1 ? t('restaurantDashboard.reviewSingular') : t('restaurantDashboard.reviewPlural')}`
                   : t('restaurantDashboard.avgRating')}
               </p>
             </div>
@@ -158,10 +158,10 @@ export function RestaurantDashboardPage({ onNavigate, onAuthClick }: RestaurantD
             </div>
             <p className="text-xs text-gray-500 dark:text-gray-400">
               {upcoming.length > 0
-                ? `${upcoming.length} mesa${upcoming.length !== 1 ? 's' : ''} próxima${upcoming.length !== 1 ? 's' : ''}`
-                : 'Ver sala en vivo'}
+                ? `${upcoming.length} ${upcoming.length !== 1 ? t('restaurantDashboard.tablePlural') : t('restaurantDashboard.tableSingular')} ${upcoming.length !== 1 ? t('restaurantDashboard.upcomingHintPlural') : t('restaurantDashboard.upcomingHint')}`
+                : t('restaurantDashboard.liveRoom')}
             </p>
-            <span className="text-[#e94560] text-xs font-medium mt-2 inline-block group-hover:underline">Ir a Agenda →</span>
+            <span className="text-[#e94560] text-xs font-medium mt-2 inline-block group-hover:underline">{t('restaurantDashboard.goToAgenda')} →</span>
           </button>
 
           <button
@@ -176,10 +176,10 @@ export function RestaurantDashboardPage({ onNavigate, onAuthClick }: RestaurantD
             </div>
             <p className="text-xs text-gray-500 dark:text-gray-400">
               {hosting.length > 0
-                ? `${hosting.length} mesa${hosting.length !== 1 ? 's' : ''} publicada${hosting.length !== 1 ? 's' : ''}`
-                : 'Crea tu primera mesa'}
+                ? `${hosting.length} ${hosting.length !== 1 ? t('restaurantDashboard.tablePlural') : t('restaurantDashboard.tableSingular')} ${hosting.length !== 1 ? t('restaurantDashboard.publishedHintPlural') : t('restaurantDashboard.publishedHint')}`
+                : t('restaurantDashboard.createFirstTable')}
             </p>
-            <span className="text-blue-600 dark:text-blue-400 text-xs font-medium mt-2 inline-block group-hover:underline">Ir a Mis mesas →</span>
+            <span className="text-blue-600 dark:text-blue-400 text-xs font-medium mt-2 inline-block group-hover:underline">{t('restaurantDashboard.goToTables')} →</span>
           </button>
 
           <button
@@ -190,10 +190,10 @@ export function RestaurantDashboardPage({ onNavigate, onAuthClick }: RestaurantD
               <div className="w-8 h-8 rounded-lg bg-purple-50 dark:bg-purple-900/30 flex items-center justify-center">
                 <TrendingUp className="w-4 h-4 text-purple-600 dark:text-purple-400" />
               </div>
-              <span className="font-semibold text-sm text-gray-900 dark:text-white">Analytics</span>
+              <span className="font-semibold text-sm text-gray-900 dark:text-white">{t('analytics.title')}</span>
             </div>
-            <p className="text-xs text-gray-500 dark:text-gray-400">Ocupación, reservas y valoraciones</p>
-            <span className="text-purple-600 dark:text-purple-400 text-xs font-medium mt-2 inline-block group-hover:underline">Ver estadísticas →</span>
+            <p className="text-xs text-gray-500 dark:text-gray-400">{t('restaurantDashboard.analyticsDesc')}</p>
+            <span className="text-purple-600 dark:text-purple-400 text-xs font-medium mt-2 inline-block group-hover:underline">{t('restaurantDashboard.goToAnalytics')} →</span>
           </button>
 
           <button
@@ -204,10 +204,10 @@ export function RestaurantDashboardPage({ onNavigate, onAuthClick }: RestaurantD
               <div className="w-8 h-8 rounded-lg bg-green-50 dark:bg-green-900/30 flex items-center justify-center">
                 <CreditCard className="w-4 h-4 text-green-600 dark:text-green-400" />
               </div>
-              <span className="font-semibold text-sm text-gray-900 dark:text-white">Suscripción</span>
+              <span className="font-semibold text-sm text-gray-900 dark:text-white">{t('nav.subscription')}</span>
             </div>
-            <p className="text-xs text-gray-500 dark:text-gray-400">Gestiona tu plan y facturación</p>
-            <span className="text-green-600 dark:text-green-400 text-xs font-medium mt-2 inline-block group-hover:underline">Ver plan →</span>
+            <p className="text-xs text-gray-500 dark:text-gray-400">{t('restaurantDashboard.subscriptionDesc')}</p>
+            <span className="text-green-600 dark:text-green-400 text-xs font-medium mt-2 inline-block group-hover:underline">{t('restaurantDashboard.goToSubscription')} →</span>
           </button>
         </div>
 
@@ -264,8 +264,8 @@ function TableRow({ table, locale, t, onNavigate, onCancel }: any) {
           </div>
           {table.status === 'cancelled' && <span className="text-xs px-2 py-1 bg-red-50 dark:bg-red-900/30 text-red-600 dark:text-red-400 rounded-full">{t('restaurantDashboard.cancelled')}</span>}
           {table.status === 'completed' && <span className="text-xs px-2 py-1 bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400 rounded-full">{t('restaurantDashboard.completed')}</span>}
-          {table.status === 'full' && <span className="text-xs px-2 py-1 bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 rounded-full">Completa</span>}
-          {table.status === 'open' && <span className="text-xs px-2 py-1 bg-green-50 dark:bg-green-900/30 text-green-600 dark:text-green-400 rounded-full">Abierta</span>}
+          {table.status === 'full' && <span className="text-xs px-2 py-1 bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 rounded-full">{t('restaurantDashboard.statusFull')}</span>}
+          {table.status === 'open' && <span className="text-xs px-2 py-1 bg-green-50 dark:bg-green-900/30 text-green-600 dark:text-green-400 rounded-full">{t('restaurantDashboard.statusOpen')}</span>}
         </div>
       </button>
       {onCancel && table.status !== 'cancelled' && (

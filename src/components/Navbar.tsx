@@ -51,38 +51,38 @@ export function Navbar({ currentPage, onNavigate, onAuthClick }: NavbarProps) {
                 onClick={() => switchToMode('user')}
                 className={`flex items-center gap-1 px-3 py-1 rounded-full text-xs font-semibold transition-all ${effectiveRole === 'user' ? 'bg-white dark:bg-gray-800 text-blue-600 shadow-sm' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700'}`}
               >
-                <User className="w-3 h-3" /> Usuario
+                <User className="w-3 h-3" /> {t('nav.user')}
               </button>
               <button
                 onClick={() => switchToMode('restaurant')}
                 className={`flex items-center gap-1 px-3 py-1 rounded-full text-xs font-semibold transition-all ${effectiveRole === 'restaurant' ? 'bg-white dark:bg-gray-800 text-orange-600 shadow-sm' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700'}`}
               >
-                <LayoutDashboard className="w-3 h-3" /> Restaurante
+                <LayoutDashboard className="w-3 h-3" /> {t('nav.restaurant')}
               </button>
             </div>
           )}
           {(!user || effectiveRole === 'user') && (
-            <NavLink active={currentPage === 'browse' || currentPage === 'restaurant-profile'} onClick={() => onNavigate('browse')} icon={<LayoutGrid className="w-4 h-4" />} label="Restaurantes" />
+            <NavLink active={currentPage === 'browse' || currentPage === 'restaurant-profile'} onClick={() => onNavigate('browse')} icon={<LayoutGrid className="w-4 h-4" />} label={t('nav.restaurants')} />
           )}
           {user && effectiveRole === 'restaurant' && (
             <>
               <NavLink active={currentPage === 'restaurant-dashboard'} onClick={() => onNavigate('restaurant-dashboard')} icon={<LayoutDashboard className="w-4 h-4" />} label={t('nav.dashboard')} />
               <NavLink active={currentPage === 'agenda'} onClick={() => onNavigate('agenda')} icon={<CalendarClock className="w-4 h-4" />} label={t('nav.agenda')} />
               <NavLink active={currentPage === 'my-tables'} onClick={() => onNavigate('my-tables')} icon={<CalendarDays className="w-4 h-4" />} label={t('nav.myTables')} />
-              <NavLink active={currentPage === 'reviews'} onClick={() => onNavigate('reviews')} icon={<Star className="w-4 h-4" />} label="Reseñas" />
+              <NavLink active={currentPage === 'reviews'} onClick={() => onNavigate('reviews')} icon={<Star className="w-4 h-4" />} label={t('nav.reviews')} />
               <NavLink
                 active={currentPage === 'subscription'}
                 onClick={() => onNavigate('subscription')}
                 icon={<CreditCard className="w-4 h-4" />}
-                label="Suscripción"
+                label={t('nav.subscription')}
                 alert={!profile?.subscription_status || profile.subscription_status === 'canceled' || profile.subscription_status === 'past_due'}
               />
             </>
           )}
           {user && effectiveRole === 'user' && (
             <>
-              <NavLink active={currentPage === 'companions'} onClick={() => onNavigate('companions')} icon={<Users className="w-4 h-4" />} label="Comensales" />
-              <NavLink active={currentPage === 'my-tables'} onClick={() => onNavigate('my-tables')} icon={<CalendarDays className="w-4 h-4" />} label="Mis reservas" />
+              <NavLink active={currentPage === 'companions'} onClick={() => onNavigate('companions')} icon={<Users className="w-4 h-4" />} label={t('nav.companions')} />
+              <NavLink active={currentPage === 'my-tables'} onClick={() => onNavigate('my-tables')} icon={<CalendarDays className="w-4 h-4" />} label={t('nav.myReservations')} />
             </>
           )}
         </nav>
@@ -128,19 +128,19 @@ export function Navbar({ currentPage, onNavigate, onAuthClick }: NavbarProps) {
                     {/* Switcher de vista para admins */}
                     {isAdminSwitcher && (
                       <div className="px-4 py-3 border-b border-gray-100 dark:border-gray-700">
-                        <p className="text-xs text-gray-400 mb-2 font-medium">Vista activa</p>
+                        <p className="text-xs text-gray-400 mb-2 font-medium">{t('nav.activeView')}</p>
                         <div className="flex gap-1 bg-gray-100 dark:bg-gray-700 rounded-full p-0.5">
                           <button
                             onClick={() => switchToMode('user')}
                             className={`flex-1 flex items-center justify-center gap-1 py-1 rounded-full text-xs font-semibold transition-all ${effectiveRole === 'user' ? 'bg-white dark:bg-gray-800 text-blue-600 shadow-sm' : 'text-gray-500'}`}
                           >
-                            <User className="w-3 h-3" /> Usuario
+                            <User className="w-3 h-3" /> {t('nav.user')}
                           </button>
                           <button
                             onClick={() => switchToMode('restaurant')}
                             className={`flex-1 flex items-center justify-center gap-1 py-1 rounded-full text-xs font-semibold transition-all ${effectiveRole === 'restaurant' ? 'bg-white dark:bg-gray-800 text-orange-600 shadow-sm' : 'text-gray-500'}`}
                           >
-                            <LayoutDashboard className="w-3 h-3" /> Restaurante
+                            <LayoutDashboard className="w-3 h-3" /> {t('nav.restaurant')}
                           </button>
                         </div>
                       </div>
@@ -149,30 +149,30 @@ export function Navbar({ currentPage, onNavigate, onAuthClick }: NavbarProps) {
                       <User className="w-4 h-4" /> {t('nav.profile')}
                     </button>
                     <button onClick={() => { onNavigate('settings'); setShowMenu(false) }} className="w-full px-4 py-3 text-left text-sm hover:bg-gray-50 dark:hover:bg-gray-700 flex items-center gap-2">
-                      <Settings className="w-4 h-4" /> Ajustes
+                      <Settings className="w-4 h-4" /> {t('nav.settings')}
                     </button>
                     {effectiveRole === 'restaurant' && (
                       <>
                         <button onClick={() => { onNavigate('subscription'); setShowMenu(false) }} className="w-full px-4 py-3 text-left text-sm hover:bg-gray-50 dark:hover:bg-gray-700 flex items-center gap-2">
                           <CreditCard className="w-4 h-4" />
-                          <span className="flex-1">Suscripción</span>
+                          <span className="flex-1">{t('nav.subscription')}</span>
                           {(!profile?.subscription_status || profile.subscription_status === 'canceled' || profile.subscription_status === 'past_due') && (
                             <span className="w-2 h-2 rounded-full bg-orange-400 flex-shrink-0" />
                           )}
                         </button>
                         <button onClick={() => { onNavigate('aviso-legal'); setShowMenu(false) }} className="w-full px-4 py-3 text-left text-sm hover:bg-gray-50 dark:hover:bg-gray-700 flex items-center gap-2">
-                          <FileText className="w-4 h-4" /> Términos y condiciones
+                          <FileText className="w-4 h-4" /> {t('settings.privacy.terms')}
                         </button>
                       </>
                     )}
                     {effectiveRole === 'user' && (
                       <button onClick={() => { onNavigate('ambassador'); setShowMenu(false) }} className="w-full px-4 py-3 text-left text-sm hover:bg-gray-50 dark:hover:bg-gray-700 flex items-center gap-2 text-primary-600 dark:text-primary-400">
-                        <Award className="w-4 h-4" /> Ser embajador
+                        <Award className="w-4 h-4" /> {t('nav.becomeAmbassador')}
                       </button>
                     )}
                     {profile?.is_admin && (
                       <button onClick={() => { onNavigate('admin'); setShowMenu(false) }} className="w-full px-4 py-3 text-left text-sm hover:bg-gray-50 dark:hover:bg-gray-700 flex items-center gap-2 text-purple-600 dark:text-purple-400 border-t border-gray-100 dark:border-gray-700">
-                        <ShieldCheck className="w-4 h-4" /> Panel Admin
+                        <ShieldCheck className="w-4 h-4" /> {t('nav.adminPanel')}
                       </button>
                     )}
                     <button onClick={() => { signOut(); setShowMenu(false) }} className="w-full px-4 py-3 text-left text-sm hover:bg-gray-50 dark:hover:bg-gray-700 flex items-center gap-2 text-red-600 border-t border-gray-100 dark:border-gray-700">
@@ -200,20 +200,20 @@ export function Navbar({ currentPage, onNavigate, onAuthClick }: NavbarProps) {
         <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 z-50 px-2 pb-safe">
           <div className="flex justify-around py-2">
             {effectiveRole !== 'restaurant' && (
-              <MobileNavButton active={currentPage === 'browse' || currentPage === 'restaurant-profile'} onClick={() => onNavigate('browse')} icon={<Search className="w-5 h-5" />} label="Restaurantes" />
+              <MobileNavButton active={currentPage === 'browse' || currentPage === 'restaurant-profile'} onClick={() => onNavigate('browse')} icon={<Search className="w-5 h-5" />} label={t('nav.restaurants')} />
             )}
             {effectiveRole === 'restaurant' ? (
               <>
                 <MobileNavButton active={currentPage === 'restaurant-dashboard'} onClick={() => onNavigate('restaurant-dashboard')} icon={<LayoutDashboard className="w-5 h-5" />} label={t('nav.dashboard')} />
                 <MobileNavButton active={currentPage === 'agenda'} onClick={() => onNavigate('agenda')} icon={<CalendarClock className="w-5 h-5" />} label={t('nav.agenda')} />
                 <MobileNavButton active={currentPage === 'my-tables'} onClick={() => onNavigate('my-tables')} icon={<CalendarDays className="w-5 h-5" />} label={t('nav.myTables')} />
-                <MobileNavButton active={currentPage === 'reviews'} onClick={() => onNavigate('reviews')} icon={<Star className="w-5 h-5" />} label="Reseñas" />
+                <MobileNavButton active={currentPage === 'reviews'} onClick={() => onNavigate('reviews')} icon={<Star className="w-5 h-5" />} label={t('nav.reviews')} />
               </>
             ) : (
               <>
-                <MobileNavButton active={currentPage === 'companions'} onClick={() => onNavigate('companions')} icon={<Users className="w-5 h-5" />} label="Comensales" />
-                <MobileNavButton active={currentPage === 'my-tables'} onClick={() => onNavigate('my-tables')} icon={<CalendarDays className="w-5 h-5" />} label="Reservas" />
-                <MobileNavButton active={currentPage === 'my-tables'} onClick={() => onNavigate('my-tables', 'invitations')} icon={<Mail className="w-5 h-5" />} label="Invitaciones" />
+                <MobileNavButton active={currentPage === 'companions'} onClick={() => onNavigate('companions')} icon={<Users className="w-5 h-5" />} label={t('nav.companions')} />
+                <MobileNavButton active={currentPage === 'my-tables'} onClick={() => onNavigate('my-tables')} icon={<CalendarDays className="w-5 h-5" />} label={t('nav.reservations')} />
+                <MobileNavButton active={currentPage === 'my-tables'} onClick={() => onNavigate('my-tables', 'invitations')} icon={<Mail className="w-5 h-5" />} label={t('nav.invitations')} />
               </>
             )}
             {isAdminSwitcher ? (
@@ -221,7 +221,7 @@ export function Navbar({ currentPage, onNavigate, onAuthClick }: NavbarProps) {
                 active={false}
                 onClick={() => switchToMode(effectiveRole === 'user' ? 'restaurant' : 'user')}
                 icon={<ArrowLeftRight className="w-5 h-5" />}
-                label={effectiveRole === 'user' ? 'Restaurante' : 'Usuario'}
+                label={effectiveRole === 'user' ? t('nav.restaurant') : t('nav.user')}
               />
             ) : (
               <MobileNavButton active={currentPage === 'profile'} onClick={() => onNavigate('profile')} icon={<User className="w-5 h-5" />} label={t('nav.profile')} />

@@ -8,6 +8,7 @@ import { useRestaurantProfile } from '@/hooks/useRestaurants'
 import { useRestaurantPublicReviews } from '@/hooks/useReviews'
 import { useFavorites } from '@/hooks/useFavorites'
 import { useAuth } from '@/contexts/AuthContext'
+import { useLanguage } from '@/contexts/LanguageContext'
 import type { RestaurantReview } from '@/types/database'
 
 interface RestaurantProfilePageProps {
@@ -24,6 +25,7 @@ export function RestaurantProfilePage({ restaurantId, onNavigate, onAuthClick }:
   const { restaurant, tables, loading, error } = useRestaurantProfile(restaurantId)
   const { reviews, avgRating, submitReview, submitReply, submitting } = useRestaurantPublicReviews(restaurantId)
   const { isFavorite, toggleFavorite } = useFavorites()
+  const { t } = useLanguage()
 
   // Carousel
   const photos = restaurant?.restaurant_photos ?? []
@@ -115,7 +117,7 @@ export function RestaurantProfilePage({ restaurantId, onNavigate, onAuthClick }:
   const dateLabel = selectedDate
     ? new Date(selectedDate + 'T12:00:00').toLocaleDateString('es-ES', { weekday: 'short', day: 'numeric', month: 'short' })
     : 'Elige un día'
-  const timeLabel = selectedTime === 'midday' ? '☀️ Mediodía' : selectedTime === 'evening' ? '🌙 Noche' : null
+  const timeLabel = selectedTime === 'midday' ? `☀️ ${t('browse.midday')}` : selectedTime === 'evening' ? `🌙 ${t('browse.evening')}` : null
 
   if (loading) {
     return (
@@ -342,7 +344,7 @@ export function RestaurantProfilePage({ restaurantId, onNavigate, onAuthClick }:
                           : 'border-gray-200 dark:border-gray-600 text-gray-600 dark:text-gray-300 bg-gray-50 dark:bg-gray-900 hover:border-gray-300'
                       }`}
                     >
-                      {slot === 'midday' ? '☀️ Mediodía' : '🌙 Noche'}
+                    {slot === 'midday' ? `☀️ ${t('browse.midday')}` : `🌙 ${t('browse.evening')}`}
                     </button>
                   ))}
                 </div>

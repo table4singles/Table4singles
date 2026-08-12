@@ -3,6 +3,7 @@ import { ArrowLeft, CheckCircle, AlertCircle, Clock, XCircle, CreditCard, Loader
 import { Navbar } from '@/components/Navbar'
 import { useAuth } from '@/contexts/AuthContext'
 import { useViewMode } from '@/contexts/ViewModeContext'
+import { useLanguage } from '@/contexts/LanguageContext'
 import { supabase } from '@/lib/supabase'
 
 interface SubscriptionPageProps {
@@ -43,27 +44,26 @@ const STATUS_LABEL: Record<string, { label: string; color: string; icon: React.R
   },
 }
 
-const FEATURES = [
-  'Crea y gestiona mesas ilimitadas',
-  'Toggle activa/inactiva en tiempo real',
-  'Agenda de sala en vivo (Live · Lista · Calendario)',
-  'Comensales confirmados y chat de mesa',
-  'Reseñas y estadísticas de tu restaurante',
-  'Visibilidad en el catálogo de Table4Singles',
-]
-
 export function SubscriptionPage({ onNavigate, onAuthClick }: SubscriptionPageProps) {
   const { profile, refreshProfile } = useAuth()
   const { effectiveRole } = useViewMode()
+  const { t } = useLanguage()
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const FEATURES = [
+    t('subscription.features.tables'),
+    t('subscription.features.reservations'),
+    t('subscription.features.agenda'),
+    t('subscription.features.analytics'),
+    t('subscription.features.notifications'),
+  ]
 
   if (!profile || effectiveRole !== 'restaurant') {
     return (
       <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
         <Navbar currentPage="subscription" onNavigate={onNavigate} onAuthClick={onAuthClick} />
         <div className="text-center py-20">
-          <p className="text-gray-500 dark:text-gray-400">Esta sección es solo para cuentas de restaurante.</p>
+          <p className="text-gray-500 dark:text-gray-400">{t('subscription.notRestaurant')}</p>
           <button onClick={() => onNavigate('browse')} className="mt-4 text-primary-600 dark:text-primary-400 font-medium text-sm">Volver</button>
         </div>
       </div>
@@ -100,7 +100,7 @@ export function SubscriptionPage({ onNavigate, onAuthClick }: SubscriptionPagePr
           onClick={() => onNavigate('restaurant-dashboard')}
           className="flex items-center gap-2 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 mb-6 text-sm"
         >
-          <ArrowLeft className="w-4 h-4" /> Volver al dashboard
+          <ArrowLeft className="w-4 h-4" /> {t('subscription.backToDashboard')}
         </button>
 
         <div className="mb-8">
@@ -121,7 +121,7 @@ export function SubscriptionPage({ onNavigate, onAuthClick }: SubscriptionPagePr
           <div className="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-700 rounded-2xl px-5 py-4 mb-5 flex items-start gap-3">
             <Zap className="w-5 h-5 text-amber-500 flex-shrink-0 mt-0.5" />
             <div>
-              <p className="text-sm font-bold text-amber-800 dark:text-amber-300">Oferta de lanzamiento</p>
+              <p className="text-sm font-bold text-amber-800 dark:text-amber-300">{t('subscription.promoTitle')}</p>
               <p className="text-sm text-amber-700 dark:text-amber-400 mt-0.5">
                 Los primeros 3 meses por <strong>10 €</strong> en total — solo pagas el primer mes.
                 Después, 10 €/mes.
@@ -136,7 +136,7 @@ export function SubscriptionPage({ onNavigate, onAuthClick }: SubscriptionPagePr
           <div className="bg-gradient-to-br from-[#e94560] to-[#c73652] px-6 py-6 text-white">
             <div className="flex items-center gap-2 mb-1">
               <Zap className="w-5 h-5" />
-              <span className="text-sm font-semibold uppercase tracking-wide opacity-90">Plan Restaurante</span>
+              <span className="text-sm font-semibold uppercase tracking-wide opacity-90">{t('subscription.title')}</span>
             </div>
             {isNewSubscriber ? (
               <>

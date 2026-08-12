@@ -35,8 +35,8 @@ export function CancelModal({ joinType, depositAmount = 2, onClose, onConfirm }:
               <div className="flex items-start gap-2 bg-amber-50 border border-amber-200 rounded-xl p-3 mb-4">
                 <AlertTriangle className="w-5 h-5 text-amber-500 flex-shrink-0 mt-0.5" />
                 <div>
-                  <p className="text-sm font-semibold text-amber-800 mb-1">El depósito de {depositAmount.toFixed(2)}€ no será reembolsado</p>
-                  <p className="text-xs text-amber-700">Este importe es una tasa de gestión no reembolsable al cancelar.</p>
+                  <p className="text-sm font-semibold text-amber-800 mb-1">{t('cancel.depositWarning')}</p>
+                  <p className="text-xs text-amber-700">{t('cancel.depositDesc')}</p>
                 </div>
               </div>
             </>

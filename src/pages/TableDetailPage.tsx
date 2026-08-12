@@ -327,7 +327,7 @@ export function TableDetailPage({ tableId, paymentSuccess, paymentCancelled, onN
               <div className="grid grid-cols-3 gap-4 mb-4">
                 <InfoBox icon={<Calendar className="w-4 h-4" />} label={new Date(table.date).toLocaleDateString(locale, { weekday: 'long', month: 'long', day: 'numeric' })} />
                 {table.time && <InfoBox icon={<Clock className="w-4 h-4" />} label={table.time.slice(0, 5)} />}
-                <InfoBox icon={<Users className="w-4 h-4" />} label={`${table.max_seats - table.available_seats}/${table.max_seats} apuntados`} />
+                <InfoBox icon={<Users className="w-4 h-4" />} label={`${table.max_seats - table.available_seats}/${table.max_seats} ${t('tableDetail.seatsInfo')}`} />
               </div>
 
               {table.description && <p className="text-gray-600 dark:text-gray-300 text-sm">{table.description}</p>}
@@ -425,14 +425,14 @@ export function TableDetailPage({ tableId, paymentSuccess, paymentCancelled, onN
           <div className="space-y-4">
             <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 p-6 space-y-3">
               {!user && !isFull && !isCancelled && !isPast && table?.is_active !== false && (
-                <button onClick={() => onAuthClick('signin')} className="w-full py-3 bg-primary-500 text-white rounded-xl font-medium hover:bg-primary-600 transition-colors text-sm">
-                  Inicia sesión para reservar plaza
-                </button>
+              <button onClick={() => onAuthClick('signin')} className="w-full py-3 bg-primary-500 text-white rounded-xl font-medium hover:bg-primary-600 transition-colors text-sm">
+                {t('tableDetail.loginToReserve')}
+              </button>
               )}
               {user && !isHost && !isParticipant && !isFull && !isCancelled && !isPast && table?.is_active !== false && !isRestaurantUser && (
                 <>
                   <button onClick={handleJoinDeposit} disabled={joining} className="w-full py-3 bg-primary-500 text-white rounded-xl font-medium hover:bg-primary-600 disabled:opacity-50 transition-colors text-sm flex items-center justify-center gap-1.5">
-                    {joining ? t('card.redirecting') : <>Reservar plaza <span className="font-semibold">· 2 €</span></>}
+                    {joining ? t('card.redirecting') : t('tableDetail.reservePrice')}
                   </button>
                   <p className="text-xs text-gray-400 dark:text-gray-500 text-center">Tu plaza queda garantizada al reservar.</p>
                   {joinError && <p className="text-xs text-red-600 text-center">{joinError}</p>}

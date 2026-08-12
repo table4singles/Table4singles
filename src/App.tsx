@@ -26,6 +26,7 @@ import { AvisoLegalPage } from '@/pages/AvisoLegalPage'
 import { AmbassadorPage } from '@/pages/AmbassadorPage'
 import { SubscriptionPage } from '@/pages/SubscriptionPage'
 import { AdminPage } from '@/pages/AdminPage'
+import { AnalyticsPage } from '@/pages/AnalyticsPage'
 
 // Suppress unused import warning – BrowsePage kept for future use
 void BrowsePage
@@ -165,6 +166,8 @@ function AppRouter() {
         return <AmbassadorPage onNavigate={navigate} onAuthClick={openAuth} />
       case 'subscription':
         return <SubscriptionPage onNavigate={navigate} onAuthClick={openAuth} />
+      case 'analytics':
+        return <AnalyticsPage onNavigate={navigate} onAuthClick={openAuth} />
       case 'admin':
         return <AdminPage onNavigate={navigate} onAuthClick={openAuth} />
       default:

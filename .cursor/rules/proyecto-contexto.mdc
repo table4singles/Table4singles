@@ -1,0 +1,117 @@
+---
+description: Contexto completo del proyecto Table4Singles para nuevos chats
+globs:
+alwaysApply: true
+---
+
+# Table4Singles — Contexto del proyecto
+
+## Stack técnico
+React + Vite + TypeScript + Tailwind + Supabase (Edge Functions, RLS, Realtime, pg_cron). PWA instalable. Repo GitHub: `table4singles/Table4singles`, rama `main`, deploy automático desde `main`.
+
+- **Project ID Supabase**: `jcuonaxmworztegolvyf`
+- **URL producción**: `https://table4singles.online`
+- **Supabase MCP**: disponible y autenticado con token personal `sbp_...`
+- **Responde siempre en español**
+
+## Completado (~85%)
+
+### Autenticación y perfiles
+- Login/signup con email, Google, Apple
+- Recuperar contraseña + toggle visibilidad contraseña
+- Roles: `user`, `restaurant`, `ambassador`
+- Admins: `manelmercadal@me.com` y `joseanglesai@gmail.com` (`is_admin = true`)
+- Toggle usuario ↔ restaurante para admins sin cerrar sesión (`ViewModeContext` + `localStorage` clave `t4s_admin_view`)
+
+### Sistema de pagos (Stripe LIVE — en pausa)
+- Suscripción 10€/mes restaurantes → Edge Function `create-subscription-checkout` (precio dinámico inline)
+- Depósito 2€ por reserva → Edge Function `create-reservation-checkout` (precio dinámico inline)
+- Webhook `stripe-webhook` → sincroniza BD y genera notificación in-app al restaurante
+- Credenciales live ya en Supabase Secrets (`STRIPE_SECRET_KEY`, `STRIPE_PUBLISHABLE_KEY`, `STRIPE_WEBHOOK_SECRET`)
+- **Pendiente**: usuario quiere cambiar a nueva cuenta de Stripe (retomará más adelante)
+- **Decisión acordada**: suscripción usará producto fijo en Stripe, reserva seguirá dinámica
+
+### Buscador de restaurantes
+- Filtro por nombre/ciudad, cocina (multi), precio (`0€-50€` / `50€-100€` / `100€-200€` / `+200€`), fecha (mesas disponibles ese día), radio geográfico (km), solo favoritos
+- Vista lista / mapa. Contador de filtros activos en el botón
+
+### Onboarding restaurante — wizard 4 pasos
+1. Identidad (nombre, cocina, precio, descripción)
+2. Ubicación (dirección, ciudad, país)
+3. Contacto (teléfono, horarios, web)
+4. Confirmar (resumen + activar)
+
+### Valoraciones post-cena — `PostDinnerReviewModal`
+- Un botón "Valorar experiencia" → 2 pasos:
+  1. Restaurante: estrellas + comentario público
+  2. Comensales: puntuación anónima privada
+- Si ya valoró el restaurante → salta al paso 2. Host → solo paso 2
+
+### Respuestas del restaurante a reseñas
+- Tabla `review_replies` (RLS: restaurante escribe, todos leen)
+- `RestaurantReviewsPage`: ambos tabs ("Reseñas del local" y "Valoraciones de cenas") con botón Responder/Editar
+- Respuestas visibles públicamente en `TableDetailPage`
+
+### Notificaciones en tiempo real
+- Campana navbar con badge. Realtime via Supabase
+- Restaurante recibe notificación in-app cuando usuario reserva (desde webhook Stripe)
+
+### Recordatorios por email
+- Edge Function `send-reservation-reminders` desplegada
+- Cron job `pg_cron` a las 18:00 UTC (migración 023). Email HTML via Resend
+- **Pendiente**: añadir `RESEND_API_KEY` en Supabase Secrets para activarlo
+
+### PWA / app móvil
+- `manifest.json` + SW registrado. `InstallPrompt`: banner a los 30s (Android: instalar, iOS: instrucciones)
+
+### Paneles
+- **Admin** (`is_admin = true`): vista global usuarios, restaurantes, embajadores, movimientos
+- **Embajador**: restaurantes captados, reservas, comisiones estimadas (5%)
+
+## Migraciones aplicadas en Supabase
+| # | Nombre | Contenido |
+|---|--------|-----------|
+| 018 | realtime_notifications | Tabla notifications + Realtime |
+| 019 | ambassadors | Sistema de embajadores |
+| 020 | table_availability | Disponibilidad de mesas |
+| 021 | stripe_payments | Pagos Stripe + subscription_status |
+| 022 | admin_ambassador_policies | RLS admin/embajador + RPC stats |
+| 023 | email_reminders_cron | pg_cron + Edge Function recordatorios |
+| 024 | price_ranges_and_review_replies | Rangos precio + tabla review_replies |
+
+## Pendiente prioritario
+
+### Para activar en producción
+- `RESEND_API_KEY` en Supabase Secrets → activa recordatorios email
+- Cambio de cuenta Stripe (en pausa)
+- Reactivar validación de email al registrarse (desactivada para pruebas)
+- Contraseña segura obligatoria en signup
+
+### Features no iniciadas
+- Analytics para restaurante (gráficas ocupación, ingresos, valoración media)
+- Portal de cliente Stripe (gestión suscripción desde la app)
+- Perfil público del comensal
+- Búsqueda directa de mesas (actualmente se buscan restaurantes)
+- Programa de referidos con código de embajador automático
+- Soporte multiidioma completo (`LanguageContext` existe, claves `t()` incompletas)
+
+### Deuda técnica
+- Test E2E: restaurante crea mesa → usuario reserva → agenda → notificación
+- Verificar visualización precio en `RestaurantCard` con nuevo formato `0€-50€`
+
+## Archivos clave
+| Archivo | Descripción |
+|---------|-------------|
+| `src/App.tsx` | Router principal + redirects de pago |
+| `src/contexts/ViewModeContext.tsx` | Toggle usuario/restaurante para admins |
+| `src/contexts/AuthContext.tsx` | Auth + resetPassword |
+| `src/pages/RestaurantsBrowsePage.tsx` | Buscador con filtros completos |
+| `src/pages/OnboardingPage.tsx` | Wizard 4 pasos para restaurantes |
+| `src/pages/RestaurantReviewsPage.tsx` | Reseñas + respuestas del restaurante |
+| `src/components/PostDinnerReviewModal.tsx` | Modal unificado de valoración post-cena |
+| `src/components/InstallPrompt.tsx` | Banner instalación PWA |
+| `src/components/Navbar.tsx` | Navegación + toggle admin |
+| `src/hooks/useReviews.ts` | Reviews + review_replies + submitReply |
+| `src/hooks/useRestaurants.ts` | Filtros precio + fecha |
+| `supabase/functions/stripe-webhook/` | Webhook Stripe + notificaciones in-app |
+| `supabase/functions/send-reservation-reminders/` | Email recordatorios diarios |

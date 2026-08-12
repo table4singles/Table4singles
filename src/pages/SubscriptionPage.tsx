@@ -180,14 +180,28 @@ export function SubscriptionPage({ onNavigate, onAuthClick }: SubscriptionPagePr
             )}
 
             {isActive ? (
-              <div className="text-center py-2">
-                <p className="text-sm text-gray-500 dark:text-gray-400">
-                  Tu suscripción está activa. Para cancelar o cambiar el método de pago, contacta con{' '}
-                  <a href="mailto:hola@table4singles.online" className="text-primary-600 hover:underline">
-                    hola@table4singles.online
-                  </a>
-                  .
-                </p>
+              <div className="space-y-3 text-center">
+                <p className="text-sm text-green-600 dark:text-green-400 font-medium">✓ Suscripción activa</p>
+                <button
+                  onClick={async () => {
+                    setLoading(true)
+                    setError(null)
+                    try {
+                      const { data, error: fnErr } = await supabase.functions.invoke('create-billing-portal', {})
+                      if (fnErr) throw fnErr
+                      if (data?.url) window.location.href = data.url
+                    } catch (err: any) {
+                      setError(err.message || 'Error al abrir el portal de facturación.')
+                    }
+                    setLoading(false)
+                  }}
+                  disabled={loading}
+                  className="w-full py-3 border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-200 rounded-xl text-sm font-medium hover:bg-gray-50 dark:hover:bg-gray-700 flex items-center justify-center gap-2 disabled:opacity-60 transition-colors"
+                >
+                  {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <CreditCard className="w-4 h-4" />}
+                  Gestionar suscripción y facturación
+                </button>
+                <p className="text-xs text-gray-400 dark:text-gray-500">Cancela, cambia método de pago o descarga facturas</p>
               </div>
             ) : (
               <button

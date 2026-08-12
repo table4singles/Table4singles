@@ -1,5 +1,5 @@
 import { useState, useMemo, useEffect } from 'react'
-import { UtensilsCrossed, Users, Star, Loader2, XCircle, Calendar, Clock, CalendarClock, CalendarDays, AlertCircle, CheckCircle, CreditCard } from 'lucide-react'
+import { UtensilsCrossed, Users, Star, Loader2, XCircle, Calendar, Clock, CalendarClock, CalendarDays, AlertCircle, CheckCircle, CreditCard, TrendingUp } from 'lucide-react'
 import { Navbar } from '@/components/Navbar'
 import { CancelModal } from '@/components/CancelModal'
 import { useLanguage } from '@/contexts/LanguageContext'
@@ -180,6 +180,34 @@ export function RestaurantDashboardPage({ onNavigate, onAuthClick }: RestaurantD
                 : 'Crea tu primera mesa'}
             </p>
             <span className="text-blue-600 dark:text-blue-400 text-xs font-medium mt-2 inline-block group-hover:underline">Ir a Mis mesas →</span>
+          </button>
+
+          <button
+            onClick={() => onNavigate('analytics')}
+            className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-4 text-left hover:shadow-md hover:border-purple-300 dark:hover:border-purple-600 transition-all group"
+          >
+            <div className="flex items-center gap-2 mb-2">
+              <div className="w-8 h-8 rounded-lg bg-purple-50 dark:bg-purple-900/30 flex items-center justify-center">
+                <TrendingUp className="w-4 h-4 text-purple-600 dark:text-purple-400" />
+              </div>
+              <span className="font-semibold text-sm text-gray-900 dark:text-white">Analytics</span>
+            </div>
+            <p className="text-xs text-gray-500 dark:text-gray-400">Ocupación, reservas y valoraciones</p>
+            <span className="text-purple-600 dark:text-purple-400 text-xs font-medium mt-2 inline-block group-hover:underline">Ver estadísticas →</span>
+          </button>
+
+          <button
+            onClick={() => onNavigate('subscription')}
+            className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-4 text-left hover:shadow-md hover:border-green-300 dark:hover:border-green-600 transition-all group"
+          >
+            <div className="flex items-center gap-2 mb-2">
+              <div className="w-8 h-8 rounded-lg bg-green-50 dark:bg-green-900/30 flex items-center justify-center">
+                <CreditCard className="w-4 h-4 text-green-600 dark:text-green-400" />
+              </div>
+              <span className="font-semibold text-sm text-gray-900 dark:text-white">Suscripción</span>
+            </div>
+            <p className="text-xs text-gray-500 dark:text-gray-400">Gestiona tu plan y facturación</p>
+            <span className="text-green-600 dark:text-green-400 text-xs font-medium mt-2 inline-block group-hover:underline">Ver plan →</span>
           </button>
         </div>
 

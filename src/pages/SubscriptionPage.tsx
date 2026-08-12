@@ -73,6 +73,7 @@ export function SubscriptionPage({ onNavigate, onAuthClick }: SubscriptionPagePr
   const status = profile.subscription_status
   const isActive = status === 'active' || status === 'trialing'
   const statusInfo = status ? (STATUS_LABEL[status] ?? null) : null
+  const isNewSubscriber = !status || status === 'inactive' || status === 'canceled'
 
   const handleSubscribe = async () => {
     setLoading(true)
@@ -115,6 +116,20 @@ export function SubscriptionPage({ onNavigate, onAuthClick }: SubscriptionPagePr
           </div>
         )}
 
+        {/* Banner promo lanzamiento */}
+        {isNewSubscriber && (
+          <div className="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-700 rounded-2xl px-5 py-4 mb-5 flex items-start gap-3">
+            <Zap className="w-5 h-5 text-amber-500 flex-shrink-0 mt-0.5" />
+            <div>
+              <p className="text-sm font-bold text-amber-800 dark:text-amber-300">Oferta de lanzamiento</p>
+              <p className="text-sm text-amber-700 dark:text-amber-400 mt-0.5">
+                Los primeros 3 meses por <strong>10 €</strong> en total — solo pagas el primer mes.
+                Después, 10 €/mes.
+              </p>
+            </div>
+          </div>
+        )}
+
         {/* Card de plan */}
         <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden mb-6">
           {/* Header plan */}
@@ -123,11 +138,24 @@ export function SubscriptionPage({ onNavigate, onAuthClick }: SubscriptionPagePr
               <Zap className="w-5 h-5" />
               <span className="text-sm font-semibold uppercase tracking-wide opacity-90">Plan Restaurante</span>
             </div>
-            <div className="flex items-baseline gap-1">
-              <span className="text-4xl font-display font-bold">10 €</span>
-              <span className="text-sm opacity-80">/ mes</span>
-            </div>
-            <p className="text-sm opacity-80 mt-1">Facturación mensual · Cancela cuando quieras</p>
+            {isNewSubscriber ? (
+              <>
+                <div className="flex items-baseline gap-2">
+                  <span className="text-4xl font-display font-bold">10 €</span>
+                  <span className="text-sm opacity-80 line-through">30 €</span>
+                  <span className="bg-white/20 text-xs font-bold px-2 py-0.5 rounded-full">3 meses</span>
+                </div>
+                <p className="text-sm opacity-80 mt-1">Oferta lanzamiento · Luego 10 €/mes · Cancela cuando quieras</p>
+              </>
+            ) : (
+              <>
+                <div className="flex items-baseline gap-1">
+                  <span className="text-4xl font-display font-bold">10 €</span>
+                  <span className="text-sm opacity-80">/ mes</span>
+                </div>
+                <p className="text-sm opacity-80 mt-1">Facturación mensual · Cancela cuando quieras</p>
+              </>
+            )}
           </div>
 
           {/* Features */}
@@ -175,7 +203,7 @@ export function SubscriptionPage({ onNavigate, onAuthClick }: SubscriptionPagePr
                 ) : (
                   <>
                     <CreditCard className="w-4 h-4" />
-                    Suscribirse por 10 €/mes
+                    {isNewSubscriber ? 'Empezar por 10 € — 3 meses' : 'Suscribirse por 10 €/mes'}
                   </>
                 )}
               </button>

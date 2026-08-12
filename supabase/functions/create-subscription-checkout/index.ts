@@ -42,7 +42,7 @@ serve(async (req) => {
 
     const { data: profile } = await supabase
       .from('profiles')
-      .select('role, restaurant_name, email, stripe_customer_id')
+      .select('role, restaurant_name, email, stripe_customer_id, subscription_status')
       .eq('id', user.id)
       .single()
 
@@ -75,7 +75,11 @@ serve(async (req) => {
 
     const origin = req.headers.get('origin') || 'https://www.table4singles.online'
 
-    const session = await stripe.checkout.sessions.create({
+    // Aplicar cupón promocional a restaurantes que suscriben por primera vez
+    const isNewSubscriber = !profile?.subscription_status || profile.subscription_status === 'inactive'
+    const discounts = isNewSubscriber ? [{ coupon: 'PROMO_LAUNCH_3M' }] : []
+
+    const sessionParams: Stripe.Checkout.SessionCreateParams = {
       customer: customerId,
       mode: 'subscription',
       payment_method_types: ['card'],
@@ -85,21 +89,26 @@ serve(async (req) => {
             currency: 'eur',
             product_data: {
               name: 'Table4Singles — Plan Restaurante',
-              description: 'Acceso completo a la plataforma: gestión de mesas, reservas y comensales',
+              description: isNewSubscriber
+                ? 'Oferta lanzamiento: 10€ los primeros 3 meses, luego 10€/mes'
+                : 'Acceso completo a la plataforma: gestión de mesas, reservas y comensales',
             },
-            unit_amount: 1000, // €10 en céntimos
+            unit_amount: 1000, // 10€ en céntimos
             recurring: { interval: 'month' },
           },
           quantity: 1,
         },
       ],
+      ...(discounts.length > 0 && { discounts }),
       success_url: `${origin}?payment=subscription-success`,
       cancel_url: `${origin}?payment=subscription-cancelled`,
       metadata: {
         type: 'restaurant_subscription',
         user_id: user.id,
       },
-    })
+    }
+
+    const session = await stripe.checkout.sessions.create(sessionParams)
 
     return new Response(JSON.stringify({ url: session.url }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },

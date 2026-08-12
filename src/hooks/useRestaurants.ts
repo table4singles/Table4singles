@@ -164,6 +164,7 @@ export function useRestaurantProfile(restaurantId: string | null) {
     setError(null)
 
     // Query 1: profile + tables (sin nested join para evitar conflictos PostgREST)
+    const today = new Date().toISOString().split('T')[0]
     const [profRes, tablesRes] = await Promise.all([
       supabase.from('profiles').select('*').eq('id', restaurantId).single(),
       supabase
@@ -172,6 +173,7 @@ export function useRestaurantProfile(restaurantId: string | null) {
         .eq('host_id', restaurantId)
         .eq('status', 'open')
         .eq('is_active', true)
+        .gte('date', today)
         .order('date', { ascending: true })
         .order('time', { ascending: true }),
     ])

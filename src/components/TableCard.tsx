@@ -97,7 +97,9 @@ export function TableCard({ table, participants, onClick }: TableCardProps) {
             </span>
             <span className="flex items-center gap-1">
               <Users className="w-3.5 h-3.5" />
-              {table.available_seats}/{table.max_seats}
+              {isFull
+                ? `${table.max_seats}/${table.max_seats} completa`
+                : `${table.max_seats - table.available_seats}/${table.max_seats} apuntados`}
             </span>
           </div>
           <ChevronRight className="w-4 h-4 text-gray-400 dark:text-gray-500 group-hover:text-primary-500 transition-colors" />

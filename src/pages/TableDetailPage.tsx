@@ -327,7 +327,7 @@ export function TableDetailPage({ tableId, paymentSuccess, paymentCancelled, onN
               <div className="grid grid-cols-3 gap-4 mb-4">
                 <InfoBox icon={<Calendar className="w-4 h-4" />} label={new Date(table.date).toLocaleDateString(locale, { weekday: 'long', month: 'long', day: 'numeric' })} />
                 {table.time && <InfoBox icon={<Clock className="w-4 h-4" />} label={table.time.slice(0, 5)} />}
-                <InfoBox icon={<Users className="w-4 h-4" />} label={`${table.available_seats}/${table.max_seats} ${t('card.seats')}`} />
+                <InfoBox icon={<Users className="w-4 h-4" />} label={`${table.max_seats - table.available_seats}/${table.max_seats} apuntados`} />
               </div>
 
               {table.description && <p className="text-gray-600 dark:text-gray-300 text-sm">{table.description}</p>}

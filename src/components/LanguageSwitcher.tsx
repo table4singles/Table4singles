@@ -22,7 +22,7 @@ export function LanguageSwitcher() {
         <span className="text-xl leading-none">{current?.emoji}</span>
       </button>
       {open && (
-        <div className="absolute right-0 top-full mt-1 bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 overflow-hidden z-50 min-w-[140px] animate-fade-in">
+        <div className="absolute right-0 top-full mt-1 bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 overflow-hidden z-50 min-w-[160px] animate-fade-in max-h-72 overflow-y-auto">
           {languageOptions.map(l => (
             <button
               key={l.code}

@@ -21,6 +21,10 @@ export function AuthModal({ isOpen, onClose, mode, onSwitchMode }: AuthModalProp
   const [password, setPassword] = useState('')
   const [name, setName] = useState('')
   const [showPassword, setShowPassword] = useState(false)
+  const [referralCode, setReferralCode] = useState(() => {
+    // Pre-fill if URL has ?ref=
+    try { return new URLSearchParams(window.location.search).get('ref') ?? '' } catch { return '' }
+  })
   const [error, setError] = useState<string | null>(null)
   const [success, setSuccess] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
@@ -52,7 +56,7 @@ export function AuthModal({ isOpen, onClose, mode, onSwitchMode }: AuthModalProp
 
     try {
       if (mode === 'signup') {
-        const { error: err } = await signUp(email, password, name, role)
+        const { error: err } = await signUp(email, password, name, role, referralCode.trim().toUpperCase() || undefined)
         if (err) throw err
         setSuccess('¡Revisa tu email para confirmar tu cuenta!')
       } else {
@@ -183,6 +187,20 @@ export function AuthModal({ isOpen, onClose, mode, onSwitchMode }: AuthModalProp
                     >
                       ¿Olvidaste tu contraseña?
                     </button>
+                  </div>
+                )}
+
+                {/* Código de referido — solo en signup */}
+                {mode === 'signup' && (
+                  <div>
+                    <input
+                      type="text"
+                      placeholder="Código de referido (opcional)"
+                      value={referralCode}
+                      onChange={e => setReferralCode(e.target.value.toUpperCase())}
+                      maxLength={10}
+                      className="w-full px-4 py-2.5 border border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700/50 dark:text-white rounded-xl text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none transition-all font-mono tracking-widest placeholder:font-sans placeholder:tracking-normal"
+                    />
                   </div>
                 )}
 

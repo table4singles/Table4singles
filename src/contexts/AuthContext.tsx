@@ -8,7 +8,7 @@ interface AuthContextType {
   session: Session | null
   profile: Profile | null
   loading: boolean
-  signUp: (email: string, password: string, name: string, role: 'user' | 'restaurant') => Promise<{ error: Error | null }>
+  signUp: (email: string, password: string, name: string, role: 'user' | 'restaurant', referralCode?: string) => Promise<{ error: Error | null }>
   signIn: (email: string, password: string) => Promise<{ error: Error | null }>
   signInWithMagicLink: (email: string, role?: string) => Promise<{ error: Error | null }>
   signInWithGoogle: () => Promise<{ error: Error | null }>
@@ -57,8 +57,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return () => subscription.unsubscribe()
   }, [fetchProfile])
 
-  const signUp = useCallback(async (email: string, password: string, name: string, role: 'user' | 'restaurant') => {
-    const referredBy = localStorage.getItem('t4s_referred_by') || undefined
+  const signUp = useCallback(async (email: string, password: string, name: string, role: 'user' | 'restaurant', referralCode?: string) => {
+    const referredBy = referralCode || localStorage.getItem('t4s_referred_by') || undefined
     const { error } = await supabase.auth.signUp({
       email,
       password,

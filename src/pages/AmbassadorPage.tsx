@@ -41,7 +41,10 @@ export function AmbassadorPage({ onNavigate, onAuthClick }: AmbassadorPageProps)
   const { restaurants, totalReferred, activeSubscriptions, estimatedMonthlyEuros, loading: statsLoading } =
     useAmbassadorStats(ambassador ? (user?.id ?? null) : null, ambassador?.commission_rate)
 
-  const referralUrl = user ? `${window.location.origin}/?ref=${user.id}` : ''
+  const referralCode = (ambassador as any)?.referral_code ?? null
+  const referralUrl = referralCode
+    ? `${window.location.origin}/?ref=${referralCode}`
+    : user ? `${window.location.origin}/?ref=${user.id}` : ''
 
   useEffect(() => {
     if (!user) { setLoadingAmb(false); return }
@@ -140,12 +143,26 @@ export function AmbassadorPage({ onNavigate, onAuthClick }: AmbassadorPageProps)
               </div>
             </div>
 
-            {/* Enlace */}
+            {/* Código + Enlace */}
             <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 p-5">
-              <h2 className="font-semibold text-gray-900 dark:text-white mb-1">Tu enlace de embajador</h2>
+              <h2 className="font-semibold text-gray-900 dark:text-white mb-1">Tu código de embajador</h2>
               <p className="text-sm text-gray-500 dark:text-gray-400 mb-3">
-                Cuando un restaurante se registre usando este enlace, quedará vinculado a ti y generará comisión.
+                Cuando un restaurante use tu código al registrarse, quedará vinculado a ti y generará comisión.
               </p>
+              {referralCode && (
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="px-5 py-3 bg-[#e94560]/10 dark:bg-[#e94560]/20 border border-[#e94560]/30 rounded-xl text-xl font-bold font-mono tracking-widest text-[#e94560]">
+                    {referralCode}
+                  </div>
+                  <button
+                    onClick={() => { navigator.clipboard.writeText(referralCode); setCopied(true); setTimeout(() => setCopied(false), 2000) }}
+                    className="px-4 py-2.5 border border-gray-200 dark:border-gray-700 rounded-xl text-sm font-medium text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 flex items-center gap-2"
+                  >
+                    {copied ? <><Check className="w-4 h-4 text-green-500" /> Copiado</> : <><Copy className="w-4 h-4" /> Copiar código</>}
+                  </button>
+                </div>
+              )}
+              <p className="text-xs text-gray-400 dark:text-gray-500 mb-3">O comparte el enlace directo:</p>
               <div className="flex gap-2">
                 <div className="flex-1 px-4 py-2.5 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl text-sm text-gray-700 dark:text-gray-300 truncate font-mono">
                   {referralUrl}

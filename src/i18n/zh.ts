@@ -177,6 +177,7 @@ export const zh = {
     subtitleUser: '您的晚餐和已预订的餐桌',
     invitationsLabel: '邀请',
     since: '从',
+    until: '至',
     statusCancelled: '已取消',
     statusAvailable: '可用',
     statusUnavailable: '不可用',

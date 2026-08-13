@@ -177,6 +177,7 @@ export const ja = {
     subtitleUser: 'あなたのディナーと予約済みテーブル',
     invitationsLabel: '招待',
     since: 'から',
+    until: 'まで',
     statusCancelled: 'キャンセル済み',
     statusAvailable: '利用可能',
     statusUnavailable: '利用不可',

@@ -177,6 +177,7 @@ export const it = {
     subtitleUser: 'Le tue cene e tavoli prenotati',
     invitationsLabel: 'Inviti',
     since: 'Dal',
+    until: 'fino al',
     statusCancelled: 'Annullato',
     statusAvailable: 'Disponibile',
     statusUnavailable: 'Non disponibile',

@@ -177,6 +177,7 @@ export const ro = {
     subtitleUser: 'Cinele și mesele tale rezervate',
     invitationsLabel: 'Invitații',
     since: 'Din',
+    until: 'până la',
     statusCancelled: 'Anulat',
     statusAvailable: 'Disponibil',
     statusUnavailable: 'Indisponibil',

@@ -177,6 +177,7 @@ export const sv = {
     subtitleUser: 'Dina middagar och bokade bord',
     invitationsLabel: 'Inbjudningar',
     since: 'Från',
+    until: 'till',
     statusCancelled: 'Avbokad',
     statusAvailable: 'Tillgänglig',
     statusUnavailable: 'Inte tillgänglig',

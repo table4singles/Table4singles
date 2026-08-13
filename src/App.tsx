@@ -182,8 +182,8 @@ function AppRouter() {
 
   return (
     <>
-      {user && <PendingInviteBanner />}
-      {user && effectiveRole === 'user' && <AmbassadorBanner onNavigate={navigate} />}
+      {user && !isPasswordRecovery && <PendingInviteBanner />}
+      {user && !isPasswordRecovery && effectiveRole === 'user' && <AmbassadorBanner onNavigate={navigate} />}
       {renderPage()}
       <AuthModal
         isOpen={authModal}

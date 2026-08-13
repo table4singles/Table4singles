@@ -177,6 +177,7 @@ export const ar = {
     subtitleUser: 'عشاءاتك وطاولاتك المحجوزة',
     invitationsLabel: 'الدعوات',
     since: 'منذ',
+    until: 'حتى',
     statusCancelled: 'ملغى',
     statusAvailable: 'متاح',
     statusUnavailable: 'غير متاح',

@@ -177,6 +177,7 @@ export const fr = {
     subtitleUser: 'Vos dîners et tables réservées',
     invitationsLabel: 'Invitations',
     since: 'Depuis',
+    until: "jusqu'au",
     statusCancelled: 'Annulée',
     statusAvailable: 'Disponible',
     statusUnavailable: 'Indisponible',

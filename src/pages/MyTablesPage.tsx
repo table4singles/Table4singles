@@ -32,7 +32,12 @@ export function MyTablesPage({ onNavigate, onAuthClick, initialTab }: MyTablesPa
   const [cancelReservationTarget, setCancelReservationTarget] = useState<{ id: string; joinType: 'word' | 'deposit' } | null>(null)
   const [togglingId, setTogglingId] = useState<string | null>(null)
 
-  const locale = language === 'de' ? 'de-DE' : language === 'en' ? 'en-GB' : 'es-ES'
+  const localeMap: Record<string, string> = {
+    es: 'es-ES', en: 'en-GB', de: 'de-DE', fr: 'fr-FR', it: 'it-IT',
+    ru: 'ru-RU', pt: 'pt-PT', uk: 'uk-UA', ro: 'ro-RO', ar: 'ar-SA',
+    sv: 'sv-SE', zh: 'zh-CN', ja: 'ja-JP',
+  }
+  const locale = localeMap[language] ?? 'es-ES'
 
   const totalDiners = hosting.reduce((sum, t) => sum + (t.max_seats - t.available_seats), 0)
   const activeCount = hosting.filter(t => t.is_active !== false && t.status !== 'cancelled').length
@@ -153,7 +158,7 @@ export function MyTablesPage({ onNavigate, onAuthClick, initialTab }: MyTablesPa
                                 </h3>
                                 <p className="text-sm text-gray-500 dark:text-gray-400">
                                   {t('myTables.since')} {new Date(table.date).toLocaleDateString(locale, { month: 'short', day: 'numeric' })}
-                                  {table.available_until ? ` · hasta ${new Date(table.available_until).toLocaleDateString(locale, { month: 'short', day: 'numeric' })}` : ''}
+                                  {table.available_until ? ` · ${t('myTables.until')} ${new Date(table.available_until).toLocaleDateString(locale, { month: 'short', day: 'numeric' })}` : ''}
                                 </p>
                                 <div className="flex items-center gap-2 mt-1.5 flex-wrap">
                                   {table.status === 'cancelled' && <span className="text-xs px-2 py-0.5 bg-red-50 text-red-600 rounded-full">{t('myTables.statusCancelled')}</span>}

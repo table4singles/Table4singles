@@ -177,6 +177,7 @@ export const ru = {
     subtitleUser: 'Ваши ужины и забронированные столы',
     invitationsLabel: 'Приглашения',
     since: 'С',
+    until: 'до',
     statusCancelled: 'Отменено',
     statusAvailable: 'Доступно',
     statusUnavailable: 'Недоступно',

@@ -177,6 +177,7 @@ export const uk = {
     subtitleUser: 'Ваші вечері та заброньовані столи',
     invitationsLabel: 'Запрошення',
     since: 'З',
+    until: 'до',
     statusCancelled: 'Скасовано',
     statusAvailable: 'Доступно',
     statusUnavailable: 'Недоступно',

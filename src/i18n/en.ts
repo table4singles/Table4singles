@@ -211,6 +211,7 @@ export const en = {
     subtitleUser: 'Your dinners and reserved tables',
     invitationsLabel: 'Invitations',
     since: 'From',
+    until: 'until',
     statusCancelled: 'Cancelled',
     statusAvailable: 'Available',
     statusUnavailable: 'Unavailable',

@@ -211,6 +211,7 @@ export const de = {
     subtitleUser: 'Deine Abendessen und gebuchten Tische',
     invitationsLabel: 'Einladungen',
     since: 'Ab',
+    until: 'bis',
     statusCancelled: 'Storniert',
     statusAvailable: 'Verfügbar',
     statusUnavailable: 'Nicht verfügbar',

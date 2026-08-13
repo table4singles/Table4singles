@@ -377,6 +377,7 @@ export const es = {
     joined: 'Unido',
     invitationsLabel: 'Invitaciones',
     since: 'Desde',
+    until: 'hasta',
     statusCancelled: 'Cancelada',
     statusAvailable: 'Disponible',
     statusUnavailable: 'No disponible',

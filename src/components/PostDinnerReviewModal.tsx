@@ -56,7 +56,7 @@ export function PostDinnerReviewModal({
         setStep('done')
       }
     } catch (e: any) {
-      setRestaurantError(e.message || 'Error al enviar la valoración')
+      setRestaurantError(e.message || t('common.error'))
     }
     setSubmittingRestaurant(false)
   }
@@ -263,11 +263,13 @@ export function PostDinnerReviewModal({
                   {t('review.ratingsHelp')}
                 </p>
               </div>
-              <div className="flex items-center justify-center gap-1 mt-2">
-                {[1,2,3,4,5].map(s => (
-                  <Star key={s} className={`w-5 h-5 ${s <= restaurantRating ? 'text-yellow-400 fill-yellow-400' : 'text-gray-200 dark:text-gray-700'}`} />
-                ))}
-              </div>
+              {restaurantRating > 0 && (
+                <div className="flex items-center justify-center gap-1 mt-2">
+                  {[1,2,3,4,5].map(s => (
+                    <Star key={s} className={`w-5 h-5 ${s <= restaurantRating ? 'text-yellow-400 fill-yellow-400' : 'text-gray-200 dark:text-gray-700'}`} />
+                  ))}
+                </div>
+              )}
               <button
                 onClick={onClose}
                 className="mt-4 w-full py-2.5 bg-primary-500 text-white rounded-xl text-sm font-medium hover:bg-primary-600 transition-colors"

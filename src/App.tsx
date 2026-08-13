@@ -27,12 +27,13 @@ import { AmbassadorPage } from '@/pages/AmbassadorPage'
 import { SubscriptionPage } from '@/pages/SubscriptionPage'
 import { AdminPage } from '@/pages/AdminPage'
 import { AnalyticsPage } from '@/pages/AnalyticsPage'
+import { ResetPasswordPage } from '@/pages/ResetPasswordPage'
 
 // Suppress unused import warning – BrowsePage kept for future use
 void BrowsePage
 
 function AppRouter() {
-  const { user, profile, loading } = useAuth()
+  const { user, profile, loading, isPasswordRecovery } = useAuth()
   const { effectiveRole } = useViewMode()
   const [page, setPage] = useState('landing')
   const [selectedId, setSelectedId] = useState<string | null>(null)
@@ -123,6 +124,9 @@ function AppRouter() {
   }
 
   const renderPage = () => {
+    if (isPasswordRecovery) {
+      return <ResetPasswordPage />
+    }
     if (user && profile && !profile.onboarding_completed) {
       return <OnboardingPage onNavigate={navigate} />
     }

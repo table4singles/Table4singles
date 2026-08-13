@@ -8,6 +8,7 @@ interface AuthContextType {
   session: Session | null
   profile: Profile | null
   loading: boolean
+  isPasswordRecovery: boolean
   signUp: (email: string, password: string, name: string, role: 'user' | 'restaurant', referralCode?: string) => Promise<{ error: Error | null }>
   signIn: (email: string, password: string) => Promise<{ error: Error | null }>
   signInWithMagicLink: (email: string, role?: string) => Promise<{ error: Error | null }>
@@ -16,6 +17,7 @@ interface AuthContextType {
   signOut: () => Promise<void>
   refreshProfile: () => Promise<void>
   resetPassword: (email: string) => Promise<{ error: Error | null }>
+  updatePassword: (newPassword: string) => Promise<{ error: Error | null }>
 }
 
 const AuthContext = createContext<AuthContextType | null>(null)
@@ -25,6 +27,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [session, setSession] = useState<Session | null>(null)
   const [profile, setProfile] = useState<Profile | null>(null)
   const [loading, setLoading] = useState(true)
+  const [isPasswordRecovery, setIsPasswordRecovery] = useState(false)
 
   const fetchProfile = useCallback(async (userId: string) => {
     const { data } = await supabase
@@ -47,11 +50,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setLoading(false)
     })
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, s) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, s) => {
       setSession(s)
       setUser(s?.user ?? null)
       if (s?.user) fetchProfile(s.user.id)
       else setProfile(null)
+      if (event === 'PASSWORD_RECOVERY') setIsPasswordRecovery(true)
     })
 
     return () => subscription.unsubscribe()
@@ -113,16 +117,22 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const resetPassword = useCallback(async (email: string) => {
     const { error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: `${window.location.origin}?reset=true`,
+      redirectTo: `${window.location.origin}`,
     })
+    return { error: error ? new Error(error.message) : null }
+  }, [])
+
+  const updatePassword = useCallback(async (newPassword: string) => {
+    const { error } = await supabase.auth.updateUser({ password: newPassword })
+    if (!error) setIsPasswordRecovery(false)
     return { error: error ? new Error(error.message) : null }
   }, [])
 
   return (
     <AuthContext.Provider value={{
-      user, session, profile, loading,
+      user, session, profile, loading, isPasswordRecovery,
       signUp, signIn, signInWithMagicLink, signInWithGoogle, signInWithApple,
-      signOut, refreshProfile, resetPassword,
+      signOut, refreshProfile, resetPassword, updatePassword,
     }}>
       {children}
     </AuthContext.Provider>

@@ -28,6 +28,7 @@ import { SubscriptionPage } from '@/pages/SubscriptionPage'
 import { AdminPage } from '@/pages/AdminPage'
 import { AnalyticsPage } from '@/pages/AnalyticsPage'
 import { ResetPasswordPage } from '@/pages/ResetPasswordPage'
+import { AmbassadorBanner } from '@/components/AmbassadorBanner'
 
 // Suppress unused import warning – BrowsePage kept for future use
 void BrowsePage
@@ -182,6 +183,7 @@ function AppRouter() {
   return (
     <>
       {user && <PendingInviteBanner />}
+      {user && effectiveRole === 'user' && <AmbassadorBanner onNavigate={navigate} />}
       {renderPage()}
       <AuthModal
         isOpen={authModal}

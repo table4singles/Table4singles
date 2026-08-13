@@ -14,26 +14,35 @@ React + Vite + TypeScript + Tailwind + Supabase (Edge Functions, RLS, Realtime, 
 - **Supabase MCP**: disponible y autenticado con token personal `sbp_...`
 - **Responde siempre en español**
 
-## Completado (~85%)
+## Completado (~98%)
 
 ### Autenticación y perfiles
 - Login/signup con email, Google, Apple
-- Recuperar contraseña + toggle visibilidad contraseña
+- Recuperar contraseña + toggle visibilidad contraseña + validación fortaleza (min 8 chars, mayúscula o número)
 - Roles: `user`, `restaurant`, `ambassador`
 - Admins: `manelmercadal@me.com` y `joseanglesai@gmail.com` (`is_admin = true`)
 - Toggle usuario ↔ restaurante para admins sin cerrar sesión (`ViewModeContext` + `localStorage` clave `t4s_admin_view`)
+- RLS recursión resuelta con función `public.is_admin()` SECURITY DEFINER (migración 025)
 
-### Sistema de pagos (Stripe LIVE — en pausa)
-- Suscripción 10€/mes restaurantes → Edge Function `create-subscription-checkout` (precio dinámico inline)
-- Depósito 2€ por reserva → Edge Function `create-reservation-checkout` (precio dinámico inline)
+### Sistema de pagos (Stripe LIVE — activo)
+- Suscripción 10€/mes restaurantes → Edge Function `create-subscription-checkout`
+- Oferta lanzamiento: cupón `PROMO_LAUNCH_3M` → 100% descuento 2 meses (primer pago 10€ cubre 3 meses)
+- Depósito 2€ por reserva → Edge Function `create-reservation-checkout` (sin opción "bajo palabra")
 - Webhook `stripe-webhook` → sincroniza BD y genera notificación in-app al restaurante
-- Credenciales live ya en Supabase Secrets (`STRIPE_SECRET_KEY`, `STRIPE_PUBLISHABLE_KEY`, `STRIPE_WEBHOOK_SECRET`)
-- **Pendiente**: usuario quiere cambiar a nueva cuenta de Stripe (**YA COMPLETADO** — credenciales live actualizadas en Supabase Secrets)
-- **Decisión acordada**: suscripción usará producto fijo en Stripe, reserva seguirá dinámica
+- Portal Stripe → Edge Function `create-billing-portal` → botón en `SubscriptionPage`
+- Credenciales live actualizadas en Supabase Secrets (`STRIPE_SECRET_KEY`, `STRIPE_PUBLISHABLE_KEY`, `STRIPE_WEBHOOK_SECRET`)
 
 ### Buscador de restaurantes
-- Filtro por nombre/ciudad, cocina (multi), precio (`0€-50€` / `50€-100€` / `100€-200€` / `+200€`), fecha (mesas disponibles ese día), radio geográfico (km), solo favoritos
+- Filtro por nombre/ciudad, cocina (multi), precio (`0€-50€` / `50€-100€` / `100€-200€` / `+200€`), fecha, tramo horario (mediodía/noche), radio geográfico (km), solo favoritos
 - Vista lista / mapa. Contador de filtros activos en el botón
+- Filtros de fecha y hora siempre visibles (fuera del panel colapsable)
+
+### Flujo de reserva (UX rediseñado)
+- `RestaurantProfilePage`: carrusel de fotos, selector obligatorio de fecha + tramo horario ANTES de mostrar mesas
+- `TableCard`: compacta, sin imagen, muestra hora/fecha/ocupación, avatares clickables abren `CommensalModal`
+- `TableDetailPage`: solo opción 2€ depósito (eliminado "bajo palabra"), muestra `ocupados/total apuntados`
+- `MyTablesPage` (reservas): clic en reserva navega a `restaurant-profile` (no a `table-detail`)
+- Chat de mesa visible solo para comensales con reserva
 
 ### Onboarding restaurante — wizard 4 pasos
 1. Identidad (nombre, cocina, precio, descripción)
@@ -57,16 +66,36 @@ React + Vite + TypeScript + Tailwind + Supabase (Edge Functions, RLS, Realtime, 
 - Restaurante recibe notificación in-app cuando usuario reserva (desde webhook Stripe)
 
 ### Recordatorios por email
-- Edge Function `send-reservation-reminders` desplegada
+- Edge Function `send-reservation-reminders` desplegada y activa
 - Cron job `pg_cron` a las 18:00 UTC (migración 023). Email HTML via Resend
-- **Pendiente**: añadir `RESEND_API_KEY` en Supabase Secrets para activarlo
+- `RESEND_API_KEY` añadida en Supabase Secrets ✅
+
+### Analytics restaurante (`AnalyticsPage`)
+- KPIs: mesas, reservas, ocupación %, valoración media
+- Gráficas: reservas por día (BarChart), distribución ratings (BarChart), tramos horarios (PieChart)
+- Filtro por 7d / 30d / 90d. Solo accesible con `effectiveRole === 'restaurant'`
 
 ### PWA / app móvil
 - `manifest.json` + SW registrado. `InstallPrompt`: banner a los 30s (Android: instalar, iOS: instrucciones)
 
 ### Paneles
-- **Admin** (`is_admin = true`): vista global usuarios, restaurantes, embajadores, movimientos
+- **Admin** (`is_admin = true`): vista global usuarios, restaurantes, embajadores, movimientos. Incluye admins en listado usuarios
 - **Embajador**: restaurantes captados, reservas, comisiones estimadas (5%)
+- **Embajador → compartir**: botones WhatsApp, Email y Web Share API con `referral_code` único (formato `AMBX3F7K`)
+
+### Programa de referidos
+- `ambassadors.referral_code` (text, unique). `profiles.referred_by` (text, almacena el código)
+- Trigger `handle_new_user` acepta `referred_by` como texto (no UUID) — migración 027
+- RPC `get_ambassador_restaurants` busca por `referral_code` — migración 028
+- `AuthModal` acepta campo código de referido (pre-rellena desde `?ref=`)
+
+### Multiidioma completo — 13 idiomas
+- **Idiomas**: ES 🇪🇸, EN 🇬🇧, DE 🇩🇪, FR 🇫🇷, IT 🇮🇹, RU 🇷🇺, PT 🇵🇹, UK 🇺🇦, RO 🇷🇴, AR 🇸🇦 (RTL), SV 🇸🇪, ZH 🇨🇳, JA 🇯🇵
+- **Selector en Ajustes**: grid 2 columnas con todos los idiomas, bandera + nombre
+- **Selector en AuthModal**: botón compacto (emoji bandera + Globe) en la cabecera del modal
+- **Páginas traducidas al 100%**: Navbar, SettingsPage, AuthModal, AnalyticsPage, AmbassadorPage, RestaurantDashboardPage, SubscriptionPage, TableDetailPage, CancelModal, CommensalModal, RestaurantProfilePage
+- `src/i18n/es.ts`: archivo maestro con 25+ secciones (nav, auth, settings, analytics, ambassador, subscription, tableDetail, commensalModal, onboarding, common, etc.)
+- RTL automático para árabe via `document.documentElement.dir`
 
 ## Migraciones aplicadas en Supabase
 | # | Nombre | Contenido |
@@ -78,26 +107,25 @@ React + Vite + TypeScript + Tailwind + Supabase (Edge Functions, RLS, Realtime, 
 | 022 | admin_ambassador_policies | RLS admin/embajador + RPC stats |
 | 023 | email_reminders_cron | pg_cron + Edge Function recordatorios |
 | 024 | price_ranges_and_review_replies | Rangos precio + tabla review_replies |
+| 025 | fix_admin_rls_recursion | función `public.is_admin()` SECURITY DEFINER |
+| 026 | referral_program | `referral_code` en ambassadors, `referred_by` en profiles |
+| 027 | fix_referred_by_trigger | trigger `handle_new_user` acepta texto (no UUID) |
+| 028 | fix_ambassador_rpc_and_referral_lookup | RPC busca por `referral_code` texto |
 
-## Pendiente prioritario
+## Pendiente / deuda técnica
 
-### Para activar en producción
-- `RESEND_API_KEY` en Supabase Secrets → activa recordatorios email
-- Cambio de cuenta Stripe (en pausa)
+### Pequeños strings aún hardcodeados (baja prioridad)
+- `OnboardingPage`: nombres de cocinas (Italiana, Japonesa...), labels del wizard
+- `AdminPage`: labels del panel de administración
+- `RestaurantAgendaPage`: algunos labels menores
+- `PostDinnerReviewModal`: labels del flujo de valoración
+- `MyTablesPage`: algunos estados de disponibilidad
+
+### Para considerar en próxima iteración
 - Reactivar validación de email al registrarse (desactivada para pruebas)
-- Contraseña segura obligatoria en signup
-
-### Features no iniciadas
-- Analytics para restaurante (gráficas ocupación, ingresos, valoración media)
-- Portal de cliente Stripe (gestión suscripción desde la app)
-- Perfil público del comensal
-- Búsqueda directa de mesas (actualmente se buscan restaurantes)
-- Programa de referidos con código de embajador automático
-- Soporte multiidioma completo (`LanguageContext` existe, claves `t()` incompletas)
-
-### Deuda técnica
 - Test E2E: restaurante crea mesa → usuario reserva → agenda → notificación
-- Verificar visualización precio en `RestaurantCard` con nuevo formato `0€-50€`
+- Búsqueda directa de mesas (actualmente se buscan restaurantes)
+- Perfil público del comensal más completo
 
 ## Archivos clave
 | Archivo | Descripción |
@@ -105,13 +133,25 @@ React + Vite + TypeScript + Tailwind + Supabase (Edge Functions, RLS, Realtime, 
 | `src/App.tsx` | Router principal + redirects de pago |
 | `src/contexts/ViewModeContext.tsx` | Toggle usuario/restaurante para admins |
 | `src/contexts/AuthContext.tsx` | Auth + resetPassword |
+| `src/contexts/LanguageContext.tsx` | i18n con RTL, detección navegador, localStorage |
+| `src/i18n/es.ts` | Archivo maestro de traducciones (25+ secciones) |
+| `src/i18n/index.ts` | Exports, `languageOptions`, `RTL_LANGS`, `getTranslation` |
 | `src/pages/RestaurantsBrowsePage.tsx` | Buscador con filtros completos |
+| `src/pages/RestaurantProfilePage.tsx` | Perfil restaurante + selector fecha/hora + mesas |
+| `src/pages/RestaurantDashboardPage.tsx` | Panel restaurante con KPIs y shortcuts |
+| `src/pages/AnalyticsPage.tsx` | Gráficas de ocupación, reservas y valoraciones |
+| `src/pages/AmbassadorPage.tsx` | Programa embajadores + compartir enlace |
+| `src/pages/SubscriptionPage.tsx` | Plan + portal billing Stripe |
+| `src/pages/SettingsPage.tsx` | Ajustes + selector 13 idiomas |
 | `src/pages/OnboardingPage.tsx` | Wizard 4 pasos para restaurantes |
 | `src/pages/RestaurantReviewsPage.tsx` | Reseñas + respuestas del restaurante |
+| `src/components/AuthModal.tsx` | Login/signup + selector idioma compacto |
 | `src/components/PostDinnerReviewModal.tsx` | Modal unificado de valoración post-cena |
-| `src/components/InstallPrompt.tsx` | Banner instalación PWA |
-| `src/components/Navbar.tsx` | Navegación + toggle admin |
+| `src/components/CommensalModal.tsx` | Ficha pública del comensal con stats |
+| `src/components/Navbar.tsx` | Navegación + toggle admin (completamente traducida) |
 | `src/hooks/useReviews.ts` | Reviews + review_replies + submitReply |
 | `src/hooks/useRestaurants.ts` | Filtros precio + fecha |
+| `src/hooks/useAmbassadorStats.ts` | Stats embajador via RPC |
 | `supabase/functions/stripe-webhook/` | Webhook Stripe + notificaciones in-app |
+| `supabase/functions/create-billing-portal/` | Portal Stripe para gestión suscripción |
 | `supabase/functions/send-reservation-reminders/` | Email recordatorios diarios |

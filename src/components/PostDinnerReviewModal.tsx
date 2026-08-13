@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Loader2, Star, Users, UtensilsCrossed, ChevronRight, Check, X } from 'lucide-react'
 import { StarRating } from '@/components/StarRating'
 import { useDinerReviews } from '@/hooks/useDinerReviews'
+import { useLanguage } from '@/contexts/LanguageContext'
 import type { Profile } from '@/types/database'
 
 interface PostDinnerReviewModalProps {
@@ -29,6 +30,7 @@ export function PostDinnerReviewModal({
   onSubmitRestaurant,
   onClose,
 }: PostDinnerReviewModalProps) {
+  const { t } = useLanguage()
   const hasDiners = coDiners.length > 0
   const initialStep: Step = isHostOnly || alreadyReviewedRestaurant ? 'diners' : 'restaurant'
 
@@ -83,11 +85,11 @@ export function PostDinnerReviewModal({
         <div className="flex items-center justify-between p-6 pb-0">
           <div>
             <h3 className="text-lg font-display font-bold text-gray-900 dark:text-white">
-              {step === 'done' ? '¡Gracias por tu valoración!' : 'Valorar la experiencia'}
+              {step === 'done' ? t('review.thankYou') : t('review.title')}
             </h3>
             {step !== 'done' && stepCount > 1 && (
               <p className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">
-                Paso {currentStepNum} de {stepCount}
+                {t('review.step').replace('{current}', String(currentStepNum)).replace('{total}', String(stepCount))}
               </p>
             )}
           </div>
@@ -119,32 +121,32 @@ export function PostDinnerReviewModal({
                 <UtensilsCrossed className="w-5 h-5 text-orange-500 flex-shrink-0" />
                 <div>
                   <p className="text-sm font-semibold text-gray-900 dark:text-white">{restaurantName}</p>
-                  <p className="text-xs text-gray-500 dark:text-gray-400">¿Cómo fue tu experiencia en el restaurante?</p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400">{t('review.restaurantQuestion')}</p>
                 </div>
               </div>
 
               <div>
                 <label className="text-sm font-medium text-gray-700 dark:text-gray-200 block mb-2">
-                  Valoración general
+                  {t('review.overallRating')}
                 </label>
                 <StarRating rating={restaurantRating} onChange={setRestaurantRating} size="lg" />
                 {restaurantRating > 0 && (
                   <p className="text-xs text-gray-400 mt-1.5">
-                    {['', 'Muy malo', 'Malo', 'Normal', 'Bueno', 'Excelente'][restaurantRating]}
+                    {t(`review.rating${restaurantRating}` as Parameters<typeof t>[0])}
                   </p>
                 )}
               </div>
 
               <div>
                 <label className="text-sm font-medium text-gray-700 dark:text-gray-200 block mb-2">
-                  Comentario (opcional)
-                  <span className="text-xs font-normal text-gray-400 ml-1">· Público · Lo verá el restaurante</span>
+                  {t('review.commentOptional')}
+                  <span className="text-xs font-normal text-gray-400 ml-1">· {t('review.commentPublic')}</span>
                 </label>
                 <textarea
                   value={restaurantComment}
                   onChange={e => setRestaurantComment(e.target.value)}
                   rows={3}
-                  placeholder="Comida, ambiente, servicio... ¿qué destacarías?"
+                  placeholder={t('review.commentPlaceholder3')}
                   className="w-full px-4 py-2.5 border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 dark:text-white rounded-xl text-sm focus:ring-2 focus:ring-primary-500 outline-none resize-none"
                 />
               </div>
@@ -159,7 +161,7 @@ export function PostDinnerReviewModal({
                     onClick={() => setStep('diners')}
                     className="flex-1 py-2.5 border border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300 rounded-xl text-sm font-medium hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
                   >
-                    Saltar
+                    {t('review.skip')}
                   </button>
                 )}
                 <button
@@ -170,8 +172,8 @@ export function PostDinnerReviewModal({
                   {submittingRestaurant
                     ? <Loader2 className="w-4 h-4 animate-spin" />
                     : hasDiners && pendingDiners.length > 0
-                      ? <><span>Siguiente</span><ChevronRight className="w-4 h-4" /></>
-                      : 'Enviar valoración'
+                      ? <><span>{t('review.next')}</span><ChevronRight className="w-4 h-4" /></>
+                      : t('review.submit')
                   }
                 </button>
               </div>
@@ -184,16 +186,16 @@ export function PostDinnerReviewModal({
               <div className="flex items-center gap-3 p-4 bg-teal-50 dark:bg-teal-900/20 rounded-xl">
                 <Users className="w-5 h-5 text-teal-600 flex-shrink-0" />
                 <div>
-                  <p className="text-sm font-semibold text-gray-900 dark:text-white">Tus comensales</p>
+                  <p className="text-sm font-semibold text-gray-900 dark:text-white">{t('review.yourDiners')}</p>
                   <p className="text-xs text-gray-500 dark:text-gray-400">
-                    Privado · Solo se usa para calcular su fiabilidad. Nadie sabrá que fuiste tú.
+                    {t('review.dinersPrivate')}
                   </p>
                 </div>
               </div>
 
               {pendingDiners.length === 0 ? (
                 <p className="text-sm text-gray-500 dark:text-gray-400 text-center py-4">
-                  Ya has valorado a todos tus comensales de esta mesa.
+                  {t('review.alreadyRatedAll')}
                 </p>
               ) : (
                 <div className="space-y-3">
@@ -207,7 +209,7 @@ export function PostDinnerReviewModal({
                           {diner.avatar_url ? (
                             <img src={diner.avatar_url} alt={diner.display_name || ''} className="w-full h-full object-cover" />
                           ) : (
-                            <span className="text-gray-400 text-sm font-medium">
+                                <span className="text-gray-400 text-sm font-medium">
                               {(diner.display_name || '?').charAt(0).toUpperCase()}
                             </span>
                           )}
@@ -233,7 +235,7 @@ export function PostDinnerReviewModal({
                   onClick={skipDiners}
                   className="flex-1 py-2.5 border border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300 rounded-xl text-sm font-medium hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
                 >
-                  Ahora no
+                  {t('review.skipForNow')}
                 </button>
                 <button
                   onClick={handleSubmitDiners}
@@ -242,7 +244,7 @@ export function PostDinnerReviewModal({
                 >
                   {submittingDiners
                     ? <Loader2 className="w-4 h-4 animate-spin" />
-                    : pendingDiners.length === 0 ? 'Continuar' : 'Enviar valoraciones'
+                    : pendingDiners.length === 0 ? t('review.continue') : t('review.sendRatings')
                   }
                 </button>
               </div>
@@ -256,9 +258,9 @@ export function PostDinnerReviewModal({
                 <Check className="w-7 h-7 text-green-600" />
               </div>
               <div>
-                <p className="font-semibold text-gray-900 dark:text-white">¡Valoración enviada!</p>
+                <p className="font-semibold text-gray-900 dark:text-white">{t('review.ratingSent')}</p>
                 <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-                  Tus valoraciones ayudan a mejorar la experiencia para todos.
+                  {t('review.ratingsHelp')}
                 </p>
               </div>
               <div className="flex items-center justify-center gap-1 mt-2">
@@ -270,7 +272,7 @@ export function PostDinnerReviewModal({
                 onClick={onClose}
                 className="mt-4 w-full py-2.5 bg-primary-500 text-white rounded-xl text-sm font-medium hover:bg-primary-600 transition-colors"
               >
-                Cerrar
+                {t('review.close')}
               </button>
             </div>
           )}

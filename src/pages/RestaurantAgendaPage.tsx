@@ -82,7 +82,7 @@ function LiveRoom({ tables, onNavigate, t }: LiveRoomProps) {
           )}
           {inactiveTables.length > 0 && (
             <div>
-              <p className="text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wide mb-2 mt-2">Desactivadas</p>
+              <p className="text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wide mb-2 mt-2">{t('agenda.deactivated')}</p>
               <div className="space-y-2">
                 {inactiveTables.map(table => (
                   <AgendaTableCard key={table.id} table={table} onNavigate={onNavigate} t={t} />

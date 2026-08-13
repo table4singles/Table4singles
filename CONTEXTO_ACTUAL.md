@@ -1,129 +1,147 @@
 # CONTEXTO Table4Singles (modo caveman, ahorro tokens)
+Actualizado 2026-08-13. Completado ~98%. Fuente larga: `.cursor/rules/proyecto-contexto.mdc`. Responde siempre en español.
 
 ## QUE ES
-App cenas compartidas singles. React+Vite+TS+Tailwind+Supabase.
+App cenas compartidas singles. React+Vite+TS+Tailwind+Supabase (Edge Functions, RLS, Realtime, pg_cron). PWA instalable.
 
 ## RUTAS
 Proyecto: `/Users/joseangles/Desktop/Proyectos/Table4singles`
-GitHub: airtifexlab/Table4singles
-Supabase: jcuonaxmworztegolvyf.supabase.co (proyecto NUEVO recreado 2026-08-07; el anterior zocrwanhcschmydczgeh desapareció)
-Dominio: table4singles.online (aun apunta build vieja, dominio personalizado en Vercel pendiente de conectar)
-DEPLOY: hecho en VERCEL (no Netlify). Proyecto `table4singles` en team `jai-a359`. URL producción: https://table4singles.vercel.app (verificado OK: carga, estilos Tailwind, sin errores consola/red/Supabase). Env vars `VITE_SUPABASE_URL`/`VITE_SUPABASE_ANON_KEY` configuradas en Production+Preview. Cada push a `main` dispara redeploy automático (Git integration).
-Dev local: `npm run dev` → localhost:5173 (si puerto ocupado, matar procesos viejos: `lsof -i :5173`, `kill -9 <pid>`). OJO: si tras HMR algo raro persiste (ej. cambios que no aparecen), puede haber un proceso vite zombie en el puerto sirviendo codigo viejo desde una sesion anterior — matar y arrancar limpio.
+GitHub: `table4singles/Table4singles` rama `main` (deploy auto desde `main`)
+Supabase: `jcuonaxmworztegolvyf` (recreado 2026-08-07; el viejo `zocrwanhcschmydczgeh` desapareció)
+MCP Supabase: autenticado, ve este proyecto.
+Dominio: `https://table4singles.online` (producción)
+Vercel: proyecto `table4singles` team `jai-a359`. También `https://table4singles.vercel.app`. Env `VITE_SUPABASE_URL`/`VITE_SUPABASE_ANON_KEY` en Production+Preview.
+Dev local: `npm run dev` → localhost:5173. Si HMR sirve código viejo: `lsof -i :5173` + `kill -9 <pid>` y arrancar limpio.
 
-## MIGRACIONES SQL — TODAS EJECUTADAS ✅
-001–018 ejecutadas ✅ en proyecto nuevo `jcuonaxmworztegolvyf` (2026-08-07).
-OJO: MCP de Supabase conectado en este entorno puede no ver este proyecto (cuenta distinta: table4singles@gmail.com). Migraciones se ejecutan a mano en SQL Editor.
+## MIGRACIONES SQL — TODAS APLICADAS EN REMOTO ✅
+Local (`supabase/migrations/`): 002–025.
+Remoto extra (MCP, SIN archivo local): 026 `referral_program`, 027 `fix_referred_by_trigger`, 028 `fix_ambassador_rpc_and_referral_lookup`.
+| # | Nombre | Qué hace |
+|---|-----|-----|
+| 002–017 | lifecycle, onboarding, geo, role lock, referrals UUID, favorites, diner_reviews, reminders, invites, push, extra fields, restaurant_reviews, notify left/reply | base app |
+| 018 | realtime_notifications | tabla notifications + Realtime |
+| 019 | ambassadors | sistema embajadores |
+| 020 | table_availability | disponibilidad mesas |
+| 021 | stripe_payments | pagos + subscription_status |
+| 022 | admin_ambassador_policies | RLS admin/embajador + RPC stats |
+| 023 | email_reminders_cron | pg_cron 18:00 UTC + Resend |
+| 024 | price_ranges_and_review_replies | rangos precio + `review_replies` |
+| 025 | fix_admin_rls_recursion | `public.is_admin()` SECURITY DEFINER |
+| 026 | referral_program | `ambassadors.referral_code` + `profiles.referred_by` texto |
+| 027 | fix_referred_by_trigger | `handle_new_user` acepta texto (no UUID) |
+| 028 | fix_ambassador_rpc | `get_ambassador_restaurants` busca por `referral_code` |
+
+## EDGE FUNCTIONS (desplegadas ACTIVE)
+- `create-subscription-checkout` — Stripe 10€/mes. Cupón `PROMO_LAUNCH_3M` = 100% dto 2 meses (primer pago 10€ cubre 3 meses)
+- `create-reservation-checkout` — depósito 2€ (sin "bajo palabra")
+- `stripe-webhook` — sync BD + notif in-app al restaurante
+- `create-billing-portal` — portal Stripe (`SubscriptionPage`)
+- `send-reservation-reminders` — email HTML via Resend (`verify_jwt: false`)
+Secrets: `STRIPE_SECRET_KEY`, `STRIPE_PUBLISHABLE_KEY`, `STRIPE_WEBHOOK_SECRET`, `RESEND_API_KEY`
+Local extra no listada en remoto: `send-push-notification`
 
 ## HECHO ✅
-- Reconstrucción código fuente completo desde build Bolt vieja
-- Auth email+password+magic link. Google/Apple: código listo, falta config externa (OAuth apps + Supabase dashboard)
-- Ciclo mesa completo: crear, unir (RPC), invitar, cancelar (RPC), reseña, notifs automáticas (triggers SQL)
-- RLS en todo, 0 errores seguridad Supabase
-- Logo oficial (gradiente azul→naranja) en Navbar+footer
-- ONBOARDING obligatorio tras signup: nombre completo, foto perfil (obligatoria excepto joseviangles@gmail.com=admin), dirección completa (calle/ciudad/provincia/país), fecha nacimiento, bio, telefono (selector pais+bandera), instagram opcional. Bloquea navegación hasta completar.
-- AJUSTES (pagina nueva): suscripcion(placeholder), notif email/push, modo oscuro(parcial-solo Ajustes), idioma, privacidad/legal, ayuda soporte, cerrar sesion
-- MODELO DIFERENCIADO POR ROL:
-  - Usuario normal: ve "Restaurantes" (listado con foto/nombre/direccion/cocina, filtro ciudad+cocina) en vez de mesas planas. Click→ficha restaurante (foto grande+datos+sus mesas disponibles). Ya NO ve "Crear mesa". "Mis mesas"→"Mis reservas" (solo reservas+invitaciones)
-  - Restaurante: igual que antes - Explorar(mesas), Crear mesa, Mis Mesas, Dashboard
-- Archivos nuevos clave: OnboardingPage.tsx, SettingsPage.tsx, RestaurantsBrowsePage.tsx, RestaurantProfilePage.tsx, ThemeContext.tsx, hooks/useRestaurants.ts
-- Avatar visible en Navbar (icono usuario)
-- BUSQUEDA POR RADIO KM en RestaurantsBrowsePage: al escribir ciudad en el buscador, dentro de "Filtros" aparece un slider con pasos fijos (5/10/25/50/100/200/500 km). Al mover el slider se geocodifica el texto escrito (Nominatim/OSM, sin API key, `src/lib/geocoding.ts`) y se calcula distancia Haversine contra cada restaurante (se geocodifica su city/province/country y se cachea lat/lng en `profiles` para no repetir). Sin radio seleccionado, se mantiene el comportamiento anterior (texto ilike). Requiere migracion 006 (ver arriba)
-- Pestaña "Invitaciones" en barra inferior movil (junto a Reservas), abre directamente esa sub-pestaña en MyTablesPage
-- Filtros de tipo de cocina (Restaurantes y Mesas) ahora son multiseleccion (antes solo 1)
-- ROL INMUTABLE: usuario y restaurante son cuentas distintas, el rol se elige solo al registrarse (AuthModal) y ya NO se puede cambiar despues. Se quito el boton "Cambiar a cuenta de restaurante/personal" de ProfilePage. Ademas bloqueado a nivel BD con trigger (migracion 007, ver arriba) para que ni siquiera se pueda cambiar manipulando la API directamente
-- 5+ commits pusheados a GitHub
 
-### MEJORAS LADO USUARIO (10 features, plan "Mejoras lado usuario") — codigo + migraciones 008-011 completos y ejecutados
-1. **Mini-perfiles de comensales**: `components/ParticipantCard.tsx` (avatar, edad, bio, idiomas/intereses, badge de confianza), usado en TableDetailPage para el anfitrion + participantes
-2. **Idiomas e intereses**: chips multiseleccion nuevos (`lib/options.ts`) en OnboardingPage (opcional) y ProfilePage (editable), guardan en `profiles.languages`/`interests`
-3. **Mapa de restaurantes**: dependencias `leaflet`+`react-leaflet@4`(compatibles con React 18)+`@types/leaflet`. `components/RestaurantsMap.tsx` (tiles OSM gratis), toggle Lista/Mapa en RestaurantsBrowsePage. `useRestaurants` acepta `ensureCoordinates` para geocodificar bajo demanda al activar el mapa
-4. **Favoritos**: `hooks/useFavorites.ts` + tabla `favorites` (migracion 009). Corazon en tarjeta de RestaurantsBrowsePage y en cabecera de RestaurantProfilePage. Filtro "Solo favoritos"
-5. **Filtros de mesas**: en RestaurantProfilePage, filtro client-side por fecha desde/idioma/plazas libres minimas sobre las mesas ya cargadas
-6. **Resenas entre comensales**: `hooks/useDinerReviews.ts` + tabla `diner_reviews` (migracion 010, solo rating 1-5 sin comentario, filas privadas). Agregado publico solo via funcion SQL `get_diner_trust_score` (security definer). Modal `components/DinerReviewModal.tsx` en TableDetailPage cuando la mesa ya paso
-7. **Recordatorios in-app**: migracion 011, funcion `send_dinner_reminders()` + `cron.schedule` cada hora (pg_cron), inserta en `notifications` 24h antes. Sin cambios de frontend (NotificationsPanel ya es generico)
-8. **Modo oscuro completo (TODA la app, lado usuario Y restaurante)**: variantes `dark:` anadidas a Navbar, LandingPage, RestaurantsBrowsePage, RestaurantProfilePage, TableDetailPage, MyTablesPage, ProfilePage, OnboardingPage, AuthModal, NotificationsPanel, TableCard, ShareButton, InviteModal, CancelModal, StarRating, RestaurantsMap + componentes nuevos. Ampliado despues (ver mas abajo) a CreateTablePage, RestaurantDashboardPage, BrowsePage (lado restaurante), PrivacyPolicyPage, AvisoLegalPage, ErrorBanner, LanguageSwitcher — ya no queda ninguna pagina sin dark mode
-9. **Estadisticas de perfil**: seccion "Mi actividad" en ProfilePage (cenas asistidas, confianza, miembro desde)
-10. **Referidos**: enlace `?ref={user_id}` compartible desde ProfilePage (ShareButton), capturado en `App.tsx` (localStorage) y aplicado en `AuthContext.signUp` -> `profiles.referred_by` (migracion 008, via `handle_new_user()` actualizado). Contador de invitados en ProfilePage
+### Auth / perfiles / roles
+- Email + Google + Apple. Recuperar password + toggle visibilidad + fortaleza (min 8, mayúscula o número)
+- Roles: `user`, `restaurant`, `ambassador`. Rol inmutable post-signup (trigger 007)
+- Admins: `manelmercadal@me.com`, `joseanglesai@gmail.com` (`is_admin=true`)
+- Toggle admin usuario↔restaurante sin logout: `ViewModeContext` + localStorage `t4s_admin_view`
+- Onboarding obligatorio: nombre, foto (excepto admin), dirección, nacimiento, bio, teléfono, instagram opcional. Restaurante: wizard 4 pasos (identidad → ubicación → contacto → confirmar)
 
-### PESTAÑA COMENSALES + INVITAR DESDE COMENSALES (feature nueva, codigo completo, migracion 012 ejecutada)
-- **Comensales** (`pages/CompanionsPage.tsx`, ruta `'companions'`): directorio de usuarios rol=user (solo lectura de perfiles). Hook `hooks/useCompanions.ts` (columnas publicas explicitas, nunca email/phone/street_address/lat/lng; filtro nombre+ciudad+idiomas+intereses; paginacion `.range()` + "cargar mas"). Tarjeta `components/CompanionCard.tsx`. Click abre `components/CompanionProfileModal.tsx` (ficha completa: bio, idiomas, intereses, confianza via `useDinerTrustScore`, miembro desde). Pestaña en Navbar (desktop+movil) solo visible role=user, entre Restaurantes y Mis reservas.
-- **Invitar desde Comensales**: hallazgo clave -> las mesas SIEMPRE las crea un restaurante (`host_id` nunca es usuario normal), asi que se abrio la politica RLS de `invitations` (migracion 012) para permitir tambien a participantes con `status='approved'`, no solo al host.
-  - `hooks/useInvitableTables.ts`: mesas desde las que el usuario puede invitar ya mismo (host o participante aprobado, `status='open'`, plazas libres, fecha futura)
-  - `components/InviteToTableModal.tsx`: boton "Invitar a una cena" en `CompanionProfileModal`. Si 1 mesa invitable -> elegir tipo ("Yo invito"/"Cada uno paga") y enviar. Si varias -> elegir mesa primero. Si 0 -> boton "Buscar restaurante para invitar"
-  - Fase 2 (invitar sin tener mesa aun): `contexts/PendingInviteContext.tsx` (persiste intencion `{inviteeId,inviteeName}` en localStorage `t4s_pending_invite`, provider montado en `App.tsx`), `components/PendingInviteBanner.tsx` (banner fijo global "Buscando mesa para invitar a X"). En `TableDetailPage`, tras unirse ("doy mi palabra" o volviendo de pago con deposito exitoso), si hay invitacion pendiente se ofrece enviarla al instante y se limpia el estado
-  - No se toca `InviteModal.tsx` (flujo host clasico) ni reglas de `diner_reviews`
+### Stripe LIVE — activo
+Suscripción restaurantes + depósito reserva 2€ + webhook + portal billing. Ver Edge Functions.
 
-### CUENTAS DE PRUEBA — creadas ✅
-`scripts/seed-test-accounts.mjs` reescrito para usar la Secret Key de Supabase (API admin: `auth.admin.createUser`/`updateUserById` con `email_confirm:true`, bypassa confirmacion de email y RLS). Re-ejecutable sin duplicar (busca por email, actualiza si ya existe). Requiere `SUPABASE_SECRET_KEY` en `.env` (clave secreta del nuevo sistema de API keys de Supabase, formato `sb_secret_...`, NO subida a git). Cuentas creadas, confirmadas y con onboarding completo, password para todas: `Test1234!`:
-- `t4s.test.elena.martin@gmail.com` — Elena Martín, user, Madrid, idiomas Español/Inglés, intereses Cine/Gastronomía/Viajar
-- `t4s.test.marc.soler@gmail.com` — Marc Soler, user, Barcelona, idiomas Español/Catalán, intereses Fotografía/Deporte/Música
-- `t4s.test.tabernasur@gmail.com` — La Taberna del Sur, restaurant, Madrid, española €€, mesa abierta con 6 plazas
-- `t4s.test.sakurasushi@gmail.com` — Sakura Sushi Bar, restaurant, Barcelona, japonesa €€€, mesa abierta con 8 plazas
+### Buscador restaurantes (`RestaurantsBrowsePage`)
+Filtro nombre/ciudad, cocina multi, precio (`0-50`/`50-100`/`100-200`/`+200`), fecha, tramo (mediodía/noche), radio km (Nominatim+Haversine, cache lat/lng en profiles), solo favoritos. Lista/mapa Leaflet. Contador filtros. Fecha+hora siempre visibles.
 
-### MODO OSCURO — ampliado a toda la app ✅
-Ya cubre el 100% de paginas y componentes (antes faltaba el lado restaurante y las legales):
-- `CreateTablePage.tsx`, `RestaurantDashboardPage.tsx`, `BrowsePage.tsx` (lado restaurante)
-- `PrivacyPolicyPage.tsx`, `AvisoLegalPage.tsx` (legales)
-- `ErrorBanner.tsx`, `LanguageSwitcher.tsx` (componentes que faltaban)
-- Verificado visualmente con capturas en local (Crear mesa, Dashboard, Politica de Privacidad, Aviso Legal) via CDP (`document.documentElement.classList.add('dark')`), sin bloques blancos ni texto ilegible
-- BONUS fix: el boton "Politica de Privacidad" del footer de LandingPage llamaba a `onNavigate('privacy')` pero la ruta real en App.tsx es `'politica-privacidad'` -> nunca navegaba. Corregido (bug pre-existente, no relacionado con dark mode)
+### Flujo reserva
+- Perfil restaurante: carrusel fotos, selector fecha+tramo OBLIGATORIO antes de mesas
+- `TableCard` compacta sin imagen; avatares → `CommensalModal`
+- `TableDetailPage`: solo depósito 2€; ocupados/total; chat solo si hay reserva
+- `MyTablesPage`: clic reserva → `restaurant-profile` (no table-detail)
 
-### RESEÑAS UNIFICADAS (local) ✅ codigo
-- Fuente unica de media del local: `restaurant_reviews` (perfil usuario + pagina Reseñas restaurante + media del Dashboard).
-- Dashboard ya NO lee `reviews` (post-cena de mesa); lee `restaurant_reviews` por `restaurant_id`. Card de estrellas clicable → pagina Reseñas.
-- Notifs: migracion 016 ejecutada ✅ (triggers INSERT/UPDATE → `notifications` tipo `new_restaurant_review` / `updated_restaurant_review`).
-- Siguen aparte: `reviews` (post-cena por mesa) y `diner_reviews` (confianza entre comensales).
+### Valoraciones
+- `PostDinnerReviewModal`: 1 botón → paso1 restaurante (estrellas+comentario público) → paso2 comensales (rating anónimo). Si ya valoró local → salta a 2. Host → solo 2
+- `review_replies`: restaurante escribe, todos leen. UI en `RestaurantReviewsPage` (tabs local + cenas) y público en `TableDetailPage`
+- Aparte: `diner_reviews` (confianza, agregado via `get_diner_trust_score`)
 
-### SYNC USUARIO↔RESTAURANTE — GAPS CERRADOS ✅ codigo
-Todos los flujos bidireccionales corregidos (migraciones 017-018 pendientes de ejecutar):
-- **B (participante cancela)**: trigger `notify_participant_left` (017) → notif al restaurante. Agenda live ahora también refresca participantes cuando suben las plazas (no solo al bajar).
-- **D (reseñas post-cena)**: `RestaurantReviewsPage` tiene dos pestañas: "Reseñas del local" (`restaurant_reviews`) y "Valoraciones de cenas" (`reviews` por `host_id`).
-- **J (approve/reject)**: RPC `remove_participant` (017) → el restaurante puede eliminar un comensal desde el detalle de mesa (botón aparece al hacer hover sobre cada participante, solo si es host y la mesa no ha pasado).
-- **K (campos extra perfil)**: `RestaurantProfilePage` muestra `restaurant_hours`, `restaurant_offers`, `restaurant_menu_url`, `restaurant_specialties` si tienen valor.
-- **L (respuesta a reseña)**: trigger `notify_review_reply` (017) → notifica al usuario cuando el restaurante responde.
-- **Transversal (notifs Realtime)**: `useNotifications` suscrito a `postgres_changes INSERT` filtrado por `user_id`. Requiere habilitar `notifications` en publicación Realtime (migración 018).
+### Notifs / recordatorios / PWA
+- Campana navbar + badge. Realtime postgres_changes
+- Reserva → notif in-app al restaurante (webhook Stripe)
+- Email recordatorio diario 18:00 UTC (pg_cron + Resend)
+- PWA: `manifest.json` + SW. `InstallPrompt` a los 30s (Android instalar / iOS instrucciones)
+- Dark mode 100% (`darkMode: class`)
 
-## PENDIENTE ⚠️
-1. EJECUTAR migraciones 017 y 018 en SQL Editor (zocrwanhcschmydczgeh)
-2. PROBAR flujo completo con cuentas de prueba: unirse a mesa, chat, reseñas (local + cena), favoritos, mapa, referidos, Comensales+Invitar, notifs en tiempo real
-3. STRIPE: Edge Functions + deposito. Falta cuenta Stripe+keys
-4. LOGIN SOCIAL: solo config externa (Google/Apple + Supabase dashboard). Código ya OK.
-5. DOMINIO: conectar table4singles.online a Vercel
+### Paneles
+- Admin: usuarios (incluye admins), restaurantes, embajadores, movimientos
+- Embajador: restaurantes captados, reservas, comisión 5%. Compartir WhatsApp/Email/Web Share con `referral_code` tipo `AMBX3F7K`
+- Analytics restaurante: KPIs mesas/reservas/ocupación/rating + BarChart/PieChart, filtro 7d/30d/90d. Solo `effectiveRole==='restaurant'`
+- Agenda restaurante: `RestaurantAgendaPage`
+
+### Referidos
+`?ref=` → localStorage → `AuthModal` pre-rellena código. `referred_by` es TEXTO (código), no UUID. RPC embajador busca por `referral_code`.
+
+### i18n — 13 idiomas
+ES EN DE FR IT RU PT UK RO AR(RTL) SV ZH JA. Selector grid en Ajustes + botón compacto en AuthModal. Maestro: `src/i18n/es.ts`. RTL: `document.documentElement.dir`.
+Traducido 100%: Navbar, Settings, AuthModal, Analytics, Ambassador, Dashboard, Subscription, TableDetail, CancelModal, CommensalModal, RestaurantProfile.
+
+### Features lado usuario (siguen vivas)
+Mini-perfiles, idiomas/intereses, mapa, favoritos, Comensales+invitar (`CompanionsPage`, `PendingInviteContext`), stats perfil, modo oscuro.
+
+## CUENTAS DE PRUEBA
+Password todas: `Test1234!` (script `scripts/seed-test-accounts.mjs`, requiere `SUPABASE_SECRET_KEY`)
+- `t4s.test.elena.martin@gmail.com` — Elena Martín, user, Madrid
+- `t4s.test.marc.soler@gmail.com` — Marc Soler, user, Barcelona
+- `t4s.test.tabernasur@gmail.com` — La Taberna del Sur, restaurant, Madrid
+- `t4s.test.sakurasushi@gmail.com` — Sakura Sushi Bar, restaurant, Barcelona
+
+## PENDIENTE ⚠️ (baja prioridad)
+- Strings hardcodeados: OnboardingPage (cocinas/wizard), AdminPage, RestaurantAgendaPage, PostDinnerReviewModal, MyTablesPage (estados)
+- Reactivar validación email al registrarse (off para pruebas)
+- Test E2E: restaurante crea mesa → usuario reserva → agenda → notif
+- Búsqueda directa de mesas (ahora se buscan restaurantes)
+- Perfil público comensal más completo
+- Subir a git archivos SQL de 026–028 (existen solo en remoto)
 
 ## ESTRUCTURA CLAVE
 ```
-src/App.tsx              routing principal (switch por 'page' string) + captura ?ref= + PendingInviteProvider+Banner global
-src/contexts/            AuthContext(signUp con referred_by), LanguageContext, ThemeContext, PendingInviteContext(nuevo)
-src/hooks/                useTables, useMyTables, useTableDetail(+hostProfile), useInvitations,
-                          useMessages, useNotifications, useReviews, useRestaurants(+ensureCoordinates),
-                          useFavorites, useDinerReviews(trust score + envio ratings),
-                          useCompanions(nuevo, directorio), useInvitableTables(nuevo, mesas desde las que invitar)
+src/App.tsx                 routing + ?ref= + redirects pago Stripe + PendingInviteProvider
+src/contexts/               Auth, Language(RTL), Theme, ViewMode(admin toggle), PendingInvite
+src/i18n/                   es.ts maestro + 12 langs + index (languageOptions, RTL_LANGS)
 src/pages/
-  LandingPage, BrowsePage(mesas-solo restaurantes), RestaurantsBrowsePage(usuarios, +mapa+favoritos),
-  RestaurantProfilePage(ficha, +favorito+filtros mesas), CreateTablePage, TableDetailPage(+mini-perfiles+resenas comensales+auto-invitar tras reservar),
-  RestaurantDashboardPage, OnboardingPage(+idiomas/intereses), SettingsPage, ProfilePage(+stats+referidos+idiomas/intereses),
-  CompanionsPage(nuevo, pestaña Comensales), PrivacyPolicyPage, AvisoLegalPage
+  Landing, Browse(mesas-solo restaurant), RestaurantsBrowse(user+mapa+filtros),
+  RestaurantProfile(fecha/hora+mesas), CreateTable, TableDetail(deposito 2€),
+  MyTables, RestaurantDashboard, RestaurantAgenda, Analytics, RestaurantReviews,
+  Onboarding(wizard 4), Settings(13 langs), Profile, Subscription(Stripe portal),
+  Ambassador, Admin, Companions, Privacy, AvisoLegal
 src/components/
-  Navbar(diferenciado por rol, +tab Comensales), AuthModal, TableCard, InviteModal, CancelModal,
-  LoadingSpinner, ErrorBanner, ShareButton, StarRating, LanguageSwitcher, NotificationsPanel,
-  ParticipantCard, DinerReviewModal, RestaurantsMap(Leaflet),
-  CompanionCard(nuevo), CompanionProfileModal(nuevo, +boton Invitar), InviteToTableModal(nuevo), PendingInviteBanner(nuevo)
-src/lib/geocoding.ts     geocodeQuery (Nominatim/OSM) + haversineDistanceKm + RADIUS_STEPS_KM
-src/lib/options.ts       LANGUAGE_OPTIONS + INTEREST_OPTIONS (chips)
-src/types/database.ts    tipos+Profile con todos los campos nuevos (incluye referred_by, created_at)
-supabase/schema.sql       schema base
-supabase/migrations/      002–016, todas ejecutadas
-scripts/seed-test-accounts.mjs  crea/actualiza 2 users+2 restaurantes+mesa de prueba via API admin (SUPABASE_SECRET_KEY). Ya ejecutado, ver cuentas arriba
+  Navbar(+toggle admin), AuthModal(+lang), TableCard, CommensalModal,
+  PostDinnerReviewModal, CancelModal, InviteModal, InviteToTableModal,
+  CompanionCard/Modal, PendingInviteBanner, RestaurantsMap, InstallPrompt,
+  NotificationsPanel, ParticipantCard, DinerReviewModal, Agenda*
+src/hooks/                  useTables, useRestaurants, useReviews(+replies), useFavorites,
+                            useDinerReviews, useCompanions, useInvitableTables,
+                            useAmbassadorStats, useAdminData, useRestaurantAgenda,
+                            useNotifications, usePushSubscription, useMessages, useInvitations
+src/lib/geocoding.ts        Nominatim + Haversine + RADIUS_STEPS_KM
+src/lib/options.ts          LANGUAGE_OPTIONS + INTEREST_OPTIONS
+supabase/functions/         5 desplegadas (ver arriba) + send-push-notification local
+supabase/migrations/        002–025 en git; 026–028 solo remoto
 ```
 
+## TABLAS PUBLIC (RLS on)
+profiles, cities, dining_tables, table_participants, invitations, reviews, messages, notifications, refund_claims, payments, vip_cards, referrals, restaurant_terms_acceptance, favorites, diner_reviews, push_subscriptions, restaurant_reviews, restaurant_review_replies, ambassadors, reservation_payments, review_replies
+
 ## OJO / GOTCHAS
-- Tailwind config cambia (darkMode:class) requiere reiniciar Vite completo, no solo HMR
-- Si Chrome/macOS en modo oscuro del sistema y no se reinicia Vite tras tocar tailwind.config, sale todo oscuro por error
-- Bucket storage `restaurant-photos` se reutiliza tambien para avatares de usuario normal (path distinto: `{user_id}/avatar_*`)
-- reviews: hook `useReviews(tableId)` es por mesa, `useRestaurantReviews(hostId)` es por restaurante completo
-- Supabase migró a nuevo sistema de API keys: `publishable key` (=antiguo anon, sigue siendo JWT en este proyecto, funciona igual) y `secret key` (=antiguo service_role, formato `sb_secret_...`, usada en `SUPABASE_SECRET_KEY`)
-- Recurrente: si tras editar archivos el navegador sigue mostrando codigo viejo (HMR no lo recoge), el fix es matar el proceso vite del puerto 5173 y arrancar `npm run dev` de cero — verificar con `curl http://localhost:5173/src/archivo.tsx` que el contenido servido coincide con el fuente antes de dar por buena una verificacion visual
+- Tailwind `darkMode:class` → reiniciar Vite, no solo HMR. Si macOS dark y Vite no reiniciado, sale todo oscuro
+- Vite zombie en :5173 sirve código viejo → matar y `npm run dev` limpio
+- Bucket `restaurant-photos` también avatares user (`{user_id}/avatar_*`)
+- `useReviews(tableId)` = por mesa; reviews de local = `restaurant_reviews`
+- `referred_by` es CÓDIGO TEXTO no UUID (026–027). No romper el trigger
+- Keys Supabase: publishable (=anon JWT) + secret `sb_secret_...` (`SUPABASE_SECRET_KEY`, no git)
+- 026–028 aplicadas por MCP: si recreas el proyecto, hay que reaplicarlas; no están en `supabase/migrations/`
+- Landing footer "Política de Privacidad" navega a ruta `politica-privacidad` (no `privacy`)
 
 ## SIGUIENTE PASO
-Probar flujo completo con las cuentas de prueba (local o en https://table4singles.vercel.app), incluyendo Comensales+Invitar entre Elena y Marc. Luego Stripe. Luego conectar dominio table4singles.online.
+Deuda i18n residual (Onboarding/Admin/Agenda/PostDinner/MyTables). Luego E2E con cuentas de prueba. Opcional: volcar 026–028 a archivos SQL locales.

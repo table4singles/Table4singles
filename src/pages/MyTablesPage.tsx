@@ -53,8 +53,8 @@ export function MyTablesPage({ onNavigate, onAuthClick, initialTab }: MyTablesPa
       <main className="max-w-4xl mx-auto px-4 py-6 pb-24 md:pb-8">
         <div className="flex items-center justify-between mb-6">
           <div>
-            <h1 className="text-2xl font-display font-bold text-gray-900 dark:text-white">{isRestaurant ? t('myTables.title') : 'Mis reservas'}</h1>
-            <p className="text-gray-500 dark:text-gray-400 text-sm mt-1">{isRestaurant ? t('myTables.subtitle') : 'Tus cenas y mesas reservadas'}</p>
+            <h1 className="text-2xl font-display font-bold text-gray-900 dark:text-white">{isRestaurant ? t('myTables.title') : t('myTables.titleUser')}</h1>
+            <p className="text-gray-500 dark:text-gray-400 text-sm mt-1">{isRestaurant ? t('myTables.subtitle') : t('myTables.subtitleUser')}</p>
           </div>
           {isRestaurant && (
             <button onClick={() => onNavigate('create')} className="px-4 py-2.5 bg-[#e94560] text-white rounded-xl font-medium text-sm hover:bg-[#d63d56] transition-colors flex items-center gap-2">
@@ -107,7 +107,7 @@ export function MyTablesPage({ onNavigate, onAuthClick, initialTab }: MyTablesPa
               </div>
               <div>
                 <p className="text-xl font-bold text-gray-900 dark:text-white">{invitations.length}</p>
-                <p className="text-xs text-gray-500 dark:text-gray-400">Invitaciones</p>
+                <p className="text-xs text-gray-500 dark:text-gray-400">{t('myTables.invitationsLabel')}</p>
               </div>
             </div>
           )}
@@ -152,13 +152,13 @@ export function MyTablesPage({ onNavigate, onAuthClick, initialTab }: MyTablesPa
                                   {table.description || table.restaurant_name}
                                 </h3>
                                 <p className="text-sm text-gray-500 dark:text-gray-400">
-                                  Desde {new Date(table.date).toLocaleDateString(locale, { month: 'short', day: 'numeric' })}
+                                  {t('myTables.since')} {new Date(table.date).toLocaleDateString(locale, { month: 'short', day: 'numeric' })}
                                   {table.available_until ? ` · hasta ${new Date(table.available_until).toLocaleDateString(locale, { month: 'short', day: 'numeric' })}` : ''}
                                 </p>
                                 <div className="flex items-center gap-2 mt-1.5 flex-wrap">
-                                  {table.status === 'cancelled' && <span className="text-xs px-2 py-0.5 bg-red-50 text-red-600 rounded-full">Cancelada</span>}
+                                  {table.status === 'cancelled' && <span className="text-xs px-2 py-0.5 bg-red-50 text-red-600 rounded-full">{t('myTables.statusCancelled')}</span>}
                                   <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${isActive ? 'bg-green-50 text-green-700 dark:bg-green-900/30 dark:text-green-400' : 'bg-gray-100 text-gray-500 dark:bg-gray-700 dark:text-gray-400'}`}>
-                                    {isActive ? 'Disponible' : 'No disponible'}
+                                    {isActive ? t('myTables.statusAvailable') : t('myTables.statusUnavailable')}
                                   </span>
                                   <span className="text-xs text-gray-400 dark:text-gray-500 flex items-center gap-1">
                                     <Users className="w-3 h-3" />{table.max_seats - table.available_seats}/{table.max_seats}
@@ -173,7 +173,7 @@ export function MyTablesPage({ onNavigate, onAuthClick, initialTab }: MyTablesPa
                               onClick={() => handleToggle(table.id, !isActive)}
                               disabled={togglingId === table.id}
                               className="flex flex-col items-center gap-0.5 flex-shrink-0 pt-0.5"
-                              title={isActive ? 'Marcar como no disponible' : 'Marcar como disponible'}
+                              title={isActive ? t('myTables.markUnavailable') : t('myTables.markAvailable')}
                             >
                               {togglingId === table.id ? (
                                 <Loader2 className="w-7 h-7 animate-spin text-gray-400" />
@@ -183,7 +183,7 @@ export function MyTablesPage({ onNavigate, onAuthClick, initialTab }: MyTablesPa
                                 <ToggleLeft className="w-8 h-8 text-gray-300 dark:text-gray-600" />
                               )}
                               <span className={`text-[10px] font-medium ${isActive ? 'text-green-600' : 'text-gray-400'}`}>
-                                {isActive ? 'Activa' : 'Inactiva'}
+                                {isActive ? t('myTables.statusAvailable') : t('myTables.statusUnavailable')}
                               </span>
                             </button>
                           )}

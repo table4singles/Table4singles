@@ -28,6 +28,7 @@ import { SubscriptionPage } from '@/pages/SubscriptionPage'
 import { AdminPage } from '@/pages/AdminPage'
 import { AnalyticsPage } from '@/pages/AnalyticsPage'
 import { ResetPasswordPage } from '@/pages/ResetPasswordPage'
+import { FlyerPage } from '@/pages/FlyerPage'
 import { AmbassadorBanner } from '@/components/AmbassadorBanner'
 
 // Suppress unused import warning – BrowsePage kept for future use
@@ -104,6 +105,17 @@ function AppRouter() {
     }
   }, [])
 
+  // Handle flyer link (?flyer=restaurantId) — ruta pública sin login
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search)
+    const flyerId = params.get('flyer')
+    if (flyerId) {
+      setSelectedId(flyerId)
+      setPage('flyer')
+      window.history.replaceState({}, '', window.location.pathname)
+    }
+  }, [])
+
   const navigate = (p: string, id?: string) => {
     setPage(p)
     setSelectedId(id ?? null)
@@ -163,6 +175,8 @@ function AppRouter() {
         return <ProfilePage onNavigate={navigate} onAuthClick={openAuth} />
       case 'settings':
         return <SettingsPage onNavigate={navigate} onAuthClick={openAuth} />
+      case 'flyer':
+        return selectedId ? <FlyerPage restaurantId={selectedId} /> : null
       case 'politica-privacidad':
         return <PrivacyPolicyPage onNavigate={navigate} />
       case 'aviso-legal':

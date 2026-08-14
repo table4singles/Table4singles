@@ -136,6 +136,14 @@ export function OnboardingPage({ onNavigate }: { onNavigate: (page: string) => v
     }
     await refreshProfile()
     setSaving(false)
+
+    // Enviar email de bienvenida con flyer personalizado al restaurante
+    if (isRestaurant) {
+      supabase.functions.invoke('send-welcome-restaurant', {
+        body: { restaurantId: user.id },
+      }).catch(() => { /* silencioso — no bloquear la navegación */ })
+    }
+
     onNavigate('browse')
   }
 

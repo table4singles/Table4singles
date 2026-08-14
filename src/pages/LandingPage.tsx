@@ -73,7 +73,7 @@ export function LandingPage({ onNavigate, onAuthClick }: LandingPageProps) {
       {/* Mediterranean section */}
       <section className="relative text-white overflow-hidden">
         <img
-          src="https://images.pexels.com/photos/19721743/pexels-photo-19721743.jpeg?auto=compress&cs=tinysrgb&w=1200"
+          src="/hero-dinner.jpg"
           alt=""
           className="absolute inset-0 w-full h-full object-cover"
         />

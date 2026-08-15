@@ -46,12 +46,19 @@ function AppRouter() {
 
   useEffect(() => {
     if (!loading && user && profile && page === 'landing') {
+      const pendingTable = localStorage.getItem('t4s_invite_table')
+      if (pendingTable) {
+        localStorage.removeItem('t4s_invite_table')
+        setSelectedId(pendingTable)
+        setPage('table-detail')
+        return
+      }
       const savedMode = profile.is_admin
         ? (localStorage.getItem('t4s_admin_view') as 'user' | 'restaurant' | null) ?? 'user'
         : profile.role
       setPage(savedMode === 'restaurant' ? 'restaurant-dashboard' : 'browse')
     }
-    if (!loading && !user && !['landing', 'politica-privacidad', 'aviso-legal'].includes(page)) setPage('landing')
+    if (!loading && !user && !['landing', 'politica-privacidad', 'aviso-legal', 'flyer', 'table-detail'].includes(page)) setPage('landing')
   }, [user, loading, profile])
 
   // Capture referral code (?ref=<user_id>) for use during sign up
@@ -113,6 +120,20 @@ function AppRouter() {
       setSelectedId(flyerId)
       setPage('flyer')
       window.history.replaceState({}, '', window.location.pathname)
+    }
+  }, [])
+
+  // Invitación a una cena (?invite=tableId) — quien no tenga cuenta ve la mesa y puede registrarse
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search)
+    const inviteId = params.get('invite')
+    if (inviteId) {
+      localStorage.setItem('t4s_invite_table', inviteId)
+      setSelectedId(inviteId)
+      setPage('table-detail')
+      params.delete('invite')
+      const newSearch = params.toString()
+      window.history.replaceState({}, '', window.location.pathname + (newSearch ? `?${newSearch}` : ''))
     }
   }, [])
 

@@ -356,6 +356,10 @@ export const ro = {
     send: 'Trimite invitația',
     noCity: 'Selectează mai întâi un oraș',
     close: 'Închide',
+    inviteViaWhatsApp: 'Invită pe WhatsApp',
+    inviteViaWhatsAppDesc: 'Prietenul tău nu are nevoie de aplicație. Va primi un link pentru a vedea cina și a se alătura.',
+    waInviteText: 'Te invit la o cină pe Table4Singles. Deschide linkul și înregistrează-te pentru a-ți rezerva locul:',
+    orSearchUser: 'Sau caută pe cineva deja în aplicație',
   },
   settings: {
     title: 'Setări',

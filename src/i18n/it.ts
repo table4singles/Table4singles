@@ -356,6 +356,10 @@ export const it = {
     send: 'Invia invito',
     noCity: 'Seleziona prima una città',
     close: 'Chiudi',
+    inviteViaWhatsApp: 'Invita su WhatsApp',
+    inviteViaWhatsAppDesc: 'Il tuo amico non ha bisogno dell\'app. Riceverà un link per vedere questa cena e unirsi.',
+    waInviteText: 'Ti invito a una cena su Table4Singles. Aprilo e registrati per prenotare il tuo posto:',
+    orSearchUser: 'Oppure cerca qualcuno già nell\'app',
   },
   settings: {
     title: 'Impostazioni',

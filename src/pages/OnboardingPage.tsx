@@ -18,7 +18,7 @@ const RESTAURANT_STEPS = [
   { label: 'Confirmar', icon: Check },
 ]
 
-export function OnboardingPage({ onNavigate }: { onNavigate: (page: string) => void }) {
+export function OnboardingPage({ onNavigate }: { onNavigate: (page: string, id?: string) => void }) {
   const { user, profile, refreshProfile, signOut } = useAuth()
   const isAdmin = user?.email === ADMIN_EMAIL
   const isRestaurant = profile?.role === 'restaurant'
@@ -164,7 +164,13 @@ export function OnboardingPage({ onNavigate }: { onNavigate: (page: string) => v
     }
 
     setSaving(false)
-    onNavigate('browse')
+    const pendingTable = !isRestaurant ? localStorage.getItem('t4s_invite_table') : null
+    if (pendingTable) {
+      localStorage.removeItem('t4s_invite_table')
+      onNavigate('table-detail', pendingTable)
+    } else {
+      onNavigate('browse')
+    }
   }
 
   const handleBack = async () => {

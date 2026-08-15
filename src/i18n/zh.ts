@@ -356,6 +356,10 @@ export const zh = {
     send: '发送邀请',
     noCity: '请先选择城市',
     close: '关闭',
+    inviteViaWhatsApp: '通过 WhatsApp 邀请',
+    inviteViaWhatsAppDesc: '朋友无需安装应用。他们会收到链接查看这次晚餐并加入。',
+    waInviteText: '我邀请你参加 Table4Singles 的晚餐。打开链接并注册即可预订座位：',
+    orSearchUser: '或搜索已在应用中的用户',
   },
   settings: {
     title: '设置',

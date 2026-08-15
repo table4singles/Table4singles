@@ -356,6 +356,10 @@ export const sv = {
     send: 'Skicka inbjudan',
     noCity: 'Välj en stad först',
     close: 'Stäng',
+    inviteViaWhatsApp: 'Bjud in via WhatsApp',
+    inviteViaWhatsAppDesc: 'Din vän behöver inte appen. Hen får en länk för att se middagen och gå med.',
+    waInviteText: 'Jag bjuder in dig till en middag på Table4Singles. Öppna länken och registrera dig för att boka din plats:',
+    orSearchUser: 'Eller sök efter någon som redan är i appen',
   },
   settings: {
     title: 'Inställningar',

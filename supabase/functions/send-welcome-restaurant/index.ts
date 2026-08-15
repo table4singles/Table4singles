@@ -19,7 +19,7 @@ Deno.serve(async (req) => {
     return new Response('ok', { headers: corsHeaders })
   }
 
-  const { restaurantId } = await req.json()
+  const { restaurantId, overrideEmail } = await req.json()
   if (!restaurantId) {
     return new Response(JSON.stringify({ error: 'restaurantId required' }), {
       status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -35,14 +35,19 @@ Deno.serve(async (req) => {
     .eq('id', restaurantId)
     .single()
 
-  if (error || !profile?.email) {
-    return new Response(JSON.stringify({ error: 'Restaurant not found or no email' }), {
+  if (error || !profile) {
+    return new Response(JSON.stringify({ error: 'Restaurant not found' }), {
       status: 404, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     })
   }
 
   const name    = profile.restaurant_name || profile.display_name || 'Tu restaurante'
-  const email   = profile.email
+  const email   = overrideEmail || profile.email
+  if (!email) {
+    return new Response(JSON.stringify({ error: 'No email available' }), {
+      status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    })
+  }
   const flyerUrl = `${APP_URL}/?flyer=${restaurantId}`
   const logoSrc  = profile.avatar_url || `${APP_URL}/icons/logo-icon.png`
 
@@ -158,7 +163,7 @@ Deno.serve(async (req) => {
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({
-      from: 'Table4Singles <hola@table4singles.online>',
+      from: 'Table4Singles <onboarding@resend.dev>',
       to: [email],
       subject: `¡Bienvenido a Table4Singles, ${name}! Tu flyer te espera 🎨`,
       html,

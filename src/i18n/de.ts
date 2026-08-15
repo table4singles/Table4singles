@@ -390,6 +390,10 @@ export const de = {
     send: 'Einladung senden',
     noCity: 'Wähle zuerst eine Stadt',
     close: 'Schließen',
+    inviteViaWhatsApp: 'Per WhatsApp einladen',
+    inviteViaWhatsAppDesc: 'Dein Freund braucht die App nicht. Er erhält einen Link, um dieses Abendessen zu sehen und beizutreten.',
+    waInviteText: 'Ich lade dich zu einem Abendessen auf Table4Singles ein. Öffne den Link und registriere dich, um deinen Platz zu reservieren:',
+    orSearchUser: 'Oder suche jemanden, der schon in der App ist',
   },
   settings: {
     title: 'Einstellungen',

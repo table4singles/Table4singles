@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { X, Search, Loader2, Check } from 'lucide-react'
 import { useLanguage } from '@/contexts/LanguageContext'
 import { useInvitations } from '@/hooks/useInvitations'
+import { openWhatsAppInvite } from '@/lib/inviteLink'
 import type { Profile } from '@/types/database'
 
 interface InviteModalProps {
@@ -81,6 +82,24 @@ export function InviteModal({ tableId, onClose }: InviteModalProps) {
             </div>
           ) : (
             <>
+              <button
+                type="button"
+                onClick={() => openWhatsAppInvite(tableId, t('invite.waInviteText'))}
+                className="w-full mb-4 py-3 bg-[#25D366] text-white rounded-xl font-medium hover:bg-[#1ebe5d] transition-colors flex items-center justify-center gap-2"
+              >
+                <span className="text-lg leading-none">💬</span>
+                {t('invite.inviteViaWhatsApp')}
+              </button>
+              <p className="text-xs text-gray-500 dark:text-gray-400 text-center -mt-2 mb-4">
+                {t('invite.inviteViaWhatsAppDesc')}
+              </p>
+
+              <div className="flex items-center gap-3 mb-3">
+                <div className="flex-1 h-px bg-gray-200 dark:bg-gray-700" />
+                <span className="text-[11px] uppercase tracking-wide text-gray-400">{t('invite.orSearchUser')}</span>
+                <div className="flex-1 h-px bg-gray-200 dark:bg-gray-700" />
+              </div>
+
               <div className="relative mb-3">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 dark:text-gray-500" />
                 <input

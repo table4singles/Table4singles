@@ -356,6 +356,10 @@ export const ja = {
     send: '招待を送信',
     noCity: '先に都市を選択してください',
     close: '閉じる',
+    inviteViaWhatsApp: 'WhatsAppで招待',
+    inviteViaWhatsAppDesc: '友達はアプリがなくても大丈夫。このディナーを見て参加できるリンクが届きます。',
+    waInviteText: 'Table4Singlesのディナーに招待します。リンクを開いて登録し、席を予約してください：',
+    orSearchUser: 'またはすでにアプリにいる人を検索',
   },
   settings: {
     title: '設定',

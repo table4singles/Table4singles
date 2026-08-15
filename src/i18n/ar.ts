@@ -356,6 +356,10 @@ export const ar = {
     send: 'إرسال الدعوة',
     noCity: 'اختر مدينة أولاً',
     close: 'إغلاق',
+    inviteViaWhatsApp: 'دعوة عبر واتساب',
+    inviteViaWhatsAppDesc: 'صديقك لا يحتاج إلى التطبيق. سيحصل على رابط لرؤية العشاء والانضمام.',
+    waInviteText: 'أدعوك إلى عشاء على Table4Singles. افتح الرابط وسجّل لحجز مكانك:',
+    orSearchUser: 'أو ابحث عن شخص موجود بالفعل في التطبيق',
   },
   settings: {
     title: 'الإعدادات',

@@ -300,7 +300,7 @@ export function TableDetailPage({ tableId, paymentSuccess, paymentCancelled, onN
         <div className="relative h-56 md:h-72 rounded-2xl overflow-hidden mb-6">
           <img src={table.restaurant_image_url || 'https://images.pexels.com/photos/67468/pexels-photo-67468.jpeg?auto=compress&cs=tinysrgb&w=800'} alt={table.restaurant_name} className="w-full h-full object-cover" />
           <div className="absolute bottom-4 right-4 flex gap-2">
-            <ShareButton url={`${window.location.origin}/table/${table.id}`} />
+            <ShareButton url={`${window.location.origin}/?invite=${table.id}`} />
           </div>
         </div>
 
@@ -473,6 +473,12 @@ export function TableDetailPage({ tableId, paymentSuccess, paymentCancelled, onN
                     </button>
                   )}
                 </>
+              )}
+
+              {isParticipant && !isHost && !isCancelled && !isFull && !isPast && (
+                <button onClick={() => setShowInvite(true)} className="w-full py-2.5 bg-[#25D366]/10 text-[#128C7E] border border-[#25D366]/30 rounded-xl text-sm font-medium hover:bg-[#25D366]/20 flex items-center justify-center gap-2">
+                  <UserPlus className="w-4 h-4" /> {t('invite.title')}
+                </button>
               )}
 
               {!isRestaurantUser && (

@@ -356,6 +356,10 @@ export const fr = {
     send: 'Envoyer l\'invitation',
     noCity: 'Sélectionnez d\'abord une ville',
     close: 'Fermer',
+    inviteViaWhatsApp: 'Inviter via WhatsApp',
+    inviteViaWhatsAppDesc: 'Votre ami n\'a pas besoin de l\'app. Il recevra un lien pour voir ce dîner et s\'inscrire.',
+    waInviteText: 'Je t\'invite à un dîner sur Table4Singles. Ouvre le lien et inscris-toi pour réserver ta place :',
+    orSearchUser: 'Ou recherchez quelqu\'un déjà sur l\'app',
   },
   settings: {
     title: 'Paramètres',

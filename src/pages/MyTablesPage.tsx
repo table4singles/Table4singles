@@ -7,6 +7,7 @@ import { useAuth } from '@/contexts/AuthContext'
 import { useViewMode } from '@/contexts/ViewModeContext'
 import { useMyTables } from '@/hooks/useTables'
 import { useInvitations } from '@/hooks/useInvitations'
+import { openWhatsAppInvite } from '@/lib/inviteLink'
 
 interface MyTablesPageProps {
   onNavigate: (page: string, id?: string) => void
@@ -233,9 +234,17 @@ export function MyTablesPage({ onNavigate, onAuthClick, initialTab }: MyTablesPa
                           </div>
                         </button>
                         {!isPast && dt?.status !== 'cancelled' && (
-                          <button onClick={() => setCancelReservationTarget({ id: r.id, joinType: r.join_type })} className="mt-3 text-xs text-red-500 hover:text-red-600 font-medium flex items-center gap-1">
-                            <XCircle className="w-3.5 h-3.5" /> {t('card.cancelReservation')}
-                          </button>
+                          <div className="mt-3 flex items-center gap-3">
+                            <button
+                              onClick={() => openWhatsAppInvite(r.table_id, t('invite.waInviteText'))}
+                              className="text-xs text-[#128C7E] hover:text-[#0d6e62] font-medium"
+                            >
+                              💬 {t('invite.inviteViaWhatsApp')}
+                            </button>
+                            <button onClick={() => setCancelReservationTarget({ id: r.id, joinType: r.join_type })} className="text-xs text-red-500 hover:text-red-600 font-medium flex items-center gap-1">
+                              <XCircle className="w-3.5 h-3.5" /> {t('card.cancelReservation')}
+                            </button>
+                          </div>
                         )}
                       </div>
                     )

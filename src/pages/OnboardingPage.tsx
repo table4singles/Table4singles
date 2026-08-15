@@ -95,6 +95,7 @@ export function OnboardingPage({ onNavigate }: { onNavigate: (page: string) => v
       ? {
           display_name: restaurantName.trim(),
           restaurant_name: restaurantName.trim(),
+          avatar_url: avatarUrl || null,
           restaurant_address: restaurantAddress.trim(),
           city: restaurantCity.trim(),
           country: restaurantCountry.trim(),
@@ -135,15 +136,18 @@ export function OnboardingPage({ onNavigate }: { onNavigate: (page: string) => v
       return
     }
     await refreshProfile()
-    setSaving(false)
 
     // Enviar email de bienvenida con flyer personalizado al restaurante
+    // Se hace AWAIT para evitar que el navegador cancele la petición al navegar (EarlyDrop)
     if (isRestaurant) {
-      supabase.functions.invoke('send-welcome-restaurant', {
-        body: { restaurantId: user.id },
-      }).catch(() => { /* silencioso — no bloquear la navegación */ })
+      try {
+        await supabase.functions.invoke('send-welcome-restaurant', {
+          body: { restaurantId: user.id },
+        })
+      } catch { /* silencioso — no bloquear si falla */ }
     }
 
+    setSaving(false)
     onNavigate('browse')
   }
 
@@ -311,6 +315,34 @@ export function OnboardingPage({ onNavigate }: { onNavigate: (page: string) => v
             {/* Paso 1: Identidad */}
             {step === 1 && (
               <>
+                {/* Logo del restaurante */}
+                <div className="flex flex-col items-center mb-2">
+                  <p className="text-sm font-medium text-gray-700 dark:text-gray-200 mb-3 self-start">
+                    Logo del restaurante <span className="text-gray-400 font-normal">(recomendado)</span>
+                  </p>
+                  <label className="relative w-28 h-28 rounded-2xl border-2 border-dashed border-gray-300 dark:border-gray-600 hover:border-primary-400 transition-colors cursor-pointer flex flex-col items-center justify-center overflow-hidden bg-gray-50 dark:bg-gray-900 group">
+                    {avatarUrl ? (
+                      <>
+                        <img src={avatarUrl} alt="Logo" className="w-full h-full object-cover" />
+                        <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                          <Camera className="w-6 h-6 text-white" />
+                        </div>
+                      </>
+                    ) : uploadingAvatar ? (
+                      <Loader2 className="w-7 h-7 text-gray-400 animate-spin" />
+                    ) : (
+                      <>
+                        <Camera className="w-8 h-8 text-gray-400 dark:text-gray-500 mb-1" />
+                        <span className="text-[10px] text-gray-400 dark:text-gray-500 text-center px-2">Subir logo</span>
+                      </>
+                    )}
+                    <input type="file" accept="image/jpeg,image/png,image/webp" onChange={handleAvatarUpload} disabled={uploadingAvatar} className="hidden" />
+                  </label>
+                  <p className="text-[11px] text-gray-400 dark:text-gray-500 mt-2 text-center">
+                    Aparece en tu perfil y en el flyer que recibirás por email
+                  </p>
+                </div>
+
                 <Field label="Nombre del restaurante *" value={restaurantName} onChange={setRestaurantName} placeholder="La Taberna del Chef" />
 
                 <div>

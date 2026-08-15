@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Loader2, ArrowRight, Camera, ChevronLeft, LogOut, UtensilsCrossed, MapPin, Clock, Globe, Phone, Check } from 'lucide-react'
+import { Loader2, ArrowRight, Camera, ChevronLeft, LogOut, UtensilsCrossed, MapPin, Clock, Globe, Phone, Check, X, Sparkles, Tag, Link } from 'lucide-react'
 import PhoneInput from 'react-phone-number-input'
 import 'react-phone-number-input/style.css'
 import { useAuth } from '@/contexts/AuthContext'
@@ -52,6 +52,19 @@ export function OnboardingPage({ onNavigate }: { onNavigate: (page: string) => v
   const [restaurantDescription, setRestaurantDescription] = useState('')
   const [restaurantWebsite, setRestaurantWebsite] = useState('')
   const [restaurantHours, setRestaurantHours] = useState('')
+  const [restaurantMenuUrl, setRestaurantMenuUrl] = useState('')
+  const [restaurantOffers, setRestaurantOffers] = useState('')
+  const [restaurantSpecialties, setRestaurantSpecialties] = useState<string[]>([])
+  const [specialtyInput, setSpecialtyInput] = useState('')
+
+  const addSpecialty = (value: string) => {
+    const trimmed = value.trim()
+    if (trimmed && !restaurantSpecialties.includes(trimmed)) {
+      setRestaurantSpecialties(prev => [...prev, trimmed])
+    }
+    setSpecialtyInput('')
+  }
+  const removeSpecialty = (s: string) => setRestaurantSpecialties(prev => prev.filter(x => x !== s))
 
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -105,6 +118,9 @@ export function OnboardingPage({ onNavigate }: { onNavigate: (page: string) => v
           restaurant_description: restaurantDescription.trim(),
           restaurant_website: restaurantWebsite.trim() || null,
           restaurant_hours: restaurantHours.trim() || null,
+          restaurant_menu_url: restaurantMenuUrl.trim() || null,
+          restaurant_offers: restaurantOffers.trim() || null,
+          restaurant_specialties: restaurantSpecialties.length > 0 ? restaurantSpecialties : null,
           onboarding_completed: true,
         }
       : {
@@ -385,6 +401,33 @@ export function OnboardingPage({ onNavigate }: { onNavigate: (page: string) => v
                     className="w-full px-4 py-2.5 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 dark:text-white rounded-xl text-sm focus:ring-2 focus:ring-primary-500 outline-none resize-none"
                   />
                 </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1 flex items-center gap-1.5">
+                    <Sparkles className="w-3.5 h-3.5 text-gray-400" /> Especialidades <span className="text-gray-400 font-normal">(opcional)</span>
+                  </label>
+                  <p className="text-xs text-gray-400 dark:text-gray-500 mb-2">Escribe un plato o producto estrella y pulsa Enter o la coma para añadirlo</p>
+                  <div className="flex flex-wrap gap-1.5 mb-2">
+                    {restaurantSpecialties.map(s => (
+                      <span key={s} className="flex items-center gap-1 px-2.5 py-1 bg-primary-50 dark:bg-primary-900/30 text-primary-700 dark:text-primary-300 rounded-full text-xs font-medium">
+                        {s}
+                        <button type="button" onClick={() => removeSpecialty(s)} className="hover:text-primary-900 dark:hover:text-primary-100">
+                          <X className="w-3 h-3" />
+                        </button>
+                      </span>
+                    ))}
+                  </div>
+                  <input
+                    value={specialtyInput}
+                    onChange={e => setSpecialtyInput(e.target.value)}
+                    onKeyDown={e => {
+                      if (e.key === 'Enter' || e.key === ',') { e.preventDefault(); addSpecialty(specialtyInput) }
+                    }}
+                    onBlur={() => { if (specialtyInput.trim()) addSpecialty(specialtyInput) }}
+                    placeholder="Ej: Paella valenciana, Pulpo a la gallega..."
+                    className="w-full px-4 py-2.5 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 dark:text-white rounded-xl text-sm focus:ring-2 focus:ring-primary-500 outline-none"
+                  />
+                </div>
               </>
             )}
 
@@ -449,6 +492,31 @@ export function OnboardingPage({ onNavigate }: { onNavigate: (page: string) => v
                     className="w-full px-4 py-2.5 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 dark:text-white rounded-xl text-sm focus:ring-2 focus:ring-primary-500 outline-none"
                   />
                 </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1 flex items-center gap-1.5">
+                    <Link className="w-3.5 h-3.5 text-gray-400" /> URL del menú (opcional)
+                  </label>
+                  <input
+                    value={restaurantMenuUrl}
+                    onChange={e => setRestaurantMenuUrl(e.target.value)}
+                    placeholder="https://www.mirestaurante.com/menu"
+                    className="w-full px-4 py-2.5 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 dark:text-white rounded-xl text-sm focus:ring-2 focus:ring-primary-500 outline-none"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1 flex items-center gap-1.5">
+                    <Tag className="w-3.5 h-3.5 text-gray-400" /> Ofertas y promociones (opcional)
+                  </label>
+                  <textarea
+                    value={restaurantOffers}
+                    onChange={e => setRestaurantOffers(e.target.value)}
+                    rows={2}
+                    placeholder="Ej: Menú del día 15€, 2x1 en cócteles los martes..."
+                    className="w-full px-4 py-2.5 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 dark:text-white rounded-xl text-sm focus:ring-2 focus:ring-primary-500 outline-none resize-none"
+                  />
+                </div>
               </>
             )}
 
@@ -464,9 +532,12 @@ export function OnboardingPage({ onNavigate }: { onNavigate: (page: string) => v
                   {restaurantCuisine && <SummaryRow label="Cocina" value={restaurantCuisine} />}
                   <SummaryRow label="Precio" value={restaurantPriceRange} />
                   {restaurantDescription && <SummaryRow label="Descripción" value={restaurantDescription} multiline />}
+                  {restaurantSpecialties.length > 0 && <SummaryRow label="Especialidades" value={restaurantSpecialties.join(', ')} multiline />}
                   {restaurantCity && <SummaryRow label="Ciudad" value={`${restaurantCity}${restaurantCountry ? `, ${restaurantCountry}` : ''}`} />}
                   {restaurantPhone && <SummaryRow label="Teléfono" value={restaurantPhone} />}
                   {restaurantWebsite && <SummaryRow label="Web" value={restaurantWebsite} />}
+                  {restaurantMenuUrl && <SummaryRow label="Menú" value={restaurantMenuUrl} />}
+                  {restaurantOffers && <SummaryRow label="Ofertas" value={restaurantOffers} multiline />}
                 </div>
                 <p className="text-xs text-gray-400 dark:text-gray-500 text-center">
                   Podrás editar todos estos datos y añadir fotos desde tu perfil de restaurante.

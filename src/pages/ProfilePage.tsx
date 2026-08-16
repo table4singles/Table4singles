@@ -5,6 +5,7 @@ import 'react-phone-number-input/style.css'
 import { Navbar } from '@/components/Navbar'
 import { ErrorBanner } from '@/components/ErrorBanner'
 import { ShareButton } from '@/components/ShareButton'
+import { RestaurantHoursPicker } from '@/components/RestaurantHoursPicker'
 import { useLanguage } from '@/contexts/LanguageContext'
 import { useAuth } from '@/contexts/AuthContext'
 import { useViewMode } from '@/contexts/ViewModeContext'
@@ -428,9 +429,10 @@ export function ProfilePage({ onNavigate, onAuthClick }: ProfilePageProps) {
               <SectionTitle icon={<Clock className="w-4 h-4" />} label="Horarios y capacidad" />
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1.5">Horarios de apertura</label>
-                <textarea value={restaurantHours} onChange={e => setRestaurantHours(e.target.value)} rows={2}
-                  placeholder="Ej: Lun-Vie 13:00-16:00 / 20:00-24:00. Sáb-Dom 12:00-24:00"
-                  className="w-full px-4 py-2.5 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 dark:text-white rounded-xl text-sm focus:ring-2 focus:ring-[#e94560] outline-none resize-none" />
+                <p className="text-xs text-gray-400 dark:text-gray-500 mb-2">
+                  Selecciona los días y las horas. Añade un tramo por franja (comida, cena, finde…).
+                </p>
+                <RestaurantHoursPicker value={restaurantHours} onChange={setRestaurantHours} />
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1.5 flex items-center gap-1.5"><Hash className="w-3.5 h-3.5 text-gray-400" /> Total de mesas en el local</label>

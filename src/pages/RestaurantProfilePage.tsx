@@ -236,7 +236,8 @@ export function RestaurantProfilePage({ restaurantId, onNavigate, onAuthClick }:
             <div className="space-y-1.5">
               {restaurant.restaurant_hours && (
                 <p className="flex items-start gap-2 text-xs text-gray-500 dark:text-gray-400">
-                  <Clock className="w-3.5 h-3.5 flex-shrink-0 mt-0.5" />{restaurant.restaurant_hours}
+                  <Clock className="w-3.5 h-3.5 flex-shrink-0 mt-0.5" />
+                  <span className="leading-relaxed">{restaurant.restaurant_hours}</span>
                 </p>
               )}
               {restaurant.restaurant_offers && (

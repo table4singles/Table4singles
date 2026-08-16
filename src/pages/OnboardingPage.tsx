@@ -5,6 +5,7 @@ import 'react-phone-number-input/style.css'
 import { useAuth } from '@/contexts/AuthContext'
 import { supabase } from '@/lib/supabase'
 import { ErrorBanner } from '@/components/ErrorBanner'
+import { RestaurantHoursPicker } from '@/components/RestaurantHoursPicker'
 import { LANGUAGE_OPTIONS, INTEREST_OPTIONS } from '@/lib/options'
 
 const ADMIN_EMAIL = 'joseviangles@gmail.com'
@@ -475,16 +476,13 @@ export function OnboardingPage({ onNavigate }: { onNavigate: (page: string, id?:
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1 flex items-center gap-1.5">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1.5 flex items-center gap-1.5">
                     <Clock className="w-3.5 h-3.5 text-gray-400" /> Horarios (opcional)
                   </label>
-                  <textarea
-                    value={restaurantHours}
-                    onChange={e => setRestaurantHours(e.target.value)}
-                    rows={2}
-                    placeholder="Ej: Lun-Vie 13:00-16:00 / 20:00-24:00. Sáb-Dom 12:00-24:00"
-                    className="w-full px-4 py-2.5 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 dark:text-white rounded-xl text-sm focus:ring-2 focus:ring-primary-500 outline-none resize-none"
-                  />
+                  <p className="text-xs text-gray-400 dark:text-gray-500 mb-2">
+                    Elige los días y luego la hora de apertura y cierre. Puedes añadir varios tramos (comida, cena, fin de semana…).
+                  </p>
+                  <RestaurantHoursPicker value={restaurantHours} onChange={setRestaurantHours} />
                 </div>
 
                 <div>
@@ -541,6 +539,7 @@ export function OnboardingPage({ onNavigate }: { onNavigate: (page: string, id?:
                   {restaurantSpecialties.length > 0 && <SummaryRow label="Especialidades" value={restaurantSpecialties.join(', ')} multiline />}
                   {restaurantCity && <SummaryRow label="Ciudad" value={`${restaurantCity}${restaurantCountry ? `, ${restaurantCountry}` : ''}`} />}
                   {restaurantPhone && <SummaryRow label="Teléfono" value={restaurantPhone} />}
+                  {restaurantHours && <SummaryRow label="Horarios" value={restaurantHours} />}
                   {restaurantWebsite && <SummaryRow label="Web" value={restaurantWebsite} />}
                   {restaurantMenuUrl && <SummaryRow label="Menú" value={restaurantMenuUrl} />}
                   {restaurantOffers && <SummaryRow label="Ofertas" value={restaurantOffers} multiline />}

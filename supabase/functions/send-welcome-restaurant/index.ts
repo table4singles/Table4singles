@@ -6,10 +6,6 @@ const SUPABASE_SERVICE  = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
 const APP_URL           = 'https://table4singles.online'
 
 Deno.serve(async (req) => {
-  if (req.method !== 'POST') {
-    return new Response('Method not allowed', { status: 405 })
-  }
-
   const corsHeaders = {
     'Access-Control-Allow-Origin': '*',
     'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
@@ -17,6 +13,10 @@ Deno.serve(async (req) => {
 
   if (req.method === 'OPTIONS') {
     return new Response('ok', { headers: corsHeaders })
+  }
+
+  if (req.method !== 'POST') {
+    return new Response('Method not allowed', { status: 405 })
   }
 
   const { restaurantId, overrideEmail } = await req.json()
@@ -163,7 +163,7 @@ Deno.serve(async (req) => {
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({
-      from: 'Table4Singles <onboarding@resend.dev>',
+      from: 'Table4Singles <hola@table4singles.online>',
       to: [email],
       subject: `¡Bienvenido a Table4Singles, ${name}! Tu flyer te espera 🎨`,
       html,

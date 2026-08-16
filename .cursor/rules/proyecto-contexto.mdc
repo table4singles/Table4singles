@@ -32,6 +32,15 @@ React + Vite + TypeScript + Tailwind + Supabase (Edge Functions, RLS, Realtime, 
 - Portal Stripe → Edge Function `create-billing-portal` → botón en `SubscriptionPage`
 - Credenciales live actualizadas en Supabase Secrets (`STRIPE_SECRET_KEY`, `STRIPE_PUBLISHABLE_KEY`, `STRIPE_WEBHOOK_SECRET`)
 
+#### CRÍTICO — flujo pago depósito → reserva (no romper)
+Causa del bug histórico: cobro OK pero sin plaza porque `stripe-webhook` tenía `verify_jwt=true` (Stripe no envía JWT → 401).
+
+1. **`stripe-webhook` DEBE desplegarse con `verify_jwt=false`** (documentado en `supabase/config.toml`). Auth = cabecera `stripe-signature` + `STRIPE_WEBHOOK_SECRET`.
+2. Errores de negocio en el webhook → **HTTP 500** (Stripe reintenta). Nunca devolver 200 si falló crear la plaza.
+3. Reserva **idempotente** + lock optimista en `available_seats`; unique `(table_id, user_id)` en `table_participants`.
+4. Red de seguridad: al volver de Stripe (`?payment=success&table=`), `TableDetailPage` llama a **`reconcile-reservation`** (JWT del usuario). Si el pago está `paid` en Stripe y no hay plaza, la crea.
+5. Al redesplegar: `supabase functions deploy stripe-webhook --no-verify-jwt` (o respetar `config.toml`). Comprobar en logs que el POST no sea 401.
+
 ### Buscador de restaurantes
 - Filtro por nombre/ciudad, cocina (multi), precio (`0€-50€` / `50€-100€` / `100€-200€` / `+200€`), fecha, tramo horario (mediodía/noche), radio geográfico (km), solo favoritos
 - Vista lista / mapa. Contador de filtros activos en el botón

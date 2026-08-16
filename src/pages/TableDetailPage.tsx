@@ -57,16 +57,27 @@ export function TableDetailPage({ tableId, paymentSuccess, paymentCancelled, onN
   const [editError, setEditError] = useState<string | null>(null)
   const [removingParticipantId, setRemovingParticipantId] = useState<string | null>(null)
 
-  // Cuando el usuario vuelve del pago, refrescamos varias veces por si el webhook de Stripe
-  // aún no ha procesado la inserción del participante.
+  // Cuando el usuario vuelve del pago: reconciliar (por si el webhook falló) y refrescar.
   const refreshedAfterPayment = useRef(false)
   useEffect(() => {
-    if (!paymentSuccess || refreshedAfterPayment.current) return
+    if (!paymentSuccess || refreshedAfterPayment.current || !user || !tableId) return
     refreshedAfterPayment.current = true
-    const t1 = setTimeout(() => refresh(), 2000)
-    const t2 = setTimeout(() => refresh(), 5000)
-    return () => { clearTimeout(t1); clearTimeout(t2) }
-  }, [paymentSuccess, refresh])
+
+    const run = async () => {
+      try {
+        await supabase.functions.invoke('reconcile-reservation', {
+          body: { tableId },
+        })
+      } catch (err) {
+        console.warn('reconcile-reservation:', err)
+      }
+      await refresh()
+      // Por si el webhook llega un poco más tarde
+      setTimeout(() => refresh(), 2000)
+      setTimeout(() => refresh(), 5000)
+    }
+    run()
+  }, [paymentSuccess, user, tableId, refresh])
 
   // Si venias de "Comensales" con la intencion de invitar a alguien y aun no tenias mesa,
   // en cuanto confirmas el pago con deposito (redirect de Stripe) ofrecemos enviar la invitacion.

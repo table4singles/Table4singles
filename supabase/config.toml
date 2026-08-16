@@ -1,0 +1,25 @@
+# Configuración local / referencia de deploy.
+# IMPORTANTE: stripe-webhook DEBE tener verify_jwt = false porque Stripe
+# autentica con la cabecera stripe-signature, no con JWT de Supabase.
+# Si se despliega con verify_jwt=true, los pagos se cobran pero no se crea la reserva.
+
+[functions.stripe-webhook]
+verify_jwt = false
+
+[functions.send-reservation-reminders]
+verify_jwt = false
+
+[functions.reconcile-reservation]
+verify_jwt = true
+
+[functions.create-reservation-checkout]
+verify_jwt = true
+
+[functions.create-subscription-checkout]
+verify_jwt = true
+
+[functions.create-billing-portal]
+verify_jwt = true
+
+[functions.send-welcome-restaurant]
+verify_jwt = true

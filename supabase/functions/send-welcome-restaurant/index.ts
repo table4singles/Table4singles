@@ -163,7 +163,7 @@ Deno.serve(async (req) => {
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({
-      from: 'Table4Singles <hola@table4singles.online>',
+      from: 'Table4Singles <no-reply@table4singles.online>',
       to: [email],
       subject: `¡Bienvenido a Table4Singles, ${name}! Tu flyer te espera 🎨`,
       html,

@@ -146,7 +146,7 @@ Deno.serve(async (req) => {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          from: 'Table4Singles <hola@table4singles.online>',
+          from: 'Table4Singles <no-reply@table4singles.online>',
           to: [email],
           subject: `🍽️ Recordatorio: Tu cena es mañana en ${restaurantName}`,
           html,

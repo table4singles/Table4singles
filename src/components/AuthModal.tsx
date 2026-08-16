@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { X, Apple, Mail, Lock, Eye, EyeOff, ChevronLeft, Globe } from 'lucide-react'
+import { X, Mail, Lock, Eye, EyeOff, ChevronLeft, Globe } from 'lucide-react'
 import { useAuth } from '@/contexts/AuthContext'
 import { useLanguage } from '@/contexts/LanguageContext'
 import { languageOptions } from '@/i18n'
@@ -11,10 +11,10 @@ interface AuthModalProps {
   onSwitchMode: (mode: 'signin' | 'signup') => void
 }
 
-type Screen = 'main' | 'forgot' | 'forgot-sent'
+type Screen = 'main' | 'forgot' | 'forgot-sent' | 'confirm-email'
 
 export function AuthModal({ isOpen, onClose, mode, onSwitchMode }: AuthModalProps) {
-  const { signUp, signIn, signInWithGoogle, signInWithApple, resetPassword } = useAuth()
+  const { signUp, signIn, signInWithGoogle, resetPassword } = useAuth()
   const { t, language, setLanguage } = useLanguage()
   const [screen, setScreen] = useState<Screen>('main')
   const [role, setRole] = useState<'user' | 'restaurant'>('user')
@@ -27,21 +27,30 @@ export function AuthModal({ isOpen, onClose, mode, onSwitchMode }: AuthModalProp
     try { return new URLSearchParams(window.location.search).get('ref') ?? '' } catch { return '' }
   })
   const [error, setError] = useState<string | null>(null)
-  const [success, setSuccess] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
 
   if (!isOpen) return null
 
-  const resetState = () => { setError(null); setSuccess(null); setLoading(false) }
+  const resetState = () => { setError(null); setLoading(false) }
 
   const handleClose = () => { setScreen('main'); setShowLangPicker(false); resetState(); onClose() }
 
   const handleBack = () => { setScreen('main'); resetState() }
 
+  const handleGoogle = async () => {
+    setError(null)
+    setLoading(true)
+    const { error: err } = await signInWithGoogle(mode === 'signup' ? role : undefined)
+    if (err) {
+      setError(err.message)
+      setLoading(false)
+    }
+    // Si OK, el navegador redirige a Google (sesión confirmada al volver)
+  }
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setError(null)
-    setSuccess(null)
 
     if (mode === 'signup') {
       if (password.length < 8) {
@@ -57,16 +66,35 @@ export function AuthModal({ isOpen, onClose, mode, onSwitchMode }: AuthModalProp
     setLoading(true)
     try {
       if (mode === 'signup') {
-        const { error: err } = await signUp(email, password, name, role, referralCode.trim().toUpperCase() || undefined)
+        const { error: err, needsEmailConfirmation } = await signUp(
+          email,
+          password,
+          name,
+          role,
+          referralCode.trim().toUpperCase() || undefined,
+        )
         if (err) throw err
-        setSuccess(t('auth.checkEmail'))
+        if (needsEmailConfirmation) {
+          setScreen('confirm-email')
+        } else {
+          handleClose()
+        }
       } else {
         const { error: err } = await signIn(email, password)
-        if (err) throw err
+        if (err) {
+          if (err.message === 'EMAIL_NOT_CONFIRMED') {
+            throw new Error(t('auth.emailNotConfirmed'))
+          }
+          throw err
+        }
         handleClose()
       }
     } catch (err: any) {
-      setError(err.message || t('common.error'))
+      if (err?.message === 'EMAIL_ALREADY_REGISTERED') {
+        setError(t('auth.emailAlreadyRegistered'))
+      } else {
+        setError(err.message || t('common.error'))
+      }
     }
     setLoading(false)
   }
@@ -91,7 +119,6 @@ export function AuthModal({ isOpen, onClose, mode, onSwitchMode }: AuthModalProp
     <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4" onClick={handleClose}>
       <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl w-full max-w-md max-h-[90vh] overflow-y-auto" onClick={e => e.stopPropagation()}>
 
-        {/* ── Pantalla principal ── */}
         {screen === 'main' && (
           <>
             <div className="flex items-center justify-between p-6 pb-4">
@@ -109,7 +136,6 @@ export function AuthModal({ isOpen, onClose, mode, onSwitchMode }: AuthModalProp
                 </div>
               </div>
               <div className="flex items-center gap-1">
-                {/* Selector de idioma compacto */}
                 <div className="relative">
                   <button
                     onClick={() => setShowLangPicker(v => !v)}
@@ -156,10 +182,12 @@ export function AuthModal({ isOpen, onClose, mode, onSwitchMode }: AuthModalProp
               )}
 
               <div className="space-y-3 mb-5">
-                <button onClick={() => signInWithApple()} className="w-full flex items-center justify-center gap-3 px-4 py-3 bg-black text-white rounded-xl text-sm font-medium hover:bg-gray-800 transition-colors">
-                  <Apple className="w-5 h-5" /> {t('auth.continueWithApple')}
-                </button>
-                <button onClick={() => signInWithGoogle()} className="w-full flex items-center justify-center gap-3 px-4 py-3 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-xl text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors">
+                <button
+                  type="button"
+                  onClick={handleGoogle}
+                  disabled={loading}
+                  className="w-full flex items-center justify-center gap-3 px-4 py-3 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-xl text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors disabled:opacity-50"
+                >
                   <GoogleIcon /> {t('auth.continueWithGoogle')}
                 </button>
               </div>
@@ -210,7 +238,6 @@ export function AuthModal({ isOpen, onClose, mode, onSwitchMode }: AuthModalProp
                   </button>
                 </div>
 
-                {/* Indicador de fortaleza de contraseña */}
                 {mode === 'signup' && password.length > 0 && (() => {
                   const has8 = password.length >= 8
                   const hasUpper = /[A-Z]/.test(password)
@@ -258,7 +285,6 @@ export function AuthModal({ isOpen, onClose, mode, onSwitchMode }: AuthModalProp
                 )}
 
                 {error && <p className="text-sm text-red-600 bg-red-50 dark:bg-red-900/20 px-3 py-2 rounded-lg">{error}</p>}
-                {success && <p className="text-sm text-green-600 bg-green-50 dark:bg-green-900/20 px-3 py-2 rounded-lg">{success}</p>}
 
                 <button type="submit" disabled={loading} className="w-full py-3 bg-primary-500 text-white rounded-xl font-medium hover:bg-primary-600 disabled:opacity-50 transition-colors">
                   {loading ? '...' : mode === 'signup' ? t('auth.submit.signUp') : t('auth.submit.signIn')}
@@ -275,7 +301,6 @@ export function AuthModal({ isOpen, onClose, mode, onSwitchMode }: AuthModalProp
           </>
         )}
 
-        {/* ── Pantalla "olvidé mi contraseña" ── */}
         {screen === 'forgot' && (
           <>
             <div className="flex items-center gap-2 p-6 pb-4">
@@ -314,7 +339,6 @@ export function AuthModal({ isOpen, onClose, mode, onSwitchMode }: AuthModalProp
           </>
         )}
 
-        {/* ── Pantalla de confirmación enviada ── */}
         {screen === 'forgot-sent' && (
           <div className="p-8 text-center">
             <div className="w-16 h-16 bg-green-100 dark:bg-green-900/30 rounded-full flex items-center justify-center mx-auto mb-4">
@@ -328,6 +352,34 @@ export function AuthModal({ isOpen, onClose, mode, onSwitchMode }: AuthModalProp
               {t('auth.emailSentOk')}
             </button>
             <button onClick={handleBack} className="mt-3 w-full py-2 text-sm text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 transition-colors">
+              {t('auth.backToSignIn')}
+            </button>
+          </div>
+        )}
+
+        {screen === 'confirm-email' && (
+          <div className="p-8 text-center">
+            <div className="w-16 h-16 bg-primary-50 dark:bg-primary-900/30 rounded-full flex items-center justify-center mx-auto mb-4">
+              <Mail className="w-8 h-8 text-primary-600" />
+            </div>
+            <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-2">{t('auth.confirmEmailTitle')}</h2>
+            <p className="text-sm text-gray-600 dark:text-gray-300 mb-3 leading-relaxed">
+              {email ? (
+                <>
+                  {t('auth.confirmEmailSentTo')}{' '}
+                  <strong className="text-gray-900 dark:text-white">{email}</strong>.{' '}
+                </>
+              ) : null}
+              {t('auth.confirmEmailDesc')}
+            </p>
+            <p className="text-xs text-gray-500 dark:text-gray-400 mb-6">{t('auth.confirmEmailHint')}</p>
+            <button onClick={handleClose} className="w-full py-3 bg-primary-500 text-white rounded-xl font-medium hover:bg-primary-600 transition-colors">
+              {t('auth.confirmEmailOk')}
+            </button>
+            <button
+              onClick={() => { onSwitchMode('signin'); setScreen('main'); resetState() }}
+              className="mt-3 w-full py-2 text-sm text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 transition-colors"
+            >
               {t('auth.backToSignIn')}
             </button>
           </div>

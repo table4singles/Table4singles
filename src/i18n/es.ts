@@ -97,6 +97,13 @@ export const es = {
     emailSentOk: 'Entendido',
     backToSignIn: 'Volver al inicio de sesión',
     checkEmail: '¡Revisa tu email para confirmar tu cuenta!',
+    confirmEmailTitle: 'Confirma tu correo',
+    confirmEmailSentTo: 'Te hemos enviado un enlace de confirmación a',
+    confirmEmailDesc: 'Abre tu bandeja de entrada, entra en el mensaje de Table4Singles y pulsa el enlace para activar tu cuenta. Hasta entonces no podrás iniciar sesión.',
+    confirmEmailHint: 'Si no lo ves, revisa la carpeta de spam o correo no deseado.',
+    confirmEmailOk: 'Entendido',
+    emailNotConfirmed: 'Debes confirmar tu correo antes de entrar. Revisa tu bandeja de entrada y pulsa el enlace de activación.',
+    emailAlreadyRegistered: 'Este email ya está registrado. Inicia sesión o, si aún no confirmaste, revisa tu correo.',
   },
   browse: {
     searchPlaceholder: 'Buscar restaurante o ciudad...',

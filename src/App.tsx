@@ -104,11 +104,15 @@ function AppRouter() {
     }
   }, [])
 
-  // Handle auth callback
+  // Handle auth callback (confirmación email / OAuth Google)
   useEffect(() => {
     if (window.location.pathname === '/auth/callback') {
       setPage('browse')
-      window.history.replaceState({}, '', '/')
+      // Mantener hash/query un instante para que supabase.js intercambie la sesión
+      const t = window.setTimeout(() => {
+        window.history.replaceState({}, '', '/')
+      }, 50)
+      return () => window.clearTimeout(t)
     }
   }, [])
 

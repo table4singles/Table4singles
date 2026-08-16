@@ -17,7 +17,7 @@ React + Vite + TypeScript + Tailwind + Supabase (Edge Functions, RLS, Realtime, 
 ## Completado (~98%)
 
 ### Autenticación y perfiles
-- Login/signup con email, Google, Apple
+- Login/signup con email o Google (sin Apple). Google entra confirmado; email/contraseña requiere confirmar el correo.
 - Recuperar contraseña + toggle visibilidad contraseña + validación fortaleza (min 8 chars, mayúscula o número)
 - Roles: `user`, `restaurant`, `ambassador`
 - Admins: `manelmercadal@me.com` y `joseanglesai@gmail.com` (`is_admin = true`)
@@ -124,19 +124,14 @@ Causa del bug histórico: cobro OK pero sin plaza porque `stripe-webhook` tenía
 ## Pendiente / deuda técnica
 
 ### Pequeños strings aún hardcodeados (baja prioridad)
-- `OnboardingPage`: nombres de cocinas (Italiana, Japonesa...), labels del wizard
-- `AdminPage`: labels del panel de administración
-- `RestaurantAgendaPage`: algunos labels menores
-- `PostDinnerReviewModal`: labels del flujo de valoración
-- `MyTablesPage`: algunos estados de disponibilidad
+- `OnboardingPage`: nombres de cocinas, labels del wizard
+- `AdminPage`, `RestaurantAgendaPage`, `PostDinnerReviewModal`, `MyTablesPage`: labels menores
 
 ### Para considerar en próxima iteración
-- Reactivar validación de email al registrarse (desactivada para pruebas)
 - Test E2E: restaurante crea mesa → usuario reserva → agenda → notificación
 - Búsqueda directa de mesas (actualmente se buscan restaurantes)
 - Perfil público del comensal más completo
-
-## Archivos clave
+- SMTP Resend en Auth de Supabase (confirmación de cuenta / reset password)
 | Archivo | Descripción |
 |---------|-------------|
 | `src/App.tsx` | Router principal + redirects de pago |

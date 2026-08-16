@@ -32,7 +32,15 @@ function getNestedValue(obj: Record<string, unknown>, path: string): string {
 }
 
 export function getTranslation(lang: Language) {
-  const t = (key: string): string => getNestedValue(translations[lang] as unknown as Record<string, unknown>, key)
+  const t = (key: string): string => {
+    const fromLang = getNestedValue(translations[lang] as unknown as Record<string, unknown>, key)
+    if (fromLang !== key) return fromLang
+    if (lang !== 'es') {
+      const fromEs = getNestedValue(es as unknown as Record<string, unknown>, key)
+      if (fromEs !== key) return fromEs
+    }
+    return key
+  }
   return t
 }
 

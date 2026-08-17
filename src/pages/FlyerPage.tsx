@@ -62,7 +62,7 @@ export function FlyerPage({ restaurantId }: FlyerPageProps) {
 
   const name = restaurant.restaurant_name || restaurant.display_name || ''
   const logo = restaurant.avatar_url
-  const heroPhoto = restaurant.restaurant_photos?.[0] || '/hero-dinner.jpg'
+  const heroPhoto = restaurant.restaurant_photos?.[0] || '/hero-flyer-default.jpg'
 
   return (
     <div className="min-h-screen bg-gray-100 flex flex-col items-center py-8 px-4 print:bg-white print:p-0 print:block">
@@ -90,28 +90,37 @@ export function FlyerPage({ restaurantId }: FlyerPageProps) {
         style={{ fontFamily: "'Georgia', 'Times New Roman', serif" }}
       >
 
-        {/* ── 1. Header: logo | divider | T4S ── */}
-        <div className="flex items-center justify-between px-8 pt-7 pb-5 gap-4">
-          <div className="flex items-center min-w-0 flex-1">
-            {logo ? (
+        {/* ── 1. Header: logos juntos y centrados ── */}
+        <div className="flex justify-center px-8 pt-7 pb-5">
+          <div className="inline-flex items-center gap-5">
+            <div className="h-[80px] w-[190px] flex items-center justify-center">
+              {logo ? (
+                <img
+                  src={logo}
+                  alt={name}
+                  className="max-h-[80px] max-w-[190px] object-contain"
+                  crossOrigin="anonymous"
+                />
+              ) : (
+                <p className="font-bold text-gray-800 text-lg leading-tight text-center">{name}</p>
+              )}
+            </div>
+
+            <div className="h-16 w-px bg-gray-300 flex-shrink-0" />
+
+            <div className="h-[80px] flex items-center justify-center gap-2.5">
               <img
-                src={logo}
-                alt={name}
-                className="h-[88px] max-w-[300px] w-auto object-contain object-left"
-                crossOrigin="anonymous"
+                src="/icons/logo-icon.png"
+                alt="Table4Singles"
+                className="h-14 w-14 object-contain flex-shrink-0"
               />
-            ) : (
-              <p className="font-bold text-gray-800 text-xl leading-tight">{name}</p>
-            )}
-          </div>
-
-          <div className="h-14 w-px bg-gray-300 flex-shrink-0" />
-
-          <div className="flex items-center gap-2.5 flex-shrink-0">
-            <img src="/icons/logo-icon.png" alt="Table4Singles" className="h-11 w-11 object-contain" />
-            <p className="font-bold text-[#1a1a2e] text-lg leading-tight" style={{ fontFamily: "'Georgia', serif" }}>
-              Table4Singles
-            </p>
+              <p
+                className="font-bold text-[#1a1a2e] text-[17px] leading-tight"
+                style={{ fontFamily: "'Georgia', serif" }}
+              >
+                Table4Singles
+              </p>
+            </div>
           </div>
         </div>
 
@@ -148,7 +157,7 @@ export function FlyerPage({ restaurantId }: FlyerPageProps) {
             <img
               src={heroPhoto}
               alt=""
-              className="w-full h-[360px] object-cover object-center"
+              className="w-full h-[400px] object-cover object-center"
             />
             <div
               className="absolute inset-0"
@@ -173,15 +182,15 @@ export function FlyerPage({ restaurantId }: FlyerPageProps) {
                 </p>
               </div>
 
-              {/* Un solo QR */}
+              {/* QR grande — único, centrado */}
               <div
-                className="relative z-10 rounded-2xl p-2.5 sm:p-3"
+                className="relative z-10 rounded-2xl p-3 sm:p-4"
                 style={{ backgroundColor: 'rgba(255,255,255,0.97)', boxShadow: '0 8px 32px rgba(0,0,0,0.18)' }}
               >
                 <img
                   src="/icons/qr-app-logo.png"
                   alt="QR Table4Singles"
-                  className="w-36 h-36 sm:w-44 sm:h-44 block"
+                  className="w-[200px] h-[200px] sm:w-[220px] sm:h-[220px] block"
                 />
               </div>
 

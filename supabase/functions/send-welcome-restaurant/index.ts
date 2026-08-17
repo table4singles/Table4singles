@@ -73,8 +73,8 @@ Deno.serve(async (req) => {
         <!-- Hero saludo -->
         <tr>
           <td style="padding:40px 40px 24px;text-align:center;">
-            <div style="width:72px;height:72px;border-radius:16px;overflow:hidden;margin:0 auto 16px;">
-              <img src="${logoSrc}" alt="${name}" width="72" height="72" style="object-fit:cover;display:block;" />
+            <div style="max-width:220px;margin:0 auto 16px;">
+              <img src="${logoSrc}" alt="${name}" style="width:100%;height:auto;max-height:96px;object-fit:contain;display:block;" />
             </div>
             <h1 style="margin:0 0 8px;font-size:24px;color:#1a1a2e;font-weight:800;">
               ¡Bienvenido, ${name}! 🎉

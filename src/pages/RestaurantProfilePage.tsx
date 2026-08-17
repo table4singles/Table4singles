@@ -28,7 +28,12 @@ export function RestaurantProfilePage({ restaurantId, onNavigate, onAuthClick }:
   const { t } = useLanguage()
 
   // Carousel
-  const photos = restaurant?.restaurant_photos ?? []
+  const photos = useMemo(() => {
+    const gallery = restaurant?.restaurant_photos ?? []
+    if (gallery.length > 0) return gallery
+    return restaurant?.avatar_url ? [restaurant.avatar_url] : []
+  }, [restaurant?.restaurant_photos, restaurant?.avatar_url])
+  const heroIsLogo = !(restaurant?.restaurant_photos?.length) && !!restaurant?.avatar_url
   const [photoIdx, setPhotoIdx] = useState(0)
   const autoRef = useRef<ReturnType<typeof setInterval> | null>(null)
   const startAuto = useCallback(() => {
@@ -154,7 +159,7 @@ export function RestaurantProfilePage({ restaurantId, onNavigate, onAuthClick }:
               key={photoIdx}
               src={currentPhoto}
               alt={restaurant.restaurant_name ?? ''}
-              className="w-full h-full object-cover transition-opacity duration-500"
+              className={`w-full h-full transition-opacity duration-500 ${heroIsLogo ? 'object-contain bg-white dark:bg-gray-900 p-8' : 'object-cover'}`}
             />
           ) : (
             <div className="w-full h-full flex items-center justify-center">

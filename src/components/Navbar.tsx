@@ -114,7 +114,11 @@ export function Navbar({ currentPage, onNavigate, onAuthClick }: NavbarProps) {
                 <button onClick={() => setShowMenu(!showMenu)} className="flex items-center gap-2 px-3 py-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors">
                   <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center overflow-hidden">
                     {profile?.avatar_url ? (
-                      <img src={profile.avatar_url} alt="" className="w-full h-full object-cover" />
+                      <img
+                        src={profile.avatar_url}
+                        alt=""
+                        className={`w-full h-full ${effectiveRole === 'restaurant' ? 'object-contain p-0.5 bg-white' : 'object-cover'}`}
+                      />
                     ) : (
                       <User className="w-4 h-4 text-blue-600" />
                     )}

@@ -62,7 +62,7 @@ export function FlyerPage({ restaurantId }: FlyerPageProps) {
 
   const name = restaurant.restaurant_name || restaurant.display_name || ''
   const logo = restaurant.avatar_url
-  const heroPhoto = restaurant.restaurant_photos?.[0] || '/hero-flyer.jpg'
+  const heroPhoto = restaurant.restaurant_photos?.[0] || '/hero-dinner.jpg'
 
   return (
     <div className="min-h-screen bg-gray-100 flex flex-col items-center py-8 px-4 print:bg-white print:p-0 print:block">
@@ -142,75 +142,93 @@ export function FlyerPage({ restaurantId }: FlyerPageProps) {
           </p>
         </div>
 
-        {/* ── 5. Hero + QR + badge + scan text ── */}
-        <div className="relative mx-5 rounded-2xl overflow-hidden" style={{ minHeight: 340 }}>
-          <img src={heroPhoto} alt="" className="absolute inset-0 w-full h-full object-cover" />
-          <div className="absolute inset-0 bg-black/15" />
-
-          <div className="relative flex items-center justify-center py-12 px-4 min-h-[340px]">
-            {/* Left badge */}
+        {/* ── 5. Hero integrado: foto limpia + un solo QR ── */}
+        <div className="relative mx-6">
+          <div className="relative rounded-2xl overflow-hidden">
+            <img
+              src={heroPhoto}
+              alt=""
+              className="w-full h-[360px] object-cover object-center"
+            />
             <div
-              className="absolute left-3 sm:left-5 bottom-8 sm:bottom-10 w-[88px] h-[88px] sm:w-[100px] sm:h-[100px] rounded-full flex flex-col items-center justify-center text-center shadow-lg z-10"
-              style={{ backgroundColor: brand.primary, color: '#ffffff' }}
-            >
-              <Heart className="w-5 h-5 mb-1" strokeWidth={2.5} fill="none" />
-              <div className="w-8 h-px bg-white/70 my-0.5" />
-              <p
-                className="text-[7px] sm:text-[8px] font-bold uppercase leading-tight px-1.5"
-                style={{ fontFamily: "'Arial', sans-serif" }}
-              >
-                La mejor<br />experiencia<br />empieza aquí
-              </p>
-            </div>
+              className="absolute inset-0"
+              style={{
+                background: 'linear-gradient(to bottom, rgba(0,0,0,0.08) 0%, rgba(0,0,0,0.22) 55%, rgba(0,0,0,0.35) 100%)',
+              }}
+            />
 
-            {/* QR */}
-            <div className="bg-white rounded-2xl p-3 sm:p-4 shadow-xl z-10">
-              <img src="/icons/qr-app-logo.png" alt="QR Table4Singles" className="w-40 h-40 sm:w-48 sm:h-48" />
-            </div>
-
-            {/* Right scan text */}
-            <div className="absolute right-3 sm:right-6 top-1/2 -translate-y-1/2 text-white z-10 hidden sm:block">
-              <p
-                className="text-base italic leading-snug"
-                style={{ fontFamily: "'Brush Script MT', 'Segoe Script', cursive" }}
+            <div className="absolute inset-0 flex items-center justify-center px-4 sm:px-8">
+              {/* Badge izquierda — centrado vertical como referencia */}
+              <div
+                className="absolute left-3 sm:left-5 top-1/2 -translate-y-1/2 w-[92px] h-[92px] sm:w-[104px] sm:h-[104px] rounded-full flex flex-col items-center justify-center text-center z-10"
+                style={{ backgroundColor: brand.primary, color: '#ffffff', boxShadow: '0 4px 20px rgba(0,0,0,0.25)' }}
               >
-                Escanéame<br />y descubre<br />la app
-              </p>
-              <svg width="48" height="48" viewBox="0 0 48 48" fill="none" className="text-white mt-1 ml-4">
-                <path
-                  d="M8 8 C 20 20, 28 28, 40 40"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  fill="none"
+                <Heart className="w-5 h-5 mb-1" strokeWidth={2.5} fill="none" />
+                <div className="w-9 h-px bg-white/80 my-0.5" />
+                <p
+                  className="text-[7px] sm:text-[8px] font-bold uppercase leading-tight px-1.5"
+                  style={{ fontFamily: "'Arial', sans-serif" }}
+                >
+                  La mejor<br />experiencia<br />empieza aquí
+                </p>
+              </div>
+
+              {/* Un solo QR */}
+              <div
+                className="relative z-10 rounded-2xl p-2.5 sm:p-3"
+                style={{ backgroundColor: 'rgba(255,255,255,0.97)', boxShadow: '0 8px 32px rgba(0,0,0,0.18)' }}
+              >
+                <img
+                  src="/icons/qr-app-logo.png"
+                  alt="QR Table4Singles"
+                  className="w-36 h-36 sm:w-44 sm:h-44 block"
                 />
-                <path d="M32 40 L40 40 L40 32" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-              </svg>
+              </div>
+
+              {/* Texto escaneame derecha */}
+              <div className="absolute right-3 sm:right-6 top-1/2 -translate-y-1/2 text-white z-10 hidden sm:block">
+                <p
+                  className="text-[1.05rem] italic leading-snug drop-shadow-md"
+                  style={{ fontFamily: "'Brush Script MT', 'Segoe Script', cursive" }}
+                >
+                  Escanéame<br />y descubre<br />la app
+                </p>
+                <svg width="52" height="52" viewBox="0 0 52 52" fill="none" className="text-white/90 mt-1 ml-2">
+                  <path
+                    d="M6 46 C 18 34, 30 22, 46 8"
+                    stroke="currentColor"
+                    strokeWidth="2.5"
+                    strokeLinecap="round"
+                    fill="none"
+                  />
+                  <path d="M38 8 L46 8 L46 16" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+              </div>
             </div>
           </div>
-        </div>
 
-        {/* ── 6. Download CTA bar ── */}
-        <div className="mx-5 mt-5">
-          <div
-            className="rounded-sm py-3.5 px-4 flex items-center gap-4"
-            style={{ backgroundColor: brand.primary, color: '#ffffff' }}
-          >
-            <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center flex-shrink-0">
-              <Download className="w-5 h-5" style={{ color: '#ffffff' }} />
-            </div>
-            <p
-              className="font-black text-sm sm:text-base uppercase tracking-wide leading-tight"
-              style={{ fontFamily: "'Arial Black', sans-serif" }}
+          {/* CTA solapando el borde inferior del hero — como referencia */}
+          <div className="relative z-20 -mt-5 mx-2 sm:mx-4">
+            <div
+              className="rounded-md py-3.5 px-4 flex items-center gap-3 sm:gap-4"
+              style={{ backgroundColor: brand.primary, color: '#ffffff', boxShadow: '0 4px 16px rgba(0,0,0,0.12)' }}
             >
-              Descarga Table4Singles y únete a la comunidad
-            </p>
+              <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center flex-shrink-0">
+                <Download className="w-5 h-5" style={{ color: '#ffffff' }} />
+              </div>
+              <p
+                className="font-black text-xs sm:text-sm uppercase tracking-wide leading-tight"
+                style={{ fontFamily: "'Arial Black', sans-serif" }}
+              >
+                Descarga Table4Singles y únete a la comunidad
+              </p>
+            </div>
           </div>
         </div>
 
         {/* ── 7. Three features with vertical dividers ── */}
         <div
-          className="grid grid-cols-[1fr_auto_1fr_auto_1fr] items-stretch mx-5 mt-6 pb-6"
+          className="grid grid-cols-[1fr_auto_1fr_auto_1fr] items-stretch mx-6 mt-8 pb-6"
           style={{ fontFamily: "'Arial', sans-serif" }}
         >
           {[
@@ -246,7 +264,7 @@ export function FlyerPage({ restaurantId }: FlyerPageProps) {
         </div>
 
         {/* ── 8. Global movement banner ── */}
-        <div className="mx-5 mb-6">
+        <div className="mx-6 mb-6">
           <div
             className="rounded-2xl border-2 px-5 py-4 flex items-center gap-4"
             style={{ borderColor: brand.primaryLight, backgroundColor: '#f8fbff' }}

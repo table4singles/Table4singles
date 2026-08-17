@@ -33,7 +33,7 @@ export function FlyerPage({ restaurantId }: FlyerPageProps) {
       setRestaurant(data)
       const logoUrl =
         restaurantId === '96683ea6-3c2d-48df-9caa-8b615a70d154'
-          ? '/icons/bahia-mar-logo.png?v=2'
+          ? '/icons/bahia-mar-logo.png?v=3'
           : data.avatar_url
       const palette = await extractBrandColors(logoUrl)
       if (!cancelled) {
@@ -67,7 +67,7 @@ export function FlyerPage({ restaurantId }: FlyerPageProps) {
   const name = restaurant.restaurant_name || restaurant.display_name || ''
   const logo =
     restaurantId === '96683ea6-3c2d-48df-9caa-8b615a70d154'
-      ? '/icons/bahia-mar-logo.png?v=2'
+      ? '/icons/bahia-mar-logo.png?v=3'
       : restaurant.avatar_url
   const heroPhoto = '/hero-dinner.jpg'
 
@@ -93,18 +93,18 @@ export function FlyerPage({ restaurantId }: FlyerPageProps) {
 
       <div
         id="flyer"
-        className="w-full max-w-[680px] bg-white shadow-2xl print:shadow-none print:max-w-none overflow-hidden"
+        className="w-full max-w-[680px] bg-white shadow-2xl print:shadow-none print:max-w-none overflow-x-hidden"
         style={{ fontFamily: "'Georgia', 'Times New Roman', serif" }}
       >
 
         {/* ── 1. Header: logos centrados, un solo divisor ── */}
-        <div className="flex justify-center items-center gap-5 px-6 pt-8 pb-4 overflow-visible">
-          <div className="h-[110px] w-[260px] flex items-center justify-center overflow-visible shrink-0">
+        <div className="flex justify-center items-center gap-4 sm:gap-6 px-4 pt-8 pb-3 overflow-visible">
+          <div className="h-[120px] max-w-[300px] w-[46%] flex items-center justify-center overflow-visible shrink min-w-0">
             {logo ? (
               <img
                 src={logo}
                 alt={name}
-                className="max-h-[110px] max-w-[260px] w-auto object-contain object-center"
+                className="max-h-[120px] max-w-[300px] w-auto h-auto object-contain object-center"
                 crossOrigin="anonymous"
               />
             ) : (
@@ -112,13 +112,13 @@ export function FlyerPage({ restaurantId }: FlyerPageProps) {
             )}
           </div>
 
-          <div className="h-[72px] w-px bg-gray-300 flex-shrink-0" />
+          <div className="h-[76px] w-px bg-gray-300 flex-shrink-0" />
 
-          <div className="h-[110px] w-[260px] flex items-center justify-center overflow-visible shrink-0">
+          <div className="h-[120px] max-w-[300px] w-[46%] flex items-center justify-center overflow-visible shrink min-w-0">
             <img
               src="/icons/logo-full.png"
               alt="Table4Singles"
-              className="max-h-[80px] max-w-[240px] w-auto object-contain"
+              className="max-h-[88px] max-w-[300px] w-auto h-auto object-contain"
             />
           </div>
         </div>
@@ -150,90 +150,98 @@ export function FlyerPage({ restaurantId }: FlyerPageProps) {
           </p>
         </div>
 
-        {/* ── 5. Hero integrado: foto limpia + un solo QR ── */}
-        <div className="relative mx-6">
-          <div className="relative rounded-2xl overflow-hidden">
+        {/* ── 5. Hero a todo el ancho: banda fotográfica integrada ── */}
+        <div className="relative mt-1">
+          <div className="relative w-full">
             <img
               src={heroPhoto}
               alt=""
-              className="w-full h-[400px] object-cover object-center"
+              className="w-full h-[420px] object-cover object-center block"
             />
             <div
-              className="absolute inset-0"
+              className="absolute inset-0 pointer-events-none"
               style={{
-                background: 'linear-gradient(to bottom, rgba(0,0,0,0.08) 0%, rgba(0,0,0,0.22) 55%, rgba(0,0,0,0.35) 100%)',
+                background: 'linear-gradient(to bottom, rgba(0,0,0,0.10) 0%, rgba(0,0,0,0.16) 45%, rgba(0,0,0,0.32) 100%)',
               }}
             />
 
-            <div className="absolute inset-0 flex items-center justify-center px-4 sm:px-8">
-              {/* Badge izquierda — centrado vertical como referencia */}
-              <div
-                className="absolute left-3 sm:left-5 top-1/2 -translate-y-1/2 w-[92px] h-[92px] sm:w-[104px] sm:h-[104px] rounded-full flex flex-col items-center justify-center text-center z-10"
-                style={{ backgroundColor: brand.primary, color: '#ffffff', boxShadow: '0 4px 20px rgba(0,0,0,0.25)' }}
-              >
-                <Heart className="w-5 h-5 mb-1" strokeWidth={2.5} fill="none" />
-                <div className="w-9 h-px bg-white/80 my-0.5" />
-                <p
-                  className="text-[7px] sm:text-[8px] font-bold uppercase leading-tight px-1.5"
-                  style={{ fontFamily: "'Arial', sans-serif" }}
+            <div className="absolute inset-0 flex items-center justify-center">
+              <div className="relative">
+                <div
+                  className="absolute z-20 left-0 top-1/2 -translate-x-[62%] -translate-y-1/2 w-[92px] h-[92px] sm:w-[104px] sm:h-[104px] rounded-full flex flex-col items-center justify-center text-center"
+                  style={{ backgroundColor: brand.primary, color: '#ffffff', boxShadow: '0 4px 20px rgba(0,0,0,0.28)' }}
                 >
-                  La mejor<br />experiencia<br />empieza aquí
-                </p>
+                  <Heart className="w-5 h-5 mb-0.5" strokeWidth={2.5} fill="none" />
+                  <p
+                    className="text-[7px] sm:text-[8px] font-bold uppercase leading-tight px-2 mt-0.5"
+                    style={{ fontFamily: "'Arial', sans-serif" }}
+                  >
+                    La mejor<br />experiencia
+                  </p>
+                  <p
+                    className="text-[7px] sm:text-[8px] font-black uppercase leading-tight px-2"
+                    style={{ fontFamily: "'Arial', sans-serif" }}
+                  >
+                    empieza aquí
+                  </p>
+                  <div className="w-8 h-px bg-white/85 mt-1" />
+                </div>
+
+                <div
+                  className="relative z-10 rounded-2xl p-3 sm:p-3.5"
+                  style={{ backgroundColor: 'rgba(255,255,255,0.97)', boxShadow: '0 8px 32px rgba(0,0,0,0.22)' }}
+                >
+                  <img
+                    src="/icons/qr-app-logo.png"
+                    alt="QR Table4Singles"
+                    className="w-[188px] h-[188px] sm:w-[210px] sm:h-[210px] block"
+                  />
+                </div>
               </div>
 
-              {/* QR grande — único, centrado */}
-              <div
-                className="relative z-10 rounded-2xl p-3 sm:p-4"
-                style={{ backgroundColor: 'rgba(255,255,255,0.97)', boxShadow: '0 8px 32px rgba(0,0,0,0.18)' }}
-              >
-                <img
-                  src="/icons/qr-app-logo.png"
-                  alt="QR Table4Singles"
-                  className="w-[200px] h-[200px] sm:w-[220px] sm:h-[220px] block"
-                />
-              </div>
-
-              {/* Texto + flecha apuntando al QR (hacia la izquierda) */}
-              <div className="absolute right-2 sm:right-5 top-1/2 -translate-y-1/2 text-white z-10 text-right max-w-[118px]">
-                <p
-                  className="text-[1.05rem] italic leading-snug drop-shadow-md"
-                  style={{ fontFamily: "'Brush Script MT', 'Segoe Script', cursive" }}
-                >
-                  Escanéame<br />y descubre<br />la app
-                </p>
+              <div className="absolute right-3 sm:right-7 top-[46%] -translate-y-1/2 text-white z-10 flex flex-col items-end max-w-[130px]">
                 <svg
-                  width="56"
-                  height="40"
-                  viewBox="0 0 56 40"
+                  width="78"
+                  height="32"
+                  viewBox="0 0 78 32"
                   fill="none"
-                  className="text-white/95 mt-1 ml-auto drop-shadow"
+                  className="text-white drop-shadow mb-0.5 -mr-1"
                   aria-hidden
                 >
                   <path
-                    d="M50 8 C 36 10, 22 16, 10 28"
+                    d="M74 10 C 52 4, 30 7, 14 16"
                     stroke="currentColor"
-                    strokeWidth="2.4"
+                    strokeWidth="2.3"
                     strokeLinecap="round"
                     fill="none"
                   />
                   <path
-                    d="M18 24 L8 30 L18 34"
+                    d="M24 8 L10 16 L24 22"
                     stroke="currentColor"
-                    strokeWidth="2.4"
+                    strokeWidth="2.3"
                     strokeLinecap="round"
                     strokeLinejoin="round"
                     fill="none"
                   />
                 </svg>
+                <p
+                  className="text-[1.08rem] italic leading-snug drop-shadow-md text-right"
+                  style={{ fontFamily: "'Brush Script MT', 'Segoe Script', cursive" }}
+                >
+                  Escanéame<br />y descubre<br />la app
+                </p>
               </div>
             </div>
           </div>
 
-          {/* CTA solapando el borde inferior del hero — como referencia */}
-          <div className="relative z-20 -mt-5 mx-2 sm:mx-4">
+          {/* CTA solapando el borde inferior de la foto (mitad sobre foto, mitad debajo) */}
+          <div
+            className="absolute z-20 left-5 right-5 sm:left-8 sm:right-8"
+            style={{ bottom: 0, transform: 'translateY(50%)' }}
+          >
             <div
               className="rounded-md py-3.5 px-4 flex items-center gap-3 sm:gap-4"
-              style={{ backgroundColor: brand.primary, color: '#ffffff', boxShadow: '0 4px 16px rgba(0,0,0,0.12)' }}
+              style={{ backgroundColor: brand.primary, color: '#ffffff', boxShadow: '0 6px 20px rgba(0,0,0,0.18)' }}
             >
               <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center flex-shrink-0">
                 <Download className="w-5 h-5" style={{ color: '#ffffff' }} />
@@ -248,9 +256,11 @@ export function FlyerPage({ restaurantId }: FlyerPageProps) {
           </div>
         </div>
 
+        <div className="h-10 sm:h-11" />
+
         {/* ── 7. Three features with vertical dividers ── */}
         <div
-          className="grid grid-cols-[1fr_auto_1fr_auto_1fr] items-stretch mx-6 mt-8 pb-6"
+          className="grid grid-cols-[1fr_auto_1fr_auto_1fr] items-stretch mx-6 mt-6 pb-6"
           style={{ fontFamily: "'Arial', sans-serif" }}
         >
           {[

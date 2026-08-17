@@ -18,6 +18,8 @@ export interface Profile {
   latitude: number | null
   longitude: number | null
   date_of_birth: string | null
+  show_city: boolean
+  show_age: boolean
   phone: string | null
   instagram: string | null
   onboarding_completed: boolean

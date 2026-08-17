@@ -8,6 +8,7 @@ import { useRestaurants, type RestaurantWithDistance } from '@/hooks/useRestaura
 import { useFavorites } from '@/hooks/useFavorites'
 import { useAuth } from '@/contexts/AuthContext'
 import { RADIUS_STEPS_KM } from '@/lib/geocoding'
+import { restaurantPublicLocation } from '@/lib/privacy'
 
 const CUISINE_TYPES = ['Italian', 'Japanese', 'Mexican', 'French', 'Thai', 'Indian', 'Chinese', 'Spanish', 'Mediterranean', 'American', 'Korean', 'Vietnamese', 'Greek', 'Turkish', 'Other']
 const PRICE_RANGES = ['0€-50€', '50€-100€', '100€-200€', '+200€']
@@ -325,7 +326,7 @@ function RestaurantCard({
         <h3 className="font-semibold text-gray-900 dark:text-white truncate">{restaurant.restaurant_name || 'Restaurante'}</h3>
         <p className="text-sm text-gray-500 dark:text-gray-400 flex items-center gap-1 mt-1">
           <MapPin className="w-3.5 h-3.5 flex-shrink-0" />
-          <span className="truncate">{[restaurant.city, restaurant.country].filter(Boolean).join(', ') || 'Ubicación no especificada'}</span>
+          <span className="truncate">{restaurantPublicLocation(restaurant) || 'Ubicación no especificada'}</span>
         </p>
         <div className="flex items-center gap-2 mt-2 flex-wrap">
           {restaurant.restaurant_cuisine && (

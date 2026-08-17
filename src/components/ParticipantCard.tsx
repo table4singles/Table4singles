@@ -1,14 +1,7 @@
 import { ShieldCheck } from 'lucide-react'
 import type { Profile } from '@/types/database'
 import { useDinerTrustScore } from '@/hooks/useDinerReviews'
-
-function calculateAge(dateOfBirth: string | null): number | null {
-  if (!dateOfBirth) return null
-  const dob = new Date(dateOfBirth)
-  if (Number.isNaN(dob.getTime())) return null
-  const diff = Date.now() - dob.getTime()
-  return Math.floor(diff / (1000 * 60 * 60 * 24 * 365.25))
-}
+import { publicAge } from '@/lib/privacy'
 
 interface ParticipantCardProps {
   profile: Profile
@@ -16,7 +9,7 @@ interface ParticipantCardProps {
 }
 
 export function ParticipantCard({ profile, badge }: ParticipantCardProps) {
-  const age = calculateAge(profile.date_of_birth)
+  const age = publicAge(profile)
   const { score } = useDinerTrustScore(profile.id)
 
   return (

@@ -38,6 +38,8 @@ export function ProfilePage({ onNavigate, onAuthClick }: ProfilePageProps) {
   const [province, setProvince] = useState('')
   const [country, setCountry] = useState('')
   const [dateOfBirth, setDateOfBirth] = useState('')
+  const [showCity, setShowCity] = useState(false)
+  const [showAge, setShowAge] = useState(false)
   const [phone, setPhone] = useState('')
   const [instagram, setInstagram] = useState('')
   const [languages, setLanguages] = useState<string[]>([])
@@ -71,6 +73,8 @@ export function ProfilePage({ onNavigate, onAuthClick }: ProfilePageProps) {
       setProvince(profile.province || '')
       setCountry(profile.country || '')
       setDateOfBirth(profile.date_of_birth || '')
+      setShowCity(profile.show_city ?? false)
+      setShowAge(profile.show_age ?? false)
       setPhone(profile.phone || '')
       setInstagram(profile.instagram || '')
       setLanguages(profile.languages || [])
@@ -126,6 +130,8 @@ export function ProfilePage({ onNavigate, onAuthClick }: ProfilePageProps) {
           province,
           country,
           date_of_birth: dateOfBirth || null,
+          show_city: showCity,
+          show_age: showAge,
           phone,
           instagram: instagram || null,
           languages: languages.length > 0 ? languages : null,
@@ -302,7 +308,10 @@ export function ProfilePage({ onNavigate, onAuthClick }: ProfilePageProps) {
                 <textarea value={bio} onChange={e => setBio(e.target.value)} rows={3} className="w-full px-4 py-2.5 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 dark:text-white rounded-xl text-sm focus:ring-2 focus:ring-primary-500 outline-none resize-none" />
               </div>
 
-              <FormInput label="Calle y número" value={streetAddress} onChange={setStreetAddress} />
+              <div>
+                <FormInput label="Calle y número" value={streetAddress} onChange={setStreetAddress} />
+                <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">{t('profile.streetPrivateHint')}</p>
+              </div>
 
               <div className="grid grid-cols-2 gap-4">
                 <FormInput label="Ciudad" value={city} onChange={setCity} />
@@ -311,6 +320,15 @@ export function ProfilePage({ onNavigate, onAuthClick }: ProfilePageProps) {
               <FormInput label="País" value={country} onChange={setCountry} />
 
               <FormInput label="Fecha de nacimiento" value={dateOfBirth} onChange={setDateOfBirth} type="date" />
+
+              <div className="rounded-xl border border-gray-200 dark:border-gray-600 p-4 space-y-3">
+                <div>
+                  <p className="text-sm font-semibold text-gray-800 dark:text-gray-100">{t('profile.privacySection')}</p>
+                  <p className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">{t('profile.privacySectionHint')}</p>
+                </div>
+                <PrivacyToggle label={t('profile.showCity')} checked={showCity} onChange={setShowCity} />
+                <PrivacyToggle label={t('profile.showAge')} checked={showAge} onChange={setShowAge} />
+              </div>
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Teléfono</label>
@@ -527,6 +545,23 @@ function SectionTitle({ icon, label }: { icon: React.ReactNode; label: string })
     <div className="flex items-center gap-2 pt-2 pb-0.5 border-b border-gray-100 dark:border-gray-700">
       <span className="text-[#e94560]">{icon}</span>
       <span className="text-sm font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wide">{label}</span>
+    </div>
+  )
+}
+
+function PrivacyToggle({ label, checked, onChange }: { label: string; checked: boolean; onChange: (v: boolean) => void }) {
+  return (
+    <div className="flex items-center justify-between gap-3">
+      <span className="text-sm text-gray-700 dark:text-gray-200">{label}</span>
+      <button
+        type="button"
+        role="switch"
+        aria-checked={checked}
+        onClick={() => onChange(!checked)}
+        className={`relative flex-shrink-0 w-11 h-6 rounded-full transition-colors ${checked ? 'bg-primary-500' : 'bg-gray-300 dark:bg-gray-600'}`}
+      >
+        <span className={`absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow transition-transform ${checked ? 'translate-x-5' : ''}`} />
+      </button>
     </div>
   )
 }

@@ -1,14 +1,7 @@
 import { MapPin, ShieldCheck, User } from 'lucide-react'
 import type { CompanionProfile } from '@/hooks/useCompanions'
 import { useDinerTrustScore } from '@/hooks/useDinerReviews'
-
-function calculateAge(dateOfBirth: string | null): number | null {
-  if (!dateOfBirth) return null
-  const dob = new Date(dateOfBirth)
-  if (Number.isNaN(dob.getTime())) return null
-  const diff = Date.now() - dob.getTime()
-  return Math.floor(diff / (1000 * 60 * 60 * 24 * 365.25))
-}
+import { publicAge, publicLocation } from '@/lib/privacy'
 
 interface CompanionCardProps {
   companion: CompanionProfile
@@ -16,9 +9,9 @@ interface CompanionCardProps {
 }
 
 export function CompanionCard({ companion, onClick }: CompanionCardProps) {
-  const age = calculateAge(companion.date_of_birth)
+  const age = publicAge(companion)
   const { score } = useDinerTrustScore(companion.id)
-  const location = [companion.city, companion.country].filter(Boolean).join(', ')
+  const location = publicLocation(companion)
 
   return (
     <button onClick={onClick} className="w-full bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-sm hover:shadow-md transition-all overflow-hidden text-left flex items-center gap-4 p-4">

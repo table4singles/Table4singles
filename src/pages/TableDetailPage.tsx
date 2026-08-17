@@ -16,6 +16,7 @@ import { useReviews } from '@/hooks/useReviews'
 import { useMessages } from '@/hooks/useMessages'
 import { useInvitations } from '@/hooks/useInvitations'
 import { supabase } from '@/lib/supabase'
+import { restaurantPublicLocation } from '@/lib/privacy'
 
 interface TableDetailPageProps {
   tableId: string
@@ -241,7 +242,8 @@ export function TableDetailPage({ tableId, paymentSuccess, paymentCancelled, onN
     if (!table) return
     const timePart = (table.time || '20:00').replace(/:/g, '')
     const dtStart = `${table.date.replace(/-/g, '')}T${timePart}00`
-    const ics = `BEGIN:VCALENDAR\nVERSION:2.0\nBEGIN:VEVENT\nDTSTART:${dtStart}\nSUMMARY:Dinner at ${table.restaurant_name}\nLOCATION:${table.restaurant_address || table.restaurant_city}\nEND:VEVENT\nEND:VCALENDAR`
+    const location = table.restaurant_address || table.restaurant_city
+    const ics = `BEGIN:VCALENDAR\nVERSION:2.0\nBEGIN:VEVENT\nDTSTART:${dtStart}\nSUMMARY:Dinner at ${table.restaurant_name}\nLOCATION:${location}\nEND:VEVENT\nEND:VCALENDAR`
     const blob = new Blob([ics], { type: 'text/calendar' })
     const url = URL.createObjectURL(blob)
     const a = document.createElement('a')
@@ -323,8 +325,8 @@ export function TableDetailPage({ tableId, paymentSuccess, paymentCancelled, onN
                 <div>
                   <h1 className="text-2xl font-display font-bold text-gray-900 dark:text-white">{table.restaurant_name}</h1>
                   <div className="flex items-center gap-1 text-gray-500 dark:text-gray-400 mt-1">
-                    <MapPin className="w-4 h-4" />
-                    <span>{table.restaurant_city}, {table.restaurant_country}</span>
+                    <MapPin className="w-4 h-4 flex-shrink-0" />
+                    <span>{restaurantPublicLocation(table) || `${table.restaurant_city}, ${table.restaurant_country}`}</span>
                   </div>
                 </div>
                 {avgRating && (

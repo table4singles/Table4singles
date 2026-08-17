@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react'
 import { supabase } from '@/lib/supabase'
 import type { DiningTable, TableParticipant, Profile } from '@/types/database'
+import { sanitizePublicDiner } from '@/lib/privacy'
 
 interface UseTablesOptions {
   city?: string
@@ -63,11 +64,16 @@ export function useTableDetail(tableId: string | null) {
 
     if (!tableRes.error) setTable(tableRes.data)
     else setError(tableRes.error.message)
-    if (!partRes.error) setParticipants(partRes.data || [])
+    if (!partRes.error) {
+      setParticipants((partRes.data || []).map(p =>
+        p.profiles ? { ...p, profiles: sanitizePublicDiner(p.profiles) } : p
+      ))
+    }
 
     if (!tableRes.error && tableRes.data) {
       const { data: hostData } = await supabase.from('profiles').select('*').eq('id', tableRes.data.host_id).single()
-      setHostProfile(hostData || null)
+      // El host es el restaurante: su dirección pública sí se muestra. Solo se oculta la calle de comensales.
+      setHostProfile(hostData ? (hostData.role === 'restaurant' ? hostData : { ...hostData, street_address: null }) : null)
     }
     setLoading(false)
   }, [tableId])

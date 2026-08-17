@@ -3,14 +3,7 @@ import { Mail, MapPin, ShieldCheck, User, X } from 'lucide-react'
 import type { CompanionProfile } from '@/hooks/useCompanions'
 import { useDinerTrustScore } from '@/hooks/useDinerReviews'
 import { InviteToTableModal } from '@/components/InviteToTableModal'
-
-function calculateAge(dateOfBirth: string | null): number | null {
-  if (!dateOfBirth) return null
-  const dob = new Date(dateOfBirth)
-  if (Number.isNaN(dob.getTime())) return null
-  const diff = Date.now() - dob.getTime()
-  return Math.floor(diff / (1000 * 60 * 60 * 24 * 365.25))
-}
+import { publicAge, publicLocation } from '@/lib/privacy'
 
 function formatMemberSince(createdAt: string): string {
   const date = new Date(createdAt)
@@ -25,9 +18,9 @@ interface CompanionProfileModalProps {
 }
 
 export function CompanionProfileModal({ companion, onClose, onNavigate }: CompanionProfileModalProps) {
-  const age = calculateAge(companion.date_of_birth)
+  const age = publicAge(companion)
   const { score } = useDinerTrustScore(companion.id)
-  const location = [companion.city, companion.province, companion.country].filter(Boolean).join(', ')
+  const location = publicLocation(companion)
   const [showInvite, setShowInvite] = useState(false)
 
   return (

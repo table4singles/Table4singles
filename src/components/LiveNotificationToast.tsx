@@ -1,18 +1,9 @@
 import { useEffect, useRef, useState } from 'react'
 import { X, Globe } from 'lucide-react'
 import type { NewParticipantNotification } from '@/hooks/useRestaurantAgenda'
+import { publicAge } from '@/lib/privacy'
 
 const AUTO_DISMISS_MS = 9000
-
-function getAge(dateOfBirth: string | null): number | null {
-  if (!dateOfBirth) return null
-  const dob = new Date(dateOfBirth)
-  const today = new Date()
-  let age = today.getFullYear() - dob.getFullYear()
-  const m = today.getMonth() - dob.getMonth()
-  if (m < 0 || (m === 0 && today.getDate() < dob.getDate())) age--
-  return age > 0 ? age : null
-}
 
 interface LiveNotificationToastProps {
   notification: NewParticipantNotification
@@ -27,7 +18,7 @@ export function LiveNotificationToast({ notification, onDismiss, t }: LiveNotifi
 
   const { participant, table } = notification
   const profile = participant.profiles
-  const age = getAge(profile.date_of_birth)
+  const age = publicAge(profile)
   const occupied = table.max_seats - table.available_seats
   const displayName = profile.display_name || profile.full_name || 'Usuario'
   const initials = displayName.charAt(0).toUpperCase()

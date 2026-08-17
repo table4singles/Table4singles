@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from 'react'
 import { supabase } from '@/lib/supabase'
+import { sanitizePublicDiner } from '@/lib/privacy'
 
 const PAGE_SIZE = 24
 
@@ -13,12 +14,14 @@ export interface CompanionProfile {
   province: string | null
   country: string | null
   date_of_birth: string | null
+  show_city: boolean
+  show_age: boolean
   languages: string[] | null
   interests: string[] | null
   created_at: string
 }
 
-const PUBLIC_COLUMNS = 'id, display_name, avatar_url, bio, city, province, country, date_of_birth, languages, interests, created_at'
+const PUBLIC_COLUMNS = 'id, display_name, avatar_url, bio, city, province, country, date_of_birth, show_city, show_age, languages, interests, created_at'
 
 interface UseCompanionsOptions {
   currentUserId: string | null
@@ -46,7 +49,9 @@ export function useCompanions({ currentUserId, search = '', city = '', languages
 
     if (currentUserId) query = query.neq('id', currentUserId)
     if (search.trim()) query = query.ilike('display_name', `%${search.trim()}%`)
-    if (city.trim()) query = query.ilike('city', `%${city.trim()}%`)
+    if (city.trim()) {
+      query = query.eq('show_city', true).ilike('city', `%${city.trim()}%`)
+    }
     if (languages.length > 0) query = query.overlaps('languages', languages)
     if (interests.length > 0) query = query.overlaps('interests', interests)
 
@@ -63,7 +68,7 @@ export function useCompanions({ currentUserId, search = '', city = '', languages
     if (err) {
       setError(err.message)
     } else if (data) {
-      const rows = data as unknown as CompanionProfile[]
+      const rows = (data as unknown as CompanionProfile[]).map(sanitizePublicDiner)
       setCompanions(prev => (append ? [...prev, ...rows] : rows))
       setHasMore(rows.length === PAGE_SIZE)
       pageRef.current = page

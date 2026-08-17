@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback, useMemo, useRef } from 'react'
 import { supabase } from '@/lib/supabase'
 import type { DiningTable, TableParticipant, Profile } from '@/types/database'
+import { sanitizePublicDiner } from '@/lib/privacy'
 
 export interface AgendaTable extends DiningTable {
   participants: TableParticipant[]
@@ -11,6 +12,11 @@ export interface NewParticipantNotification {
   participant: TableParticipant & { profiles: Profile }
   table: AgendaTable
   timestamp: number
+}
+
+function sanitizeParticipant(p: TableParticipant): TableParticipant {
+  if (!p.profiles) return p
+  return { ...p, profiles: sanitizePublicDiner(p.profiles) }
 }
 
 export function useRestaurantAgenda(hostId: string | null) {
@@ -54,8 +60,9 @@ export function useRestaurantAgenda(hostId: string | null) {
         setError(partsErr.message)
       } else {
         participantsByTable = (partsData || []).reduce((acc: Record<string, TableParticipant[]>, p) => {
-          acc[p.table_id] = acc[p.table_id] || []
-          acc[p.table_id].push(p)
+          const sanitized = sanitizeParticipant(p)
+          acc[sanitized.table_id] = acc[sanitized.table_id] || []
+          acc[sanitized.table_id].push(sanitized)
           return acc
         }, {})
       }
@@ -100,16 +107,17 @@ export function useRestaurantAgenda(hostId: string | null) {
               .eq('table_id', updated.id)
 
             if (partsData) {
+              const sanitizedParts = partsData.map(sanitizeParticipant)
               setTables(current =>
                 current.map(t =>
-                  t.id === updated.id ? { ...t, participants: partsData } : t
+                  t.id === updated.id ? { ...t, participants: sanitizedParts } : t
                 )
               )
 
               // New join: available_seats went DOWN → show live toast + push
               if (updated.available_seats < prevSeats) {
                 const prevIds = new Set((prevTable.participants || []).map(p => p.id))
-                const newPart = partsData.find(p => !prevIds.has(p.id))
+                const newPart = sanitizedParts.find(p => !prevIds.has(p.id))
 
                 if (newPart?.profiles) {
                   const notifId = `${newPart.id}-${Date.now()}`
@@ -118,7 +126,7 @@ export function useRestaurantAgenda(hostId: string | null) {
                     {
                       id: notifId,
                       participant: newPart as TableParticipant & { profiles: Profile },
-                      table: { ...updated, participants: partsData },
+                      table: { ...updated, participants: sanitizedParts },
                       timestamp: Date.now(),
                     },
                   ])
@@ -128,7 +136,7 @@ export function useRestaurantAgenda(hostId: string | null) {
                       body: {
                         host_id: hostId,
                         participant_profile: newPart.profiles,
-                        table: { ...updated, participants: partsData },
+                        table: { ...updated, participants: sanitizedParts },
                       },
                     })
                     .catch(() => { /* silent — push is best-effort */ })

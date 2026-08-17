@@ -10,6 +10,7 @@ import { useFavorites } from '@/hooks/useFavorites'
 import { useAuth } from '@/contexts/AuthContext'
 import { useLanguage } from '@/contexts/LanguageContext'
 import type { RestaurantReview } from '@/types/database'
+import { restaurantPublicLocation } from '@/lib/privacy'
 
 interface RestaurantProfilePageProps {
   restaurantId: string
@@ -145,6 +146,7 @@ export function RestaurantProfilePage({ restaurantId, onNavigate, onAuthClick }:
   }
 
   const currentPhoto = photos[photoIdx] || null
+  const locationLabel = restaurantPublicLocation(restaurant)
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
@@ -210,8 +212,8 @@ export function RestaurantProfilePage({ restaurantId, onNavigate, onAuthClick }:
           <div className="absolute bottom-0 left-0 right-0 px-5 pb-4">
             <h1 className="text-2xl font-display font-bold text-white drop-shadow">{restaurant.restaurant_name || 'Restaurante'}</h1>
             <p className="flex items-center gap-1 text-sm text-white/80 mt-0.5">
-              <MapPin className="w-3.5 h-3.5" />
-              {[restaurant.city, restaurant.country].filter(Boolean).join(', ') || 'Ubicación no especificada'}
+              <MapPin className="w-3.5 h-3.5 flex-shrink-0" />
+              {locationLabel || 'Ubicación no especificada'}
             </p>
           </div>
         </div>
@@ -239,6 +241,12 @@ export function RestaurantProfilePage({ restaurantId, onNavigate, onAuthClick }:
             )}
 
             <div className="space-y-1.5">
+              {locationLabel && (
+                <p className="flex items-start gap-2 text-xs text-gray-500 dark:text-gray-400">
+                  <MapPin className="w-3.5 h-3.5 flex-shrink-0 mt-0.5" />
+                  <span className="leading-relaxed">{locationLabel}</span>
+                </p>
+              )}
               {restaurant.restaurant_hours && (
                 <p className="flex items-start gap-2 text-xs text-gray-500 dark:text-gray-400">
                   <Clock className="w-3.5 h-3.5 flex-shrink-0 mt-0.5" />

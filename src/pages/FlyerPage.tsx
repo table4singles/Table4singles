@@ -31,7 +31,11 @@ export function FlyerPage({ restaurantId }: FlyerPageProps) {
       }
 
       setRestaurant(data)
-      const palette = await extractBrandColors(data.avatar_url)
+      const logoUrl =
+        restaurantId === '96683ea6-3c2d-48df-9caa-8b615a70d154'
+          ? '/icons/bahia-mar-logo.png'
+          : data.avatar_url
+      const palette = await extractBrandColors(logoUrl)
       if (!cancelled) {
         setBrand(palette)
         setLoading(false)
@@ -61,8 +65,11 @@ export function FlyerPage({ restaurantId }: FlyerPageProps) {
   }
 
   const name = restaurant.restaurant_name || restaurant.display_name || ''
-  const logo = restaurant.avatar_url
-  const heroPhoto = restaurant.restaurant_photos?.[0] || '/hero-flyer-default.jpg'
+  const logo =
+    restaurantId === '96683ea6-3c2d-48df-9caa-8b615a70d154'
+      ? '/icons/bahia-mar-logo.png'
+      : restaurant.avatar_url
+  const heroPhoto = '/hero-dinner.jpg'
 
   return (
     <div className="min-h-screen bg-gray-100 flex flex-col items-center py-8 px-4 print:bg-white print:p-0 print:block">
@@ -90,37 +97,29 @@ export function FlyerPage({ restaurantId }: FlyerPageProps) {
         style={{ fontFamily: "'Georgia', 'Times New Roman', serif" }}
       >
 
-        {/* ── 1. Header: logos juntos y centrados ── */}
-        <div className="flex justify-center px-8 pt-7 pb-5">
-          <div className="inline-flex items-center gap-5">
-            <div className="h-[80px] w-[190px] flex items-center justify-center">
-              {logo ? (
-                <img
-                  src={logo}
-                  alt={name}
-                  className="max-h-[80px] max-w-[190px] object-contain"
-                  crossOrigin="anonymous"
-                />
-              ) : (
-                <p className="font-bold text-gray-800 text-lg leading-tight text-center">{name}</p>
-              )}
-            </div>
-
-            <div className="h-16 w-px bg-gray-300 flex-shrink-0" />
-
-            <div className="h-[80px] flex items-center justify-center gap-2.5">
+        {/* ── 1. Header: logos centrados, un solo divisor ── */}
+        <div className="flex justify-center items-center gap-6 px-8 pt-8 pb-4">
+          <div className="h-[96px] w-[210px] flex items-center justify-center">
+            {logo ? (
               <img
-                src="/icons/logo-icon.png"
-                alt="Table4Singles"
-                className="h-14 w-14 object-contain flex-shrink-0"
+                src={logo}
+                alt={name}
+                className="max-h-[96px] max-w-[210px] object-contain"
+                crossOrigin="anonymous"
               />
-              <p
-                className="font-bold text-[#1a1a2e] text-[17px] leading-tight"
-                style={{ fontFamily: "'Georgia', serif" }}
-              >
-                Table4Singles
-              </p>
-            </div>
+            ) : (
+              <p className="font-bold text-gray-800 text-lg leading-tight text-center">{name}</p>
+            )}
+          </div>
+
+          <div className="h-[72px] w-px bg-gray-300 flex-shrink-0" />
+
+          <div className="h-[96px] w-[210px] flex items-center justify-center">
+            <img
+              src="/icons/logo-full.png"
+              alt="Table4Singles"
+              className="max-h-[72px] max-w-[210px] w-auto object-contain"
+            />
           </div>
         </div>
 
@@ -194,23 +193,37 @@ export function FlyerPage({ restaurantId }: FlyerPageProps) {
                 />
               </div>
 
-              {/* Texto escaneame derecha */}
-              <div className="absolute right-3 sm:right-6 top-1/2 -translate-y-1/2 text-white z-10 hidden sm:block">
+              {/* Texto + flecha apuntando al QR (hacia la izquierda) */}
+              <div className="absolute right-2 sm:right-5 top-1/2 -translate-y-1/2 text-white z-10 text-right max-w-[118px]">
                 <p
                   className="text-[1.05rem] italic leading-snug drop-shadow-md"
                   style={{ fontFamily: "'Brush Script MT', 'Segoe Script', cursive" }}
                 >
                   Escanéame<br />y descubre<br />la app
                 </p>
-                <svg width="52" height="52" viewBox="0 0 52 52" fill="none" className="text-white/90 mt-1 ml-2">
+                <svg
+                  width="56"
+                  height="40"
+                  viewBox="0 0 56 40"
+                  fill="none"
+                  className="text-white/95 mt-1 ml-auto drop-shadow"
+                  aria-hidden
+                >
                   <path
-                    d="M6 46 C 18 34, 30 22, 46 8"
+                    d="M50 8 C 36 10, 22 16, 10 28"
                     stroke="currentColor"
-                    strokeWidth="2.5"
+                    strokeWidth="2.4"
                     strokeLinecap="round"
                     fill="none"
                   />
-                  <path d="M38 8 L46 8 L46 16" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+                  <path
+                    d="M18 24 L8 30 L18 34"
+                    stroke="currentColor"
+                    strokeWidth="2.4"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    fill="none"
+                  />
                 </svg>
               </div>
             </div>

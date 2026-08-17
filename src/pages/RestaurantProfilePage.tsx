@@ -159,7 +159,7 @@ export function RestaurantProfilePage({ restaurantId, onNavigate, onAuthClick }:
               key={photoIdx}
               src={currentPhoto}
               alt={restaurant.restaurant_name ?? ''}
-              className={`w-full h-full transition-opacity duration-500 ${heroIsLogo ? 'object-contain bg-white dark:bg-gray-900 p-8' : 'object-cover'}`}
+              className={`w-full h-full transition-opacity duration-500 ${heroIsLogo ? 'object-contain p-8' : 'object-cover'}`}
             />
           ) : (
             <div className="w-full h-full flex items-center justify-center">

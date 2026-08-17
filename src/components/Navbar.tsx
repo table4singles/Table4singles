@@ -117,7 +117,7 @@ export function Navbar({ currentPage, onNavigate, onAuthClick }: NavbarProps) {
                       <img
                         src={profile.avatar_url}
                         alt=""
-                        className={`w-full h-full ${effectiveRole === 'restaurant' ? 'object-contain p-0.5 bg-white' : 'object-cover'}`}
+                        className={`w-full h-full ${effectiveRole === 'restaurant' ? 'object-contain p-0.5' : 'object-cover'}`}
                       />
                     ) : (
                       <User className="w-4 h-4 text-blue-600" />

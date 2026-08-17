@@ -97,7 +97,7 @@ export function FlyerPage({ restaurantId }: FlyerPageProps) {
               <img
                 src={logo}
                 alt={name}
-                className="h-[72px] max-w-[260px] w-auto object-contain object-left"
+                className="h-[88px] max-w-[300px] w-auto object-contain object-left"
                 crossOrigin="anonymous"
               />
             ) : (

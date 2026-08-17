@@ -314,7 +314,7 @@ function RestaurantCard({
       )}
       <div className="w-32 h-32 sm:w-40 sm:h-40 flex-shrink-0 bg-gray-100 dark:bg-gray-700">
         {photo ? (
-          <img src={photo} alt={restaurant.restaurant_name ?? ''} className={`w-full h-full ${photoIsLogo ? 'object-contain p-3 bg-white dark:bg-gray-800' : 'object-cover'}`} />
+          <img src={photo} alt={restaurant.restaurant_name ?? ''} className={`w-full h-full ${photoIsLogo ? 'object-contain p-3' : 'object-cover'}`} />
         ) : (
           <div className="w-full h-full flex items-center justify-center text-gray-300 dark:text-gray-600">
             <UtensilsCrossed className="w-10 h-10" />

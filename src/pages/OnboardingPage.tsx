@@ -158,6 +158,11 @@ export function OnboardingPage({ onNavigate }: { onNavigate: (page: string, id?:
     // Se hace AWAIT para evitar que el navegador cancele la petición al navegar (EarlyDrop)
     if (isRestaurant) {
       try {
+        await supabase.functions.invoke('generate-restaurant-flyer', {
+          body: { restaurantId: user.id },
+        })
+      } catch { /* si falla OpenAI, el email igual enlaza al flyer HTML */ }
+      try {
         await supabase.functions.invoke('send-welcome-restaurant', {
           body: { restaurantId: user.id },
         })

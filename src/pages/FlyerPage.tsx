@@ -1,7 +1,9 @@
 import { useState, useEffect } from 'react'
-import { Printer, Download, Users, MapPin, Heart, Globe, UtensilsCrossed } from 'lucide-react'
+import { Printer, Download, Users, MapPin, Heart, Globe, UtensilsCrossed, Loader2, Sparkles } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
 import { extractBrandColors, DEFAULT_BRAND, type BrandPalette } from '@/lib/extractBrandColors'
+import { flyerPublicUrl } from '@/lib/flyer'
+import { useAuth } from '@/contexts/AuthContext'
 import type { Profile } from '@/types/database'
 
 interface FlyerPageProps {
@@ -9,10 +11,16 @@ interface FlyerPageProps {
 }
 
 export function FlyerPage({ restaurantId }: FlyerPageProps) {
+  const { user, profile: myProfile } = useAuth()
   const [restaurant, setRestaurant] = useState<Profile | null>(null)
   const [brand, setBrand] = useState<BrandPalette>(DEFAULT_BRAND)
+  const [generatedUrl, setGeneratedUrl] = useState<string | null>(null)
   const [loading, setLoading] = useState(true)
+  const [generating, setGenerating] = useState(false)
+  const [genError, setGenError] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
+
+  const canGenerate = !!user && (user.id === restaurantId || myProfile?.is_admin)
 
   useEffect(() => {
     let cancelled = false
@@ -36,14 +44,37 @@ export function FlyerPage({ restaurantId }: FlyerPageProps) {
           ? '/icons/bahia-mar-logo.png?v=3'
           : data.avatar_url
       const palette = await extractBrandColors(logoUrl)
+
+      const probe = flyerPublicUrl(restaurantId)
+      let found = false
+      try {
+        const head = await fetch(probe, { method: 'HEAD', cache: 'no-store' })
+        found = head.ok
+      } catch { /* ignore */ }
+
       if (!cancelled) {
         setBrand(palette)
+        if (found) setGeneratedUrl(flyerPublicUrl(restaurantId, Date.now()))
         setLoading(false)
       }
     })()
 
     return () => { cancelled = true }
   }, [restaurantId])
+
+  const generateFlyer = async () => {
+    setGenerating(true)
+    setGenError(null)
+    const { data, error: fnErr } = await supabase.functions.invoke('generate-restaurant-flyer', {
+      body: { restaurantId },
+    })
+    setGenerating(false)
+    if (fnErr || data?.error) {
+      setGenError(data?.error || fnErr?.message || 'No se pudo generar el flyer')
+      return
+    }
+    setGeneratedUrl(flyerPublicUrl(restaurantId, Date.now()))
+  }
 
   if (loading) {
     return (
@@ -74,7 +105,7 @@ export function FlyerPage({ restaurantId }: FlyerPageProps) {
   return (
     <div className="min-h-screen bg-gray-100 flex flex-col items-center py-8 px-4 print:bg-white print:p-0 print:block">
 
-      <div className="flex gap-3 mb-6 print:hidden">
+      <div className="flex flex-wrap justify-center gap-3 mb-6 print:hidden">
         <button
           onClick={() => window.print()}
           className="flex items-center gap-2 px-5 py-2.5 bg-white border border-gray-200 text-gray-700 rounded-xl font-medium text-sm hover:bg-gray-50 shadow-sm transition-colors"
@@ -89,8 +120,46 @@ export function FlyerPage({ restaurantId }: FlyerPageProps) {
         >
           <Download className="w-4 h-4" /> Descargar QR
         </a>
+        {canGenerate && (
+          <button
+            onClick={generateFlyer}
+            disabled={generating}
+            className="flex items-center gap-2 px-5 py-2.5 bg-white border border-gray-200 text-gray-700 rounded-xl font-medium text-sm hover:bg-gray-50 shadow-sm transition-colors disabled:opacity-60"
+          >
+            {generating
+              ? <><Loader2 className="w-4 h-4 animate-spin" /> Generando…</>
+              : <><Sparkles className="w-4 h-4" /> {generatedUrl ? 'Regenerar flyer' : 'Generar flyer IA'}</>}
+          </button>
+        )}
       </div>
 
+      {genError && (
+        <p className="print:hidden mb-4 text-sm text-red-600 bg-red-50 border border-red-100 rounded-xl px-4 py-2 max-w-[680px]">
+          {genError}
+        </p>
+      )}
+
+      {generating && (
+        <p className="print:hidden mb-4 text-sm text-gray-500">
+          OpenAI está componiendo el flyer con tu logo (puede tardar ~30–60 s)…
+        </p>
+      )}
+
+      {generatedUrl ? (
+        <div
+          id="flyer"
+          className="relative w-full max-w-[680px] bg-white shadow-2xl print:shadow-none print:max-w-none"
+        >
+          <img src={generatedUrl} alt={`Flyer ${name}`} className="w-full h-auto block" />
+          {/* QR real — único elemento que no genera la IA */}
+          <img
+            src="/icons/qr-app-logo.png"
+            alt="QR Table4Singles"
+            className="absolute left-1/2 -translate-x-1/2 w-[22%] h-auto rounded-[6%] bg-white p-[1.4%] shadow-lg"
+            style={{ top: '40.5%' }}
+          />
+        </div>
+      ) : (
       <div
         id="flyer"
         className="w-full max-w-[680px] bg-white shadow-2xl print:shadow-none print:max-w-none overflow-x-hidden"
@@ -134,14 +203,12 @@ export function FlyerPage({ restaurantId }: FlyerPageProps) {
             <span className="text-[#1a1a2e]">TABLE4SINGLES</span>
           </h1>
 
-          {/* ── 3. Blue line + heart ── */}
           <div className="flex items-center justify-center gap-3 mt-4 px-6">
             <div className="h-px flex-1 max-w-[180px]" style={{ backgroundColor: brand.primary }} />
             <Heart className="w-4 h-4 flex-shrink-0" style={{ color: brand.primary, fill: brand.primary }} />
             <div className="h-px flex-1 max-w-[180px]" style={{ backgroundColor: brand.primary }} />
           </div>
 
-          {/* ── 4. Tagline ── */}
           <p
             className="text-gray-700 text-sm mt-4 max-w-md mx-auto leading-relaxed"
             style={{ fontFamily: "'Arial', sans-serif" }}
@@ -150,7 +217,6 @@ export function FlyerPage({ restaurantId }: FlyerPageProps) {
           </p>
         </div>
 
-        {/* ── 5. Hero a todo el ancho: banda fotográfica integrada ── */}
         <div className="relative mt-1">
           <div className="relative w-full">
             <img
@@ -234,7 +300,6 @@ export function FlyerPage({ restaurantId }: FlyerPageProps) {
             </div>
           </div>
 
-          {/* CTA solapando el borde inferior de la foto (mitad sobre foto, mitad debajo) */}
           <div
             className="absolute z-20 left-5 right-5 sm:left-8 sm:right-8"
             style={{ bottom: 0, transform: 'translateY(50%)' }}
@@ -258,7 +323,6 @@ export function FlyerPage({ restaurantId }: FlyerPageProps) {
 
         <div className="h-10 sm:h-11" />
 
-        {/* ── 7. Three features with vertical dividers ── */}
         <div
           className="grid grid-cols-[1fr_auto_1fr_auto_1fr] items-stretch mx-6 mt-6 pb-6"
           style={{ fontFamily: "'Arial', sans-serif" }}
@@ -295,7 +359,6 @@ export function FlyerPage({ restaurantId }: FlyerPageProps) {
           })}
         </div>
 
-        {/* ── 8. Global movement banner ── */}
         <div className="mx-6 mb-6">
           <div
             className="rounded-2xl border-2 px-5 py-4 flex items-center gap-4"
@@ -321,6 +384,7 @@ export function FlyerPage({ restaurantId }: FlyerPageProps) {
         </div>
 
       </div>
+      )}
 
       <style>{`
         @media print {

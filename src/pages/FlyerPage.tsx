@@ -33,7 +33,7 @@ export function FlyerPage({ restaurantId }: FlyerPageProps) {
       setRestaurant(data)
       const logoUrl =
         restaurantId === '96683ea6-3c2d-48df-9caa-8b615a70d154'
-          ? '/icons/bahia-mar-logo.png'
+          ? '/icons/bahia-mar-logo.png?v=2'
           : data.avatar_url
       const palette = await extractBrandColors(logoUrl)
       if (!cancelled) {
@@ -67,7 +67,7 @@ export function FlyerPage({ restaurantId }: FlyerPageProps) {
   const name = restaurant.restaurant_name || restaurant.display_name || ''
   const logo =
     restaurantId === '96683ea6-3c2d-48df-9caa-8b615a70d154'
-      ? '/icons/bahia-mar-logo.png'
+      ? '/icons/bahia-mar-logo.png?v=2'
       : restaurant.avatar_url
   const heroPhoto = '/hero-dinner.jpg'
 
@@ -98,13 +98,13 @@ export function FlyerPage({ restaurantId }: FlyerPageProps) {
       >
 
         {/* ── 1. Header: logos centrados, un solo divisor ── */}
-        <div className="flex justify-center items-center gap-6 px-8 pt-8 pb-4">
-          <div className="h-[96px] w-[210px] flex items-center justify-center">
+        <div className="flex justify-center items-center gap-5 px-6 pt-8 pb-4 overflow-visible">
+          <div className="h-[110px] w-[260px] flex items-center justify-center overflow-visible shrink-0">
             {logo ? (
               <img
                 src={logo}
                 alt={name}
-                className="max-h-[96px] max-w-[210px] object-contain"
+                className="max-h-[110px] max-w-[260px] w-auto object-contain object-center"
                 crossOrigin="anonymous"
               />
             ) : (
@@ -114,11 +114,11 @@ export function FlyerPage({ restaurantId }: FlyerPageProps) {
 
           <div className="h-[72px] w-px bg-gray-300 flex-shrink-0" />
 
-          <div className="h-[96px] w-[210px] flex items-center justify-center">
+          <div className="h-[110px] w-[260px] flex items-center justify-center overflow-visible shrink-0">
             <img
               src="/icons/logo-full.png"
               alt="Table4Singles"
-              className="max-h-[72px] max-w-[210px] w-auto object-contain"
+              className="max-h-[80px] max-w-[240px] w-auto object-contain"
             />
           </div>
         </div>

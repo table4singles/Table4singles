@@ -1,8 +1,16 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import { Printer, Download, Users, MapPin, Heart, Globe, UtensilsCrossed, Loader2, Sparkles } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
 import { extractBrandColors, DEFAULT_BRAND, type BrandPalette } from '@/lib/extractBrandColors'
 import { flyerPublicUrl } from '@/lib/flyer'
+import { downloadFlyerPng } from '@/lib/exportFlyer'
+import {
+  DEFAULT_FLYER_FORMAT_ID,
+  FLYER_FORMATS,
+  formatPrintPageSize,
+  getFlyerFormat,
+  type FlyerFormat,
+} from '@/lib/flyerFormats'
 import { useAuth } from '@/contexts/AuthContext'
 import type { Profile } from '@/types/database'
 
@@ -19,6 +27,11 @@ export function FlyerPage({ restaurantId }: FlyerPageProps) {
   const [generating, setGenerating] = useState(false)
   const [genError, setGenError] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
+  const [selectedFormatId, setSelectedFormatId] = useState(DEFAULT_FLYER_FORMAT_ID)
+  const [exporting, setExporting] = useState(false)
+  const [exportError, setExportError] = useState<string | null>(null)
+
+  const selectedFormat = useMemo(() => getFlyerFormat(selectedFormatId), [selectedFormatId])
 
   const canGenerate = !!user && (user.id === restaurantId || myProfile?.is_admin)
 
@@ -76,6 +89,24 @@ export function FlyerPage({ restaurantId }: FlyerPageProps) {
     setGeneratedUrl(flyerPublicUrl(restaurantId, Date.now()))
   }
 
+  const downloadFlyer = async () => {
+    if (!generatedUrl || !restaurant) return
+    setExporting(true)
+    setExportError(null)
+    try {
+      await downloadFlyerPng({
+        flyerImageUrl: generatedUrl,
+        qrImageUrl: `${window.location.origin}/icons/qr-app-logo.png`,
+        format: selectedFormat,
+        restaurantName: restaurant.restaurant_name || restaurant.display_name || 'restaurante',
+      })
+    } catch (err) {
+      setExportError(err instanceof Error ? err.message : 'No se pudo descargar el flyer')
+    } finally {
+      setExporting(false)
+    }
+  }
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
@@ -102,36 +133,91 @@ export function FlyerPage({ restaurantId }: FlyerPageProps) {
       : restaurant.avatar_url
   const heroPhoto = '/hero-dinner.jpg'
 
+  const posterFormats = FLYER_FORMATS.filter(f => f.category === 'poster')
+  const tableFormats = FLYER_FORMATS.filter(f => f.category === 'table')
+
   return (
     <div className="min-h-screen bg-gray-100 flex flex-col items-center py-8 px-4 print:bg-white print:p-0 print:block">
 
-      <div className="flex flex-wrap justify-center gap-3 mb-6 print:hidden">
-        <button
-          onClick={() => window.print()}
-          className="flex items-center gap-2 px-5 py-2.5 bg-white border border-gray-200 text-gray-700 rounded-xl font-medium text-sm hover:bg-gray-50 shadow-sm transition-colors"
-        >
-          <Printer className="w-4 h-4" /> Imprimir
-        </button>
-        <a
-          href="/icons/qr-app-logo.png"
-          download="qr-table4singles.png"
-          className="flex items-center gap-2 px-5 py-2.5 text-white rounded-xl font-medium text-sm shadow-sm transition-opacity hover:opacity-90"
-          style={{ backgroundColor: brand.primary }}
-        >
-          <Download className="w-4 h-4" /> Descargar QR
-        </a>
-        {canGenerate && (
+      <div className="w-full max-w-[680px] print:hidden mb-6 space-y-4">
+        <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-4 sm:p-5">
+          <h2 className="text-sm font-semibold text-gray-900 mb-1">Formato de descarga e impresión</h2>
+          <p className="text-xs text-gray-500 mb-4">
+            Elige el tamaño antes de descargar. Vertical para carteles; horizontal o mini para mesas.
+          </p>
+
+          <FormatGroup
+            title="Carteles"
+            formats={posterFormats}
+            selectedId={selectedFormatId}
+            onSelect={setSelectedFormatId}
+          />
+          <FormatGroup
+            title="Mesas"
+            formats={tableFormats}
+            selectedId={selectedFormatId}
+            onSelect={setSelectedFormatId}
+            className="mt-4"
+          />
+
+          <p className="text-[11px] text-gray-400 mt-3">
+            Seleccionado: <span className="font-medium text-gray-600">{selectedFormat.label}</span>
+            {' · '}
+            {selectedFormat.hint}
+            {' · '}
+            300 DPI
+          </p>
+        </div>
+
+        <div className="flex flex-wrap justify-center gap-3">
           <button
-            onClick={generateFlyer}
-            disabled={generating}
-            className="flex items-center gap-2 px-5 py-2.5 bg-white border border-gray-200 text-gray-700 rounded-xl font-medium text-sm hover:bg-gray-50 shadow-sm transition-colors disabled:opacity-60"
+            onClick={() => window.print()}
+            className="flex items-center gap-2 px-5 py-2.5 bg-white border border-gray-200 text-gray-700 rounded-xl font-medium text-sm hover:bg-gray-50 shadow-sm transition-colors"
           >
-            {generating
-              ? <><Loader2 className="w-4 h-4 animate-spin" /> Generando…</>
-              : <><Sparkles className="w-4 h-4" /> {generatedUrl ? 'Regenerar flyer' : 'Generar flyer IA'}</>}
+            <Printer className="w-4 h-4" /> Imprimir
           </button>
-        )}
+          {generatedUrl ? (
+            <button
+              onClick={downloadFlyer}
+              disabled={exporting}
+              className="flex items-center gap-2 px-5 py-2.5 text-white rounded-xl font-medium text-sm shadow-sm transition-opacity hover:opacity-90 disabled:opacity-60"
+              style={{ backgroundColor: brand.primary }}
+            >
+              {exporting
+                ? <><Loader2 className="w-4 h-4 animate-spin" /> Preparando…</>
+                : <><Download className="w-4 h-4" /> Descargar PNG</>}
+            </button>
+          ) : (
+            <span className="flex items-center gap-2 px-5 py-2.5 bg-gray-100 text-gray-400 rounded-xl font-medium text-sm">
+              <Download className="w-4 h-4" /> Descarga PNG tras generar con IA
+            </span>
+          )}
+          <a
+            href="/icons/qr-app-logo.png"
+            download="qr-table4singles.png"
+            className="flex items-center gap-2 px-5 py-2.5 bg-white border border-gray-200 text-gray-700 rounded-xl font-medium text-sm hover:bg-gray-50 shadow-sm transition-colors"
+          >
+            <Download className="w-4 h-4" /> Solo QR
+          </a>
+          {canGenerate && (
+            <button
+              onClick={generateFlyer}
+              disabled={generating}
+              className="flex items-center gap-2 px-5 py-2.5 bg-white border border-gray-200 text-gray-700 rounded-xl font-medium text-sm hover:bg-gray-50 shadow-sm transition-colors disabled:opacity-60"
+            >
+              {generating
+                ? <><Loader2 className="w-4 h-4 animate-spin" /> Generando…</>
+                : <><Sparkles className="w-4 h-4" /> {generatedUrl ? 'Regenerar flyer' : 'Generar flyer IA'}</>}
+            </button>
+          )}
+        </div>
       </div>
+
+      {exportError && (
+        <p className="print:hidden mb-4 text-sm text-red-600 bg-red-50 border border-red-100 rounded-xl px-4 py-2 max-w-[680px]">
+          {exportError}
+        </p>
+      )}
 
       {genError && (
         <p className="print:hidden mb-4 text-sm text-red-600 bg-red-50 border border-red-100 rounded-xl px-4 py-2 max-w-[680px]">
@@ -388,11 +474,62 @@ export function FlyerPage({ restaurantId }: FlyerPageProps) {
 
       <style>{`
         @media print {
-          @page { size: A4 portrait; margin: 0; }
+          @page { size: ${formatPrintPageSize(selectedFormat)}; margin: 0; }
           body { margin: 0; }
           #flyer { width: 100%; max-width: 100% !important; }
         }
       `}</style>
+    </div>
+  )
+}
+
+function FormatGroup({
+  title,
+  formats,
+  selectedId,
+  onSelect,
+  className = '',
+}: {
+  title: string
+  formats: FlyerFormat[]
+  selectedId: string
+  onSelect: (id: string) => void
+  className?: string
+}) {
+  return (
+    <div className={className}>
+      <p className="text-[11px] font-semibold uppercase tracking-wide text-gray-400 mb-2">{title}</p>
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+        {formats.map(format => {
+          const selected = format.id === selectedId
+          const isLandscape = format.orientation === 'landscape'
+          return (
+            <button
+              key={format.id}
+              type="button"
+              onClick={() => onSelect(format.id)}
+              className={`text-left rounded-xl border p-2.5 transition-all ${
+                selected
+                  ? 'border-[#e94560] bg-red-50 ring-1 ring-[#e94560]/30'
+                  : 'border-gray-200 bg-gray-50 hover:border-gray-300 hover:bg-white'
+              }`}
+            >
+              <div className="flex items-center gap-2 mb-1.5">
+                <span
+                  className={`inline-block border-2 rounded-sm flex-shrink-0 ${
+                    selected ? 'border-[#e94560]' : 'border-gray-400'
+                  } ${isLandscape ? 'w-5 h-3.5' : 'w-3.5 h-5'}`}
+                  aria-hidden
+                />
+                <span className={`text-xs font-semibold leading-tight ${selected ? 'text-[#e94560]' : 'text-gray-800'}`}>
+                  {format.label}
+                </span>
+              </div>
+              <p className="text-[10px] text-gray-500 leading-snug">{format.hint}</p>
+            </button>
+          )
+        })}
+      </div>
     </div>
   )
 }

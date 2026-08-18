@@ -1,11 +1,11 @@
 import { supabase } from '@/lib/supabase'
 
-export function flyerStoragePath(restaurantId: string) {
-  return `${restaurantId}/flyer.png`
+export function flyerHeroPath(restaurantId: string) {
+  return `${restaurantId}/flyer-hero.png`
 }
 
-export function flyerPublicUrl(restaurantId: string, cacheBust?: number) {
-  const { data } = supabase.storage.from('restaurant-photos').getPublicUrl(flyerStoragePath(restaurantId))
+export function flyerHeroUrl(restaurantId: string, cacheBust?: number) {
+  const { data } = supabase.storage.from('restaurant-photos').getPublicUrl(flyerHeroPath(restaurantId))
   const url = data.publicUrl
   return cacheBust ? `${url}?t=${cacheBust}` : url
 }
@@ -33,7 +33,7 @@ export async function readFlyerStatus(restaurantId: string): Promise<FlyerJobSta
 }
 
 export async function flyerExists(restaurantId: string): Promise<boolean> {
-  const url = flyerPublicUrl(restaurantId)
+  const url = flyerHeroUrl(restaurantId)
   try {
     const res = await fetch(url, { method: 'HEAD', cache: 'no-store' })
     return res.ok

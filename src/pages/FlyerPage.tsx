@@ -2,7 +2,7 @@ import { useState, useEffect, useMemo } from 'react'
 import { Printer, Download, Users, MapPin, Heart, Globe, UtensilsCrossed, Loader2, Sparkles } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
 import { extractBrandColors, DEFAULT_BRAND, type BrandPalette } from '@/lib/extractBrandColors'
-import { flyerPublicUrl } from '@/lib/flyer'
+import { flyerPublicUrl, readFlyerStatus } from '@/lib/flyer'
 import { downloadFlyerPng } from '@/lib/exportFlyer'
 import {
   DEFAULT_FLYER_FORMAT_ID,
@@ -81,12 +81,39 @@ export function FlyerPage({ restaurantId }: FlyerPageProps) {
     const { data, error: fnErr } = await supabase.functions.invoke('generate-restaurant-flyer', {
       body: { restaurantId },
     })
-    setGenerating(false)
     if (fnErr || data?.error) {
-      setGenError(data?.error || fnErr?.message || 'No se pudo generar el flyer')
+      let detail = data?.error || fnErr?.message || 'No se pudo generar el flyer'
+      const ctx = (fnErr as { context?: Response } | null)?.context
+      if (ctx) {
+        try {
+          const body = await ctx.clone().json()
+          detail = body.error || body.message || detail
+          if (body.detail) detail = `${detail}: ${String(body.detail).slice(0, 240)}`
+        } catch { /* ignore */ }
+      }
+      setGenerating(false)
+      setGenError(detail)
       return
     }
-    setGeneratedUrl(flyerPublicUrl(restaurantId, Date.now()))
+
+    const deadline = Date.now() + 130_000
+    while (Date.now() < deadline) {
+      await new Promise(r => setTimeout(r, 3000))
+      const status = await readFlyerStatus(restaurantId)
+      if (status?.status === 'ok') {
+        setGeneratedUrl(flyerPublicUrl(restaurantId, Date.now()))
+        setGenerating(false)
+        return
+      }
+      if (status?.status === 'error') {
+        setGenerating(false)
+        setGenError(status.error || 'No se pudo generar el flyer')
+        return
+      }
+    }
+
+    setGenerating(false)
+    setGenError('La generación está tardando demasiado. Vuelve a intentar en un minuto.')
   }
 
   const downloadFlyer = async () => {
@@ -227,7 +254,7 @@ export function FlyerPage({ restaurantId }: FlyerPageProps) {
 
       {generating && (
         <p className="print:hidden mb-4 text-sm text-gray-500">
-          OpenAI está componiendo el flyer con tu logo (puede tardar ~30–60 s)…
+        OpenAI está componiendo el flyer con tu logo (puede tardar 1–2 minutos)…
         </p>
       )}
 

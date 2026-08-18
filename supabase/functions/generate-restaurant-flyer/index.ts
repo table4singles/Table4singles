@@ -1,4 +1,4 @@
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
+import { createClient, type SupabaseClient } from 'https://esm.sh/@supabase/supabase-js@2'
 
 const OPENAI_API_KEY = Deno.env.get('OPENAI_API_KEY') ?? ''
 const SUPABASE_URL = Deno.env.get('SUPABASE_URL') ?? ''
@@ -9,6 +9,8 @@ const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 }
+
+declare const EdgeRuntime: { waitUntil: (promise: Promise<unknown>) => void }
 
 function json(body: unknown, status = 200) {
   return new Response(JSON.stringify(body), {
@@ -80,22 +82,39 @@ function extFromType(type: string) {
   return 'png'
 }
 
-Deno.serve(async (req) => {
-  if (req.method === 'OPTIONS') return new Response('ok', { headers: corsHeaders })
-  if (req.method !== 'POST') return json({ error: 'Method not allowed' }, 405)
+function decodeBase64Png(b64: string): Uint8Array {
+  const bin = atob(b64)
+  const bytes = new Uint8Array(bin.length)
+  for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i)
+  return bytes
+}
 
-  if (!OPENAI_API_KEY) return json({ error: 'OPENAI_API_KEY no configurada' }, 500)
-
-  let restaurantId = ''
+function openaiErrorMessage(aiText: string): string {
   try {
-    const body = await req.json()
-    restaurantId = body.restaurantId
+    const parsed = JSON.parse(aiText)
+    return parsed?.error?.message || parsed?.message || aiText.slice(0, 400)
   } catch {
-    return json({ error: 'JSON inválido' }, 400)
+    return aiText.slice(0, 400)
   }
-  if (!restaurantId) return json({ error: 'restaurantId required' }, 400)
+}
 
+async function writeStatus(
+  supabase: SupabaseClient,
+  restaurantId: string,
+  payload: { status: 'generating' | 'ok' | 'error'; error?: string; url?: string },
+) {
+  const { error } = await supabase.storage
+    .from('restaurant-photos')
+    .upload(`${restaurantId}/flyer-status.json`, JSON.stringify(payload), {
+      contentType: 'application/json',
+      upsert: true,
+    })
+  if (error) console.error('flyer-status upload failed', error.message)
+}
+
+async function generateFlyer(restaurantId: string) {
   const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE)
+  await writeStatus(supabase, restaurantId, { status: 'generating' })
 
   const { data: profile, error } = await supabase
     .from('profiles')
@@ -103,7 +122,10 @@ Deno.serve(async (req) => {
     .eq('id', restaurantId)
     .single()
 
-  if (error || !profile) return json({ error: 'Restaurant not found' }, 404)
+  if (error || !profile) {
+    await writeStatus(supabase, restaurantId, { status: 'error', error: 'Restaurante no encontrado' })
+    return
+  }
 
   const name = profile.restaurant_name || profile.display_name || 'Restaurante'
   const logoUrl =
@@ -113,7 +135,10 @@ Deno.serve(async (req) => {
 
   const restaurantLogo = logoUrl ? await fetchBytes(logoUrl) : null
   const t4sLogo = await fetchBytes(`${APP_URL}/icons/logo-full.png`)
-  if (!t4sLogo) return json({ error: 'No se pudo cargar el logo de Table4Singles' }, 500)
+  if (!t4sLogo) {
+    await writeStatus(supabase, restaurantId, { status: 'error', error: 'No se pudo cargar el logo de Table4Singles' })
+    return
+  }
 
   const form = new FormData()
   form.append('model', 'gpt-image-1')
@@ -126,7 +151,6 @@ Deno.serve(async (req) => {
   form.append('quality', 'medium')
   form.append('input_fidelity', 'high')
 
-  // Primera imagen = mayor fidelidad (logo del restaurante)
   if (restaurantLogo) {
     form.append(
       'image[]',
@@ -140,15 +164,20 @@ Deno.serve(async (req) => {
     `t4s-logo.${extFromType(t4sLogo.type)}`,
   )
 
+  console.log('openai: calling images/edits', restaurantId)
   const aiRes = await fetch('https://api.openai.com/v1/images/edits', {
     method: 'POST',
     headers: { Authorization: `Bearer ${OPENAI_API_KEY}` },
     body: form,
+    signal: AbortSignal.timeout(120_000),
   })
 
   const aiText = await aiRes.text()
   if (!aiRes.ok) {
-    return json({ error: 'OpenAI error', detail: aiText.slice(0, 2000) }, 502)
+    const message = openaiErrorMessage(aiText)
+    console.error('openai error', aiRes.status, message)
+    await writeStatus(supabase, restaurantId, { status: 'error', error: message })
+    return
   }
 
   let b64 = ''
@@ -156,20 +185,70 @@ Deno.serve(async (req) => {
     const parsed = JSON.parse(aiText)
     b64 = parsed?.data?.[0]?.b64_json || ''
   } catch {
-    return json({ error: 'Respuesta OpenAI inválida' }, 502)
+    await writeStatus(supabase, restaurantId, { status: 'error', error: 'Respuesta OpenAI inválida' })
+    return
   }
-  if (!b64) return json({ error: 'OpenAI no devolvió imagen' }, 502)
+  if (!b64) {
+    await writeStatus(supabase, restaurantId, { status: 'error', error: 'OpenAI no devolvió imagen' })
+    return
+  }
 
-  const pngBytes = Uint8Array.from(atob(b64), (c) => c.charCodeAt(0))
+  const pngBytes = decodeBase64Png(b64)
   const path = `${restaurantId}/flyer.png`
-
   const { error: upErr } = await supabase.storage
     .from('restaurant-photos')
     .upload(path, pngBytes, { contentType: 'image/png', upsert: true })
 
-  if (upErr) return json({ error: upErr.message }, 500)
+  if (upErr) {
+    console.error('png upload failed', upErr.message)
+    await writeStatus(supabase, restaurantId, { status: 'error', error: upErr.message })
+    return
+  }
 
   const publicUrl = supabase.storage.from('restaurant-photos').getPublicUrl(path).data.publicUrl
+  console.log('flyer ready', restaurantId)
+  await writeStatus(supabase, restaurantId, { status: 'ok', url: publicUrl })
+}
 
-  return json({ ok: true, url: publicUrl })
+Deno.serve(async (req) => {
+  if (req.method === 'OPTIONS') return new Response('ok', { headers: corsHeaders })
+  if (req.method !== 'POST') return json({ error: 'Method not allowed' }, 405)
+
+  if (!OPENAI_API_KEY) {
+    return json({ error: 'OPENAI_API_KEY no configurada en los secrets de Supabase' }, 500)
+  }
+
+  let restaurantId = ''
+  try {
+    const body = await req.json()
+    restaurantId = body.restaurantId
+  } catch {
+    return json({ error: 'JSON inválido' }, 400)
+  }
+  if (!restaurantId) return json({ error: 'restaurantId required' }, 400)
+
+  const job = generateFlyer(restaurantId).catch(async (err) => {
+    console.error('generateFlyer failed', err)
+    const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE)
+    await writeStatus(supabase, restaurantId, {
+      status: 'error',
+      error: err instanceof Error ? err.message : 'Error interno generando el flyer',
+    })
+  })
+
+  try {
+    EdgeRuntime.waitUntil(job)
+  } catch {
+    await job
+    const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE)
+    const { data } = await supabase.storage.from('restaurant-photos').download(`${restaurantId}/flyer-status.json`)
+    const text = data ? await data.text() : ''
+    try {
+      const status = JSON.parse(text)
+      if (status.status === 'error') return json({ error: status.error || 'Error generando el flyer' }, 502)
+    } catch { /* ignore */ }
+    return json({ ok: true, status: 'ok' })
+  }
+
+  return json({ ok: true, status: 'started' })
 })

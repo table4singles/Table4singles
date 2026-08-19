@@ -1,17 +1,23 @@
 import { supabase } from '@/lib/supabase'
 
-export function flyerHeroPath(restaurantId: string) {
-  return `${restaurantId}/flyer-hero.png`
+export type FlyerSlot = 1 | 2 | 3
+export const FLYER_SLOTS: FlyerSlot[] = [1, 2, 3]
+export const STOCK_HERO = '/hero-dinner.jpg'
+
+export function flyerHeroPath(restaurantId: string, slot: FlyerSlot = 1) {
+  return `${restaurantId}/flyer-hero-${slot}.png`
 }
 
-export function flyerHeroUrl(restaurantId: string, cacheBust?: number) {
-  const { data } = supabase.storage.from('restaurant-photos').getPublicUrl(flyerHeroPath(restaurantId))
+export function flyerHeroUrl(restaurantId: string, slot: FlyerSlot = 1, cacheBust?: number) {
+  const { data } = supabase.storage.from('restaurant-photos').getPublicUrl(flyerHeroPath(restaurantId, slot))
   const url = data.publicUrl
   return cacheBust ? `${url}?t=${cacheBust}` : url
 }
 
-export function flyerStatusUrl(restaurantId: string, cacheBust?: number) {
-  const { data } = supabase.storage.from('restaurant-photos').getPublicUrl(`${restaurantId}/flyer-status.json`)
+export function flyerStatusUrl(restaurantId: string, slot: FlyerSlot = 1, cacheBust?: number) {
+  const { data } = supabase.storage
+    .from('restaurant-photos')
+    .getPublicUrl(`${restaurantId}/flyer-status-${slot}.json`)
   const url = data.publicUrl
   return cacheBust ? `${url}?t=${cacheBust}` : url
 }
@@ -22,9 +28,9 @@ export type FlyerJobStatus = {
   url?: string
 }
 
-export async function readFlyerStatus(restaurantId: string): Promise<FlyerJobStatus | null> {
+export async function readFlyerStatus(restaurantId: string, slot: FlyerSlot = 1): Promise<FlyerJobStatus | null> {
   try {
-    const res = await fetch(flyerStatusUrl(restaurantId, Date.now()), { cache: 'no-store' })
+    const res = await fetch(flyerStatusUrl(restaurantId, slot, Date.now()), { cache: 'no-store' })
     if (!res.ok) return null
     return await res.json() as FlyerJobStatus
   } catch {
@@ -32,12 +38,17 @@ export async function readFlyerStatus(restaurantId: string): Promise<FlyerJobSta
   }
 }
 
-export async function flyerExists(restaurantId: string): Promise<boolean> {
-  const url = flyerHeroUrl(restaurantId)
-  try {
-    const res = await fetch(url, { method: 'HEAD', cache: 'no-store' })
-    return res.ok
-  } catch {
-    return false
-  }
+/** Comprueba qué slots ya tienen foto generada. */
+export async function checkExistingSlots(restaurantId: string): Promise<Set<FlyerSlot>> {
+  const results = await Promise.all(
+    FLYER_SLOTS.map(async slot => {
+      try {
+        const res = await fetch(flyerHeroUrl(restaurantId, slot), { method: 'HEAD', cache: 'no-store' })
+        return res.ok ? slot : null
+      } catch {
+        return null
+      }
+    }),
+  )
+  return new Set(results.filter((s): s is FlyerSlot => s !== null))
 }

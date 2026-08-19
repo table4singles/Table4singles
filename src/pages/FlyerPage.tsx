@@ -1,8 +1,15 @@
 import { useState, useEffect, useMemo, useRef } from 'react'
-import { Printer, Download, Loader2, Sparkles } from 'lucide-react'
+import { Printer, Download, Loader2, Sparkles, Info, ImageIcon } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
 import { extractBrandColors, DEFAULT_BRAND, type BrandPalette } from '@/lib/extractBrandColors'
-import { flyerHeroUrl, readFlyerStatus } from '@/lib/flyer'
+import {
+  flyerHeroUrl,
+  readFlyerStatus,
+  checkExistingSlots,
+  FLYER_SLOTS,
+  STOCK_HERO,
+  type FlyerSlot,
+} from '@/lib/flyer'
 import { downloadFlyerPng } from '@/lib/exportFlyer'
 import { FlyerPreview } from '@/components/FlyerPreview'
 import {
@@ -19,26 +26,40 @@ interface FlyerPageProps {
   restaurantId: string
 }
 
-const STOCK_HERO = '/hero-dinner.jpg'
+const MAX_SLOTS = 3
 
 export function FlyerPage({ restaurantId }: FlyerPageProps) {
   const { user, profile: myProfile } = useAuth()
   const flyerRef = useRef<HTMLDivElement>(null)
+
   const [restaurant, setRestaurant] = useState<Profile | null>(null)
   const [brand, setBrand] = useState<BrandPalette>(DEFAULT_BRAND)
-  const [heroUrl, setHeroUrl] = useState(STOCK_HERO)
   const [loading, setLoading] = useState(true)
-  const [generating, setGenerating] = useState(false)
-  const [genError, setGenError] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
+
+  // Slot activo y fotos ya generadas
+  const [activeSlot, setActiveSlot] = useState<FlyerSlot>(1)
+  const [slotHeros, setSlotHeros] = useState<Record<FlyerSlot, string>>({
+    1: STOCK_HERO,
+    2: STOCK_HERO,
+    3: STOCK_HERO,
+  })
+  const [existingSlots, setExistingSlots] = useState<Set<FlyerSlot>>(new Set())
+
+  // Estado de generación por slot
+  const [generatingSlot, setGeneratingSlot] = useState<FlyerSlot | null>(null)
+  const [genError, setGenError] = useState<string | null>(null)
+
+  // Formato de descarga
   const [selectedFormatId, setSelectedFormatId] = useState(DEFAULT_FLYER_FORMAT_ID)
   const [exporting, setExporting] = useState(false)
   const [exportError, setExportError] = useState<string | null>(null)
 
   const selectedFormat = useMemo(() => getFlyerFormat(selectedFormatId), [selectedFormatId])
   const canGenerate = !!user && (user.id === restaurantId || myProfile?.is_admin)
-  const hasAiHero = heroUrl !== STOCK_HERO
+  const heroUrl = slotHeros[activeSlot]
 
+  // Cargar restaurante y fotos existentes
   useEffect(() => {
     let cancelled = false
     ;(async () => {
@@ -61,30 +82,33 @@ export function FlyerPage({ restaurantId }: FlyerPageProps) {
           ? '/icons/bahia-mar-logo.png?v=3'
           : data.avatar_url
       const palette = await extractBrandColors(logoUrl)
-
-      let aiHero = STOCK_HERO
-      try {
-        const probe = flyerHeroUrl(restaurantId)
-        const head = await fetch(probe, { method: 'HEAD', cache: 'no-store' })
-        if (head.ok) aiHero = flyerHeroUrl(restaurantId, Date.now())
-      } catch { /* stock */ }
+      const existing = await checkExistingSlots(restaurantId)
 
       if (!cancelled) {
         setBrand(palette)
-        setHeroUrl(aiHero)
+        setExistingSlots(existing)
+        const newHeros: Record<FlyerSlot, string> = { 1: STOCK_HERO, 2: STOCK_HERO, 3: STOCK_HERO }
+        for (const slot of existing) {
+          newHeros[slot] = flyerHeroUrl(restaurantId, slot, Date.now())
+        }
+        setSlotHeros(newHeros)
+        // Activar primer slot con foto, o slot 1
+        const firstFilled = FLYER_SLOTS.find(s => existing.has(s))
+        if (firstFilled) setActiveSlot(firstFilled)
         setLoading(false)
       }
     })()
-
     return () => { cancelled = true }
   }, [restaurantId])
 
-  const generateFlyer = async () => {
-    setGenerating(true)
+  const generateFlyer = async (slot: FlyerSlot) => {
+    setGeneratingSlot(slot)
     setGenError(null)
+
     const { data, error: fnErr } = await supabase.functions.invoke('generate-restaurant-flyer', {
-      body: { restaurantId },
+      body: { restaurantId, slot },
     })
+
     if (fnErr || data?.error) {
       let detail = data?.error || fnErr?.message || 'No se pudo generar la foto'
       const ctx = (fnErr as { context?: Response } | null)?.context
@@ -94,29 +118,33 @@ export function FlyerPage({ restaurantId }: FlyerPageProps) {
           detail = body.error || body.message || detail
         } catch { /* ignore */ }
       }
-      setGenerating(false)
+      setGeneratingSlot(null)
       setGenError(detail)
       return
     }
 
+    // Esperar hasta recibir ok o error (máx 2 min)
     const deadline = Date.now() + 130_000
     while (Date.now() < deadline) {
       await new Promise(r => setTimeout(r, 3000))
-      const status = await readFlyerStatus(restaurantId)
+      const status = await readFlyerStatus(restaurantId, slot)
       if (status?.status === 'ok') {
-        setHeroUrl(flyerHeroUrl(restaurantId, Date.now()))
-        setGenerating(false)
+        const url = flyerHeroUrl(restaurantId, slot, Date.now())
+        setSlotHeros(prev => ({ ...prev, [slot]: url }))
+        setExistingSlots(prev => new Set([...prev, slot]))
+        setActiveSlot(slot)
+        setGeneratingSlot(null)
         return
       }
       if (status?.status === 'error') {
-        setGenerating(false)
+        setGeneratingSlot(null)
         setGenError(status.error || 'No se pudo generar la foto')
         return
       }
     }
 
-    setGenerating(false)
-    setGenError('La generación está tardando demasiado. Vuelve a intentar en un minuto.')
+    setGeneratingSlot(null)
+    setGenError('La generación tardó demasiado. Vuelve a intentarlo.')
   }
 
   const downloadFlyer = async () => {
@@ -140,10 +168,8 @@ export function FlyerPage({ restaurantId }: FlyerPageProps) {
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <div
-          className="w-8 h-8 border-4 border-t-transparent rounded-full animate-spin"
-          style={{ borderColor: `${brand.primary} transparent transparent transparent` }}
-        />
+        <div className="w-8 h-8 border-4 border-t-transparent rounded-full animate-spin"
+          style={{ borderColor: `${brand.primary} transparent transparent transparent` }} />
       </div>
     )
   }
@@ -162,18 +188,147 @@ export function FlyerPage({ restaurantId }: FlyerPageProps) {
       ? '/icons/bahia-mar-logo.png?v=3'
       : restaurant.avatar_url
 
+  const slotsUsed = existingSlots.size
+  const slotsLeft = MAX_SLOTS - slotsUsed
   const posterFormats = FLYER_FORMATS.filter(f => f.category === 'poster')
   const tableFormats = FLYER_FORMATS.filter(f => f.category === 'table')
 
   return (
     <div className="min-h-screen bg-gray-100 flex flex-col items-center py-8 px-4 print:bg-white print:p-0 print:block">
 
+      {/* ── Panel de control ── */}
       <div className="w-full max-w-[720px] print:hidden mb-6 space-y-4">
+
+        {/* Fotos IA */}
+        {canGenerate && (
+          <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-4 sm:p-5">
+            <div className="flex items-start justify-between gap-4 mb-3">
+              <div>
+                <h2 className="text-sm font-semibold text-gray-900">Fotos IA</h2>
+                <p className="text-xs text-gray-500 mt-0.5">
+                  Cada establecimiento puede generar hasta <strong>3 fotos distintas</strong> con IA (gpt-image-1.5).
+                  Elige el formato correcto antes de generar.
+                </p>
+              </div>
+              <span className={`flex-shrink-0 text-xs font-semibold px-2.5 py-1 rounded-full ${
+                slotsLeft === 0
+                  ? 'bg-gray-100 text-gray-500'
+                  : slotsLeft === 1
+                    ? 'bg-yellow-50 text-yellow-700'
+                    : 'bg-green-50 text-green-700'
+              }`}>
+                {slotsLeft === 0 ? 'Límite alcanzado' : `${slotsLeft} ${slotsLeft === 1 ? 'foto disponible' : 'fotos disponibles'}`}
+              </span>
+            </div>
+
+            {/* Slots */}
+            <div className="grid grid-cols-3 gap-2">
+              {FLYER_SLOTS.map(slot => {
+                const filled = existingSlots.has(slot)
+                const isActive = activeSlot === slot
+                const isGenerating = generatingSlot === slot
+
+                return (
+                  <div
+                    key={slot}
+                    className={`rounded-xl border-2 overflow-hidden transition-all ${
+                      isActive ? 'border-[#e94560] shadow-md' : 'border-gray-200'
+                    }`}
+                  >
+                    {/* Miniatura */}
+                    <button
+                      type="button"
+                      onClick={() => { if (filled) setActiveSlot(slot) }}
+                      disabled={!filled}
+                      className="w-full aspect-video relative bg-gray-100"
+                    >
+                      {filled && !isGenerating ? (
+                        <>
+                          <img
+                            src={slotHeros[slot]}
+                            alt={`Foto ${slot}`}
+                            className="w-full h-full object-cover"
+                          />
+                          {isActive && (
+                            <div className="absolute inset-0 bg-[#e94560]/20 flex items-center justify-center">
+                              <span className="bg-[#e94560] text-white text-[10px] font-bold px-2 py-0.5 rounded-full">Activa</span>
+                            </div>
+                          )}
+                        </>
+                      ) : isGenerating ? (
+                        <div className="absolute inset-0 flex flex-col items-center justify-center gap-1">
+                          <Loader2 className="w-5 h-5 animate-spin text-gray-400" />
+                          <p className="text-[10px] text-gray-400">Generando…</p>
+                        </div>
+                      ) : (
+                        <div className="absolute inset-0 flex flex-col items-center justify-center gap-1 text-gray-400">
+                          <ImageIcon className="w-5 h-5" />
+                          <p className="text-[10px]">Sin foto</p>
+                        </div>
+                      )}
+                    </button>
+
+                    {/* Botón generar / regenerar */}
+                    <div className="px-2 py-2 bg-gray-50 border-t border-gray-100 flex flex-col gap-1.5">
+                      <p className="text-[11px] font-semibold text-gray-700 text-center">Foto {slot}</p>
+                      <button
+                        type="button"
+                        onClick={() => generateFlyer(slot)}
+                        disabled={!!generatingSlot || (!filled && slotsLeft === 0)}
+                        className={`w-full flex items-center justify-center gap-1 py-1.5 rounded-lg text-[11px] font-medium transition-colors ${
+                          !!generatingSlot || (!filled && slotsLeft === 0)
+                            ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                            : filled
+                              ? 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                              : 'text-white hover:opacity-90'
+                        }`}
+                        style={
+                          !filled && !generatingSlot && slotsLeft > 0
+                            ? { backgroundColor: brand.primary }
+                            : {}
+                        }
+                      >
+                        {isGenerating
+                          ? <><Loader2 className="w-3 h-3 animate-spin" /> Generando…</>
+                          : filled
+                            ? <><Sparkles className="w-3 h-3" /> Regenerar</>
+                            : <><Sparkles className="w-3 h-3" /> Generar</>}
+                      </button>
+                    </div>
+                  </div>
+                )
+              })}
+            </div>
+
+            {slotsLeft === 0 && (
+              <div className="mt-3 flex items-start gap-2 bg-amber-50 border border-amber-200 rounded-xl px-3 py-2">
+                <Info className="w-4 h-4 text-amber-600 flex-shrink-0 mt-0.5" />
+                <p className="text-xs text-amber-700">
+                  Has alcanzado el límite de 3 fotos. Puedes regenerar cualquiera de las existentes (sustituye la anterior).
+                </p>
+              </div>
+            )}
+
+            {genError && (
+              <p className="mt-3 text-sm text-red-600 bg-red-50 border border-red-100 rounded-xl px-3 py-2">
+                {genError}
+              </p>
+            )}
+
+            {generatingSlot && (
+              <p className="mt-3 text-xs text-gray-500">
+                Generando foto {generatingSlot} con gpt-image-1.5 (calidad alta). Puede tardar 1–2 minutos…
+              </p>
+            )}
+          </div>
+        )}
+
+        {/* Formato */}
         <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-4 sm:p-5">
-          <h2 className="text-sm font-semibold text-gray-900 mb-1">Formato de descarga e impresión</h2>
+          <h2 className="text-sm font-semibold text-gray-900 mb-1">Formato de impresión</h2>
           <p className="text-xs text-gray-500 mb-4">
-            Cartel = diseño completo. Mesa = QR grande y poco texto, para que se lea al lado del cubierto.
-            Textos, logos y QR son reales; la IA solo genera la foto.
+            <strong>Elige el formato antes de generar la foto IA</strong> — cada foto se crea para el tipo seleccionado.
+            Cartel = diseño completo; Mesa = QR grande para poner en la mesa.
           </p>
 
           <FormatGroup
@@ -192,13 +347,12 @@ export function FlyerPage({ restaurantId }: FlyerPageProps) {
 
           <p className="text-[11px] text-gray-400 mt-3">
             Seleccionado: <span className="font-medium text-gray-600">{selectedFormat.label}</span>
-            {' · '}
-            {selectedFormat.hint}
-            {' · '}
-            300 DPI
+            {' · '}{selectedFormat.hint}
+            {' · '}300 DPI
           </p>
         </div>
 
+        {/* Acciones */}
         <div className="flex flex-wrap justify-center gap-3">
           <button
             onClick={() => window.print()}
@@ -216,38 +370,16 @@ export function FlyerPage({ restaurantId }: FlyerPageProps) {
               ? <><Loader2 className="w-4 h-4 animate-spin" /> Preparando…</>
               : <><Download className="w-4 h-4" /> Descargar PNG</>}
           </button>
-          {canGenerate && (
-            <button
-              onClick={generateFlyer}
-              disabled={generating}
-              className="flex items-center gap-2 px-5 py-2.5 bg-white border border-gray-200 text-gray-700 rounded-xl font-medium text-sm hover:bg-gray-50 shadow-sm transition-colors disabled:opacity-60"
-            >
-              {generating
-                ? <><Loader2 className="w-4 h-4 animate-spin" /> Generando foto…</>
-                : <><Sparkles className="w-4 h-4" /> {hasAiHero ? 'Nueva foto IA' : 'Foto IA (como ChatGPT)'}</>}
-            </button>
-          )}
         </div>
+
+        {exportError && (
+          <p className="text-sm text-red-600 bg-red-50 border border-red-100 rounded-xl px-4 py-2 text-center">
+            {exportError}
+          </p>
+        )}
       </div>
 
-      {exportError && (
-        <p className="print:hidden mb-4 text-sm text-red-600 bg-red-50 border border-red-100 rounded-xl px-4 py-2 max-w-[720px]">
-          {exportError}
-        </p>
-      )}
-
-      {genError && (
-        <p className="print:hidden mb-4 text-sm text-red-600 bg-red-50 border border-red-100 rounded-xl px-4 py-2 max-w-[720px]">
-          {genError}
-        </p>
-      )}
-
-      {generating && (
-        <p className="print:hidden mb-4 text-sm text-gray-500">
-          OpenAI (gpt-image-1.5, calidad alta) está generando la foto del cartel. Puede tardar 1–2 minutos.
-        </p>
-      )}
-
+      {/* ── Preview ── */}
       <div ref={flyerRef} className="flex justify-center w-full print:block">
         <FlyerPreview
           format={selectedFormat}

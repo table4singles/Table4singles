@@ -106,36 +106,40 @@ export function RestaurantDashboardPage({ onNavigate, onAuthClick }: RestaurantD
           </div>
         )}
 
-        <div className="grid grid-cols-3 gap-4 mb-8">
-          <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-4 flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full bg-teal-100 flex items-center justify-center flex-shrink-0">
-              <UtensilsCrossed className="w-5 h-5 text-teal-600" />
+        <div className="grid grid-cols-3 gap-2 sm:gap-4 mb-8">
+          <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-3 sm:p-4 flex flex-col items-center text-center gap-2 min-w-0">
+            <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-teal-100 flex items-center justify-center flex-shrink-0">
+              <UtensilsCrossed className="w-4 h-4 sm:w-5 sm:h-5 text-teal-600" />
             </div>
-            <div>
-              <p className="text-xl font-bold text-gray-900 dark:text-white">{hosting.length}</p>
-              <p className="text-xs text-gray-500 dark:text-gray-400">{t('restaurantDashboard.activeTables')}</p>
+            <div className="min-w-0 w-full">
+              <p className="text-lg sm:text-xl font-bold text-gray-900 dark:text-white">{hosting.length}</p>
+              <p className="text-[10px] sm:text-xs leading-snug text-gray-500 dark:text-gray-400 break-words">
+                {t('restaurantDashboard.activeTables')}
+              </p>
             </div>
           </div>
-          <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-4 flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full bg-orange-100 flex items-center justify-center flex-shrink-0">
-              <Users className="w-5 h-5 text-orange-600" />
+          <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-3 sm:p-4 flex flex-col items-center text-center gap-2 min-w-0">
+            <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-orange-100 flex items-center justify-center flex-shrink-0">
+              <Users className="w-4 h-4 sm:w-5 sm:h-5 text-orange-600" />
             </div>
-            <div>
-              <p className="text-xl font-bold text-gray-900 dark:text-white">{totalDiners}</p>
-              <p className="text-xs text-gray-500 dark:text-gray-400">{t('restaurantDashboard.totalDiners')}</p>
+            <div className="min-w-0 w-full">
+              <p className="text-lg sm:text-xl font-bold text-gray-900 dark:text-white">{totalDiners}</p>
+              <p className="text-[10px] sm:text-xs leading-snug text-gray-500 dark:text-gray-400 break-words">
+                {t('restaurantDashboard.totalDiners')}
+              </p>
             </div>
           </div>
           <button
             type="button"
             onClick={() => onNavigate('reviews')}
-            className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-4 flex items-center gap-3 text-left hover:shadow-md hover:border-yellow-300 dark:hover:border-yellow-600 transition-all"
+            className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-3 sm:p-4 flex flex-col items-center text-center gap-2 min-w-0 text-left hover:shadow-md hover:border-yellow-300 dark:hover:border-yellow-600 transition-all"
           >
-            <div className="w-10 h-10 rounded-full bg-yellow-100 flex items-center justify-center flex-shrink-0">
-              <Star className="w-5 h-5 text-yellow-600" />
+            <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-yellow-100 flex items-center justify-center flex-shrink-0">
+              <Star className="w-4 h-4 sm:w-5 sm:h-5 text-yellow-600" />
             </div>
-            <div>
-              <p className="text-xl font-bold text-gray-900 dark:text-white">{avgRating ? avgRating.toFixed(1) : '-'}</p>
-              <p className="text-xs text-gray-500 dark:text-gray-400">
+            <div className="min-w-0 w-full">
+              <p className="text-lg sm:text-xl font-bold text-gray-900 dark:text-white">{avgRating ? avgRating.toFixed(1) : '-'}</p>
+              <p className="text-[10px] sm:text-xs leading-snug text-gray-500 dark:text-gray-400 break-words">
                 {reviewCount > 0
                   ? `${reviewCount} ${reviewCount === 1 ? t('restaurantDashboard.reviewSingular') : t('restaurantDashboard.reviewPlural')}`
                   : t('restaurantDashboard.avgRating')}

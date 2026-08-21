@@ -13,6 +13,7 @@ import { supabase } from '@/lib/supabase'
 import { LANGUAGE_OPTIONS, INTEREST_OPTIONS } from '@/lib/options'
 import { useMyTables } from '@/hooks/useTables'
 import { useDinerTrustScore } from '@/hooks/useDinerReviews'
+import { appLocale } from '@/lib/locale'
 
 const CUISINE_TYPES = ['Italiana', 'Japonesa', 'Mexicana', 'Francesa', 'Tailandesa', 'India', 'China', 'Española', 'Mediterránea', 'Americana', 'Coreana', 'Vietnamita', 'Griega', 'Turca', 'Fusión', 'Otra']
 const PRICE_RANGES = ['0€-50€', '50€-100€', '100€-200€', '+200€']
@@ -23,7 +24,7 @@ interface ProfilePageProps {
 }
 
 export function ProfilePage({ onNavigate, onAuthClick }: ProfilePageProps) {
-  const { t } = useLanguage()
+  const { t, language } = useLanguage()
   const { profile, refreshProfile, user } = useAuth()
   const { effectiveRole } = useViewMode()
   const isRestaurant = effectiveRole === 'restaurant'
@@ -198,7 +199,7 @@ export function ProfilePage({ onNavigate, onAuthClick }: ProfilePageProps) {
     hosting.filter(t => tableEndMs(t.date, t.time, t.available_until) < now).length +
     reservations.filter(r => tableEndMs(r.dining_tables.date, r.dining_tables.time, r.dining_tables.available_until) < now).length
   const memberSince = profile?.created_at
-    ? new Date(profile.created_at).toLocaleDateString('es-ES', { month: 'long', year: 'numeric' })
+    ? new Date(profile.created_at).toLocaleDateString(appLocale(language), { month: 'long', year: 'numeric' })
     : null
 
   const toggleLanguage = (l: string) => setLanguages(prev => (prev.includes(l) ? prev.filter(x => x !== l) : [...prev, l]))
@@ -226,24 +227,24 @@ export function ProfilePage({ onNavigate, onAuthClick }: ProfilePageProps) {
 
         {!isRestaurant && (
           <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 p-6 mb-6">
-            <h2 className="font-semibold text-gray-900 dark:text-white mb-4">Mi actividad</h2>
+            <h2 className="font-semibold text-gray-900 dark:text-white mb-4">{t('profile.myActivity')}</h2>
             <div className="grid grid-cols-3 gap-3">
               <div className="text-center bg-gray-50 dark:bg-gray-900 rounded-xl py-4">
                 <UtensilsCrossed className="w-5 h-5 text-primary-500 mx-auto mb-1.5" />
                 <p className="text-lg font-bold text-gray-900 dark:text-white">{dinnersAttended}</p>
-                <p className="text-xs text-gray-500 dark:text-gray-400">Cenas</p>
+                <p className="text-xs text-gray-500 dark:text-gray-400">{t('profile.dinners')}</p>
               </div>
               <div className="text-center bg-gray-50 dark:bg-gray-900 rounded-xl py-4">
                 <ShieldCheck className="w-5 h-5 text-green-500 mx-auto mb-1.5" />
                 <p className="text-lg font-bold text-gray-900 dark:text-white">
                   {trustScore && trustScore.reviewCount > 0 ? trustScore.avgRating.toFixed(1) : '—'}
                 </p>
-                <p className="text-xs text-gray-500 dark:text-gray-400">Confianza {trustScore && trustScore.reviewCount > 0 ? `(${trustScore.reviewCount})` : ''}</p>
+                <p className="text-xs text-gray-500 dark:text-gray-400">{t('profile.trust')} {trustScore && trustScore.reviewCount > 0 ? `(${trustScore.reviewCount})` : ''}</p>
               </div>
               <div className="text-center bg-gray-50 dark:bg-gray-900 rounded-xl py-4">
                 <CalendarDays className="w-5 h-5 text-blue-500 mx-auto mb-1.5" />
                 <p className="text-sm font-bold text-gray-900 dark:text-white capitalize">{memberSince || '—'}</p>
-                <p className="text-xs text-gray-500 dark:text-gray-400">Miembro desde</p>
+                <p className="text-xs text-gray-500 dark:text-gray-400">{t('profile.memberSince')}</p>
               </div>
             </div>
           </div>
@@ -253,10 +254,10 @@ export function ProfilePage({ onNavigate, onAuthClick }: ProfilePageProps) {
           <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 p-6 mb-6">
             <div className="flex items-center gap-2 mb-1">
               <Gift className="w-5 h-5 text-primary-500" />
-              <h2 className="font-semibold text-gray-900 dark:text-white">Invita a tus amigos</h2>
+              <h2 className="font-semibold text-gray-900 dark:text-white">{t('profile.inviteFriends')}</h2>
             </div>
             <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
-              Comparte tu enlace y descubre juntos nuevas cenas. Llevas <span className="font-semibold text-gray-700 dark:text-gray-200">{referredCount}</span> {referredCount === 1 ? 'persona invitada' : 'personas invitadas'}.
+              {t('profile.inviteFriendsDesc')} <span className="font-semibold text-gray-700 dark:text-gray-200">{referredCount}</span> {referredCount === 1 ? t('profile.invitedPerson') : t('profile.invitedPeople')}.
             </p>
             <ShareButton url={`${window.location.origin}/?ref=${user.id}`} />
           </div>
@@ -266,16 +267,16 @@ export function ProfilePage({ onNavigate, onAuthClick }: ProfilePageProps) {
           <div className="bg-gradient-to-br from-primary-50 to-primary-100 dark:from-primary-900/20 dark:to-primary-800/20 rounded-2xl border border-primary-200 dark:border-primary-800/40 p-6 mb-6">
             <div className="flex items-center gap-2 mb-1">
               <Award className="w-5 h-5 text-primary-600 dark:text-primary-400" />
-              <h2 className="font-semibold text-gray-900 dark:text-white">Programa de Embajadores</h2>
+              <h2 className="font-semibold text-gray-900 dark:text-white">{t('profile.ambassadorsProgram')}</h2>
             </div>
             <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
-              Presenta Table4Singles a restaurantes y gana el <strong>5%</strong> de sus ingresos de forma indefinida.
+              {t('profile.ambassadorsProgramDesc')}
             </p>
             <button
               onClick={() => onNavigate('ambassador')}
               className="flex items-center gap-2 px-4 py-2.5 bg-primary-500 text-white rounded-xl text-sm font-semibold hover:bg-primary-600 transition-colors"
             >
-              <Award className="w-4 h-4" /> Ver programa
+              <Award className="w-4 h-4" /> {t('profile.viewProgram')}
             </button>
           </div>
         )}
@@ -285,7 +286,7 @@ export function ProfilePage({ onNavigate, onAuthClick }: ProfilePageProps) {
             <div className="flex flex-col items-center mb-2">
               <label className="relative w-24 h-24 rounded-full border-2 border-dashed border-gray-300 dark:border-gray-600 hover:border-primary-400 transition-colors cursor-pointer flex items-center justify-center overflow-hidden bg-gray-50 dark:bg-gray-900">
                 {profile?.avatar_url ? (
-                  <img src={profile.avatar_url} alt="Foto de perfil" className="w-full h-full object-cover" />
+                  <img src={profile.avatar_url} alt={t('profile.profilePhoto')} className="w-full h-full object-cover" />
                 ) : uploading ? (
                   <Loader2 className="w-6 h-6 text-gray-400 dark:text-gray-500 animate-spin" />
                 ) : (
@@ -293,7 +294,7 @@ export function ProfilePage({ onNavigate, onAuthClick }: ProfilePageProps) {
                 )}
                 <input type="file" accept="image/jpeg,image/png,image/webp" onChange={handleAvatarUpload} disabled={uploading} className="hidden" />
               </label>
-              <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">Foto de perfil</p>
+              <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">{t('profile.profilePhoto')}</p>
             </div>
           )}
 
@@ -301,25 +302,25 @@ export function ProfilePage({ onNavigate, onAuthClick }: ProfilePageProps) {
 
           {!isRestaurant && (
             <>
-              <FormInput label="Nombre completo" value={fullName} onChange={setFullName} />
+              <FormInput label={t('profile.fullName')} value={fullName} onChange={setFullName} />
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Sobre ti</label>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">{t('profile.aboutYou')}</label>
                 <textarea value={bio} onChange={e => setBio(e.target.value)} rows={3} className="w-full px-4 py-2.5 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 dark:text-white rounded-xl text-sm focus:ring-2 focus:ring-primary-500 outline-none resize-none" />
               </div>
 
               <div>
-                <FormInput label="Calle y número" value={streetAddress} onChange={setStreetAddress} />
+                <FormInput label={t('profile.streetAddress')} value={streetAddress} onChange={setStreetAddress} />
                 <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">{t('profile.streetPrivateHint')}</p>
               </div>
 
               <div className="grid grid-cols-2 gap-4">
-                <FormInput label="Ciudad" value={city} onChange={setCity} />
-                <FormInput label="Provincia" value={province} onChange={setProvince} />
+                <FormInput label={t('profile.city')} value={city} onChange={setCity} />
+                <FormInput label={t('profile.province')} value={province} onChange={setProvince} />
               </div>
-              <FormInput label="País" value={country} onChange={setCountry} />
+              <FormInput label={t('profile.country')} value={country} onChange={setCountry} />
 
-              <FormInput label="Fecha de nacimiento" value={dateOfBirth} onChange={setDateOfBirth} type="date" />
+              <FormInput label={t('profile.dateOfBirth')} value={dateOfBirth} onChange={setDateOfBirth} type="date" />
 
               <div className="rounded-xl border border-gray-200 dark:border-gray-600 p-4 space-y-3">
                 <div>
@@ -331,14 +332,14 @@ export function ProfilePage({ onNavigate, onAuthClick }: ProfilePageProps) {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Teléfono</label>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">{t('profile.phone')}</label>
                 <PhoneInput international defaultCountry="ES" value={phone} onChange={v => setPhone(v || '')} className="phone-input-custom" />
               </div>
 
-              <FormInput label="Instagram (opcional)" value={instagram} onChange={setInstagram} />
+              <FormInput label={t('profile.instagramOptional')} value={instagram} onChange={setInstagram} />
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-2">Idiomas que hablas</label>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-2">{t('profile.languagesSpoken')}</label>
                 <div className="flex flex-wrap gap-2">
                   {LANGUAGE_OPTIONS.map(l => (
                     <button
@@ -354,7 +355,7 @@ export function ProfilePage({ onNavigate, onAuthClick }: ProfilePageProps) {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-2">Tus intereses</label>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-2">{t('profile.yourInterests')}</label>
                 <div className="flex flex-wrap gap-2">
                   {INTEREST_OPTIONS.map(i => (
                     <button
@@ -375,12 +376,12 @@ export function ProfilePage({ onNavigate, onAuthClick }: ProfilePageProps) {
             <>
               <div className="flex flex-col items-center mb-2">
                 <p className="text-sm font-medium text-gray-700 dark:text-gray-200 mb-3 self-start">
-                  Logo del restaurante
+                  {t('profile.restaurantLogo')}
                 </p>
                 <label className="relative w-32 h-32 rounded-2xl border-2 border-dashed border-gray-300 dark:border-gray-600 hover:border-[#e94560] transition-colors cursor-pointer flex flex-col items-center justify-center overflow-hidden bg-gray-50 dark:bg-gray-900 group">
                   {profile?.avatar_url ? (
                     <>
-                      <img src={profile.avatar_url} alt="Logo" className="w-full h-full object-contain p-2" />
+                      <img src={profile.avatar_url} alt={t('profile.restaurantLogo')} className="w-full h-full object-contain p-2" />
                       <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
                         <Camera className="w-6 h-6 text-white" />
                       </div>
@@ -390,45 +391,43 @@ export function ProfilePage({ onNavigate, onAuthClick }: ProfilePageProps) {
                   ) : (
                     <>
                       <Camera className="w-8 h-8 text-gray-400 dark:text-gray-500 mb-1" />
-                      <span className="text-[10px] text-gray-400 dark:text-gray-500 text-center px-2">Subir logo</span>
+                      <span className="text-[10px] text-gray-400 dark:text-gray-500 text-center px-2">{t('profile.uploadLogo')}</span>
                     </>
                   )}
                   <input type="file" accept="image/jpeg,image/png,image/webp" onChange={handleAvatarUpload} disabled={uploading} className="hidden" />
                 </label>
                 <p className="text-[11px] text-gray-400 dark:text-gray-500 mt-2 text-center">
-                  Aparece en tu perfil, el buscador y el flyer promocional
+                  {t('profile.logoHint')}
                 </p>
               </div>
 
-              {/* ── Información básica ── */}
-              <SectionTitle icon={<MapPin className="w-4 h-4" />} label="Información básica" />
-              <FormInput label="Dirección" value={restaurantAddress} onChange={setRestaurantAddress} placeholder="Calle Mayor 12, Barcelona" />
+              <SectionTitle icon={<MapPin className="w-4 h-4" />} label={t('profile.basicInfo')} />
+              <FormInput label={t('profile.address')} value={restaurantAddress} onChange={setRestaurantAddress} placeholder="Calle Mayor 12, Barcelona" />
               <div className="grid grid-cols-2 gap-4">
-                <FormInput label="Ciudad" value={city} onChange={setCity} placeholder="Barcelona" />
-                <FormInput label="País" value={country} onChange={setCountry} placeholder="España" />
+                <FormInput label={t('profile.city')} value={city} onChange={setCity} placeholder="Barcelona" />
+                <FormInput label={t('profile.country')} value={country} onChange={setCountry} placeholder="España" />
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1.5 flex items-center gap-1.5"><Phone className="w-3.5 h-3.5 text-gray-400" /> Teléfono</label>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1.5 flex items-center gap-1.5"><Phone className="w-3.5 h-3.5 text-gray-400" /> {t('profile.phone')}</label>
                   <input value={restaurantPhone} onChange={e => setRestaurantPhone(e.target.value)} placeholder="+34 600 000 000" className="w-full px-4 py-2.5 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 dark:text-white rounded-xl text-sm focus:ring-2 focus:ring-[#e94560] outline-none" />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1.5 flex items-center gap-1.5"><Globe className="w-3.5 h-3.5 text-gray-400" /> Web</label>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1.5 flex items-center gap-1.5"><Globe className="w-3.5 h-3.5 text-gray-400" /> {t('profile.web')}</label>
                   <input value={restaurantWebsite} onChange={e => setRestaurantWebsite(e.target.value)} placeholder="www.mirestaurante.com" className="w-full px-4 py-2.5 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 dark:text-white rounded-xl text-sm focus:ring-2 focus:ring-[#e94560] outline-none" />
                 </div>
               </div>
 
-              {/* ── Identidad ── */}
-              <SectionTitle icon={<UtensilsCrossed className="w-4 h-4" />} label="Identidad del restaurante" />
+              <SectionTitle icon={<UtensilsCrossed className="w-4 h-4" />} label={t('profile.restaurantIdentity')} />
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1.5">Tipo de cocina</label>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1.5">{t('profile.cuisineType')}</label>
                 <select value={restaurantCuisine} onChange={e => setRestaurantCuisine(e.target.value)} className="w-full px-4 py-2.5 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 dark:text-white rounded-xl text-sm focus:ring-2 focus:ring-[#e94560] outline-none">
-                  <option value="">Seleccionar...</option>
+                  <option value="">{t('profile.selectCuisinePlaceholder')}</option>
                   {CUISINE_TYPES.map(c => <option key={c} value={c}>{c}</option>)}
                 </select>
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1.5">Rango de precios</label>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1.5">{t('profile.priceRange')}</label>
                 <div className="flex gap-2">
                   {PRICE_RANGES.map(p => (
                     <button key={p} type="button" onClick={() => setRestaurantPriceRange(p)}
@@ -439,7 +438,7 @@ export function ProfilePage({ onNavigate, onAuthClick }: ProfilePageProps) {
                 </div>
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1.5 flex items-center gap-1.5"><Tag className="w-3.5 h-3.5 text-gray-400" /> Especialidades</label>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1.5 flex items-center gap-1.5"><Tag className="w-3.5 h-3.5 text-gray-400" /> {t('profile.specialties')}</label>
                 <div className="flex flex-wrap gap-2 mb-2">
                   {restaurantSpecialties.map(s => (
                     <span key={s} className="flex items-center gap-1 px-3 py-1 bg-[#e94560]/10 text-[#e94560] rounded-full text-sm font-medium">
@@ -453,7 +452,7 @@ export function ProfilePage({ onNavigate, onAuthClick }: ProfilePageProps) {
                     value={specialtyInput}
                     onChange={e => setSpecialtyInput(e.target.value)}
                     onKeyDown={e => { if (e.key === 'Enter' && specialtyInput.trim()) { setRestaurantSpecialties(prev => [...prev, specialtyInput.trim()]); setSpecialtyInput('') } }}
-                    placeholder="Ej: Paella, Chuletón, Sushi... (Enter para añadir)"
+                    placeholder={t('profile.specialtiesPlaceholder')}
                     className="flex-1 px-4 py-2.5 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 dark:text-white rounded-xl text-sm focus:ring-2 focus:ring-[#e94560] outline-none"
                   />
                   <button type="button"
@@ -464,41 +463,38 @@ export function ProfilePage({ onNavigate, onAuthClick }: ProfilePageProps) {
                 </div>
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1.5">Descripción</label>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1.5">{t('profile.description')}</label>
                 <textarea value={restaurantDescription} onChange={e => setRestaurantDescription(e.target.value)} rows={3}
-                  placeholder="Cuéntanos qué hace especial a tu restaurante..."
+                  placeholder={t('profile.descriptionPlaceholder')}
                   className="w-full px-4 py-2.5 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 dark:text-white rounded-xl text-sm focus:ring-2 focus:ring-[#e94560] outline-none resize-none" />
               </div>
 
-              {/* ── Horarios y capacidad ── */}
-              <SectionTitle icon={<Clock className="w-4 h-4" />} label="Horarios y capacidad" />
+              <SectionTitle icon={<Clock className="w-4 h-4" />} label={t('profile.hoursAndCapacity')} />
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1.5">Horarios de apertura</label>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1.5">{t('profile.openingHours')}</label>
                 <p className="text-xs text-gray-400 dark:text-gray-500 mb-2">
-                  Selecciona los días y las horas. Añade un tramo por franja (comida, cena, finde…).
+                  {t('profile.openingHoursHint')}
                 </p>
                 <RestaurantHoursPicker value={restaurantHours} onChange={setRestaurantHours} />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1.5 flex items-center gap-1.5"><Hash className="w-3.5 h-3.5 text-gray-400" /> Total de mesas en el local</label>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1.5 flex items-center gap-1.5"><Hash className="w-3.5 h-3.5 text-gray-400" /> {t('profile.totalTables')}</label>
                 <input type="number" min={1} max={200} value={restaurantTotalTables}
                   onChange={e => setRestaurantTotalTables(e.target.value === '' ? '' : Number(e.target.value))}
                   placeholder="Ej: 20"
                   className="w-full px-4 py-2.5 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 dark:text-white rounded-xl text-sm focus:ring-2 focus:ring-[#e94560] outline-none" />
               </div>
 
-              {/* ── Carta y ofertas ── */}
-              <SectionTitle icon={<Link className="w-4 h-4" />} label="Carta y ofertas" />
-              <FormInput label="Enlace a la carta / menú" value={restaurantMenuUrl} onChange={setRestaurantMenuUrl} placeholder="https://mirestaurante.com/carta" />
+              <SectionTitle icon={<Link className="w-4 h-4" />} label={t('profile.menuAndOffers')} />
+              <FormInput label={t('profile.menuLink')} value={restaurantMenuUrl} onChange={setRestaurantMenuUrl} placeholder="https://mirestaurante.com/carta" />
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1.5">Ofertas especiales</label>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1.5">{t('profile.specialOffers')}</label>
                 <textarea value={restaurantOffers} onChange={e => setRestaurantOffers(e.target.value)} rows={2}
-                  placeholder="Ej: Menú del día 14€, 2x1 en cócteles los jueves, Brunch domingos..."
+                  placeholder={t('profile.specialOffersPlaceholder')}
                   className="w-full px-4 py-2.5 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 dark:text-white rounded-xl text-sm focus:ring-2 focus:ring-[#e94560] outline-none resize-none" />
               </div>
 
-              {/* ── Fotos ── */}
-              <SectionTitle icon={<Camera className="w-4 h-4" />} label="Fotos del restaurante" />
+              <SectionTitle icon={<Camera className="w-4 h-4" />} label={t('profile.restaurantPhotos')} />
               <div className="flex flex-wrap gap-3">
                 {(profile?.restaurant_photos || []).map((photo, i) => (
                   <div key={i} className="relative w-24 h-24 rounded-xl overflow-hidden group">
@@ -511,7 +507,7 @@ export function ProfilePage({ onNavigate, onAuthClick }: ProfilePageProps) {
                 ))}
                 {(profile?.restaurant_photos?.length || 0) < 8 && (
                   <label className="w-24 h-24 rounded-xl border-2 border-dashed border-gray-300 dark:border-gray-600 flex flex-col items-center justify-center cursor-pointer hover:border-[#e94560] transition-colors gap-1">
-                    {uploading ? <Loader2 className="w-5 h-5 text-gray-400 animate-spin" /> : <><Camera className="w-5 h-5 text-gray-400" /><span className="text-xs text-gray-400">Añadir</span></>}
+                    {uploading ? <Loader2 className="w-5 h-5 text-gray-400 animate-spin" /> : <><Camera className="w-5 h-5 text-gray-400" /><span className="text-xs text-gray-400">{t('profile.addPhoto')}</span></>}
                     <input type="file" accept="image/jpeg,image/png,image/webp" onChange={handlePhotoUpload} disabled={uploading} className="hidden" />
                   </label>
                 )}

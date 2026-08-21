@@ -354,6 +354,8 @@ export const ja = {
     copied: 'コピーしました！',
     waText: 'Table4Singles のこのディナーをチェックして！',
     tweetText: '@Table4Singles でこの素晴らしいディナーを見つけました',
+    friendWaText: 'Table4Singles に招待します！私のリンクから参加して、一緒にディナーを見つけましょう：',
+    friendTweetText: 'Table4Singles で一緒にシェアディナーを見つけよう',
   },
   cancel: {
     title: '予約をキャンセル',
@@ -631,6 +633,8 @@ export const ja = {
     signIn: 'ログイン',
     restaurantOnly: '一般ユーザー専用です。',
     backToProfile: 'プロフィールに戻る',
+    inviteMessage: 'こんにちは！レストラン向け共有ディナーの Table4Singles へ招待します。私のコード {code} で登録してください：{url}',
+    inviteEmailSubject: 'Table4Singles に参加 — アンバサダーコード',
   },
   subscription: {
     title: 'レストランプラン',

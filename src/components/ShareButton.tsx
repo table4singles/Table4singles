@@ -4,9 +4,13 @@ import { useLanguage } from '@/contexts/LanguageContext'
 
 interface ShareButtonProps {
   url: string
+  /** Texto para WhatsApp (sin URL). Por defecto: share.waText */
+  message?: string
+  /** Texto para Twitter (sin URL). Por defecto: share.tweetText */
+  tweetMessage?: string
 }
 
-export function ShareButton({ url }: ShareButtonProps) {
+export function ShareButton({ url, message, tweetMessage }: ShareButtonProps) {
   const { t } = useLanguage()
   const [open, setOpen] = useState(false)
   const [copied, setCopied] = useState(false)
@@ -20,15 +24,21 @@ export function ShareButton({ url }: ShareButtonProps) {
     return () => document.removeEventListener('mousedown', handleClick)
   }, [])
 
+  const waMessage = message ?? t('share.waText')
+  const twMessage = tweetMessage ?? t('share.tweetText')
+
   const shareWhatsApp = () => {
-    const text = `${t('share.waText')} ${url}`
+    const text = `${waMessage} ${url}`
     window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank', 'noopener')
     setOpen(false)
   }
 
   const shareTwitter = () => {
-    const text = t('share.tweetText')
-    window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}`, '_blank', 'noopener')
+    window.open(
+      `https://twitter.com/intent/tweet?text=${encodeURIComponent(twMessage)}&url=${encodeURIComponent(url)}`,
+      '_blank',
+      'noopener',
+    )
     setOpen(false)
   }
 

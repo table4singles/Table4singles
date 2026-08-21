@@ -354,6 +354,8 @@ export const ro = {
     copied: 'Copiat!',
     waText: 'Uită-te la această cină pe Table4Singles!',
     tweetText: 'Am găsit această cină incredibilă pe @Table4Singles',
+    friendWaText: 'Te invit pe Table4Singles! Alătură-te cu linkul meu și descoperim cine împreună:',
+    friendTweetText: 'Alătură-te mie pe Table4Singles și descoperim cine împărtășite',
   },
   cancel: {
     title: 'Anulează rezervarea',
@@ -631,6 +633,8 @@ export const ro = {
     signIn: 'Conectare',
     restaurantOnly: 'Exclusiv pentru utilizatori particulari.',
     backToProfile: 'Înapoi la profil',
+    inviteMessage: 'Salut! Te invit să te alături Table4Singles, platforma de cine împărtășite pentru restaurante. Înregistrează-te cu codul meu {code}: {url}',
+    inviteEmailSubject: 'Alătură-te Table4Singles — Cod ambasador',
   },
   subscription: {
     title: 'Plan Restaurant',

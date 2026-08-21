@@ -354,6 +354,8 @@ export const zh = {
     copied: '已复制！',
     waText: '来看看 Table4Singles 上的这场晚餐！',
     tweetText: '我在 @Table4Singles 找到了这场精彩的晚餐',
+    friendWaText: '邀请你加入 Table4Singles！用我的链接注册，一起发现晚餐：',
+    friendTweetText: '和我一起加入 Table4Singles，发现共享晚餐',
   },
   cancel: {
     title: '取消预订',
@@ -631,6 +633,8 @@ export const zh = {
     signIn: '登录',
     restaurantOnly: '仅限普通用户。',
     backToProfile: '返回个人资料',
+    inviteMessage: '你好！邀请你加入 Table4Singles——面向餐厅的共享晚餐平台。使用我的代码注册 {code}：{url}',
+    inviteEmailSubject: '加入 Table4Singles — 大使代码',
   },
   subscription: {
     title: '餐厅套餐',

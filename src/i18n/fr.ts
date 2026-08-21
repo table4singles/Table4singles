@@ -354,6 +354,8 @@ export const fr = {
     copied: 'Copié !',
     waText: 'Regardez ce dîner sur Table4Singles !',
     tweetText: 'J\'ai trouvé ce dîner incroyable sur @Table4Singles',
+    friendWaText: 'Je t’invite sur Table4Singles ! Rejoins-moi avec mon lien et découvrons des dîners ensemble :',
+    friendTweetText: 'Rejoins Table4Singles avec moi et découvrons des dîners partagés',
   },
   cancel: {
     title: 'Annuler la réservation',
@@ -631,6 +633,8 @@ export const fr = {
     signIn: 'Se connecter',
     restaurantOnly: 'Le programme ambassadeur est exclusif aux utilisateurs particuliers.',
     backToProfile: 'Retour au profil',
+    inviteMessage: 'Bonjour ! Je t’invite à rejoindre Table4Singles, la plateforme de dîners partagés pour restaurants. Inscris-toi avec mon code {code} : {url}',
+    inviteEmailSubject: 'Rejoins Table4Singles — Code ambassadeur',
   },
   subscription: {
     title: 'Plan Restaurant',

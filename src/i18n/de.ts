@@ -354,6 +354,8 @@ export const de = {
     copied: 'Kopiert!',
     waText: 'Schau dir dieses Abendessen auf Table4Singles an!',
     tweetText: 'Ich habe dieses tolle Abendessen auf @Table4Singles gefunden',
+    friendWaText: 'Ich lade dich zu Table4Singles ein! Komm mit meinem Link und entdecken wir gemeinsam Abendessen:',
+    friendTweetText: 'Komm mit mir zu Table4Singles und entdecken wir gemeinsame Abendessen',
   },
   cancel: {
     title: 'Reservierung stornieren',
@@ -631,6 +633,8 @@ export const de = {
     signIn: 'Anmelden',
     restaurantOnly: 'Das Botschafterprogramm ist ausschließlich für Privatnutzer.',
     backToProfile: 'Zurück zum Profil',
+    inviteMessage: 'Hallo! Ich lade dich ein, Table4Singles beizutreten — der Plattform für gemeinsame Abendessen für Restaurants. Registriere dich mit meinem Code {code}: {url}',
+    inviteEmailSubject: 'Tritt Table4Singles bei — Botschaftercode',
   },
   subscription: {
     title: 'Restaurant-Plan',

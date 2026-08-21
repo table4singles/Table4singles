@@ -354,6 +354,8 @@ export const sv = {
     copied: 'Kopierat!',
     waText: 'Kolla in den här middagen på Table4Singles!',
     tweetText: 'Jag hittade den här fantastiska middagen på @Table4Singles',
+    friendWaText: 'Jag bjuder in dig till Table4Singles! Gå med via min länk så upptäcker vi middagar tillsammans:',
+    friendTweetText: 'Gå med mig på Table4Singles och låt oss upptäcka delade middagar',
   },
   cancel: {
     title: 'Avboka',
@@ -631,6 +633,8 @@ export const sv = {
     signIn: 'Logga in',
     restaurantOnly: 'Exklusivt för privatanvändare.',
     backToProfile: 'Tillbaka till profilen',
+    inviteMessage: 'Hej! Jag bjuder in dig till Table4Singles, plattformen för delade middagar för restauranger. Registrera dig med min kod {code}: {url}',
+    inviteEmailSubject: 'Gå med i Table4Singles — Ambassadörskod',
   },
   subscription: {
     title: 'Restaurangplan',

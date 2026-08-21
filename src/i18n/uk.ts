@@ -354,6 +354,8 @@ export const uk = {
     copied: 'Скопійовано!',
     waText: 'Подивіться на цю вечерю на Table4Singles!',
     tweetText: 'Я знайшов цю неймовірну вечерю на @Table4Singles',
+    friendWaText: 'Запрошую тебе до Table4Singles! Перейди за моїм посиланням — відкриватимемо вечері разом:',
+    friendTweetText: 'Приєднуйся до мене в Table4Singles — відкриваємо спільні вечері',
   },
   cancel: {
     title: 'Скасувати бронювання',
@@ -631,6 +633,8 @@ export const uk = {
     signIn: 'Увійти',
     restaurantOnly: 'Тільки для приватних користувачів.',
     backToProfile: 'Назад до профілю',
+    inviteMessage: 'Привіт! Запрошую приєднатися до Table4Singles — платформи спільних вечерь для ресторанів. Зареєструйся з моїм кодом {code}: {url}',
+    inviteEmailSubject: 'Приєднуйся до Table4Singles — код амбасадора',
   },
   subscription: {
     title: 'Тарифний план для ресторанів',

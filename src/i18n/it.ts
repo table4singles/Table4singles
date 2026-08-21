@@ -354,6 +354,8 @@ export const it = {
     copied: 'Copiato!',
     waText: 'Guarda questa cena su Table4Singles!',
     tweetText: 'Ho trovato questa cena incredibile su @Table4Singles',
+    friendWaText: 'Ti invito su Table4Singles! Unisciti con il mio link e scopriamo cene insieme:',
+    friendTweetText: 'Unisciti a Table4Singles con me e scopriamo cene condivise',
   },
   cancel: {
     title: 'Annulla prenotazione',
@@ -631,6 +633,8 @@ export const it = {
     signIn: 'Accedi',
     restaurantOnly: 'Il programma ambasciatori è esclusivo per utenti privati.',
     backToProfile: 'Torna al profilo',
+    inviteMessage: 'Ciao! Ti invito a unirti a Table4Singles, la piattaforma di cene condivise per ristoranti. Registrati con il mio codice {code}: {url}',
+    inviteEmailSubject: 'Unisciti a Table4Singles — Codice ambasciatore',
   },
   subscription: {
     title: 'Piano Ristorante',

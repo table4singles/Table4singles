@@ -354,6 +354,8 @@ export const ru = {
     copied: 'Скопировано!',
     waText: 'Посмотри этот ужин на Table4Singles!',
     tweetText: 'Я нашёл этот невероятный ужин на @Table4Singles',
+    friendWaText: 'Приглашаю тебя в Table4Singles! Перейди по моей ссылке — будем открывать ужины вместе:',
+    friendTweetText: 'Присоединяйся ко мне в Table4Singles — открываем совместные ужины',
   },
   cancel: {
     title: 'Отменить бронь',
@@ -631,6 +633,8 @@ export const ru = {
     signIn: 'Войти',
     restaurantOnly: 'Программа послов предназначена исключительно для частных пользователей.',
     backToProfile: 'Вернуться в профиль',
+    inviteMessage: 'Привет! Приглашаю присоединиться к Table4Singles — платформе совместных ужинов для ресторанов. Зарегистрируйся с моим кодом {code}: {url}',
+    inviteEmailSubject: 'Присоединяйся к Table4Singles — код амбассадора',
   },
   subscription: {
     title: 'План для ресторана',

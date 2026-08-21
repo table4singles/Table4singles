@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { Download, X, Smartphone } from 'lucide-react'
+import { useLanguage } from '@/contexts/LanguageContext'
 
 interface BeforeInstallPromptEvent extends Event {
   prompt: () => Promise<void>
@@ -7,6 +8,7 @@ interface BeforeInstallPromptEvent extends Event {
 }
 
 export function InstallPrompt() {
+  const { t } = useLanguage()
   const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null)
   const [showBanner, setShowBanner] = useState(false)
   const [isIOS, setIsIOS] = useState(false)
@@ -63,14 +65,14 @@ export function InstallPrompt() {
           <Smartphone className="w-5 h-5 text-primary-600" />
         </div>
         <div className="flex-1 min-w-0">
-          <p className="text-sm font-semibold text-gray-900 dark:text-white">Instala la app</p>
+          <p className="text-sm font-semibold text-gray-900 dark:text-white">{t('common.installApp')}</p>
           {isIOS ? (
             <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
-              Toca <strong>Compartir</strong> <span className="text-base">⬆️</span> y luego <strong>Añadir a pantalla de inicio</strong>
+              {t('common.installIosHint')}
             </p>
           ) : (
             <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
-              Accede más rápido a Table4Singles desde tu móvil
+              {t('common.installAndroidHint')}
             </p>
           )}
           {!isIOS && (
@@ -78,7 +80,7 @@ export function InstallPrompt() {
               onClick={handleInstall}
               className="mt-2 flex items-center gap-1.5 px-3 py-1.5 bg-primary-500 text-white text-xs font-medium rounded-lg hover:bg-primary-600 transition-colors"
             >
-              <Download className="w-3.5 h-3.5" /> Instalar ahora
+              <Download className="w-3.5 h-3.5" /> {t('common.installNow')}
             </button>
           )}
         </div>

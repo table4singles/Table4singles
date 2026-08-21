@@ -1,8 +1,10 @@
-import { Clock, Users } from 'lucide-react'
+import { Users } from 'lucide-react'
 import { useState } from 'react'
 import type { DiningTable } from '@/types/database'
 import type { TableParticipantBasic } from '@/hooks/useRestaurants'
 import { CommensalModal } from '@/components/CommensalModal'
+import { useLanguage } from '@/contexts/LanguageContext'
+import { appLocale } from '@/lib/locale'
 
 interface TableCardProps {
   table: DiningTable
@@ -11,12 +13,13 @@ interface TableCardProps {
 }
 
 export function TableCard({ table, participants, onClick }: TableCardProps) {
+  const { t, language } = useLanguage()
   const [modalProfile, setModalProfile] = useState<{ id?: string; display_name: string | null; avatar_url: string | null } | null>(null)
 
   const isFull = table.status === 'full' || table.available_seats <= 0
   const occupied = table.max_seats - table.available_seats
 
-  const formattedDate = new Date(table.date + 'T12:00:00').toLocaleDateString('es-ES', {
+  const formattedDate = new Date(table.date + 'T12:00:00').toLocaleDateString(appLocale(language), {
     weekday: 'short', day: 'numeric', month: 'short',
   })
   const formattedTime = table.time ? table.time.slice(0, 5) : null
@@ -79,11 +82,13 @@ export function TableCard({ table, participants, onClick }: TableCardProps) {
                     )}
                   </div>
                   <span className="text-xs text-gray-400 dark:text-gray-500">
-                    {approved.length === 1 ? '1 comensal' : `${approved.length} comensales`}
+                    {approved.length === 1
+                      ? `1 ${t('card.diner')}`
+                      : `${approved.length} ${t('card.diners')}`}
                   </span>
                 </>
               ) : (
-                <span className="text-xs text-gray-400 dark:text-gray-500 italic">Sé el primero en unirte</span>
+                <span className="text-xs text-gray-400 dark:text-gray-500 italic">{t('card.beFirstJoin')}</span>
               )}
             </div>
           </div>
@@ -91,7 +96,7 @@ export function TableCard({ table, participants, onClick }: TableCardProps) {
           {/* Right: status + seats */}
           <div className="flex flex-col items-end gap-2 flex-shrink-0">
             <span className={`text-xs px-2.5 py-1 rounded-full font-medium ${isFull ? 'bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400' : 'bg-green-50 dark:bg-green-900/30 text-green-700 dark:text-green-400'}`}>
-              {isFull ? 'Completa' : 'Disponible'}
+              {isFull ? t('card.full') : t('card.available')}
             </span>
             <span className="flex items-center gap-1 text-xs text-gray-500 dark:text-gray-400">
               <Users className="w-3.5 h-3.5" />

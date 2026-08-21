@@ -331,6 +331,8 @@ export const es = {
     shareWhatsApp: 'WhatsApp',
     shareEmail: 'Email',
     shareMore: 'Más opciones',
+    inviteMessage: '¡Hola! Te invito a unirte a Table4Singles, la plataforma de cenas compartidas para restaurantes. Regístrate con mi código {code}: {url}',
+    inviteEmailSubject: 'Únete a Table4Singles — Código de embajador',
     copyCode: 'Copiar',
     copyLink: 'Copiar enlace',
     copied: 'Copiado',
@@ -500,6 +502,8 @@ export const es = {
     copied: '¡Copiado!',
     waText: '¡Mira esta cena en Table4Singles!',
     tweetText: 'He encontrado esta cena increíble en @Table4Singles',
+    friendWaText: '¡Te invito a Table4Singles! Únete con mi enlace y descubramos cenas juntos:',
+    friendTweetText: 'Únete a Table4Singles conmigo y descubramos cenas compartidas',
   },
   cancel: {
     title: 'Cancelar reserva',

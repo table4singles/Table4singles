@@ -354,6 +354,8 @@ export const pt = {
     copied: 'Copiado!',
     waText: 'Vê este jantar no Table4Singles!',
     tweetText: 'Encontrei este jantar incrível no @Table4Singles',
+    friendWaText: 'Convido-te para o Table4Singles! Junta-te com o meu link e descubramos jantares juntos:',
+    friendTweetText: 'Junta-te ao Table4Singles comigo e descubramos jantares partilhados',
   },
   cancel: {
     title: 'Cancelar reserva',
@@ -631,6 +633,8 @@ export const pt = {
     signIn: 'Iniciar sessão',
     restaurantOnly: 'O programa de embaixadores é exclusivo para utilizadores particulares.',
     backToProfile: 'Voltar ao perfil',
+    inviteMessage: 'Olá! Convido-te a juntar-te ao Table4Singles, a plataforma de jantares partilhados para restaurantes. Regista-te com o meu código {code}: {url}',
+    inviteEmailSubject: 'Junta-te ao Table4Singles — Código de embaixador',
   },
   subscription: {
     title: 'Plano Restaurante',

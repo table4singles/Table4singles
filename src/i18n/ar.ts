@@ -354,6 +354,8 @@ export const ar = {
     copied: 'تم النسخ!',
     waText: 'انظر إلى هذا العشاء على Table4Singles!',
     tweetText: 'وجدت هذا العشاء الرائع على @Table4Singles',
+    friendWaText: 'أدعوك إلى Table4Singles! انضم عبر رابطي ولنكتشف عشاءات معًا:',
+    friendTweetText: 'انضم إليّ في Table4Singles ولنكتشف عشاءات مشتركة',
   },
   cancel: {
     title: 'إلغاء الحجز',
@@ -631,6 +633,8 @@ export const ar = {
     signIn: 'تسجيل الدخول',
     restaurantOnly: 'حصري للمستخدمين الخاصين.',
     backToProfile: 'العودة إلى الملف الشخصي',
+    inviteMessage: 'مرحبًا! أدعوك للانضمام إلى Table4Singles، منصة العشاءات المشتركة للمطاعم. سجّل برمزي {code}: {url}',
+    inviteEmailSubject: 'انضم إلى Table4Singles — رمز السفير',
   },
   subscription: {
     title: 'خطة المطعم',

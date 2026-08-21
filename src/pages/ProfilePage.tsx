@@ -259,7 +259,11 @@ export function ProfilePage({ onNavigate, onAuthClick }: ProfilePageProps) {
             <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
               {t('profile.inviteFriendsDesc')} <span className="font-semibold text-gray-700 dark:text-gray-200">{referredCount}</span> {referredCount === 1 ? t('profile.invitedPerson') : t('profile.invitedPeople')}.
             </p>
-            <ShareButton url={`${window.location.origin}/?ref=${user.id}`} />
+            <ShareButton
+              url={`${window.location.origin}/?ref=${user.id}`}
+              message={t('share.friendWaText')}
+              tweetMessage={t('share.friendTweetText')}
+            />
           </div>
         )}
 

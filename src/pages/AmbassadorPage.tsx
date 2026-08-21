@@ -50,23 +50,28 @@ export function AmbassadorPage({ onNavigate, onAuthClick }: AmbassadorPageProps)
     ? `${window.location.origin}/?ref=${referralCode}`
     : user ? `${window.location.origin}/?ref=${user.id}` : ''
 
-  const shareText = `${t('ambassador.shareWhatsApp')} ${referralCode ?? ''} ${referralUrl}`
+  const buildInviteMessage = () =>
+    t('ambassador.inviteMessage')
+      .replace('{code}', referralCode ?? '')
+      .replace('{url}', referralUrl)
 
   const handleShareWhatsApp = () => {
-    const text = `¡Hola! Te invito a unirte a Table4Singles, la plataforma de cenas compartidas para restaurantes. Regístrate con mi código ${referralCode ?? ''}: ${referralUrl}`
-    window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank')
+    window.open(`https://wa.me/?text=${encodeURIComponent(buildInviteMessage())}`, '_blank')
   }
 
   const handleShareEmail = () => {
-    const subject = encodeURIComponent(`${t('ambassador.title')} — Table4Singles`)
-    const body = `¡Hola! Te invito a unirte a Table4Singles, la plataforma de cenas compartidas para restaurantes. Regístrate con mi código ${referralCode ?? ''}: ${referralUrl}`
-    window.open(`mailto:?subject=${subject}&body=${encodeURIComponent(body)}`, '_blank')
+    const subject = encodeURIComponent(t('ambassador.inviteEmailSubject'))
+    window.open(`mailto:?subject=${subject}&body=${encodeURIComponent(buildInviteMessage())}`, '_blank')
   }
 
   const handleShareNative = async () => {
     if (navigator.share) {
       try {
-        await navigator.share({ title: 'Table4Singles', text: shareText, url: referralUrl })
+        await navigator.share({
+          title: 'Table4Singles',
+          text: buildInviteMessage(),
+          url: referralUrl,
+        })
       } catch { /* usuario canceló */ }
     } else {
       handleCopy()

@@ -7,6 +7,7 @@ import { ViewModeProvider, useViewMode } from '@/contexts/ViewModeContext'
 import { AuthModal } from '@/components/AuthModal'
 import { InstallPrompt } from '@/components/InstallPrompt'
 import { LandingPage } from '@/pages/LandingPage'
+import { RestaurantLandingPage } from '@/pages/RestaurantLandingPage'
 import { BrowsePage } from '@/pages/BrowsePage'
 import { RestaurantsBrowsePage } from '@/pages/RestaurantsBrowsePage'
 import { RestaurantProfilePage } from '@/pages/RestaurantProfilePage'
@@ -55,8 +56,13 @@ function AppRouter() {
         : profile.role
       setPage(savedMode === 'restaurant' ? 'restaurant-dashboard' : 'browse')
     }
-    if (!loading && !user && !['landing', 'politica-privacidad', 'aviso-legal', 'flyer', 'table-detail'].includes(page)) setPage('landing')
+    if (!loading && !user && !['landing', 'restaurant-landing', 'politica-privacidad', 'aviso-legal', 'flyer', 'table-detail'].includes(page)) setPage('landing')
   }, [user, loading, profile])
+
+  // Landing de captación para restaurantes (/restaurantes) — ruta pública sin login
+  useEffect(() => {
+    if (window.location.pathname === '/restaurantes') setPage('restaurant-landing')
+  }, [])
 
   // Capture referral code (?ref=<user_id>) for use during sign up
   useEffect(() => {
@@ -168,6 +174,8 @@ function AppRouter() {
     switch (page) {
       case 'landing':
         return <LandingPage onNavigate={navigate} onAuthClick={openAuth} />
+      case 'restaurant-landing':
+        return <RestaurantLandingPage onNavigate={navigate} onAuthClick={openAuth} />
       case 'browse':
         return effectiveRole === 'restaurant'
           ? <RestaurantDashboardPage onNavigate={navigate} onAuthClick={openAuth} />

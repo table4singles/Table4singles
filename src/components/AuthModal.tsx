@@ -17,7 +17,9 @@ export function AuthModal({ isOpen, onClose, mode, onSwitchMode }: AuthModalProp
   const { signUp, signIn, signInWithGoogle, resetPassword } = useAuth()
   const { t, language, setLanguage } = useLanguage()
   const [screen, setScreen] = useState<Screen>('main')
-  const [role, setRole] = useState<'user' | 'restaurant'>('user')
+  const [role, setRole] = useState<'user' | 'restaurant'>(() => {
+    try { return window.location.pathname === '/restaurantes' ? 'restaurant' : 'user' } catch { return 'user' }
+  })
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [name, setName] = useState('')

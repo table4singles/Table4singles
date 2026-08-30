@@ -12,34 +12,34 @@ interface SubscriptionPageProps {
   onAuthClick: (mode?: 'signin' | 'signup') => void
 }
 
-const STATUS_LABEL: Record<string, { label: string; color: string; icon: React.ReactNode }> = {
+const STATUS_STYLE: Record<string, { key: string; color: string; icon: React.ReactNode }> = {
   active: {
-    label: 'Activa',
+    key: 'active',
     color: 'text-green-700 bg-green-50 border-green-200',
     icon: <CheckCircle className="w-4 h-4 text-green-600" />,
   },
   trialing: {
-    label: 'Periodo de prueba',
+    key: 'trialing',
     color: 'text-blue-700 bg-blue-50 border-blue-200',
     icon: <Clock className="w-4 h-4 text-blue-600" />,
   },
   past_due: {
-    label: 'Pago pendiente',
+    key: 'pastDue',
     color: 'text-orange-700 bg-orange-50 border-orange-200',
     icon: <AlertCircle className="w-4 h-4 text-orange-600" />,
   },
   canceled: {
-    label: 'Cancelada',
+    key: 'canceled',
     color: 'text-red-700 bg-red-50 border-red-200',
     icon: <XCircle className="w-4 h-4 text-red-600" />,
   },
   incomplete: {
-    label: 'Incompleta',
+    key: 'incomplete',
     color: 'text-orange-700 bg-orange-50 border-orange-200',
     icon: <AlertCircle className="w-4 h-4 text-orange-600" />,
   },
   unpaid: {
-    label: 'Impagada',
+    key: 'unpaid',
     color: 'text-red-700 bg-red-50 border-red-200',
     icon: <AlertCircle className="w-4 h-4 text-red-600" />,
   },
@@ -65,7 +65,7 @@ export function SubscriptionPage({ onNavigate, onAuthClick }: SubscriptionPagePr
         <Navbar currentPage="subscription" onNavigate={onNavigate} onAuthClick={onAuthClick} />
         <div className="text-center py-20">
           <p className="text-gray-500 dark:text-gray-400">{t('subscription.notRestaurant')}</p>
-          <button onClick={() => onNavigate('browse')} className="mt-4 text-primary-600 dark:text-primary-400 font-medium text-sm">Volver</button>
+          <button onClick={() => onNavigate('browse')} className="mt-4 text-primary-600 dark:text-primary-400 font-medium text-sm">{t('common.back')}</button>
         </div>
       </div>
     )
@@ -73,7 +73,7 @@ export function SubscriptionPage({ onNavigate, onAuthClick }: SubscriptionPagePr
 
   const status = profile.subscription_status
   const isActive = status === 'active' || status === 'trialing'
-  const statusInfo = status ? (STATUS_LABEL[status] ?? null) : null
+  const statusStyle = status ? (STATUS_STYLE[status] ?? null) : null
   const isNewSubscriber = !status || status === 'canceled'
 
   const handleSubscribe = async () => {
@@ -85,10 +85,10 @@ export function SubscriptionPage({ onNavigate, onAuthClick }: SubscriptionPagePr
       if (data?.url) {
         window.location.href = data.url
       } else {
-        throw new Error('No se recibió la URL de pago')
+        throw new Error(t('subscription.errors.noPaymentUrl'))
       }
     } catch (err: any) {
-      setError(err.message || 'Error al iniciar el pago. Inténtalo de nuevo.')
+      setError(err.message || t('subscription.errors.startFailed'))
     }
     setLoading(false)
   }
@@ -104,13 +104,13 @@ export function SubscriptionPage({ onNavigate, onAuthClick }: SubscriptionPagePr
           <ArrowLeft className="w-4 h-4" /> {t('subscription.backToDashboard')}
         </button>
 
-        <PageHeader title="Suscripción" subtitle="Gestiona tu plan mensual de Table4Singles" variant="restaurant" />
+        <PageHeader title={t('nav.subscription')} subtitle={t('subscription.pageSubtitle')} variant="restaurant" />
 
         {/* Estado actual */}
-        {statusInfo && (
-          <div className={`flex items-center gap-2 border rounded-xl px-4 py-3 mb-6 text-sm font-medium ${statusInfo.color}`}>
-            {statusInfo.icon}
-            <span>Suscripción <strong>{statusInfo.label}</strong></span>
+        {statusStyle && (
+          <div className={`flex items-center gap-2 border rounded-xl px-4 py-3 mb-6 text-sm font-medium ${statusStyle.color}`}>
+            {statusStyle.icon}
+            <span>{t('subscription.statusPrefix')} <strong>{t(`subscription.status.${statusStyle.key}`)}</strong></span>
           </div>
         )}
 
@@ -120,10 +120,7 @@ export function SubscriptionPage({ onNavigate, onAuthClick }: SubscriptionPagePr
             <Zap className="w-5 h-5 text-amber-500 flex-shrink-0 mt-0.5" />
             <div>
               <p className="text-sm font-bold text-amber-800 dark:text-amber-300">{t('subscription.promoTitle')}</p>
-              <p className="text-sm text-amber-700 dark:text-amber-400 mt-0.5">
-                Los primeros 3 meses por <strong>10 €</strong> en total — solo pagas el primer mes.
-                Después, 10 €/mes.
-              </p>
+              <p className="text-sm text-amber-700 dark:text-amber-400 mt-0.5">{t('subscription.promoDesc')}</p>
             </div>
           </div>
         )}
@@ -141,9 +138,9 @@ export function SubscriptionPage({ onNavigate, onAuthClick }: SubscriptionPagePr
                 <div className="flex items-baseline gap-2">
                   <span className="text-4xl font-display font-bold">10 €</span>
                   <span className="text-sm opacity-80 line-through">30 €</span>
-                  <span className="bg-white/20 text-xs font-bold px-2 py-0.5 rounded-full">3 meses</span>
+                  <span className="bg-white/20 text-xs font-bold px-2 py-0.5 rounded-full">{t('subscription.threeMonthsBadge')}</span>
                 </div>
-                <p className="text-sm opacity-80 mt-1">Oferta lanzamiento · Luego 10 €/mes · Cancela cuando quieras</p>
+                <p className="text-sm opacity-80 mt-1">{t('subscription.promoBadgeLine')}</p>
               </>
             ) : (
               <>
@@ -151,7 +148,7 @@ export function SubscriptionPage({ onNavigate, onAuthClick }: SubscriptionPagePr
                   <span className="text-4xl font-display font-bold">10 €</span>
                   <span className="text-sm opacity-80">{t('subscription.perMonth')}</span>
                 </div>
-                <p className="text-sm opacity-80 mt-1">Facturación mensual · Cancela cuando quieras</p>
+                <p className="text-sm opacity-80 mt-1">{t('subscription.regularBadgeLine')}</p>
               </>
             )}
           </div>
@@ -189,7 +186,7 @@ export function SubscriptionPage({ onNavigate, onAuthClick }: SubscriptionPagePr
                       if (fnErr) throw fnErr
                       if (data?.url) window.location.href = data.url
                     } catch (err: any) {
-                      setError(err.message || 'Error al abrir el portal de facturación.')
+                      setError(err.message || t('subscription.errors.portalFailed'))
                     }
                     setLoading(false)
                   }}
@@ -225,10 +222,8 @@ export function SubscriptionPage({ onNavigate, onAuthClick }: SubscriptionPagePr
 
         {/* Info pago usuarios */}
         <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 p-5">
-          <h3 className="font-semibold text-gray-900 dark:text-white text-sm mb-2">¿Cuánto pagan los usuarios?</h3>
-          <p className="text-sm text-gray-500 dark:text-gray-400">
-            Cada usuario abona un depósito de <strong className="text-gray-700 dark:text-gray-200">2 € por reserva</strong>. Este importe es reembolsable si el usuario cancela con suficiente antelación.
-          </p>
+          <h3 className="font-semibold text-gray-900 dark:text-white text-sm mb-2">{t('subscription.usersPayTitle')}</h3>
+          <p className="text-sm text-gray-500 dark:text-gray-400">{t('subscription.usersPayBody')}</p>
         </div>
       </main>
     </div>

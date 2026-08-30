@@ -80,7 +80,7 @@ export function RestaurantDashboardPage({ onNavigate, onAuthClick }: RestaurantD
         {profile?.subscription_status === 'active' || profile?.subscription_status === 'trialing' ? (
           <div className="flex items-center gap-3 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-xl px-4 py-3 mb-6 text-sm">
             <CheckCircle className="w-4 h-4 text-green-600 flex-shrink-0" />
-            <span className="text-green-800 dark:text-green-300 font-medium">{t('restaurantDashboard.subscriptionActive')} — Plan Restaurante · 10 €/mes</span>
+            <span className="text-green-800 dark:text-green-300 font-medium">{t('restaurantDashboard.subscriptionActive')} {t('restaurantDashboard.subscriptionPlanDetail')}</span>
             <button onClick={() => onNavigate('subscription')} className="ml-auto text-xs text-green-700 dark:text-green-400 hover:underline font-medium">{t('restaurantDashboard.manageSubscription')}</button>
           </div>
         ) : profile?.subscription_status === 'past_due' ? (

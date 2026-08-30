@@ -2,6 +2,8 @@ import { useState } from 'react'
 import { Search, SlidersHorizontal, MapPin, UtensilsCrossed, ChevronRight, Navigation, Heart, List, Map as MapIcon, X } from 'lucide-react'
 import { Navbar } from '@/components/Navbar'
 import { PageHeader } from '@/components/PageHeader'
+import { ActivitySummaryCard } from '@/components/ActivitySummaryCard'
+import { EmptyStateIllustration } from '@/components/EmptyStateIllustration'
 import { LoadingSpinner } from '@/components/LoadingSpinner'
 import { ErrorBanner } from '@/components/ErrorBanner'
 import { RestaurantsMap } from '@/components/RestaurantsMap'
@@ -74,6 +76,8 @@ export function RestaurantsBrowsePage({ onNavigate, onAuthClick }: RestaurantsBr
 
       <main className="max-w-5xl mx-auto px-4 py-6 pb-24 md:pb-8">
         <PageHeader title={t('browse.title')} subtitle={t('browse.subtitle')} />
+
+        <ActivitySummaryCard onNavigate={onNavigate} />
 
         <div className="flex gap-3 mb-6">
           <div className="flex-1 relative">
@@ -248,9 +252,7 @@ export function RestaurantsBrowsePage({ onNavigate, onAuthClick }: RestaurantsBr
           <LoadingSpinner className="py-32" />
         ) : restaurants.length === 0 ? (
           <div className="text-center py-20">
-            <div className="w-20 h-20 rounded-full bg-teal-100 flex items-center justify-center mx-auto mb-6">
-              <UtensilsCrossed className="w-10 h-10 text-teal-600" />
-            </div>
+            <EmptyStateIllustration className="w-24 h-24 mx-auto mb-4" />
             <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-2">{t('browse.noRestaurants')}</h3>
             <p className="text-gray-500 dark:text-gray-400">{hasFilters ? t('browse.adjustFilters') : t('browse.comingSoon')}</p>
           </div>
@@ -301,7 +303,7 @@ function RestaurantCard({
   const photo = restaurant.restaurant_photos?.[0] ?? restaurant.avatar_url
   const photoIsLogo = !restaurant.restaurant_photos?.[0] && !!restaurant.avatar_url
   return (
-    <button onClick={onClick} className="group relative w-full bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-sm hover:shadow-lg transition-all overflow-hidden text-left">
+    <button onClick={onClick} className="group relative w-full bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-e2 hover:shadow-e3 hover:-translate-y-0.5 transition-all overflow-hidden text-left">
       <div className="relative h-44 bg-gray-100 dark:bg-gray-700">
         {photo ? (
           <img src={photo} alt={restaurant.restaurant_name ?? ''} className={`w-full h-full transition-transform duration-300 group-hover:scale-105 ${photoIsLogo ? 'object-contain p-6' : 'object-cover'}`} />

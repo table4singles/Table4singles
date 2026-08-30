@@ -8,9 +8,13 @@ interface ShareButtonProps {
   message?: string
   /** Texto para Twitter (sin URL). Por defecto: share.tweetText */
   tweetMessage?: string
+  /** 'outline' (por defecto) para uso secundario, 'solid' para CTA primario coral */
+  variant?: 'outline' | 'solid'
+  /** Texto del botón disparador. Por defecto: share.title */
+  label?: string
 }
 
-export function ShareButton({ url, message, tweetMessage }: ShareButtonProps) {
+export function ShareButton({ url, message, tweetMessage, variant = 'outline', label }: ShareButtonProps) {
   const { t } = useLanguage()
   const [open, setOpen] = useState(false)
   const [copied, setCopied] = useState(false)
@@ -50,8 +54,15 @@ export function ShareButton({ url, message, tweetMessage }: ShareButtonProps) {
 
   return (
     <div className="relative" ref={ref}>
-      <button onClick={() => setOpen(!open)} className="flex items-center gap-2 px-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-200 font-medium text-sm hover:bg-gray-50 dark:hover:bg-gray-700 active:scale-95 transition-all">
-        <Share2 className="w-4 h-4" /> {t('share.title')}
+      <button
+        onClick={() => setOpen(!open)}
+        className={
+          variant === 'solid'
+            ? 'flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-primary-500 text-white font-semibold text-sm shadow-glow-coral hover:bg-primary-600 active:scale-95 transition-all w-full'
+            : 'flex items-center gap-2 px-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-200 font-medium text-sm hover:bg-gray-50 dark:hover:bg-gray-700 active:scale-95 transition-all'
+        }
+      >
+        <Share2 className="w-4 h-4" /> {label ?? t('share.title')}
       </button>
       {open && (
         <>

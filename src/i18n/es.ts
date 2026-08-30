@@ -290,6 +290,7 @@ export const es = {
     ambassadorsProgram: 'Programa de Embajadores',
     ambassadorsProgramDesc: 'Presenta Table4Singles a restaurantes y gana el 5% de sus ingresos de forma indefinida.',
     viewProgram: 'Ver programa',
+    ambassadorTeaser: 'Gana 5% · Embajador',
     restaurantLogo: 'Logo del restaurante',
     uploadLogo: 'Subir logo',
     logoHint: 'Aparece en tu perfil, el buscador y el flyer promocional',

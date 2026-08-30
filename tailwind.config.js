@@ -18,10 +18,33 @@ export default {
           900: '#801b37',
           950: '#470a19',
         },
+        // Warm neutral (Tailwind "stone") in place of the default cool gray —
+        // ties the whole app to the coral/sunset palette instead of a generic blue-gray.
+        gray: {
+          50: '#fafaf9',
+          100: '#f5f5f4',
+          200: '#e7e5e4',
+          300: '#d6d3d1',
+          400: '#a8a29e',
+          500: '#78716c',
+          600: '#57534e',
+          700: '#44403c',
+          800: '#292524',
+          900: '#1c1917',
+          950: '#0c0a09',
+        },
       },
       fontFamily: {
         sans: ['Inter', 'system-ui', 'sans-serif'],
         display: ['Playfair Display', 'Georgia', 'serif'],
+      },
+      boxShadow: {
+        e1: '0 1px 2px rgba(28,25,23,0.07)',
+        e2: '0 1px 2px rgba(28,25,23,0.04), 0 6px 16px -4px rgba(28,25,23,0.12)',
+        e3: '0 2px 4px rgba(28,25,23,0.06), 0 16px 32px -8px rgba(28,25,23,0.18)',
+        e4: '0 4px 8px rgba(28,25,23,0.08), 0 32px 64px -16px rgba(28,25,23,0.30)',
+        'glow-coral': '0 4px 14px -2px rgba(233,69,96,0.4)',
+        'glow-indigo': '0 4px 14px -2px rgba(79,70,229,0.4)',
       },
       animation: {
         'fade-in': 'fadeIn 0.2s ease-out',

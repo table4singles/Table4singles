@@ -66,8 +66,8 @@ export function ShareButton({ url, message, tweetMessage, variant = 'outline', l
       </button>
       {open && (
         <>
-          <div className="fixed inset-0 z-40" onClick={() => setOpen(false)} />
-          <div className="absolute right-0 top-full mt-2 bg-white dark:bg-gray-800 rounded-2xl shadow-xl border border-gray-200 dark:border-gray-700 overflow-hidden z-50 w-56 animate-fade-in">
+          <div className="fixed inset-0 z-40 bg-black/20" onClick={() => setOpen(false)} />
+          <div className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 bg-white dark:bg-gray-800 rounded-2xl shadow-e4 border border-gray-200 dark:border-gray-700 overflow-hidden z-50 w-72 max-w-[calc(100vw-2rem)] animate-fade-in">
             <div className="flex items-center justify-between px-4 py-3 border-b border-gray-100 dark:border-gray-700">
               <span className="font-medium text-sm text-gray-900 dark:text-white">{t('share.title')}</span>
               <button onClick={() => setOpen(false)} className="p-1 hover:bg-gray-100 dark:hover:bg-gray-600 rounded-lg"><X className="w-4 h-4" /></button>

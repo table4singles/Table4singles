@@ -40,28 +40,28 @@ export function Navbar({ currentPage, onNavigate, onAuthClick }: NavbarProps) {
 
   return (
     <>
-    <header className="sticky top-0 z-50 bg-white dark:bg-gray-800 border-b border-gray-100 dark:border-gray-700">
+    <header className="sticky top-0 z-50 bg-gray-950 border-b border-gold-500/10">
       <div className="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
         <button onClick={() => onNavigate(user ? 'browse' : 'landing')} className="flex items-center gap-2">
           <span className="h-9 w-9 rounded-xl overflow-hidden flex-shrink-0">
             <img src="/icons/logo-full.png" alt="" className="h-full w-full object-cover object-left" />
           </span>
-          <span className="font-display font-bold text-lg text-gray-900 dark:text-white whitespace-nowrap">Table4Singles</span>
+          <span className="font-display font-bold text-lg text-white whitespace-nowrap">Table4Singles</span>
         </button>
 
         <nav className="hidden md:flex items-center gap-1">
           {/* Toggle de vista para admins */}
           {isAdminSwitcher && (
-            <div className="flex items-center bg-gray-100 dark:bg-gray-700 rounded-full p-0.5 mr-2">
+            <div className="flex items-center bg-white/5 rounded-full p-0.5 mr-2">
               <button
                 onClick={() => switchToMode('user')}
-                className={`flex items-center gap-1 px-3 py-1 rounded-full text-xs font-semibold transition-all ${effectiveRole === 'user' ? 'bg-white dark:bg-gray-800 text-blue-600 shadow-sm' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700'}`}
+                className={`flex items-center gap-1 px-3 py-1 rounded-full text-xs font-semibold transition-all ${effectiveRole === 'user' ? 'bg-gray-800 text-sky-400 shadow-sm' : 'text-gray-400 hover:text-gray-200'}`}
               >
                 <User className="w-3 h-3" /> {t('nav.user')}
               </button>
               <button
                 onClick={() => switchToMode('restaurant')}
-                className={`flex items-center gap-1 px-3 py-1 rounded-full text-xs font-semibold transition-all ${effectiveRole === 'restaurant' ? 'bg-white dark:bg-gray-800 text-orange-600 shadow-sm' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700'}`}
+                className={`flex items-center gap-1 px-3 py-1 rounded-full text-xs font-semibold transition-all ${effectiveRole === 'restaurant' ? 'bg-gray-800 text-orange-400 shadow-sm' : 'text-gray-400 hover:text-gray-200'}`}
               >
                 <LayoutDashboard className="w-3 h-3" /> {t('nav.restaurant')}
               </button>
@@ -98,10 +98,10 @@ export function Navbar({ currentPage, onNavigate, onAuthClick }: NavbarProps) {
           {user ? (
             <>
               <div className="relative">
-                <button onClick={() => setShowNotifications(!showNotifications)} className="relative p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors">
-                  <Bell className="w-5 h-5 text-gray-600 dark:text-gray-300" />
+                <button onClick={() => setShowNotifications(!showNotifications)} className="relative p-2 rounded-lg hover:bg-white/5 transition-colors">
+                  <Bell className="w-5 h-5 text-gray-400" />
                   {unreadCount > 0 && (
-                    <span className="absolute -top-0.5 -right-0.5 w-5 h-5 bg-blue-500 text-white text-xs rounded-full flex items-center justify-center font-medium">
+                    <span className="absolute -top-0.5 -right-0.5 w-5 h-5 bg-gold-500 text-gray-900 text-xs rounded-full flex items-center justify-center font-bold">
                       {unreadCount > 9 ? '9+' : unreadCount}
                     </span>
                   )}
@@ -117,8 +117,8 @@ export function Navbar({ currentPage, onNavigate, onAuthClick }: NavbarProps) {
               </div>
 
               <div className="relative" ref={menuRef}>
-                <button onClick={() => setShowMenu(!showMenu)} className="flex items-center gap-2 px-3 py-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors">
-                  <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center overflow-hidden">
+                <button onClick={() => setShowMenu(!showMenu)} className="flex items-center gap-2 px-3 py-1.5 rounded-lg hover:bg-white/5 transition-colors">
+                  <div className="w-8 h-8 rounded-full bg-gold-400/15 border border-gold-400/30 flex items-center justify-center overflow-hidden">
                     {profile?.avatar_url ? (
                       <img
                         src={profile.avatar_url}
@@ -126,66 +126,66 @@ export function Navbar({ currentPage, onNavigate, onAuthClick }: NavbarProps) {
                         className={`w-full h-full ${effectiveRole === 'restaurant' ? 'object-contain p-0.5' : 'object-cover'}`}
                       />
                     ) : (
-                      <User className="w-4 h-4 text-blue-600" />
+                      <User className="w-4 h-4 text-gold-400" />
                     )}
                   </div>
-                  <span className="hidden sm:block text-sm font-medium text-gray-700 dark:text-gray-200 max-w-[120px] truncate">
+                  <span className="hidden sm:block text-sm font-medium text-gray-200 max-w-[120px] truncate">
                     {profile?.display_name || profile?.restaurant_name || 'User'}
                   </span>
                 </button>
                 {showMenu && (
-                  <div className="absolute right-0 top-full mt-1 bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 overflow-hidden z-50 w-52 animate-fade-in">
+                  <div className="absolute right-0 top-full mt-1 bg-gray-900 rounded-xl shadow-e4 border border-gold-500/15 overflow-hidden z-50 w-52 animate-fade-in">
                     {/* Switcher de vista para admins */}
                     {isAdminSwitcher && (
-                      <div className="px-4 py-3 border-b border-gray-100 dark:border-gray-700">
-                        <p className="text-xs text-gray-400 mb-2 font-medium">{t('nav.activeView')}</p>
-                        <div className="flex gap-1 bg-gray-100 dark:bg-gray-700 rounded-full p-0.5">
+                      <div className="px-4 py-3 border-b border-white/10">
+                        <p className="text-xs text-gray-500 mb-2 font-medium">{t('nav.activeView')}</p>
+                        <div className="flex gap-1 bg-white/5 rounded-full p-0.5">
                           <button
                             onClick={() => switchToMode('user')}
-                            className={`flex-1 flex items-center justify-center gap-1 py-1 rounded-full text-xs font-semibold transition-all ${effectiveRole === 'user' ? 'bg-white dark:bg-gray-800 text-blue-600 shadow-sm' : 'text-gray-500'}`}
+                            className={`flex-1 flex items-center justify-center gap-1 py-1 rounded-full text-xs font-semibold transition-all ${effectiveRole === 'user' ? 'bg-gray-800 text-sky-400 shadow-sm' : 'text-gray-500'}`}
                           >
                             <User className="w-3 h-3" /> {t('nav.user')}
                           </button>
                           <button
                             onClick={() => switchToMode('restaurant')}
-                            className={`flex-1 flex items-center justify-center gap-1 py-1 rounded-full text-xs font-semibold transition-all ${effectiveRole === 'restaurant' ? 'bg-white dark:bg-gray-800 text-orange-600 shadow-sm' : 'text-gray-500'}`}
+                            className={`flex-1 flex items-center justify-center gap-1 py-1 rounded-full text-xs font-semibold transition-all ${effectiveRole === 'restaurant' ? 'bg-gray-800 text-orange-400 shadow-sm' : 'text-gray-500'}`}
                           >
                             <LayoutDashboard className="w-3 h-3" /> {t('nav.restaurant')}
                           </button>
                         </div>
                       </div>
                     )}
-                    <button onClick={() => { onNavigate('profile'); setShowMenu(false) }} className="w-full px-4 py-3 text-left text-sm hover:bg-gray-50 dark:hover:bg-gray-700 flex items-center gap-2">
+                    <button onClick={() => { onNavigate('profile'); setShowMenu(false) }} className="w-full px-4 py-3 text-left text-sm text-gray-200 hover:bg-white/5 flex items-center gap-2">
                       <User className="w-4 h-4" /> {t('nav.profile')}
                     </button>
-                    <button onClick={() => { onNavigate('settings'); setShowMenu(false) }} className="w-full px-4 py-3 text-left text-sm hover:bg-gray-50 dark:hover:bg-gray-700 flex items-center gap-2">
+                    <button onClick={() => { onNavigate('settings'); setShowMenu(false) }} className="w-full px-4 py-3 text-left text-sm text-gray-200 hover:bg-white/5 flex items-center gap-2">
                       <Settings className="w-4 h-4" /> {t('nav.settings')}
                     </button>
                     {effectiveRole === 'restaurant' && (
                       <>
-                        <button onClick={() => { onNavigate('subscription'); setShowMenu(false) }} className="w-full px-4 py-3 text-left text-sm hover:bg-gray-50 dark:hover:bg-gray-700 flex items-center gap-2">
+                        <button onClick={() => { onNavigate('subscription'); setShowMenu(false) }} className="w-full px-4 py-3 text-left text-sm text-gray-200 hover:bg-white/5 flex items-center gap-2">
                           <CreditCard className="w-4 h-4" />
                           <span className="flex-1">{t('nav.subscription')}</span>
                           {(!profile?.subscription_status || profile.subscription_status === 'canceled' || profile.subscription_status === 'past_due') && (
-                            <span className="w-2 h-2 rounded-full bg-orange-400 flex-shrink-0" />
+                            <span className="w-2 h-2 rounded-full bg-gold-400 flex-shrink-0" />
                           )}
                         </button>
-                        <button onClick={() => { onNavigate('aviso-legal'); setShowMenu(false) }} className="w-full px-4 py-3 text-left text-sm hover:bg-gray-50 dark:hover:bg-gray-700 flex items-center gap-2">
+                        <button onClick={() => { onNavigate('aviso-legal'); setShowMenu(false) }} className="w-full px-4 py-3 text-left text-sm text-gray-200 hover:bg-white/5 flex items-center gap-2">
                           <FileText className="w-4 h-4" /> {t('settings.privacy.terms')}
                         </button>
                       </>
                     )}
                     {effectiveRole === 'user' && (
-                      <button onClick={() => { onNavigate('ambassador'); setShowMenu(false) }} className="w-full px-4 py-3 text-left text-sm hover:bg-gray-50 dark:hover:bg-gray-700 flex items-center gap-2 text-primary-600 dark:text-primary-400">
+                      <button onClick={() => { onNavigate('ambassador'); setShowMenu(false) }} className="w-full px-4 py-3 text-left text-sm hover:bg-white/5 flex items-center gap-2 text-gold-400">
                         <Award className="w-4 h-4" /> {t('nav.becomeAmbassador')}
                       </button>
                     )}
                     {profile?.is_admin && (
-                      <button onClick={() => { onNavigate('admin'); setShowMenu(false) }} className="w-full px-4 py-3 text-left text-sm hover:bg-gray-50 dark:hover:bg-gray-700 flex items-center gap-2 text-purple-600 dark:text-purple-400 border-t border-gray-100 dark:border-gray-700">
+                      <button onClick={() => { onNavigate('admin'); setShowMenu(false) }} className="w-full px-4 py-3 text-left text-sm hover:bg-white/5 flex items-center gap-2 text-violet-400 border-t border-white/10">
                         <ShieldCheck className="w-4 h-4" /> {t('nav.adminPanel')}
                       </button>
                     )}
-                    <button onClick={() => { signOut(); setShowMenu(false) }} className="w-full px-4 py-3 text-left text-sm hover:bg-gray-50 dark:hover:bg-gray-700 flex items-center gap-2 text-red-600 border-t border-gray-100 dark:border-gray-700">
+                    <button onClick={() => { signOut(); setShowMenu(false) }} className="w-full px-4 py-3 text-left text-sm hover:bg-white/5 flex items-center gap-2 text-red-400 border-t border-white/10">
                       <LogOut className="w-4 h-4" /> {t('nav.signOut')}
                     </button>
                   </div>
@@ -194,10 +194,10 @@ export function Navbar({ currentPage, onNavigate, onAuthClick }: NavbarProps) {
             </>
           ) : (
             <div className="flex items-center gap-3">
-              <button onClick={() => onAuthClick('signin')} className="px-4 py-2 text-sm font-semibold text-blue-600 hover:text-blue-700 transition-colors">
+              <button onClick={() => onAuthClick('signin')} className="px-4 py-2 text-sm font-semibold text-gray-300 hover:text-white transition-colors">
                 {t('nav.signIn')}
               </button>
-              <button onClick={() => onAuthClick('signup')} className="px-5 py-2 text-sm font-semibold text-white bg-blue-600 hover:bg-blue-700 rounded-full transition-colors shadow-sm">
+              <button onClick={() => onAuthClick('signup')} className="px-5 py-2 text-sm font-bold text-gray-900 bg-gradient-to-r from-gold-300 to-gold-500 hover:from-gold-200 hover:to-gold-400 rounded-full transition-all shadow-glow-gold">
                 {t('nav.signUp')}
               </button>
             </div>
@@ -207,7 +207,7 @@ export function Navbar({ currentPage, onNavigate, onAuthClick }: NavbarProps) {
 
       {/* Mobile bottom nav */}
       {user && (
-        <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 z-50 px-2 pb-safe">
+        <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-gray-950 border-t border-gold-500/10 z-50 px-2 pb-safe">
           <div className="flex justify-around py-2">
             {effectiveRole !== 'restaurant' && (
               <MobileNavButton active={currentPage === 'browse' || currentPage === 'restaurant-profile'} onClick={() => onNavigate('browse')} icon={<Search className="w-5 h-5" />} label={t('nav.restaurants')} />
@@ -248,16 +248,16 @@ export function Navbar({ currentPage, onNavigate, onAuthClick }: NavbarProps) {
 
 function NavLink({ active, onClick, icon, label, alert }: { active: boolean; onClick: () => void; icon: React.ReactNode; label: string; alert?: boolean }) {
   return (
-    <button onClick={onClick} className={`relative flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-semibold transition-colors ${active ? 'text-blue-600 bg-blue-50' : 'text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-600'}`}>
+    <button onClick={onClick} className={`relative flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-semibold transition-colors ${active ? 'text-gold-300 bg-gold-400/10' : 'text-gray-400 hover:bg-white/5 hover:text-white'}`}>
       {icon} {label}
-      {alert && <span className="absolute top-1 right-1 w-2 h-2 rounded-full bg-orange-400" />}
+      {alert && <span className="absolute top-1 right-1 w-2 h-2 rounded-full bg-gold-400" />}
     </button>
   )
 }
 
 function MobileNavButton({ active, onClick, icon, label }: { active: boolean; onClick: () => void; icon: React.ReactNode; label: string }) {
   return (
-    <button onClick={onClick} className={`flex flex-col items-center gap-0.5 px-3 py-1 rounded-lg text-xs transition-colors ${active ? 'text-blue-600' : 'text-gray-500 dark:text-gray-400'}`}>
+    <button onClick={onClick} className={`flex flex-col items-center gap-0.5 px-3 py-1 rounded-lg text-xs transition-colors ${active ? 'text-gold-400' : 'text-gray-500'}`}>
       {icon}
       <span>{label}</span>
     </button>

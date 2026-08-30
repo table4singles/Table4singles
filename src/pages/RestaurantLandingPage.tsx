@@ -12,7 +12,7 @@ interface RestaurantLandingPageProps {
 
 export function RestaurantLandingPage({ onNavigate, onAuthClick }: RestaurantLandingPageProps) {
   return (
-    <div className="min-h-screen bg-white dark:bg-gray-900">
+    <div className="min-h-screen bg-violet-100 dark:bg-gray-900">
       <Navbar currentPage="restaurant-landing" onNavigate={onNavigate} onAuthClick={onAuthClick} />
 
       {/* HERO — full-bleed photo + gradient */}
@@ -20,7 +20,7 @@ export function RestaurantLandingPage({ onNavigate, onAuthClick }: RestaurantLan
         <img src="/hero-dinner.jpg" alt="" className="absolute inset-0 w-full h-full object-cover" />
         <div className="absolute inset-0 bg-gradient-to-br from-indigo-700/92 via-violet-600/85 to-amber-500/80" />
         <div className="absolute -top-24 -right-16 w-96 h-96 rounded-full bg-white/10 blur-3xl" />
-        <div className="absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-white dark:from-gray-900 to-transparent" />
+        <div className="absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-indigo-100 dark:from-gray-900 to-transparent" />
 
         <div className="relative max-w-4xl mx-auto px-4 pt-20 pb-28 md:pt-28 md:pb-36 text-center">
           <p className="inline-flex items-center gap-2 text-xs font-bold tracking-[0.18em] uppercase bg-white/15 border border-white/25 rounded-full px-4 py-1.5 mb-6">
@@ -54,7 +54,7 @@ export function RestaurantLandingPage({ onNavigate, onAuthClick }: RestaurantLan
       </section>
 
       {/* PROBLEMA → SOLUCIÓN */}
-      <section className="relative py-20 bg-gradient-to-b from-white via-indigo-50/60 to-amber-50/40 dark:from-gray-900 dark:via-indigo-950/20 dark:to-gray-900">
+      <section className="relative py-20 bg-gradient-to-b from-indigo-100 via-violet-100 to-amber-100 dark:from-gray-900 dark:via-indigo-950/20 dark:to-gray-900">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <span className="inline-flex items-center gap-2 text-xs font-bold tracking-[0.16em] uppercase text-indigo-600 dark:text-indigo-400 bg-indigo-100 dark:bg-indigo-900/30 rounded-full px-4 py-1.5 mb-6">
             <TrendingDown className="w-3.5 h-3.5" /> El problema de siempre
@@ -69,7 +69,7 @@ export function RestaurantLandingPage({ onNavigate, onAuthClick }: RestaurantLan
       </section>
 
       {/* HOW IT WORKS — alternating rows */}
-      <section id="como-funciona" className="py-20 bg-white dark:bg-gray-800 scroll-mt-16">
+      <section id="como-funciona" className="py-20 bg-gradient-to-b from-amber-100 via-orange-50 to-violet-100 dark:bg-gray-800 scroll-mt-16">
         <div className="max-w-5xl mx-auto px-4">
           <div className="text-center mb-16">
             <h2 className="font-display text-3xl md:text-4xl italic text-gray-900 dark:text-white mb-3">Así de simple</h2>
@@ -122,7 +122,7 @@ export function RestaurantLandingPage({ onNavigate, onAuthClick }: RestaurantLan
       </section>
 
       {/* FAQ */}
-      <section className="py-20 bg-gradient-to-b from-amber-50/40 via-indigo-50/40 to-white dark:from-gray-900 dark:via-indigo-950/20 dark:to-gray-900">
+      <section className="py-20 bg-gradient-to-b from-amber-100 via-indigo-100 to-violet-200 dark:from-gray-900 dark:via-indigo-950/20 dark:to-gray-900">
         <div className="max-w-2xl mx-auto px-4">
           <div className="text-center mb-12">
             <h2 className="font-display text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-3">Todo lo que necesitas saber</h2>
@@ -203,7 +203,7 @@ function BenefitCard({ icon, title, desc }: { icon: React.ReactNode; title: stri
 function FaqItem({ q, a }: { q: string; a: string }) {
   const [open, setOpen] = useState(false)
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-e2 border border-gray-100 dark:border-gray-700 overflow-hidden">
+    <div className="bg-white/80 dark:bg-gray-800 rounded-2xl shadow-e2 border border-white/60 dark:border-gray-700 overflow-hidden backdrop-blur">
       <button
         onClick={() => setOpen(!open)}
         className="w-full flex items-center justify-between gap-4 px-5 py-4 text-left"

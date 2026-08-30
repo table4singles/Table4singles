@@ -4,6 +4,7 @@ import {
   ArrowRight, Sparkles, TrendingDown, ChevronDown, Euro, ShieldCheck, Smartphone,
 } from 'lucide-react'
 import { Navbar } from '@/components/Navbar'
+import { useLanguage } from '@/contexts/LanguageContext'
 
 interface RestaurantLandingPageProps {
   onNavigate: (page: string, id?: string) => void
@@ -11,6 +12,7 @@ interface RestaurantLandingPageProps {
 }
 
 export function RestaurantLandingPage({ onNavigate, onAuthClick }: RestaurantLandingPageProps) {
+  const { t } = useLanguage()
   return (
     <div className="min-h-screen bg-gray-950">
       <Navbar currentPage="restaurant-landing" onNavigate={onNavigate} onAuthClick={onAuthClick} />
@@ -24,13 +26,13 @@ export function RestaurantLandingPage({ onNavigate, onAuthClick }: RestaurantLan
 
         <div className="relative max-w-4xl mx-auto px-4 pt-20 pb-28 md:pt-28 md:pb-36 text-center">
           <p className="inline-flex items-center gap-2 text-xs font-bold tracking-[0.18em] uppercase text-gold-300 bg-gold-400/10 border border-gold-400/30 rounded-full px-4 py-1.5 mb-6">
-            <Sparkles className="w-3.5 h-3.5" /> Para restaurantes
+            <Sparkles className="w-3.5 h-3.5" /> {t('restaurantLanding.hero.eyebrow')}
           </p>
-          <h1 className="font-display text-4xl md:text-6xl font-bold mb-6 leading-[1.1] drop-shadow-sm">
-            Tus mesas vacías,<br />llenas de gente nueva
+          <h1 className="font-display text-4xl md:text-6xl font-bold mb-6 leading-[1.1] drop-shadow-sm whitespace-pre-line">
+            {t('restaurantLanding.hero.title')}
           </h1>
           <p className="text-lg md:text-xl text-white/90 max-w-2xl mx-auto mb-10 leading-relaxed">
-            Cada noche que una mesa se queda vacía es dinero que no vuelve. Table4Singles la llena con solteros que buscan justo eso: un plan y compañía. Tú publicas cuándo te interesa, nosotros traemos a la gente.
+            {t('restaurantLanding.hero.description')}
           </p>
 
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-12">
@@ -38,17 +40,17 @@ export function RestaurantLandingPage({ onNavigate, onAuthClick }: RestaurantLan
               onClick={() => onAuthClick('signup')}
               className="inline-flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-gold-300 to-gold-500 text-gray-900 hover:from-gold-200 hover:to-gold-400 rounded-full font-bold text-lg shadow-glow-gold hover:-translate-y-0.5 transition-all"
             >
-              Registra tu restaurante gratis <ArrowRight className="w-5 h-5" />
+              {t('restaurantLanding.hero.cta')} <ArrowRight className="w-5 h-5" />
             </button>
             <a href="#como-funciona" className="text-white/80 font-semibold hover:text-gold-300 underline underline-offset-4">
-              Ver cómo funciona
+              {t('restaurantLanding.hero.secondaryCta')}
             </a>
           </div>
 
           <div className="flex flex-wrap items-center justify-center gap-x-8 gap-y-3 text-sm font-medium text-white/80">
-            <span className="flex items-center gap-1.5"><Euro className="w-4 h-4 text-gold-400" /> 3 meses por el precio de 1</span>
-            <span className="flex items-center gap-1.5"><Ban className="w-4 h-4 text-gold-400" /> Sin permanencia</span>
-            <span className="flex items-center gap-1.5"><Smartphone className="w-4 h-4 text-gold-400" /> Listo en 2 minutos</span>
+            <span className="flex items-center gap-1.5"><Euro className="w-4 h-4 text-gold-400" /> {t('restaurantLanding.hero.fact1')}</span>
+            <span className="flex items-center gap-1.5"><Ban className="w-4 h-4 text-gold-400" /> {t('restaurantLanding.hero.fact2')}</span>
+            <span className="flex items-center gap-1.5"><Smartphone className="w-4 h-4 text-gold-400" /> {t('restaurantLanding.hero.fact3')}</span>
           </div>
         </div>
       </section>
@@ -57,13 +59,13 @@ export function RestaurantLandingPage({ onNavigate, onAuthClick }: RestaurantLan
       <section className="relative py-20 bg-gray-950">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <span className="inline-flex items-center gap-2 text-xs font-bold tracking-[0.16em] uppercase text-gold-300 bg-gold-400/10 border border-gold-400/25 rounded-full px-4 py-1.5 mb-6">
-            <TrendingDown className="w-3.5 h-3.5" /> El problema de siempre
+            <TrendingDown className="w-3.5 h-3.5" /> {t('restaurantLanding.problem.eyebrow')}
           </span>
           <h2 className="font-display text-3xl md:text-4xl font-bold text-white mb-5 leading-tight">
-            Un martes a las 21h, la mitad de tu sala está vacía
+            {t('restaurantLanding.problem.title')}
           </h2>
           <p className="text-lg text-gray-400 max-w-2xl mx-auto leading-relaxed">
-            No es falta de buena comida — es que llenar las horas valle con publicidad tradicional cuesta dinero y no siempre funciona. Table4Singles resuelve justo eso: te trae comensales interesados en cenar acompañados, en las mesas y horarios que tú elijas publicar, sin gastar en anuncios.
+            {t('restaurantLanding.problem.desc')}
           </p>
         </div>
       </section>
@@ -72,32 +74,35 @@ export function RestaurantLandingPage({ onNavigate, onAuthClick }: RestaurantLan
       <section id="como-funciona" className="py-20 bg-gray-900 scroll-mt-16">
         <div className="max-w-5xl mx-auto px-4">
           <div className="text-center mb-16">
-            <h2 className="font-display text-3xl md:text-4xl italic text-white mb-3">Así de simple</h2>
-            <p className="text-gray-400 text-lg">Tres pasos, sin gestión añadida para tu equipo</p>
+            <h2 className="font-display text-3xl md:text-4xl italic text-white mb-3">{t('restaurantLanding.steps.title')}</h2>
+            <p className="text-gray-400 text-lg">{t('restaurantLanding.steps.subtitle')}</p>
           </div>
 
           <div className="space-y-14">
             <StepRow
               number={1}
+              stepLabel={t('restaurantLanding.steps.step')}
               icon={<UserPlus className="w-7 h-7 text-gray-900" />}
               bg="from-gold-300 to-gold-500"
-              title="Regístrate en 2 minutos"
-              desc="Nombre, dirección y tipo de cocina. Sin papeleo, sin llamadas comerciales, sin compromiso inicial."
+              title={t('restaurantLanding.steps.step1Title')}
+              desc={t('restaurantLanding.steps.step1Desc')}
             />
             <StepRow
               number={2}
+              stepLabel={t('restaurantLanding.steps.step')}
               icon={<CalendarPlus className="w-7 h-7 text-gray-900" />}
               bg="from-gold-300 to-gold-500"
-              title="Publica una mesa cuando te interese"
-              desc="Eliges fecha, hora y plazas disponibles. Solo los días que tú decidas — nada se publica en automático. Menos de un minuto."
+              title={t('restaurantLanding.steps.step2Title')}
+              desc={t('restaurantLanding.steps.step2Desc')}
               reverse
             />
             <StepRow
               number={3}
+              stepLabel={t('restaurantLanding.steps.step')}
               icon={<Users className="w-7 h-7 text-gray-900" />}
               bg="from-gold-300 to-gold-500"
-              title="Recibe comensales en tu agenda"
-              desc="Los solteros que reservan aparecen al instante en tu panel, en tiempo real, listos para su mesa."
+              title={t('restaurantLanding.steps.step3Title')}
+              desc={t('restaurantLanding.steps.step3Desc')}
             />
           </div>
         </div>
@@ -110,14 +115,14 @@ export function RestaurantLandingPage({ onNavigate, onAuthClick }: RestaurantLan
         <div className="absolute inset-0 bg-gradient-to-b from-gray-950 via-gray-950/70 to-gray-950" />
         <div className="relative max-w-5xl mx-auto px-4">
           <div className="text-center mb-14">
-            <h2 className="font-display text-3xl md:text-4xl font-bold text-white mb-3 drop-shadow-lg">Por qué unirte</h2>
-            <p className="text-white/80 text-lg drop-shadow">Pensado para no dar trabajo extra a tu restaurante</p>
+            <h2 className="font-display text-3xl md:text-4xl font-bold text-white mb-3 drop-shadow-lg">{t('restaurantLanding.benefits.title')}</h2>
+            <p className="text-white/80 text-lg drop-shadow">{t('restaurantLanding.benefits.subtitle')}</p>
           </div>
           <div className="grid sm:grid-cols-2 gap-5">
-            <BenefitCard icon={<Clock className="w-5 h-5" />} title="Llena horas valle" desc="Publica mesas justo en los tramos donde más te interesa tener ocupación." />
-            <BenefitCard icon={<Megaphone className="w-5 h-5" />} title="Cero coste de publicidad" desc="Exposición ante clientela nueva sin invertir un euro en anuncios." />
-            <BenefitCard icon={<CalendarCheck className="w-5 h-5" />} title="Tú decides cuándo" desc="Publicas mesas solo los días que te interesa. Nada automático ni forzado." />
-            <BenefitCard icon={<Ban className="w-5 h-5" />} title="Sin permanencia" desc="Cancela tu suscripción cuando quieras, sin penalización." />
+            <BenefitCard icon={<Clock className="w-5 h-5" />} title={t('restaurantLanding.benefits.b1Title')} desc={t('restaurantLanding.benefits.b1Desc')} />
+            <BenefitCard icon={<Megaphone className="w-5 h-5" />} title={t('restaurantLanding.benefits.b2Title')} desc={t('restaurantLanding.benefits.b2Desc')} />
+            <BenefitCard icon={<CalendarCheck className="w-5 h-5" />} title={t('restaurantLanding.benefits.b3Title')} desc={t('restaurantLanding.benefits.b3Desc')} />
+            <BenefitCard icon={<Ban className="w-5 h-5" />} title={t('restaurantLanding.benefits.b4Title')} desc={t('restaurantLanding.benefits.b4Desc')} />
           </div>
         </div>
       </section>
@@ -126,15 +131,15 @@ export function RestaurantLandingPage({ onNavigate, onAuthClick }: RestaurantLan
       <section className="py-20 bg-gray-950">
         <div className="max-w-2xl mx-auto px-4">
           <div className="text-center mb-12">
-            <h2 className="font-display text-3xl md:text-4xl font-bold text-white mb-3">Todo lo que necesitas saber</h2>
-            <p className="text-gray-400 text-lg">Las dudas más habituales, resueltas</p>
+            <h2 className="font-display text-3xl md:text-4xl font-bold text-white mb-3">{t('restaurantLanding.faq.title')}</h2>
+            <p className="text-gray-400 text-lg">{t('restaurantLanding.faq.subtitle')}</p>
           </div>
           <div className="space-y-3">
-            <FaqItem q="¿Cuánto cuesta exactamente?" a="10€/mes, sin coste de configuración. Con la oferta de lanzamiento, tu primer pago de 10€ cubre los tres primeros meses." />
-            <FaqItem q="¿Tengo que ofrecer descuentos en la carta?" a="No. Tu carta y tus precios siguen siendo los de siempre — Table4Singles solo te trae comensales a las mesas que tú decides publicar." />
-            <FaqItem q="¿Qué pasa si no se apunta nadie a una mesa?" a="No pierdes nada. Solo pagas la suscripción mensual fija, no hay coste por mesa publicada ni penalización si alguna no se llena." />
-            <FaqItem q="¿Puedo cancelar cuando quiera?" a="Sí, sin permanencia ni penalización. Cancelas desde tu panel en cualquier momento." />
-            <FaqItem q="¿Necesito instalar algo o formar a mi equipo?" a="No. Publicas la mesa desde el móvil en un minuto y las reservas te llegan directamente a tu panel — nada que instalar en el restaurante." />
+            <FaqItem q={t('restaurantLanding.faq.q1')} a={t('restaurantLanding.faq.a1')} />
+            <FaqItem q={t('restaurantLanding.faq.q2')} a={t('restaurantLanding.faq.a2')} />
+            <FaqItem q={t('restaurantLanding.faq.q3')} a={t('restaurantLanding.faq.a3')} />
+            <FaqItem q={t('restaurantLanding.faq.q4')} a={t('restaurantLanding.faq.a4')} />
+            <FaqItem q={t('restaurantLanding.faq.q5')} a={t('restaurantLanding.faq.a5')} />
           </div>
         </div>
       </section>
@@ -144,17 +149,17 @@ export function RestaurantLandingPage({ onNavigate, onAuthClick }: RestaurantLan
         <div className="absolute -bottom-20 -left-16 w-80 h-80 rounded-full bg-gold-400/10 blur-3xl" />
         <div className="relative max-w-2xl mx-auto px-4">
           <span className="inline-flex items-center gap-2 text-xs font-bold tracking-[0.16em] uppercase text-gold-300 bg-gold-400/10 border border-gold-400/30 rounded-full px-4 py-1.5 mb-6">
-            <ShieldCheck className="w-3.5 h-3.5" /> Oferta de lanzamiento
+            <ShieldCheck className="w-3.5 h-3.5" /> {t('restaurantLanding.finalCta.badge')}
           </span>
-          <h2 className="font-display text-3xl md:text-4xl font-bold mb-4 text-gold-200">3 meses por el precio de 1</h2>
+          <h2 className="font-display text-3xl md:text-4xl font-bold mb-4 text-gold-200">{t('restaurantLanding.finalCta.title')}</h2>
           <p className="text-lg text-white/80 mb-8">
-            Precio normal: 10€/mes. Con la oferta de lanzamiento, tu primer pago cubre los tres primeros meses.
+            {t('restaurantLanding.finalCta.desc')}
           </p>
           <button
             onClick={() => onAuthClick('signup')}
             className="inline-flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-gold-300 to-gold-500 text-gray-900 hover:from-gold-200 hover:to-gold-400 rounded-full font-bold text-lg shadow-glow-gold hover:-translate-y-0.5 transition-all"
           >
-            Registra tu restaurante gratis <ArrowRight className="w-5 h-5" />
+            {t('restaurantLanding.finalCta.button')} <ArrowRight className="w-5 h-5" />
           </button>
         </div>
       </section>
@@ -163,8 +168,8 @@ export function RestaurantLandingPage({ onNavigate, onAuthClick }: RestaurantLan
       <footer className="py-8 bg-black">
         <div className="max-w-5xl mx-auto px-4 text-center">
           <p className="text-gray-500 text-sm">
-            ¿Ya tienes cuenta?{' '}
-            <button onClick={() => onAuthClick('signin')} className="text-gold-400 font-medium hover:underline">Inicia sesión</button>
+            {t('restaurantLanding.footer.hasAccount')}{' '}
+            <button onClick={() => onAuthClick('signin')} className="text-gold-400 font-medium hover:underline">{t('restaurantLanding.footer.signIn')}</button>
           </p>
         </div>
       </footer>
@@ -172,14 +177,14 @@ export function RestaurantLandingPage({ onNavigate, onAuthClick }: RestaurantLan
   )
 }
 
-function StepRow({ number, icon, bg, title, desc, reverse }: { number: number; icon: React.ReactNode; bg: string; title: string; desc: string; reverse?: boolean }) {
+function StepRow({ number, stepLabel, icon, bg, title, desc, reverse }: { number: number; stepLabel: string; icon: React.ReactNode; bg: string; title: string; desc: string; reverse?: boolean }) {
   return (
     <div className={`flex items-center gap-8 md:gap-14 ${reverse ? 'md:flex-row-reverse' : ''}`}>
       <div className={`flex-shrink-0 w-20 h-20 md:w-24 md:h-24 rounded-3xl bg-gradient-to-br ${bg} shadow-glow-gold flex items-center justify-center`}>
         {icon}
       </div>
       <div>
-        <span className="text-xs font-bold tracking-[0.16em] uppercase text-gold-400">Paso {number}</span>
+        <span className="text-xs font-bold tracking-[0.16em] uppercase text-gold-400">{stepLabel} {number}</span>
         <h3 className="font-display font-semibold text-xl md:text-2xl text-white mt-1 mb-2">{title}</h3>
         <p className="text-gray-400 leading-relaxed">{desc}</p>
       </div>

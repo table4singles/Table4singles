@@ -4,6 +4,7 @@ import { useAuth } from '@/contexts/AuthContext'
 import { useLanguage } from '@/contexts/LanguageContext'
 import { useNotifications } from '@/hooks/useNotifications'
 import { useViewMode } from '@/contexts/ViewModeContext'
+import { Avatar } from './Avatar'
 import { LanguageSwitcher } from './LanguageSwitcher'
 import { NotificationsPanel } from './NotificationsPanel'
 import { PendingInviteBanner } from './PendingInviteBanner'
@@ -119,15 +120,13 @@ export function Navbar({ currentPage, onNavigate, onAuthClick }: NavbarProps) {
               <div className="relative" ref={menuRef}>
                 <button onClick={() => setShowMenu(!showMenu)} className="flex items-center gap-2 px-3 py-1.5 rounded-lg hover:bg-white/5 transition-colors">
                   <div className="w-8 h-8 rounded-full bg-gold-400/15 border border-gold-400/30 flex items-center justify-center overflow-hidden">
-                    {profile?.avatar_url ? (
-                      <img
-                        src={profile.avatar_url}
-                        alt=""
-                        className={`w-full h-full ${effectiveRole === 'restaurant' ? 'object-contain p-0.5' : 'object-cover'}`}
-                      />
-                    ) : (
-                      <User className="w-4 h-4 text-gold-400" />
-                    )}
+                    <Avatar
+                      src={profile?.avatar_url}
+                      name={profile?.display_name || profile?.restaurant_name}
+                      fit={effectiveRole === 'restaurant' ? 'contain' : 'cover'}
+                      className={`w-full h-full ${effectiveRole === 'restaurant' ? 'p-0.5' : ''}`}
+                      textClassName="text-xs"
+                    />
                   </div>
                   <span className="hidden sm:block text-sm font-medium text-gray-200 max-w-[120px] truncate">
                     {profile?.display_name || profile?.restaurant_name || 'User'}

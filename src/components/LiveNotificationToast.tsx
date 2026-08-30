@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { X, Globe } from 'lucide-react'
 import type { NewParticipantNotification } from '@/hooks/useRestaurantAgenda'
 import { publicAge } from '@/lib/privacy'
+import { Avatar } from '@/components/Avatar'
 
 const AUTO_DISMISS_MS = 9000
 
@@ -21,7 +22,6 @@ export function LiveNotificationToast({ notification, onDismiss, t }: LiveNotifi
   const age = publicAge(profile)
   const occupied = table.max_seats - table.available_seats
   const displayName = profile.display_name || profile.full_name || 'Usuario'
-  const initials = displayName.charAt(0).toUpperCase()
 
   function handleDismiss() {
     setVisible(false)
@@ -91,17 +91,12 @@ export function LiveNotificationToast({ notification, onDismiss, t }: LiveNotifi
         {/* Diner profile */}
         <div className="flex items-center gap-3">
           <div className="relative flex-shrink-0">
-            {profile.avatar_url ? (
-              <img
-                src={profile.avatar_url}
-                alt={displayName}
-                className="w-14 h-14 rounded-full object-cover ring-2 ring-[#e94560]/30"
-              />
-            ) : (
-              <div className="w-14 h-14 rounded-full bg-gradient-to-br from-[#e94560] to-pink-400 flex items-center justify-center text-white text-xl font-bold">
-                {initials}
-              </div>
-            )}
+            <Avatar
+              src={profile.avatar_url}
+              name={displayName}
+              className="w-14 h-14 ring-2 ring-[#e94560]/30"
+              textClassName="text-xl"
+            />
             <span className="absolute -bottom-0.5 -right-0.5 w-4 h-4 bg-green-500 rounded-full border-2 border-white dark:border-gray-800" />
           </div>
 

@@ -2,6 +2,7 @@ import { X, Star, UtensilsCrossed, Loader2 } from 'lucide-react'
 import { useState, useEffect } from 'react'
 import { supabase } from '@/lib/supabase'
 import { useLanguage } from '@/contexts/LanguageContext'
+import { Avatar } from '@/components/Avatar'
 
 interface CommensalProfile {
   id?: string
@@ -22,7 +23,6 @@ interface PublicStats {
 
 export function CommensalModal({ profile, onClose }: CommensalModalProps) {
   const { t, language } = useLanguage()
-  const initials = (profile.display_name ?? 'U').charAt(0).toUpperCase()
   const [stats, setStats] = useState<PublicStats | null>(null)
   const [loadingStats, setLoadingStats] = useState(false)
 
@@ -78,12 +78,8 @@ export function CommensalModal({ profile, onClose }: CommensalModalProps) {
 
         <div className="px-6 pb-6">
           <div className="-mt-10 mb-3 flex items-end gap-3">
-            <div className="w-20 h-20 rounded-full overflow-hidden bg-gray-100 dark:bg-gray-700 ring-4 ring-white dark:ring-gray-800 shadow-lg flex items-center justify-center flex-shrink-0">
-              {profile.avatar_url ? (
-                <img src={profile.avatar_url} alt={profile.display_name ?? ''} className="w-full h-full object-cover" />
-              ) : (
-                <span className="text-3xl font-bold text-gray-400 dark:text-gray-300">{initials}</span>
-              )}
+            <div className="w-20 h-20 rounded-full overflow-hidden ring-4 ring-white dark:ring-gray-800 shadow-lg flex-shrink-0">
+              <Avatar src={profile.avatar_url} name={profile.display_name} className="w-full h-full" textClassName="text-3xl" />
             </div>
           </div>
 

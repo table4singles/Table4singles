@@ -4,6 +4,7 @@ import { Navbar } from '@/components/Navbar'
 import { TableCard } from '@/components/TableCard'
 import { LoadingSpinner } from '@/components/LoadingSpinner'
 import { ErrorBanner } from '@/components/ErrorBanner'
+import { Avatar } from '@/components/Avatar'
 import { useRestaurantProfile } from '@/hooks/useRestaurants'
 import { useRestaurantPublicReviews } from '@/hooks/useReviews'
 import { useFavorites } from '@/hooks/useFavorites'
@@ -490,8 +491,8 @@ function PublicReviewCard({ review, isRestaurant, onReply }: { review: Restauran
   return (
     <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 p-4">
       <div className="flex items-start gap-3">
-        <div className="w-8 h-8 rounded-full bg-gray-100 dark:bg-gray-700 flex items-center justify-center overflow-hidden flex-shrink-0">
-          {profile?.avatar_url ? <img src={profile.avatar_url} alt="" className="w-full h-full object-cover" /> : <User className="w-3.5 h-3.5 text-gray-400" />}
+        <div className="w-8 h-8 rounded-full overflow-hidden flex-shrink-0">
+          <Avatar src={profile?.avatar_url} name={profile?.display_name} className="w-full h-full" textClassName="text-xs" />
         </div>
         <div className="flex-1 min-w-0">
           <div className="flex items-center justify-between gap-2">

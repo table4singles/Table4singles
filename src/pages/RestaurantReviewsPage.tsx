@@ -1,9 +1,10 @@
 import { useState } from 'react'
-import { Star, MessageSquare, Send, User, Loader2, BarChart2, UtensilsCrossed } from 'lucide-react'
+import { Star, MessageSquare, Send, Loader2, BarChart2, UtensilsCrossed } from 'lucide-react'
 import { Navbar } from '@/components/Navbar'
 import { PageHeader } from '@/components/PageHeader'
 import { LoadingSpinner } from '@/components/LoadingSpinner'
 import { StarRating } from '@/components/StarRating'
+import { Avatar } from '@/components/Avatar'
 import { useAuth } from '@/contexts/AuthContext'
 import { useLanguage } from '@/contexts/LanguageContext'
 import { useRestaurantPublicReviews, useRestaurantReviews } from '@/hooks/useReviews'
@@ -192,12 +193,8 @@ function DinnerReviewCard({ review, onReply }: { review: Review; onReply: (revie
     <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-sm overflow-hidden">
       <div className="p-4">
         <div className="flex items-start gap-3">
-          <div className="w-9 h-9 rounded-full bg-gray-100 dark:bg-gray-700 flex items-center justify-center overflow-hidden flex-shrink-0">
-            {profile?.avatar_url ? (
-              <img src={profile.avatar_url} alt="" className="w-full h-full object-cover" />
-            ) : (
-              <span className="text-sm font-medium text-gray-400">{(profile?.display_name || '?').charAt(0).toUpperCase()}</span>
-            )}
+          <div className="w-9 h-9 rounded-full overflow-hidden flex-shrink-0">
+            <Avatar src={profile?.avatar_url} name={profile?.display_name} className="w-full h-full" textClassName="text-sm" />
           </div>
           <div className="flex-1 min-w-0">
             <div className="flex items-center justify-between gap-2">
@@ -278,7 +275,6 @@ function ReviewCard({ review, onReply }: { review: RestaurantReview; onReply: (r
   }
 
   const profile = review.profiles
-  const initials = profile?.display_name?.charAt(0)?.toUpperCase() || '?'
   const date = new Date(review.created_at).toLocaleDateString(dateLocale, { day: 'numeric', month: 'short', year: 'numeric' })
 
   return (
@@ -286,12 +282,8 @@ function ReviewCard({ review, onReply }: { review: RestaurantReview; onReply: (r
       <div className="p-5">
         {/* Header */}
         <div className="flex items-start gap-3">
-          <div className="w-10 h-10 rounded-full bg-gray-100 dark:bg-gray-700 flex items-center justify-center overflow-hidden flex-shrink-0">
-            {profile?.avatar_url ? (
-              <img src={profile.avatar_url} alt="" className="w-full h-full object-cover" />
-            ) : (
-              <span className="text-sm font-bold text-gray-500">{initials}</span>
-            )}
+          <div className="w-10 h-10 rounded-full overflow-hidden flex-shrink-0">
+            <Avatar src={profile?.avatar_url} name={profile?.display_name} className="w-full h-full" textClassName="text-sm" />
           </div>
           <div className="flex-1 min-w-0">
             <div className="flex items-center justify-between gap-2">

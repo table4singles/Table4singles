@@ -2,6 +2,7 @@ import { ShieldCheck } from 'lucide-react'
 import type { Profile } from '@/types/database'
 import { useDinerTrustScore } from '@/hooks/useDinerReviews'
 import { publicAge } from '@/lib/privacy'
+import { Avatar } from '@/components/Avatar'
 
 interface ParticipantCardProps {
   profile: Profile
@@ -14,12 +15,8 @@ export function ParticipantCard({ profile, badge }: ParticipantCardProps) {
 
   return (
     <div className="flex gap-3 py-3 border-b border-gray-50 dark:border-gray-800 last:border-0">
-      <div className="w-12 h-12 rounded-full overflow-hidden bg-gray-100 dark:bg-gray-800 flex-shrink-0 flex items-center justify-center">
-        {profile.avatar_url ? (
-          <img src={profile.avatar_url} alt={profile.display_name || 'Usuario'} className="w-full h-full object-cover" />
-        ) : (
-          <span className="text-gray-400 text-sm font-medium">{(profile.display_name || '?').charAt(0).toUpperCase()}</span>
-        )}
+      <div className="w-12 h-12 rounded-full overflow-hidden flex-shrink-0">
+        <Avatar src={profile.avatar_url} name={profile.display_name} className="w-full h-full" textClassName="text-sm" />
       </div>
 
       <div className="flex-1 min-w-0">

@@ -1,7 +1,8 @@
-import { MapPin, ShieldCheck, User } from 'lucide-react'
+import { MapPin, ShieldCheck } from 'lucide-react'
 import type { CompanionProfile } from '@/hooks/useCompanions'
 import { useDinerTrustScore } from '@/hooks/useDinerReviews'
 import { publicAge, publicLocation } from '@/lib/privacy'
+import { Avatar } from '@/components/Avatar'
 
 interface CompanionCardProps {
   companion: CompanionProfile
@@ -15,12 +16,8 @@ export function CompanionCard({ companion, onClick }: CompanionCardProps) {
 
   return (
     <button onClick={onClick} className="w-full bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-sm hover:shadow-md transition-all overflow-hidden text-left flex items-center gap-4 p-4">
-      <div className="w-16 h-16 rounded-full overflow-hidden bg-gray-100 dark:bg-gray-700 flex-shrink-0 flex items-center justify-center">
-        {companion.avatar_url ? (
-          <img src={companion.avatar_url} alt={companion.display_name || 'Usuario'} className="w-full h-full object-cover" />
-        ) : (
-          <User className="w-7 h-7 text-gray-300 dark:text-gray-500" />
-        )}
+      <div className="w-16 h-16 rounded-full overflow-hidden flex-shrink-0">
+        <Avatar src={companion.avatar_url} name={companion.display_name} className="w-full h-full" textClassName="text-xl" />
       </div>
 
       <div className="flex-1 min-w-0">

@@ -1,5 +1,6 @@
 import type { AgendaTable } from '@/hooks/useRestaurantAgenda'
 import type { Profile } from '@/types/database'
+import { Avatar } from '@/components/Avatar'
 
 interface LiveTableCardProps {
   table: AgendaTable
@@ -17,14 +18,10 @@ function AvatarStack({ profiles }: { profiles: Profile[] }) {
         <div
           key={profile.id}
           title={profile.display_name || profile.full_name || ''}
-          className="w-9 h-9 rounded-full border-2 border-white dark:border-gray-800 overflow-hidden bg-gradient-to-br from-[#e94560] to-pink-400 flex items-center justify-center text-white text-sm font-bold flex-shrink-0"
+          className="w-9 h-9 rounded-full border-2 border-white dark:border-gray-800 overflow-hidden flex-shrink-0"
           style={{ marginLeft: i > 0 ? '-10px' : 0, zIndex: visible.length - i }}
         >
-          {profile.avatar_url ? (
-            <img src={profile.avatar_url} alt="" className="w-full h-full object-cover" />
-          ) : (
-            (profile.display_name || profile.full_name || '?').charAt(0).toUpperCase()
-          )}
+          <Avatar src={profile.avatar_url} name={profile.display_name || profile.full_name} className="w-full h-full" textClassName="text-sm" />
         </div>
       ))}
       {extra > 0 && (

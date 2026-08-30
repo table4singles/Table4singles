@@ -3,6 +3,7 @@ import { useState } from 'react'
 import type { DiningTable } from '@/types/database'
 import type { TableParticipantBasic } from '@/hooks/useRestaurants'
 import { CommensalModal } from '@/components/CommensalModal'
+import { Avatar } from '@/components/Avatar'
 import { useLanguage } from '@/contexts/LanguageContext'
 import { appLocale } from '@/lib/locale'
 
@@ -64,15 +65,10 @@ export function TableCard({ table, participants, onClick }: TableCardProps) {
                         key={p.user_id}
                         onClick={e => handleAvatarClick(e, p)}
                         style={{ zIndex: visibleAvatars.length - i }}
-                        className="relative w-7 h-7 rounded-full border-2 border-white dark:border-gray-800 bg-gray-200 dark:bg-gray-600 overflow-hidden flex items-center justify-center flex-shrink-0 hover:scale-110 transition-transform"
+                        className="relative w-7 h-7 rounded-full border-2 border-white dark:border-gray-800 overflow-hidden flex items-center justify-center flex-shrink-0 hover:scale-110 transition-transform"
                         title={p.profiles?.display_name ?? ''}
                       >
-                        {p.profiles?.avatar_url
-                          ? <img src={p.profiles.avatar_url} alt="" className="w-full h-full object-cover" />
-                          : <span className="text-[10px] font-bold text-gray-500 dark:text-gray-300">
-                              {(p.profiles?.display_name ?? '?').charAt(0).toUpperCase()}
-                            </span>
-                        }
+                        <Avatar src={p.profiles?.avatar_url} name={p.profiles?.display_name} className="w-full h-full" textClassName="text-[10px]" />
                       </button>
                     ))}
                     {extraCount > 0 && (

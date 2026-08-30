@@ -7,6 +7,7 @@ import { InviteModal } from '@/components/InviteModal'
 import { CancelModal } from '@/components/CancelModal'
 import { ParticipantCard } from '@/components/ParticipantCard'
 import { PostDinnerReviewModal } from '@/components/PostDinnerReviewModal'
+import { Avatar } from '@/components/Avatar'
 import { useLanguage } from '@/contexts/LanguageContext'
 import { useAuth } from '@/contexts/AuthContext'
 import { useViewMode } from '@/contexts/ViewModeContext'
@@ -406,11 +407,8 @@ export function TableDetailPage({ tableId, paymentSuccess, paymentCancelled, onN
                     return (
                       <div key={r.id} className="border-b border-gray-50 dark:border-gray-800 pb-4 last:border-0 last:pb-0">
                         <div className="flex items-start gap-2.5">
-                          <div className="w-8 h-8 rounded-full bg-gray-100 dark:bg-gray-700 flex-shrink-0 overflow-hidden flex items-center justify-center">
-                            {reviewProfile?.avatar_url
-                              ? <img src={reviewProfile.avatar_url} alt="" className="w-full h-full object-cover" />
-                              : <span className="text-xs font-medium text-gray-500">{(reviewProfile?.display_name || '?').charAt(0).toUpperCase()}</span>
-                            }
+                          <div className="w-8 h-8 rounded-full flex-shrink-0 overflow-hidden">
+                            <Avatar src={reviewProfile?.avatar_url} name={reviewProfile?.display_name} className="w-full h-full" textClassName="text-xs" />
                           </div>
                           <div className="flex-1 min-w-0">
                             <div className="flex items-center justify-between gap-2">

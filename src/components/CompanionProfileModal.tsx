@@ -1,8 +1,9 @@
 import { useState } from 'react'
-import { Mail, MapPin, ShieldCheck, User, X } from 'lucide-react'
+import { Mail, MapPin, ShieldCheck, X } from 'lucide-react'
 import type { CompanionProfile } from '@/hooks/useCompanions'
 import { useDinerTrustScore } from '@/hooks/useDinerReviews'
 import { InviteToTableModal } from '@/components/InviteToTableModal'
+import { Avatar } from '@/components/Avatar'
 import { publicAge, publicLocation } from '@/lib/privacy'
 
 function formatMemberSince(createdAt: string): string {
@@ -31,12 +32,8 @@ export function CompanionProfileModal({ companion, onClose, onNavigate }: Compan
         </button>
 
         <div className="flex flex-col items-center text-center mb-5">
-          <div className="w-24 h-24 rounded-full overflow-hidden bg-gray-100 dark:bg-gray-700 flex items-center justify-center mb-3">
-            {companion.avatar_url ? (
-              <img src={companion.avatar_url} alt={companion.display_name || 'Usuario'} className="w-full h-full object-cover" />
-            ) : (
-              <User className="w-10 h-10 text-gray-300 dark:text-gray-500" />
-            )}
+          <div className="w-24 h-24 rounded-full overflow-hidden mb-3">
+            <Avatar src={companion.avatar_url} name={companion.display_name} className="w-full h-full" textClassName="text-3xl" />
           </div>
           <h3 className="text-lg font-display font-bold text-gray-900 dark:text-gray-100">
             {companion.display_name || 'Usuario'}{age !== null && <span className="font-normal text-gray-500 dark:text-gray-400">, {age}</span>}

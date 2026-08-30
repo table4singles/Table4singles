@@ -3,6 +3,7 @@ import { Loader2, Star, Users, UtensilsCrossed, ChevronRight, Check, X } from 'l
 import { StarRating } from '@/components/StarRating'
 import { useDinerReviews } from '@/hooks/useDinerReviews'
 import { useLanguage } from '@/contexts/LanguageContext'
+import { Avatar } from '@/components/Avatar'
 import type { Profile } from '@/types/database'
 
 interface PostDinnerReviewModalProps {
@@ -205,14 +206,8 @@ export function PostDinnerReviewModal({
                       className="flex items-center justify-between gap-3 py-3 border-b border-gray-50 dark:border-gray-800 last:border-0"
                     >
                       <div className="flex items-center gap-2.5 min-w-0">
-                        <div className="w-9 h-9 rounded-full overflow-hidden bg-gray-100 dark:bg-gray-800 flex-shrink-0 flex items-center justify-center">
-                          {diner.avatar_url ? (
-                            <img src={diner.avatar_url} alt={diner.display_name || ''} className="w-full h-full object-cover" />
-                          ) : (
-                                <span className="text-gray-400 text-sm font-medium">
-                              {(diner.display_name || '?').charAt(0).toUpperCase()}
-                            </span>
-                          )}
+                        <div className="w-9 h-9 rounded-full overflow-hidden flex-shrink-0">
+                          <Avatar src={diner.avatar_url} name={diner.display_name} className="w-full h-full" textClassName="text-sm" />
                         </div>
                         <span className="text-sm font-medium text-gray-700 dark:text-gray-200 truncate">
                           {diner.display_name || t('restaurantProfile.user')}

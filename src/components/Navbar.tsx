@@ -67,7 +67,7 @@ export function Navbar({ currentPage, onNavigate, onAuthClick }: NavbarProps) {
               </button>
             </div>
           )}
-          {(!user || effectiveRole === 'user') && (
+          {(!user || effectiveRole === 'user') && currentPage !== 'restaurant-landing' && (
             <NavLink active={currentPage === 'browse' || currentPage === 'restaurant-profile'} onClick={() => onNavigate('browse')} icon={<LayoutGrid className="w-4 h-4" />} label={t('nav.restaurants')} />
           )}
           {user && effectiveRole === 'restaurant' && (

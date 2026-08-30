@@ -33,6 +33,19 @@ export default {
           900: '#1c1917',
           950: '#0c0a09',
         },
+        // Metallic gold accent — used on dark, glamorous marketing sections (landings).
+        gold: {
+          50: '#fdf8ec',
+          100: '#f8ecc7',
+          200: '#f0d98a',
+          300: '#e8c766',
+          400: '#d4af37',
+          500: '#c9a227',
+          600: '#a6841f',
+          700: '#8a6d1a',
+          800: '#6b5414',
+          900: '#4a3a0e',
+        },
       },
       fontFamily: {
         sans: ['Inter', 'system-ui', 'sans-serif'],
@@ -45,6 +58,7 @@ export default {
         e4: '0 4px 8px rgba(28,25,23,0.08), 0 32px 64px -16px rgba(28,25,23,0.30)',
         'glow-coral': '0 4px 14px -2px rgba(233,69,96,0.4)',
         'glow-indigo': '0 4px 14px -2px rgba(79,70,229,0.4)',
+        'glow-gold': '0 4px 20px -2px rgba(212,175,55,0.45)',
       },
       animation: {
         'fade-in': 'fadeIn 0.2s ease-out',

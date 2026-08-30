@@ -117,13 +117,14 @@ interface HourlyListProps {
   t: (key: string) => string
 }
 
-function TimelineSlot({ time, count, max, status, isActive, onClick }: {
+function TimelineSlot({ time, count, max, status, isActive, onClick, t }: {
   time: string
   count: number
   max: number
   status: string
   isActive: boolean
   onClick: () => void
+  t: (key: string) => string
 }) {
   const pct = max > 0 ? (count / max) * 100 : 0
   const barColor =
@@ -154,7 +155,7 @@ function TimelineSlot({ time, count, max, status, isActive, onClick }: {
       {/* Occupancy bar */}
       <div className="flex-1 min-w-0">
         <div className="flex items-center justify-between mb-1">
-          <span className="text-xs text-gray-500 dark:text-gray-400 truncate">{count}/{max} plazas</span>
+          <span className="text-xs text-gray-500 dark:text-gray-400 truncate">{count}/{max} {t('agenda.seats')}</span>
         </div>
         <div className="h-2 bg-gray-100 dark:bg-gray-700 rounded-full overflow-hidden">
           <div
@@ -167,7 +168,7 @@ function TimelineSlot({ time, count, max, status, isActive, onClick }: {
       {/* Status chip */}
       {!isActive ? (
         <span className="text-xs px-2.5 py-1 rounded-full font-medium flex-shrink-0 bg-gray-100 text-gray-500 dark:bg-gray-700 dark:text-gray-400">
-          Inactiva
+          {t('agendaExtra.inactive')}
         </span>
       ) : (
         <span className={`text-xs px-2.5 py-1 rounded-full font-medium flex-shrink-0 ${statusLabel[status] || ''}`}>
@@ -205,6 +206,7 @@ function HourlyList({ byDate, datesWithTables, locale, onNavigate, t }: HourlyLi
                 status={table.status}
                 isActive={table.is_active !== false}
                 onClick={() => onNavigate('table-detail', table.id)}
+                t={t}
               />
             )
           })}
@@ -248,7 +250,12 @@ export function RestaurantAgendaPage({ onNavigate, onAuthClick }: RestaurantAgen
   const [month, setMonth] = useState(() => new Date())
   const [selectedDate, setSelectedDate] = useState<string>(todayStr())
 
-  const locale = language === 'de' ? 'de-DE' : language === 'en' ? 'en-GB' : 'es-ES'
+  const localeMap: Record<string, string> = {
+    es: 'es-ES', en: 'en-GB', de: 'de-DE', fr: 'fr-FR', it: 'it-IT',
+    ru: 'ru-RU', pt: 'pt-PT', uk: 'uk-UA', ro: 'ro-RO', ar: 'ar-SA',
+    sv: 'sv-SE', zh: 'zh-CN', ja: 'ja-JP',
+  }
+  const locale = localeMap[language] ?? 'es-ES'
 
   const selectedDayTables = byDate[selectedDate] || []
 

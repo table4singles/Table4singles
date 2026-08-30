@@ -3,26 +3,31 @@ import { Loader2, ArrowRight, Camera, ChevronLeft, LogOut, UtensilsCrossed, MapP
 import PhoneInput from 'react-phone-number-input'
 import 'react-phone-number-input/style.css'
 import { useAuth } from '@/contexts/AuthContext'
+import { useLanguage } from '@/contexts/LanguageContext'
 import { supabase } from '@/lib/supabase'
 import { ErrorBanner } from '@/components/ErrorBanner'
 import { RestaurantHoursPicker } from '@/components/RestaurantHoursPicker'
 import { LANGUAGE_OPTIONS, INTEREST_OPTIONS } from '@/lib/options'
 
 const ADMIN_EMAIL = 'joseviangles@gmail.com'
+// Nota: estos valores se guardan tal cual en la base de datos (restaurant_cuisine) y se usan
+// para filtrar/emparejar restaurantes, por lo que se mantienen en español de forma consistente
+// con el resto del código (ProfilePage.tsx usa el mismo array) — no son texto de interfaz traducible.
 const CUISINE_TYPES = ['Italiana', 'Japonesa', 'Mexicana', 'Francesa', 'Tailandesa', 'India', 'China', 'Española', 'Mediterránea', 'Americana', 'Coreana', 'Vietnamita', 'Griega', 'Turca', 'Fusión', 'Otra']
 const PRICE_RANGES = ['0€-50€', '50€-100€', '100€-200€', '+200€']
 
-const RESTAURANT_STEPS = [
-  { label: 'Identidad', icon: UtensilsCrossed },
-  { label: 'Ubicación', icon: MapPin },
-  { label: 'Detalles', icon: Clock },
-  { label: 'Confirmar', icon: Check },
-]
-
 export function OnboardingPage({ onNavigate }: { onNavigate: (page: string, id?: string) => void }) {
+  const { t } = useLanguage()
   const { user, profile, refreshProfile, signOut } = useAuth()
   const isAdmin = user?.email === ADMIN_EMAIL
   const isRestaurant = profile?.role === 'restaurant'
+
+  const RESTAURANT_STEPS = [
+    { label: t('onboarding.step1'), icon: UtensilsCrossed },
+    { label: t('onboarding.step2'), icon: MapPin },
+    { label: t('onboarding.step3'), icon: Clock },
+    { label: t('onboarding.step4'), icon: Check },
+  ]
 
   // Wizard step for restaurants
   const [step, setStep] = useState(1)
@@ -46,7 +51,7 @@ export function OnboardingPage({ onNavigate }: { onNavigate: (page: string, id?:
   const [restaurantName, setRestaurantName] = useState(profile?.restaurant_name || profile?.display_name || '')
   const [restaurantAddress, setRestaurantAddress] = useState('')
   const [restaurantCity, setRestaurantCity] = useState('')
-  const [restaurantCountry, setRestaurantCountry] = useState('España')
+  const [restaurantCountry, setRestaurantCountry] = useState(t('onboardingExtra.countryPlaceholder'))
   const [restaurantPhone, setRestaurantPhone] = useState('')
   const [restaurantCuisine, setRestaurantCuisine] = useState('')
   const [restaurantPriceRange, setRestaurantPriceRange] = useState('50€-100€')
@@ -146,7 +151,7 @@ export function OnboardingPage({ onNavigate }: { onNavigate: (page: string, id?:
       const msg = err.message || ''
       setError(
         msg.includes('invalid input syntax for type date')
-          ? 'La fecha de nacimiento no es válida. Elígela en el calendario o déjala vacía.'
+          ? t('onboardingExtra.invalidDobError')
           : msg
       )
       setSaving(false)
@@ -195,7 +200,7 @@ export function OnboardingPage({ onNavigate }: { onNavigate: (page: string, id?:
           >
             <ChevronLeft className="w-4 h-4" />
             <LogOut className="w-3.5 h-3.5" />
-            Cerrar sesión
+            {t('nav.signOut')}
           </button>
           <div className="text-center">
             {isRestaurant
@@ -203,12 +208,12 @@ export function OnboardingPage({ onNavigate }: { onNavigate: (page: string, id?:
               : <MapPin className="w-8 h-8 text-primary-500 mx-auto mb-2" />
             }
             <h1 className="text-2xl font-display font-bold text-gray-900 dark:text-white">
-              {isRestaurant ? 'Configura tu restaurante' : 'Completa tu perfil'}
+              {isRestaurant ? t('onboarding.title') : t('onboardingExtra.titleUser')}
             </h1>
             <p className="text-gray-500 dark:text-gray-400 text-sm mt-1">
               {isRestaurant
-                ? 'Rellena los datos de tu local para que los comensales puedan encontrarte'
-                : 'Necesitamos estos datos antes de que empieces a usar Table4Singles'}
+                ? t('onboardingExtra.subtitleRestaurant')
+                : t('onboardingExtra.subtitleUser')}
             </p>
           </div>
         </div>
@@ -249,7 +254,7 @@ export function OnboardingPage({ onNavigate }: { onNavigate: (page: string, id?:
             <div className="flex flex-col items-center mb-2">
               <label className="relative w-24 h-24 rounded-full border-2 border-dashed border-gray-300 dark:border-gray-600 hover:border-primary-400 transition-colors cursor-pointer flex items-center justify-center overflow-hidden bg-gray-50 dark:bg-gray-900">
                 {avatarUrl ? (
-                  <img src={avatarUrl} alt="Foto de perfil" className="w-full h-full object-cover" />
+                  <img src={avatarUrl} alt={t('onboardingExtra.avatarAlt')} className="w-full h-full object-cover" />
                 ) : uploadingAvatar ? (
                   <Loader2 className="w-6 h-6 text-gray-400 dark:text-gray-500 animate-spin" />
                 ) : (
@@ -258,39 +263,39 @@ export function OnboardingPage({ onNavigate }: { onNavigate: (page: string, id?:
                 <input type="file" accept="image/jpeg,image/png,image/webp" onChange={handleAvatarUpload} disabled={uploadingAvatar} className="hidden" />
               </label>
               <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
-                {isAdmin ? 'Foto de perfil (opcional)' : 'Foto de perfil (obligatoria)'}
+                {isAdmin ? t('onboardingExtra.avatarOptional') : t('onboardingExtra.avatarRequired')}
               </p>
             </div>
 
-            <Field label="Nombre completo" value={fullName} onChange={setFullName} placeholder="Jose Angles" />
+            <Field label={t('onboardingExtra.fullNameLabel')} value={fullName} onChange={setFullName} placeholder={t('auth.namePlaceholder')} />
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-2">Dirección</label>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-2">{t('profile.address')}</label>
               <div className="space-y-3">
-                <Field label="Calle y número" value={streetAddress} onChange={setStreetAddress} placeholder="Calle Mayor 12, 3ºB" hideLabel />
+                <Field label={t('onboardingExtra.streetLabel')} value={streetAddress} onChange={setStreetAddress} placeholder={t('onboardingExtra.streetPlaceholder')} hideLabel />
                 <div className="grid grid-cols-2 gap-3">
-                  <Field label="Ciudad" value={city} onChange={setCity} placeholder="Madrid" hideLabel />
-                  <Field label="Provincia" value={province} onChange={setProvince} placeholder="Madrid" hideLabel />
+                  <Field label={t('onboarding.city')} value={city} onChange={setCity} placeholder={t('onboardingExtra.cityPlaceholder')} hideLabel />
+                  <Field label={t('onboardingExtra.provinceLabel')} value={province} onChange={setProvince} placeholder={t('onboardingExtra.cityPlaceholder')} hideLabel />
                 </div>
-                <Field label="País" value={country} onChange={setCountry} placeholder="España" hideLabel />
+                <Field label={t('onboarding.country')} value={country} onChange={setCountry} placeholder={t('onboardingExtra.countryPlaceholder')} hideLabel />
               </div>
             </div>
 
-            <Field label="Fecha de nacimiento" value={dateOfBirth} onChange={setDateOfBirth} type="date" />
+            <Field label={t('onboardingExtra.dobLabel')} value={dateOfBirth} onChange={setDateOfBirth} type="date" />
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Sobre ti</label>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">{t('profile.aboutYou')}</label>
               <textarea
                 value={bio}
                 onChange={e => setBio(e.target.value)}
                 rows={3}
-                placeholder="Cuéntanos algo sobre ti..."
+                placeholder={t('profile.bioPlaceholder')}
                 className="w-full px-4 py-2.5 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 dark:text-white rounded-xl text-sm focus:ring-2 focus:ring-primary-500 outline-none resize-none"
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Teléfono</label>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">{t('onboarding.phone')}</label>
               <PhoneInput
                 international
                 defaultCountry="ES"
@@ -300,11 +305,11 @@ export function OnboardingPage({ onNavigate }: { onNavigate: (page: string, id?:
               />
             </div>
 
-            <Field label="Correo electrónico" value={user?.email || ''} onChange={() => {}} disabled />
-            <Field label="Instagram (opcional)" value={instagram} onChange={setInstagram} placeholder="@tuusuario" />
+            <Field label={t('onboardingExtra.emailLabel')} value={user?.email || ''} onChange={() => {}} disabled />
+            <Field label={t('profile.instagramOptional')} value={instagram} onChange={setInstagram} placeholder={t('onboardingExtra.instagramPlaceholder')} />
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-2">Idiomas que hablas (opcional)</label>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-2">{t('onboardingExtra.languagesOptionalLabel')}</label>
               <div className="flex flex-wrap gap-2">
                 {LANGUAGE_OPTIONS.map(l => (
                   <button
@@ -320,7 +325,7 @@ export function OnboardingPage({ onNavigate }: { onNavigate: (page: string, id?:
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-2">Tus intereses (opcional)</label>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-2">{t('onboardingExtra.interestsOptionalLabel')}</label>
               <div className="flex flex-wrap gap-2">
                 {INTEREST_OPTIONS.map(i => (
                   <button
@@ -346,12 +351,12 @@ export function OnboardingPage({ onNavigate }: { onNavigate: (page: string, id?:
                 {/* Logo del restaurante */}
                 <div className="flex flex-col items-center mb-2">
                   <p className="text-sm font-medium text-gray-700 dark:text-gray-200 mb-3 self-start">
-                    Logo del restaurante <span className="text-gray-400 font-normal">(recomendado)</span>
+                    {t('onboardingExtra.logoLabel')} <span className="text-gray-400 font-normal">{t('onboardingExtra.logoRecommended')}</span>
                   </p>
                   <label className="relative w-28 h-28 rounded-2xl border-2 border-dashed border-gray-300 dark:border-gray-600 hover:border-primary-400 transition-colors cursor-pointer flex flex-col items-center justify-center overflow-hidden bg-gray-50 dark:bg-gray-900 group">
                     {avatarUrl ? (
                       <>
-                        <img src={avatarUrl} alt="Logo" className="w-full h-full object-contain p-1.5" />
+                        <img src={avatarUrl} alt={t('onboardingExtra.logoAlt')} className="w-full h-full object-contain p-1.5" />
                         <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
                           <Camera className="w-6 h-6 text-white" />
                         </div>
@@ -361,34 +366,34 @@ export function OnboardingPage({ onNavigate }: { onNavigate: (page: string, id?:
                     ) : (
                       <>
                         <Camera className="w-8 h-8 text-gray-400 dark:text-gray-500 mb-1" />
-                        <span className="text-[10px] text-gray-400 dark:text-gray-500 text-center px-2">Subir logo</span>
+                        <span className="text-[10px] text-gray-400 dark:text-gray-500 text-center px-2">{t('profile.uploadLogo')}</span>
                       </>
                     )}
                     <input type="file" accept="image/jpeg,image/png,image/webp" onChange={handleAvatarUpload} disabled={uploadingAvatar} className="hidden" />
                   </label>
                   <p className="text-[11px] text-gray-400 dark:text-gray-500 mt-2 text-center">
-                    Aparece en tu perfil y en el flyer que recibirás por email
+                    {t('onboardingExtra.logoHint')}
                   </p>
                 </div>
 
-                <Field label="Nombre del restaurante *" value={restaurantName} onChange={setRestaurantName} placeholder="La Taberna del Chef" />
+                <Field label={`${t('onboarding.restaurantName')} *`} value={restaurantName} onChange={setRestaurantName} placeholder={t('onboardingExtra.restaurantNamePlaceholder')} />
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1.5 flex items-center gap-1.5">
-                    <UtensilsCrossed className="w-3.5 h-3.5 text-gray-400" /> Tipo de cocina
+                    <UtensilsCrossed className="w-3.5 h-3.5 text-gray-400" /> {t('onboarding.cuisine')}
                   </label>
                   <select
                     value={restaurantCuisine}
                     onChange={e => setRestaurantCuisine(e.target.value)}
                     className="w-full px-4 py-2.5 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 dark:text-white rounded-xl text-sm focus:ring-2 focus:ring-primary-500 outline-none"
                   >
-                    <option value="">Seleccionar tipo de cocina...</option>
+                    <option value="">{t('onboardingExtra.selectCuisinePlaceholder')}</option>
                     {CUISINE_TYPES.map(c => <option key={c} value={c}>{c}</option>)}
                   </select>
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1.5">Rango de precios</label>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1.5">{t('onboarding.priceRange')}</label>
                   <div className="flex gap-2">
                     {PRICE_RANGES.map(p => (
                       <button
@@ -404,21 +409,21 @@ export function OnboardingPage({ onNavigate }: { onNavigate: (page: string, id?:
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Descripción del restaurante</label>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">{t('onboardingExtra.restaurantDescLabel')}</label>
                   <textarea
                     value={restaurantDescription}
                     onChange={e => setRestaurantDescription(e.target.value)}
                     rows={3}
-                    placeholder="Cuéntanos qué hace especial a tu restaurante..."
+                    placeholder={t('profile.descriptionPlaceholder')}
                     className="w-full px-4 py-2.5 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 dark:text-white rounded-xl text-sm focus:ring-2 focus:ring-primary-500 outline-none resize-none"
                   />
                 </div>
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1 flex items-center gap-1.5">
-                    <Sparkles className="w-3.5 h-3.5 text-gray-400" /> Especialidades <span className="text-gray-400 font-normal">(opcional)</span>
+                    <Sparkles className="w-3.5 h-3.5 text-gray-400" /> {t('onboardingExtra.specialtiesOptionalLabel')}
                   </label>
-                  <p className="text-xs text-gray-400 dark:text-gray-500 mb-2">Escribe un plato o producto estrella y pulsa Enter o la coma para añadirlo</p>
+                  <p className="text-xs text-gray-400 dark:text-gray-500 mb-2">{t('onboardingExtra.specialtiesHint')}</p>
                   <div className="flex flex-wrap gap-1.5 mb-2">
                     {restaurantSpecialties.map(s => (
                       <span key={s} className="flex items-center gap-1 px-2.5 py-1 bg-primary-50 dark:bg-primary-900/30 text-primary-700 dark:text-primary-300 rounded-full text-xs font-medium">
@@ -436,7 +441,7 @@ export function OnboardingPage({ onNavigate }: { onNavigate: (page: string, id?:
                       if (e.key === 'Enter' || e.key === ',') { e.preventDefault(); addSpecialty(specialtyInput) }
                     }}
                     onBlur={() => { if (specialtyInput.trim()) addSpecialty(specialtyInput) }}
-                    placeholder="Ej: Paella valenciana, Pulpo a la gallega..."
+                    placeholder={t('onboardingExtra.specialtiesPlaceholder')}
                     className="w-full px-4 py-2.5 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 dark:text-white rounded-xl text-sm focus:ring-2 focus:ring-primary-500 outline-none"
                   />
                 </div>
@@ -448,16 +453,16 @@ export function OnboardingPage({ onNavigate }: { onNavigate: (page: string, id?:
               <>
                 <div className="flex items-center gap-2 text-primary-600 mb-2">
                   <MapPin className="w-4 h-4" />
-                  <span className="text-sm font-medium">¿Dónde está tu restaurante?</span>
+                  <span className="text-sm font-medium">{t('onboardingExtra.whereIsRestaurant')}</span>
                 </div>
                 <div className="space-y-3">
-                  <Field label="Dirección" value={restaurantAddress} onChange={setRestaurantAddress} placeholder="Calle Mayor 12, local 1" />
+                  <Field label={t('onboarding.address')} value={restaurantAddress} onChange={setRestaurantAddress} placeholder={t('onboardingExtra.addressPlaceholder')} />
                   <div className="grid grid-cols-2 gap-3">
-                    <Field label="Ciudad" value={restaurantCity} onChange={setRestaurantCity} placeholder="Madrid" />
-                    <Field label="País" value={restaurantCountry} onChange={setRestaurantCountry} placeholder="España" />
+                    <Field label={t('onboarding.city')} value={restaurantCity} onChange={setRestaurantCity} placeholder={t('onboardingExtra.cityPlaceholder')} />
+                    <Field label={t('onboarding.country')} value={restaurantCountry} onChange={setRestaurantCountry} placeholder={t('onboardingExtra.countryPlaceholder')} />
                   </div>
                 </div>
-                <p className="text-xs text-gray-400 dark:text-gray-500">La ciudad se usa para que los usuarios te encuentren en el buscador.</p>
+                <p className="text-xs text-gray-400 dark:text-gray-500">{t('onboardingExtra.cityHint')}</p>
               </>
             )}
 
@@ -466,63 +471,63 @@ export function OnboardingPage({ onNavigate }: { onNavigate: (page: string, id?:
               <>
                 <div className="flex items-center gap-2 text-primary-600 mb-2">
                   <Phone className="w-4 h-4" />
-                  <span className="text-sm font-medium">Datos de contacto</span>
+                  <span className="text-sm font-medium">{t('onboardingExtra.contactDataTitle')}</span>
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1 flex items-center gap-1.5">
-                    <Phone className="w-3.5 h-3.5 text-gray-400" /> Teléfono de contacto
+                    <Phone className="w-3.5 h-3.5 text-gray-400" /> {t('onboardingExtra.contactPhoneLabel')}
                   </label>
                   <input
                     value={restaurantPhone}
                     onChange={e => setRestaurantPhone(e.target.value)}
-                    placeholder="+34 600 000 000"
+                    placeholder={t('onboardingExtra.phonePlaceholder')}
                     className="w-full px-4 py-2.5 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 dark:text-white rounded-xl text-sm focus:ring-2 focus:ring-primary-500 outline-none"
                   />
                 </div>
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1.5 flex items-center gap-1.5">
-                    <Clock className="w-3.5 h-3.5 text-gray-400" /> Horarios (opcional)
+                    <Clock className="w-3.5 h-3.5 text-gray-400" /> {t('onboardingExtra.hoursOptionalLabel')}
                   </label>
                   <p className="text-xs text-gray-400 dark:text-gray-500 mb-2">
-                    Elige los días y luego la hora de apertura y cierre. Puedes añadir varios tramos (comida, cena, fin de semana…).
+                    {t('onboardingExtra.hoursHint')}
                   </p>
                   <RestaurantHoursPicker value={restaurantHours} onChange={setRestaurantHours} />
                 </div>
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1 flex items-center gap-1.5">
-                    <Globe className="w-3.5 h-3.5 text-gray-400" /> Página web (opcional)
+                    <Globe className="w-3.5 h-3.5 text-gray-400" /> {t('onboardingExtra.websiteOptionalLabel')}
                   </label>
                   <input
                     value={restaurantWebsite}
                     onChange={e => setRestaurantWebsite(e.target.value)}
-                    placeholder="https://www.mirestaurante.com"
+                    placeholder={t('onboardingExtra.websitePlaceholder')}
                     className="w-full px-4 py-2.5 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 dark:text-white rounded-xl text-sm focus:ring-2 focus:ring-primary-500 outline-none"
                   />
                 </div>
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1 flex items-center gap-1.5">
-                    <Link className="w-3.5 h-3.5 text-gray-400" /> URL del menú (opcional)
+                    <Link className="w-3.5 h-3.5 text-gray-400" /> {t('onboardingExtra.menuUrlOptionalLabel')}
                   </label>
                   <input
                     value={restaurantMenuUrl}
                     onChange={e => setRestaurantMenuUrl(e.target.value)}
-                    placeholder="https://www.mirestaurante.com/menu"
+                    placeholder={t('onboardingExtra.menuUrlPlaceholder')}
                     className="w-full px-4 py-2.5 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 dark:text-white rounded-xl text-sm focus:ring-2 focus:ring-primary-500 outline-none"
                   />
                 </div>
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1 flex items-center gap-1.5">
-                    <Tag className="w-3.5 h-3.5 text-gray-400" /> Ofertas y promociones (opcional)
+                    <Tag className="w-3.5 h-3.5 text-gray-400" /> {t('onboardingExtra.offersOptionalLabel')}
                   </label>
                   <textarea
                     value={restaurantOffers}
                     onChange={e => setRestaurantOffers(e.target.value)}
                     rows={2}
-                    placeholder="Ej: Menú del día 15€, 2x1 en cócteles los martes..."
+                    placeholder={t('onboardingExtra.offersPlaceholder')}
                     className="w-full px-4 py-2.5 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 dark:text-white rounded-xl text-sm focus:ring-2 focus:ring-primary-500 outline-none resize-none"
                   />
                 </div>
@@ -534,23 +539,23 @@ export function OnboardingPage({ onNavigate }: { onNavigate: (page: string, id?:
               <div className="space-y-4">
                 <div className="flex items-center gap-2 text-primary-600 mb-2">
                   <Check className="w-4 h-4" />
-                  <span className="text-sm font-medium">Revisa tu información</span>
+                  <span className="text-sm font-medium">{t('onboardingExtra.reviewInfoTitle')}</span>
                 </div>
                 <div className="bg-gray-50 dark:bg-gray-900 rounded-xl p-4 space-y-3 text-sm">
-                  <SummaryRow label="Nombre" value={restaurantName} />
-                  {restaurantCuisine && <SummaryRow label="Cocina" value={restaurantCuisine} />}
-                  <SummaryRow label="Precio" value={restaurantPriceRange} />
-                  {restaurantDescription && <SummaryRow label="Descripción" value={restaurantDescription} multiline />}
-                  {restaurantSpecialties.length > 0 && <SummaryRow label="Especialidades" value={restaurantSpecialties.join(', ')} multiline />}
-                  {restaurantCity && <SummaryRow label="Ciudad" value={`${restaurantCity}${restaurantCountry ? `, ${restaurantCountry}` : ''}`} />}
-                  {restaurantPhone && <SummaryRow label="Teléfono" value={restaurantPhone} />}
-                  {restaurantHours && <SummaryRow label="Horarios" value={restaurantHours} />}
-                  {restaurantWebsite && <SummaryRow label="Web" value={restaurantWebsite} />}
-                  {restaurantMenuUrl && <SummaryRow label="Menú" value={restaurantMenuUrl} />}
-                  {restaurantOffers && <SummaryRow label="Ofertas" value={restaurantOffers} multiline />}
+                  <SummaryRow label={t('onboardingExtra.summaryName')} value={restaurantName} />
+                  {restaurantCuisine && <SummaryRow label={t('onboardingExtra.summaryCuisine')} value={restaurantCuisine} />}
+                  <SummaryRow label={t('onboardingExtra.summaryPrice')} value={restaurantPriceRange} />
+                  {restaurantDescription && <SummaryRow label={t('onboarding.description')} value={restaurantDescription} multiline />}
+                  {restaurantSpecialties.length > 0 && <SummaryRow label={t('profile.specialties')} value={restaurantSpecialties.join(', ')} multiline />}
+                  {restaurantCity && <SummaryRow label={t('onboarding.city')} value={`${restaurantCity}${restaurantCountry ? `, ${restaurantCountry}` : ''}`} />}
+                  {restaurantPhone && <SummaryRow label={t('onboarding.phone')} value={restaurantPhone} />}
+                  {restaurantHours && <SummaryRow label={t('onboarding.schedule')} value={restaurantHours} />}
+                  {restaurantWebsite && <SummaryRow label={t('profile.web')} value={restaurantWebsite} />}
+                  {restaurantMenuUrl && <SummaryRow label={t('onboardingExtra.summaryMenu')} value={restaurantMenuUrl} />}
+                  {restaurantOffers && <SummaryRow label={t('onboardingExtra.summaryOffers')} value={restaurantOffers} multiline />}
                 </div>
                 <p className="text-xs text-gray-400 dark:text-gray-500 text-center">
-                  Podrás editar todos estos datos y añadir fotos desde tu perfil de restaurante.
+                  {t('onboardingExtra.editLaterNote')}
                 </p>
               </div>
             )}
@@ -564,7 +569,7 @@ export function OnboardingPage({ onNavigate }: { onNavigate: (page: string, id?:
               onClick={() => setStep(s => s - 1)}
               className="px-4 py-3 border border-gray-200 dark:border-gray-600 text-gray-700 dark:text-gray-200 rounded-xl font-medium hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors flex items-center gap-1.5"
             >
-              <ChevronLeft className="w-4 h-4" /> Atrás
+              <ChevronLeft className="w-4 h-4" /> {t('onboarding.back')}
             </button>
           )}
           {isRestaurant && step < 4 ? (
@@ -573,7 +578,7 @@ export function OnboardingPage({ onNavigate }: { onNavigate: (page: string, id?:
               disabled={!canAdvance()}
               className="flex-1 py-3 bg-primary-500 text-white rounded-xl font-medium hover:bg-primary-600 disabled:opacity-40 transition-colors flex items-center justify-center gap-2"
             >
-              Siguiente <ArrowRight className="w-4 h-4" />
+              {t('onboarding.next')} <ArrowRight className="w-4 h-4" />
             </button>
           ) : (
             <button
@@ -583,7 +588,7 @@ export function OnboardingPage({ onNavigate }: { onNavigate: (page: string, id?:
             >
               {saving
                 ? <Loader2 className="w-4 h-4 animate-spin" />
-                : <>{isRestaurant ? '¡Activar mi restaurante!' : 'Continuar'} <ArrowRight className="w-4 h-4" /></>
+                : <>{isRestaurant ? t('onboardingExtra.activateCta') : t('common.continue')} <ArrowRight className="w-4 h-4" /></>
               }
             </button>
           )}

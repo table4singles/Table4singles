@@ -215,7 +215,7 @@ export function PostDinnerReviewModal({
                           )}
                         </div>
                         <span className="text-sm font-medium text-gray-700 dark:text-gray-200 truncate">
-                          {diner.display_name || 'Usuario'}
+                          {diner.display_name || t('restaurantProfile.user')}
                         </span>
                       </div>
                       <StarRating

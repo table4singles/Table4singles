@@ -223,10 +223,10 @@ export function MyTablesPage({ onNavigate, onAuthClick, initialTab }: MyTablesPa
                               <p className="text-sm text-gray-500 dark:text-gray-400 mt-0.5">
                                 {dateStr}{timeStr ? ` · ${timeStr}` : ''}
                               </p>
-                              <span className="inline-block mt-1.5 text-xs px-2 py-0.5 rounded-full bg-green-50 dark:bg-green-900/30 text-green-600 dark:text-green-400">Plaza reservada</span>
+                              <span className="inline-block mt-1.5 text-xs px-2 py-0.5 rounded-full bg-green-50 dark:bg-green-900/30 text-green-600 dark:text-green-400">{t('myTables.spotReserved')}</span>
                             </div>
                             {dt?.status === 'cancelled' && (
-                              <span className="text-xs px-2 py-0.5 rounded-full bg-red-50 text-red-500 flex-shrink-0">Cancelada</span>
+                              <span className="text-xs px-2 py-0.5 rounded-full bg-red-50 text-red-500 flex-shrink-0">{t('myTables.statusCancelled')}</span>
                             )}
                           </div>
                         </button>

@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Search, SlidersHorizontal, MapPin, UtensilsCrossed, ChevronRight, Navigation, Heart, List, Map as MapIcon, X } from 'lucide-react'
 import { Navbar } from '@/components/Navbar'
+import { PageHeader } from '@/components/PageHeader'
 import { LoadingSpinner } from '@/components/LoadingSpinner'
 import { ErrorBanner } from '@/components/ErrorBanner'
 import { RestaurantsMap } from '@/components/RestaurantsMap'
@@ -72,10 +73,7 @@ export function RestaurantsBrowsePage({ onNavigate, onAuthClick }: RestaurantsBr
       <Navbar currentPage="browse" onNavigate={onNavigate} onAuthClick={onAuthClick} />
 
       <main className="max-w-5xl mx-auto px-4 py-6 pb-24 md:pb-8">
-        <div className="mb-6">
-          <h1 className="text-2xl font-display font-bold text-gray-900 dark:text-white">{t('browse.title')}</h1>
-          <p className="text-gray-500 dark:text-gray-400 text-sm mt-1">{t('browse.subtitle')}</p>
-        </div>
+        <PageHeader title={t('browse.title')} subtitle={t('browse.subtitle')} />
 
         <div className="flex gap-3 mb-6">
           <div className="flex-1 relative">
@@ -269,7 +267,7 @@ export function RestaurantsBrowsePage({ onNavigate, onAuthClick }: RestaurantsBr
             {view === 'map' ? (
               <RestaurantsMap restaurants={restaurants} onSelect={id => onNavigate('restaurant-profile', id)} />
             ) : (
-              <div className="space-y-4">
+              <div className="grid sm:grid-cols-2 gap-4">
                 {restaurants.map(r => (
                   <RestaurantCard
                     key={r.id}
@@ -303,49 +301,54 @@ function RestaurantCard({
   const photo = restaurant.restaurant_photos?.[0] ?? restaurant.avatar_url
   const photoIsLogo = !restaurant.restaurant_photos?.[0] && !!restaurant.avatar_url
   return (
-    <button onClick={onClick} className="relative w-full bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-sm hover:shadow-md transition-all overflow-hidden text-left flex">
-      {onToggleFavorite && (
-        <span
-          role="button"
-          tabIndex={0}
-          onClick={e => { e.stopPropagation(); onToggleFavorite() }}
-          onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') { e.stopPropagation(); onToggleFavorite() } }}
-          className="absolute top-2 right-2 z-10 w-8 h-8 rounded-full bg-white dark:bg-gray-800/90 shadow flex items-center justify-center hover:scale-105 transition-transform"
-        >
-          <Heart className={`w-4 h-4 ${isFavorite ? 'fill-red-500 text-red-500' : 'text-gray-400 dark:text-gray-500'}`} />
-        </span>
-      )}
-      <div className="w-32 h-32 sm:w-40 sm:h-40 flex-shrink-0 bg-gray-100 dark:bg-gray-700">
+    <button onClick={onClick} className="group relative w-full bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-sm hover:shadow-lg transition-all overflow-hidden text-left">
+      <div className="relative h-44 bg-gray-100 dark:bg-gray-700">
         {photo ? (
-          <img src={photo} alt={restaurant.restaurant_name ?? ''} className={`w-full h-full ${photoIsLogo ? 'object-contain p-3' : 'object-cover'}`} />
+          <img src={photo} alt={restaurant.restaurant_name ?? ''} className={`w-full h-full transition-transform duration-300 group-hover:scale-105 ${photoIsLogo ? 'object-contain p-6' : 'object-cover'}`} />
         ) : (
           <div className="w-full h-full flex items-center justify-center text-gray-300 dark:text-gray-600">
             <UtensilsCrossed className="w-10 h-10" />
           </div>
         )}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/10 to-transparent" />
+
+        {onToggleFavorite && (
+          <span
+            role="button"
+            tabIndex={0}
+            onClick={e => { e.stopPropagation(); onToggleFavorite() }}
+            onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') { e.stopPropagation(); onToggleFavorite() } }}
+            className="absolute top-2.5 right-2.5 z-10 w-8 h-8 rounded-full bg-white/90 dark:bg-gray-900/80 backdrop-blur shadow flex items-center justify-center hover:scale-105 transition-transform"
+          >
+            <Heart className={`w-4 h-4 ${isFavorite ? 'fill-red-500 text-red-500' : 'text-gray-500 dark:text-gray-300'}`} />
+          </span>
+        )}
+
+        {restaurant.distanceKm != null && (
+          <span className="absolute top-2.5 left-2.5 text-xs px-2 py-1 bg-white/90 dark:bg-gray-900/80 backdrop-blur text-gray-700 dark:text-gray-200 rounded-full flex items-center gap-1 font-medium">
+            <Navigation className="w-3 h-3" /> {restaurant.distanceKm < 1 ? '<1' : Math.round(restaurant.distanceKm)} km
+          </span>
+        )}
+
+        <div className="absolute inset-x-0 bottom-0 p-3.5">
+          <h3 className="font-display font-bold text-lg text-white leading-tight truncate">{restaurant.restaurant_name || restaurantFallback}</h3>
+          <p className="text-xs text-white/85 flex items-center gap-1 mt-0.5">
+            <MapPin className="w-3 h-3 flex-shrink-0" />
+            <span className="truncate">{restaurantPublicLocation(restaurant) || locationUnspecified}</span>
+          </p>
+        </div>
       </div>
-      <div className="flex-1 p-4 flex flex-col justify-center min-w-0">
-        <h3 className="font-semibold text-gray-900 dark:text-white truncate">{restaurant.restaurant_name || restaurantFallback}</h3>
-        <p className="text-sm text-gray-500 dark:text-gray-400 flex items-center gap-1 mt-1">
-          <MapPin className="w-3.5 h-3.5 flex-shrink-0" />
-          <span className="truncate">{restaurantPublicLocation(restaurant) || locationUnspecified}</span>
-        </p>
-        <div className="flex items-center gap-2 mt-2 flex-wrap">
+
+      <div className="flex items-center justify-between gap-2 px-3.5 py-2.5">
+        <div className="flex items-center gap-2 flex-wrap min-w-0">
           {restaurant.restaurant_cuisine && (
-            <span className="text-xs px-2 py-0.5 bg-orange-50 text-orange-600 rounded-full">{restaurant.restaurant_cuisine}</span>
+            <span className="text-xs px-2 py-0.5 bg-orange-50 dark:bg-orange-900/30 text-orange-600 dark:text-orange-400 rounded-full">{restaurant.restaurant_cuisine}</span>
           )}
           {restaurant.restaurant_price_range && (
             <span className="text-xs px-2 py-0.5 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 rounded-full">{restaurant.restaurant_price_range}</span>
           )}
-          {restaurant.distanceKm != null && (
-            <span className="text-xs px-2 py-0.5 bg-primary-50 text-primary-600 rounded-full flex items-center gap-1">
-              <Navigation className="w-3 h-3" /> {restaurant.distanceKm < 1 ? '<1' : Math.round(restaurant.distanceKm)} km
-            </span>
-          )}
         </div>
-      </div>
-      <div className="flex items-center pr-4 text-gray-300 dark:text-gray-600">
-        <ChevronRight className="w-5 h-5" />
+        <ChevronRight className="w-4 h-4 text-gray-300 dark:text-gray-600 flex-shrink-0" />
       </div>
     </button>
   )

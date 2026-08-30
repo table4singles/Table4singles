@@ -9,7 +9,7 @@ export function PendingInviteBanner() {
   if (!pendingInvite) return null
 
   return (
-    <div className="fixed top-16 inset-x-0 z-40 bg-primary-500 text-white shadow-md">
+    <div className="relative z-30 bg-primary-500 text-white shadow-md">
       <div className="max-w-5xl mx-auto px-4 py-2.5 flex items-center gap-2 text-sm">
         <Mail className="w-4 h-4 flex-shrink-0" />
         <span className="flex-1">Buscando mesa para invitar a <strong>{pendingInvite.inviteeName}</strong></span>

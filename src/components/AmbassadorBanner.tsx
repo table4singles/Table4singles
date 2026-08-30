@@ -22,7 +22,7 @@ export function AmbassadorBanner({ onNavigate }: Props) {
   }
 
   return (
-    <div className="fixed top-16 inset-x-0 z-40 bg-gradient-to-r from-amber-500 to-orange-500 text-white shadow-sm">
+    <div className="relative z-30 bg-gradient-to-r from-amber-500 to-orange-500 text-white shadow-sm">
       <div className="max-w-5xl mx-auto px-4 py-2.5 flex items-center gap-3 text-sm">
         <Award className="w-4 h-4 flex-shrink-0" />
         <div className="flex-1 min-w-0">

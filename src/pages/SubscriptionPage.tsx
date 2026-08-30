@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { ArrowLeft, CheckCircle, AlertCircle, Clock, XCircle, CreditCard, Loader2, Zap } from 'lucide-react'
 import { Navbar } from '@/components/Navbar'
+import { PageHeader } from '@/components/PageHeader'
 import { useAuth } from '@/contexts/AuthContext'
 import { useViewMode } from '@/contexts/ViewModeContext'
 import { useLanguage } from '@/contexts/LanguageContext'
@@ -103,10 +104,7 @@ export function SubscriptionPage({ onNavigate, onAuthClick }: SubscriptionPagePr
           <ArrowLeft className="w-4 h-4" /> {t('subscription.backToDashboard')}
         </button>
 
-        <div className="mb-8">
-          <h1 className="text-2xl font-display font-bold text-gray-900 dark:text-white">Suscripción</h1>
-          <p className="text-gray-500 dark:text-gray-400 text-sm mt-1">Gestiona tu plan mensual de Table4Singles</p>
-        </div>
+        <PageHeader title="Suscripción" subtitle="Gestiona tu plan mensual de Table4Singles" variant="restaurant" />
 
         {/* Estado actual */}
         {statusInfo && (

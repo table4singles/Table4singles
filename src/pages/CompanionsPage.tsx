@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Search, SlidersHorizontal, Users, Loader2 } from 'lucide-react'
 import { Navbar } from '@/components/Navbar'
+import { PageHeader } from '@/components/PageHeader'
 import { LoadingSpinner } from '@/components/LoadingSpinner'
 import { ErrorBanner } from '@/components/ErrorBanner'
 import { CompanionCard } from '@/components/CompanionCard'
@@ -59,10 +60,7 @@ export function CompanionsPage({ onNavigate, onAuthClick }: CompanionsPageProps)
       <Navbar currentPage="companions" onNavigate={onNavigate} onAuthClick={onAuthClick} />
 
       <main className="max-w-5xl mx-auto px-4 py-6 pb-24 md:pb-8">
-        <div className="mb-6">
-          <h1 className="text-2xl font-display font-bold text-gray-900 dark:text-white">Comensales</h1>
-          <p className="text-gray-500 dark:text-gray-400 text-sm mt-1">Descubre a otros miembros de la comunidad</p>
-        </div>
+        <PageHeader title="Comensales" subtitle="Descubre a otros miembros de la comunidad" />
 
         <div className="flex gap-3 mb-6">
           <div className="flex-1 relative">

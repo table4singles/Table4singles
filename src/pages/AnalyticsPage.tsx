@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import { ArrowLeft, TrendingUp, Users, Star, CalendarDays, Loader2 } from 'lucide-react'
 import { Navbar } from '@/components/Navbar'
+import { PageHeader } from '@/components/PageHeader'
 import { useAuth } from '@/contexts/AuthContext'
 import { useViewMode } from '@/contexts/ViewModeContext'
 import { useLanguage } from '@/contexts/LanguageContext'
@@ -112,20 +113,21 @@ export function AnalyticsPage({ onNavigate, onAuthClick }: AnalyticsPageProps) {
           <ArrowLeft className="w-4 h-4" /> {t('analytics.back')}
         </button>
 
-        <div className="flex items-center justify-between mb-6">
-          <div>
-            <h1 className="text-2xl font-display font-bold text-gray-900 dark:text-white">{t('analytics.title')}</h1>
-            <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">{t('analytics.subtitle')}</p>
-          </div>
-          <div className="flex gap-1 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-1">
-            {(['7d', '30d', '90d'] as const).map(r => (
-              <button key={r} onClick={() => setRange(r)}
-                className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${range === r ? 'bg-[#e94560] text-white' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'}`}>
-                {r === '7d' ? t('analytics.range7d') : r === '30d' ? t('analytics.range30d') : t('analytics.range90d')}
-              </button>
-            ))}
-          </div>
-        </div>
+        <PageHeader
+          title={t('analytics.title')}
+          subtitle={t('analytics.subtitle')}
+          variant="restaurant"
+          action={
+            <div className="flex gap-1 bg-white/20 rounded-xl p-1">
+              {(['7d', '30d', '90d'] as const).map(r => (
+                <button key={r} onClick={() => setRange(r)}
+                  className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${range === r ? 'bg-white text-gray-900' : 'text-white/90 hover:text-white'}`}>
+                  {r === '7d' ? t('analytics.range7d') : r === '30d' ? t('analytics.range30d') : t('analytics.range90d')}
+                </button>
+              ))}
+            </div>
+          }
+        />
 
         {loading ? (
           <div className="flex justify-center py-20"><Loader2 className="w-8 h-8 text-[#e94560] animate-spin" /></div>
@@ -166,11 +168,11 @@ export function AnalyticsPage({ onNavigate, onAuthClick }: AnalyticsPageProps) {
                 </ChartCard>
               )}
 
-              {data.slotsChart.length > 0 && (
+              {data.slotsChart.some((s: any) => s.value > 0) && (
                 <ChartCard title={t('analytics.chartSlots')}>
                   <ResponsiveContainer width="100%" height={180}>
-                    <PieChart>
-                      <Pie data={data.slotsChart} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={70} label={({ name, percent }: any) => `${name} ${Math.round((percent ?? 0) * 100)}%`}>
+                    <PieChart margin={{ top: 16, right: 8, bottom: 0, left: 8 }}>
+                      <Pie data={data.slotsChart} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={60} label={({ name, percent }: any) => `${name} ${Math.round((percent ?? 0) * 100)}%`}>
                         {data.slotsChart.map((_: any, i: number) => <Cell key={i} fill={COLORS[i % COLORS.length]} />)}
                       </Pie>
                       <Tooltip />

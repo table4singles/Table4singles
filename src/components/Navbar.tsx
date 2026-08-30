@@ -6,6 +6,8 @@ import { useNotifications } from '@/hooks/useNotifications'
 import { useViewMode } from '@/contexts/ViewModeContext'
 import { LanguageSwitcher } from './LanguageSwitcher'
 import { NotificationsPanel } from './NotificationsPanel'
+import { PendingInviteBanner } from './PendingInviteBanner'
+import { AmbassadorBanner } from './AmbassadorBanner'
 
 interface NavbarProps {
   currentPage: string
@@ -37,10 +39,14 @@ export function Navbar({ currentPage, onNavigate, onAuthClick }: NavbarProps) {
   }, [])
 
   return (
+    <>
     <header className="sticky top-0 z-50 bg-white dark:bg-gray-800 border-b border-gray-100 dark:border-gray-700">
       <div className="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
-        <button onClick={() => onNavigate(user ? 'browse' : 'landing')} className="flex items-center">
-          <img src="/icons/logo-full.png" alt="Table4Singles" className="h-12 w-auto" />
+        <button onClick={() => onNavigate(user ? 'browse' : 'landing')} className="flex items-center gap-2">
+          <span className="h-9 w-9 rounded-xl overflow-hidden flex-shrink-0">
+            <img src="/icons/logo-full.png" alt="" className="h-full w-full object-cover object-left" />
+          </span>
+          <span className="font-display font-bold text-lg text-gray-900 dark:text-white whitespace-nowrap">Table4Singles</span>
         </button>
 
         <nav className="hidden md:flex items-center gap-1">
@@ -234,6 +240,9 @@ export function Navbar({ currentPage, onNavigate, onAuthClick }: NavbarProps) {
         </nav>
       )}
     </header>
+    {user && <PendingInviteBanner />}
+    {user && effectiveRole === 'user' && <AmbassadorBanner onNavigate={onNavigate} />}
+    </>
   )
 }
 

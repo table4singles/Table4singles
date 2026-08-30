@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react'
 import { CalendarDays, List, Loader2, CalendarX, Tv2, Plus, Clock, Bell, BellOff } from 'lucide-react'
 import { Navbar } from '@/components/Navbar'
+import { PageHeader } from '@/components/PageHeader'
 import { AgendaCalendar } from '@/components/AgendaCalendar'
 import { AgendaTableCard } from '@/components/AgendaTableCard'
 import { LiveTableCard } from '@/components/LiveTableCard'
@@ -282,44 +283,41 @@ export function RestaurantAgendaPage({ onNavigate, onAuthClick }: RestaurantAgen
 
       <main className="max-w-3xl mx-auto px-4 py-6 pb-24 md:pb-8">
         {/* Header */}
-        <div className="flex items-center justify-between mb-5">
-          <div>
-            <h1 className="text-2xl font-display font-bold text-gray-900 dark:text-white">{t('agenda.title')}</h1>
-            <p className="text-gray-500 dark:text-gray-400 text-sm mt-0.5">{t('agenda.subtitle')}</p>
-          </div>
-          <div className="flex items-center gap-2">
-            {/* Push notification toggle */}
-            {push.isSupported && push.permission !== 'denied' && (
+        <PageHeader
+          title={t('agenda.title')}
+          subtitle={t('agenda.subtitle')}
+          variant="restaurant"
+          action={
+            <div className="flex items-center gap-2">
+              {/* Push notification toggle */}
+              {push.isSupported && push.permission !== 'denied' && (
+                <button
+                  onClick={push.subscribed ? push.unsubscribe : push.subscribe}
+                  disabled={push.loading}
+                  title={push.subscribed ? t('agenda.pushDisable') : t('agenda.pushEnable')}
+                  className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-sm font-medium transition-colors flex-shrink-0 bg-white/20 hover:bg-white/30 text-white"
+                >
+                  {push.loading
+                    ? <Loader2 className="w-4 h-4 animate-spin" />
+                    : push.subscribed
+                      ? <Bell className="w-4 h-4" />
+                      : <BellOff className="w-4 h-4" />
+                  }
+                  <span className="hidden sm:inline">
+                    {push.subscribed ? t('agenda.pushActive') : t('agenda.pushEnable')}
+                  </span>
+                </button>
+              )}
               <button
-                onClick={push.subscribed ? push.unsubscribe : push.subscribe}
-                disabled={push.loading}
-                title={push.subscribed ? t('agenda.pushDisable') : t('agenda.pushEnable')}
-                className={`flex items-center gap-1.5 px-3 py-2 rounded-xl text-sm font-medium transition-colors flex-shrink-0 ${
-                  push.subscribed
-                    ? 'bg-green-50 dark:bg-green-900/30 text-green-600 dark:text-green-400 border border-green-200 dark:border-green-800'
-                    : 'bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700'
-                }`}
+                onClick={() => onNavigate('create')}
+                className="flex items-center gap-1.5 px-3 py-2 bg-white/95 text-gray-900 rounded-xl text-sm font-medium hover:bg-white transition-colors flex-shrink-0 shadow-sm"
               >
-                {push.loading
-                  ? <Loader2 className="w-4 h-4 animate-spin" />
-                  : push.subscribed
-                    ? <Bell className="w-4 h-4" />
-                    : <BellOff className="w-4 h-4" />
-                }
-                <span className="hidden sm:inline">
-                  {push.subscribed ? t('agenda.pushActive') : t('agenda.pushEnable')}
-                </span>
+                <Plus className="w-4 h-4" />
+                <span className="hidden sm:inline">{t('agenda.newTable')}</span>
               </button>
-            )}
-            <button
-              onClick={() => onNavigate('create')}
-              className="flex items-center gap-1.5 px-3 py-2 bg-[#e94560] text-white rounded-xl text-sm font-medium hover:bg-[#d63d56] transition-colors flex-shrink-0"
-            >
-              <Plus className="w-4 h-4" />
-              <span className="hidden sm:inline">{t('agenda.newTable')}</span>
-            </button>
-          </div>
-        </div>
+            </div>
+          }
+        />
 
         {/* Tab selector */}
         <div className="flex bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-1 mb-6">

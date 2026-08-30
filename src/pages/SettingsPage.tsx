@@ -1,8 +1,10 @@
 import { Bell, Mail, Moon, Sun, Globe, Shield, FileText, CreditCard, HelpCircle, LogOut, ChevronRight, Check, Loader2 } from 'lucide-react'
 import { Navbar } from '@/components/Navbar'
+import { PageHeader } from '@/components/PageHeader'
 import { ErrorBanner } from '@/components/ErrorBanner'
 import { useAuth } from '@/contexts/AuthContext'
 import { useTheme } from '@/contexts/ThemeContext'
+import { useViewMode } from '@/contexts/ViewModeContext'
 import { useLanguage } from '@/contexts/LanguageContext'
 import { languageOptions } from '@/i18n'
 import { supabase } from '@/lib/supabase'
@@ -15,6 +17,7 @@ interface SettingsPageProps {
 
 export function SettingsPage({ onNavigate, onAuthClick }: SettingsPageProps) {
   const { user, profile, refreshProfile, signOut } = useAuth()
+  const { effectiveRole } = useViewMode()
   const { theme, toggleTheme } = useTheme()
   const { language, setLanguage, t } = useLanguage()
   const [error, setError] = useState<string | null>(null)
@@ -34,10 +37,7 @@ export function SettingsPage({ onNavigate, onAuthClick }: SettingsPageProps) {
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors">
       <Navbar currentPage="settings" onNavigate={onNavigate} onAuthClick={onAuthClick} />
       <main className="max-w-2xl mx-auto px-4 py-8 pb-24 md:pb-8">
-        <div className="mb-6">
-          <h1 className="text-2xl font-display font-bold text-gray-900 dark:text-white">{t('settings.title')}</h1>
-          <p className="text-gray-500 dark:text-gray-400 text-sm mt-1">{t('settings.subtitle')}</p>
-        </div>
+        <PageHeader title={t('settings.title')} subtitle={t('settings.subtitle')} variant={effectiveRole === 'restaurant' ? 'restaurant' : 'user'} />
 
         {error && <ErrorBanner message={error} className="mb-4" />}
 

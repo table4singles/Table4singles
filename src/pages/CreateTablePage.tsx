@@ -1,17 +1,13 @@
 import { useState } from 'react'
 import { ArrowLeft, Check, Loader2, Users, MapPin, CalendarDays, CalendarRange } from 'lucide-react'
 import { Navbar } from '@/components/Navbar'
+import { PageHeader } from '@/components/PageHeader'
 import { ErrorBanner } from '@/components/ErrorBanner'
 import { useLanguage } from '@/contexts/LanguageContext'
 import { useAuth } from '@/contexts/AuthContext'
 import { supabase } from '@/lib/supabase'
 
-const ZONES = [
-  { id: 'salon', label: 'Salón' },
-  { id: 'vip', label: 'Salón VIP' },
-  { id: 'terraza', label: 'Terraza' },
-  { id: 'custom', label: 'Zona específica' },
-]
+const ZONE_IDS = ['salon', 'vip', 'terraza', 'custom'] as const
 
 interface CreateTablePageProps {
   onNavigate: (page: string, id?: string) => void
@@ -31,7 +27,7 @@ export function CreateTablePage({ onNavigate, onAuthClick }: CreateTablePageProp
   const [success, setSuccess] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
-  const locationLabel = zone === 'custom' ? customZone : ZONES.find(z => z.id === zone)?.label ?? ''
+  const locationLabel = zone === 'custom' ? customZone : t(`createTable.zone.${zone}`)
 
   const canSubmit = availableFrom && maxSeats >= 2 && (zone !== 'custom' || customZone.trim().length > 0)
 
@@ -82,22 +78,22 @@ export function CreateTablePage({ onNavigate, onAuthClick }: CreateTablePageProp
           <div className="w-16 h-16 bg-green-100 dark:bg-green-900/30 rounded-full flex items-center justify-center mx-auto mb-4">
             <Check className="w-8 h-8 text-green-600 dark:text-green-400" />
           </div>
-          <h2 className="text-2xl font-display font-bold text-gray-900 dark:text-white mb-2">¡Mesa creada!</h2>
+          <h2 className="text-2xl font-display font-bold text-gray-900 dark:text-white mb-2">{t('createTable.success.title')}</h2>
           <p className="text-gray-500 dark:text-gray-400 mb-8">
-            Tu mesa está activa y visible para los comensales. Puedes activarla o desactivarla cuando quieras desde la Agenda.
+            {t('createTable.success.desc')}
           </p>
           <div className="flex justify-center gap-3">
             <button
               onClick={() => onNavigate('agenda')}
               className="px-6 py-3 bg-[#e94560] text-white rounded-xl font-medium hover:bg-[#d63d56] transition-colors"
             >
-              Ver en Agenda
+              {t('createTable.success.viewAgenda')}
             </button>
             <button
               onClick={resetForm}
               className="px-6 py-3 border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-200 rounded-xl font-medium hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
             >
-              Crear otra mesa
+              {t('createTable.success.createAnother')}
             </button>
           </div>
         </div>
@@ -113,27 +109,26 @@ export function CreateTablePage({ onNavigate, onAuthClick }: CreateTablePageProp
           onClick={() => onNavigate('agenda')}
           className="flex items-center gap-2 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 mb-6 text-sm"
         >
-          <ArrowLeft className="w-4 h-4" /> Volver a Agenda
+          <ArrowLeft className="w-4 h-4" /> {t('createTable.backToAgenda')}
         </button>
 
-        <div className="mb-6">
-          <h1 className="text-2xl font-display font-bold text-gray-900 dark:text-white">Nueva mesa</h1>
-          <p className="text-gray-500 dark:text-gray-400 text-sm mt-1">
-            Mesa en <span className="font-medium text-gray-700 dark:text-gray-300">{profile?.restaurant_name ?? 'tu restaurante'}</span>
-          </p>
-        </div>
+        <PageHeader
+          title={t('createTable.title')}
+          subtitle={`${t('createTable.tableAt')} ${profile?.restaurant_name ?? t('createTable.yourRestaurant')}`}
+          variant="restaurant"
+        />
 
         <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 p-6 space-y-6">
 
           {/* Disponibilidad */}
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-3 flex items-center gap-1.5">
-              <CalendarDays className="w-4 h-4 text-gray-400" /> Período de disponibilidad
+              <CalendarDays className="w-4 h-4 text-gray-400" /> {t('createTable.availability')}
             </label>
             <div className="grid grid-cols-2 gap-3">
               <div>
                 <label className="block text-xs text-gray-500 dark:text-gray-400 mb-1.5 flex items-center gap-1">
-                  <CalendarRange className="w-3 h-3" /> Disponible desde
+                  <CalendarRange className="w-3 h-3" /> {t('createTable.availableFrom')}
                 </label>
                 <input
                   type="date"
@@ -144,7 +139,7 @@ export function CreateTablePage({ onNavigate, onAuthClick }: CreateTablePageProp
                 />
               </div>
               <div>
-                <label className="block text-xs text-gray-500 dark:text-gray-400 mb-1.5">Disponible hasta (opcional)</label>
+                <label className="block text-xs text-gray-500 dark:text-gray-400 mb-1.5">{t('createTable.availableUntil')}</label>
                 <input
                   type="date"
                   value={availableUntil}
@@ -155,14 +150,14 @@ export function CreateTablePage({ onNavigate, onAuthClick }: CreateTablePageProp
               </div>
             </div>
             <p className="text-xs text-gray-400 dark:text-gray-500 mt-2">
-              Si no indicas fecha de fin, la mesa permanece disponible hasta que la desactives manualmente.
+              {t('createTable.availabilityHint')}
             </p>
           </div>
 
           {/* Número de comensales */}
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1.5">
-              <span className="flex items-center gap-1.5"><Users className="w-4 h-4 text-gray-400" /> Máximo de comensales</span>
+              <span className="flex items-center gap-1.5"><Users className="w-4 h-4 text-gray-400" /> {t('createTable.maxSeats')}</span>
             </label>
             <div className="flex items-center gap-4">
               <button
@@ -180,27 +175,27 @@ export function CreateTablePage({ onNavigate, onAuthClick }: CreateTablePageProp
           {/* Ubicación dentro del local */}
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1.5">
-              <span className="flex items-center gap-1.5"><MapPin className="w-4 h-4 text-gray-400" /> Ubicación en el local</span>
+              <span className="flex items-center gap-1.5"><MapPin className="w-4 h-4 text-gray-400" /> {t('createTable.location')}</span>
             </label>
             <div className="grid grid-cols-2 gap-2">
-              {ZONES.map(z => (
+              {ZONE_IDS.map(id => (
                 <button
-                  key={z.id}
-                  onClick={() => setZone(z.id)}
+                  key={id}
+                  onClick={() => setZone(id)}
                   className={`py-2.5 px-4 rounded-xl text-sm font-medium border transition-colors text-left ${
-                    zone === z.id
+                    zone === id
                       ? 'bg-[#e94560] text-white border-[#e94560]'
                       : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border-gray-200 dark:border-gray-600 hover:border-[#e94560]/50'
                   }`}
                 >
-                  {z.label}
+                  {t(`createTable.zone.${id}`)}
                 </button>
               ))}
             </div>
             {zone === 'custom' && (
               <input
                 type="text"
-                placeholder="Ej: Terraza interior, Reservado..."
+                placeholder={t('createTable.customZonePlaceholder')}
                 value={customZone}
                 onChange={e => setCustomZone(e.target.value)}
                 className="mt-2 w-full px-4 py-2.5 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 dark:text-white rounded-xl text-sm focus:ring-2 focus:ring-[#e94560] outline-none"
@@ -215,7 +210,7 @@ export function CreateTablePage({ onNavigate, onAuthClick }: CreateTablePageProp
             disabled={!canSubmit || loading}
             className="w-full py-3.5 bg-[#e94560] text-white rounded-xl font-semibold hover:bg-[#d63d56] disabled:opacity-50 transition-colors flex items-center justify-center gap-2"
           >
-            {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : 'Crear mesa'}
+            {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : t('createTable.submit')}
           </button>
         </div>
       </main>

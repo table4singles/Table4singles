@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { Plus, CalendarDays, Users, Clock, Loader2, UtensilsCrossed, XCircle, ToggleLeft, ToggleRight } from 'lucide-react'
 import { Navbar } from '@/components/Navbar'
+import { PageHeader } from '@/components/PageHeader'
 import { CancelModal } from '@/components/CancelModal'
 import { useLanguage } from '@/contexts/LanguageContext'
 import { useAuth } from '@/contexts/AuthContext'
@@ -57,17 +58,16 @@ export function MyTablesPage({ onNavigate, onAuthClick, initialTab }: MyTablesPa
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       <Navbar currentPage="my-tables" onNavigate={onNavigate} onAuthClick={onAuthClick} />
       <main className="max-w-4xl mx-auto px-4 py-6 pb-24 md:pb-8">
-        <div className="flex items-center justify-between mb-6">
-          <div>
-            <h1 className="text-2xl font-display font-bold text-gray-900 dark:text-white">{isRestaurant ? t('myTables.title') : t('myTables.titleUser')}</h1>
-            <p className="text-gray-500 dark:text-gray-400 text-sm mt-1">{isRestaurant ? t('myTables.subtitle') : t('myTables.subtitleUser')}</p>
-          </div>
-          {isRestaurant && (
-            <button onClick={() => onNavigate('create')} className="px-4 py-2.5 bg-[#e94560] text-white rounded-xl font-medium text-sm hover:bg-[#d63d56] transition-colors flex items-center gap-2">
+        <PageHeader
+          title={isRestaurant ? t('myTables.title') : t('myTables.titleUser')}
+          subtitle={isRestaurant ? t('myTables.subtitle') : t('myTables.subtitleUser')}
+          variant={isRestaurant ? 'restaurant' : 'user'}
+          action={isRestaurant && (
+            <button onClick={() => onNavigate('create')} className="px-4 py-2.5 bg-white/95 text-gray-900 rounded-xl font-medium text-sm hover:bg-white transition-colors flex items-center gap-2 shadow-sm">
               <Plus className="w-4 h-4" /> {t('myTables.create')}
             </button>
           )}
-        </div>
+        />
 
         {error && (
           <div className="bg-red-50 border border-red-200 text-red-700 text-sm rounded-xl p-3 mb-4">{error}</div>
@@ -178,7 +178,7 @@ export function MyTablesPage({ onNavigate, onAuthClick, initialTab }: MyTablesPa
                             <button
                               onClick={() => handleToggle(table.id, !isActive)}
                               disabled={togglingId === table.id}
-                              className="flex flex-col items-center gap-0.5 flex-shrink-0 pt-0.5"
+                              className="flex-shrink-0 pt-0.5"
                               title={isActive ? t('myTables.markUnavailable') : t('myTables.markAvailable')}
                             >
                               {togglingId === table.id ? (
@@ -188,9 +188,6 @@ export function MyTablesPage({ onNavigate, onAuthClick, initialTab }: MyTablesPa
                               ) : (
                                 <ToggleLeft className="w-8 h-8 text-gray-300 dark:text-gray-600" />
                               )}
-                              <span className={`text-[10px] font-medium ${isActive ? 'text-green-600' : 'text-gray-400'}`}>
-                                {isActive ? t('myTables.statusAvailable') : t('myTables.statusUnavailable')}
-                              </span>
                             </button>
                           )}
                         </div>

@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Star, MessageSquare, Send, User, Loader2, BarChart2, UtensilsCrossed } from 'lucide-react'
 import { Navbar } from '@/components/Navbar'
+import { PageHeader } from '@/components/PageHeader'
 import { LoadingSpinner } from '@/components/LoadingSpinner'
 import { StarRating } from '@/components/StarRating'
 import { useAuth } from '@/contexts/AuthContext'
@@ -43,10 +44,7 @@ export function RestaurantReviewsPage({ onNavigate, onAuthClick }: RestaurantRev
       <Navbar currentPage="reviews" onNavigate={onNavigate} onAuthClick={onAuthClick} />
       <main className="max-w-3xl mx-auto px-4 py-6 pb-24 md:pb-8 space-y-6">
 
-        <div>
-          <h1 className="text-2xl font-display font-bold text-gray-900 dark:text-white">Reseñas</h1>
-          <p className="text-sm text-gray-500 dark:text-gray-400 mt-0.5">Lo que opinan tus clientes</p>
-        </div>
+        <PageHeader title="Reseñas" subtitle="Lo que opinan tus clientes" variant="restaurant" />
 
         {/* Tabs */}
         <div className="flex gap-1 bg-gray-100 dark:bg-gray-800 rounded-xl p-1">

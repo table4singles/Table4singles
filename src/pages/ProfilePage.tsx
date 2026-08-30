@@ -3,6 +3,7 @@ import { Save, Loader2, Check, Camera, X, UtensilsCrossed, ShieldCheck, Calendar
 import PhoneInput from 'react-phone-number-input'
 import 'react-phone-number-input/style.css'
 import { Navbar } from '@/components/Navbar'
+import { PageHeader } from '@/components/PageHeader'
 import { ErrorBanner } from '@/components/ErrorBanner'
 import { ShareButton } from '@/components/ShareButton'
 import { RestaurantHoursPicker } from '@/components/RestaurantHoursPicker'
@@ -218,10 +219,11 @@ export function ProfilePage({ onNavigate, onAuthClick }: ProfilePageProps) {
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       <Navbar currentPage="profile" onNavigate={onNavigate} onAuthClick={onAuthClick} />
       <main className="max-w-2xl mx-auto px-4 py-8 pb-24 md:pb-8">
-        <div className="mb-6">
-          <h1 className="text-2xl font-display font-bold text-gray-900 dark:text-white">{isRestaurant ? t('profile.titleRestaurant') : t('profile.title')}</h1>
-          <p className="text-gray-500 dark:text-gray-400 text-sm mt-1">{isRestaurant ? t('profile.subtitleRestaurant') : t('profile.subtitle')}</p>
-        </div>
+        <PageHeader
+          title={isRestaurant ? t('profile.titleRestaurant') : t('profile.title')}
+          subtitle={isRestaurant ? t('profile.subtitleRestaurant') : t('profile.subtitle')}
+          variant={isRestaurant ? 'restaurant' : 'user'}
+        />
 
         {error && <ErrorBanner message={error} className="mb-4" />}
 

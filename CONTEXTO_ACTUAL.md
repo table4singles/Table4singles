@@ -97,7 +97,7 @@ Password todas: `Test1234!` (script `scripts/seed-test-accounts.mjs`, requiere `
 - `t4s.test.sakurasushi@gmail.com` — Sakura Sushi Bar, restaurant, Barcelona
 
 ## PENDIENTE ⚠️ (baja prioridad)
-- Strings hardcodeados: OnboardingPage (cocinas/wizard), AdminPage, RestaurantAgendaPage, PostDinnerReviewModal, MyTablesPage (estados)
+- Strings hardcodeados: OnboardingPage (cocinas/wizard), AdminPage, RestaurantAgendaPage, PostDinnerReviewModal, MyTablesPage (estados). CreateTablePage y RestaurantProfilePage (reseñas/estados de mesas) ya traducidas 2026-08-30 (`createTable.*` y `restaurantProfile.*` en es.ts/en.ts, resto de idiomas cae a fallback español)
 - Reactivar validación email al registrarse (off para pruebas)
 - Test E2E: restaurante crea mesa → usuario reserva → agenda → notif
 - Búsqueda directa de mesas (ahora se buscan restaurantes)

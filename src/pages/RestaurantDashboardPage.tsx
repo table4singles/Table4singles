@@ -1,6 +1,7 @@
 import { useState, useMemo, useEffect } from 'react'
 import { UtensilsCrossed, Users, Star, Loader2, XCircle, Calendar, Clock, CalendarClock, CalendarDays, AlertCircle, CheckCircle, CreditCard, TrendingUp } from 'lucide-react'
 import { Navbar } from '@/components/Navbar'
+import { PageHeader } from '@/components/PageHeader'
 import { CancelModal } from '@/components/CancelModal'
 import { useLanguage } from '@/contexts/LanguageContext'
 import { useAuth } from '@/contexts/AuthContext'
@@ -70,10 +71,7 @@ export function RestaurantDashboardPage({ onNavigate, onAuthClick }: RestaurantD
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       <Navbar currentPage="restaurant-dashboard" onNavigate={onNavigate} onAuthClick={onAuthClick} />
       <main className="max-w-5xl mx-auto px-4 py-6 pb-24 md:pb-8">
-        <div className="mb-6">
-          <h1 className="text-2xl font-display font-bold text-gray-900 dark:text-white">{t('restaurantDashboard.title')}</h1>
-          <p className="text-gray-500 dark:text-gray-400 text-sm mt-1">{profile?.restaurant_name || t('restaurantDashboard.subtitle')}</p>
-        </div>
+        <PageHeader title={t('restaurantDashboard.title')} subtitle={profile?.restaurant_name || t('restaurantDashboard.subtitle')} variant="restaurant" />
 
         {error && <div className="bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-300 text-sm rounded-xl p-3 mb-4">{error}</div>}
 

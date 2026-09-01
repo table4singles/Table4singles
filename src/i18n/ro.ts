@@ -302,6 +302,12 @@ export const ro = {
     doneDesc: 'Imediat ce va fi publicată o masă potrivită căutării tale, vei primi o notificare.',
     close: 'Am înțeles',
   },
+  waitlist: {
+    join: 'Alătură-te listei de așteptare',
+    joined: 'Ești pe lista de așteptare',
+    notified: 'E rândul tău! S-a eliberat un loc',
+    leave: 'Ieși',
+  },
   card: {
     available: 'Disponibil',
     full: 'Complet',

@@ -302,6 +302,12 @@ export const en = {
     doneDesc: "As soon as a table matching what you're looking for is published, you'll get a notification.",
     close: 'Got it',
   },
+  waitlist: {
+    join: 'Join the waitlist',
+    joined: "You're on the waitlist",
+    notified: "It's your turn! A spot is free",
+    leave: 'Leave',
+  },
   restaurantProfile: {
     showingTablesFor: 'Showing tables for',
     noOpenTables: 'No open tables right now',

@@ -302,6 +302,12 @@ export const pt = {
     doneDesc: 'Assim que for publicada uma mesa que combine com o que procura, vai receber uma notificação.',
     close: 'Entendido',
   },
+  waitlist: {
+    join: 'Entrar na lista de espera',
+    joined: 'Você está na lista de espera',
+    notified: 'É a sua vez! Há uma vaga livre',
+    leave: 'Sair',
+  },
   card: {
     available: 'Disponível',
     full: 'Completa',

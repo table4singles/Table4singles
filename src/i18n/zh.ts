@@ -302,6 +302,12 @@ export const zh = {
     doneDesc: '一旦发布符合你需求的餐桌，你将收到通知。',
     close: '知道了',
   },
+  waitlist: {
+    join: '加入候补名单',
+    joined: '你已在候补名单中',
+    notified: '轮到你了！有空位了',
+    leave: '退出',
+  },
   card: {
     available: '可用',
     full: '已满',

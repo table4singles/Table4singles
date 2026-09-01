@@ -302,6 +302,12 @@ export const it = {
     doneDesc: 'Appena verrà pubblicato un tavolo che corrisponde a ciò che cerchi, riceverai una notifica.',
     close: 'Capito',
   },
+  waitlist: {
+    join: "Unisciti alla lista d'attesa",
+    joined: "Sei nella lista d'attesa",
+    notified: 'Tocca a te! C\'è un posto libero',
+    leave: 'Esci',
+  },
   card: {
     available: 'Disponibile',
     full: 'Completo',

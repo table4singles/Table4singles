@@ -283,6 +283,12 @@ export const es = {
     doneDesc: 'En cuanto se publique una mesa que encaje con lo que buscas, te llegará una notificación.',
     close: 'Entendido',
   },
+  waitlist: {
+    join: 'Unirme a la lista de espera',
+    joined: 'Estás en la lista de espera',
+    notified: '¡Te toca! Hay una plaza libre',
+    leave: 'Salir',
+  },
   restaurantProfile: {
     showingTablesFor: 'Mostrando mesas para el',
     noOpenTables: 'Sin mesas abiertas ahora mismo',

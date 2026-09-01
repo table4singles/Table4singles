@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
-import { ArrowLeft, MapPin, Clock, Users, Calendar, Loader2, MessageSquare, Star, Download, UserPlus, XCircle, PartyPopper, Check, Mail, Pencil, Save, UserMinus } from 'lucide-react'
+import { ArrowLeft, MapPin, Clock, Users, Calendar, Loader2, MessageSquare, Star, Download, UserPlus, XCircle, PartyPopper, Check, Mail, Pencil, Save, UserMinus, BellRing } from 'lucide-react'
 import { Navbar } from '@/components/Navbar'
 import { ShareButton } from '@/components/ShareButton'
 import { StarRating } from '@/components/StarRating'
@@ -18,6 +18,7 @@ import { useReviews } from '@/hooks/useReviews'
 import { useMessages } from '@/hooks/useMessages'
 import { useInvitations } from '@/hooks/useInvitations'
 import { useAnalytics } from '@/hooks/useAnalytics'
+import { useWaitlist } from '@/hooks/useWaitlist'
 import { supabase } from '@/lib/supabase'
 import { restaurantPublicLocation } from '@/lib/privacy'
 
@@ -39,6 +40,8 @@ export function TableDetailPage({ tableId, paymentSuccess, paymentCancelled, onN
   const { messages, sendMessage } = useMessages(tableId)
   const { sendInvitation } = useInvitations(null)
   const { track } = useAnalytics()
+  const { entry: waitlistEntry, join: joinWaitlist, leave: leaveWaitlist } = useWaitlist(tableId, user?.id ?? null)
+  const [waitlistBusy, setWaitlistBusy] = useState(false)
   const { pendingInvite, clearPendingInvite } = usePendingInvite()
   const [joining, setJoining] = useState(false)
   const [joinError, setJoinError] = useState<string | null>(null)
@@ -500,8 +503,35 @@ export function TableDetailPage({ tableId, paymentSuccess, paymentCancelled, onN
                   )}
                 </div>
               )}
-              {isFull && !isParticipant && !isHost && (
-                <p className="text-center text-sm font-medium text-gray-500 dark:text-gray-400 py-2">{t('card.tableFull')}</p>
+              {isFull && !isParticipant && !isHost && !isCancelled && !isPast && (
+                <div className="text-center py-2">
+                  <p className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-3">{t('card.tableFull')}</p>
+                  {!user ? (
+                    <button onClick={() => onAuthClick('signin')} className="w-full py-2.5 bg-primary-50 text-primary-700 border border-primary-200 rounded-xl text-sm font-medium hover:bg-primary-100 flex items-center justify-center gap-2">
+                      <BellRing className="w-4 h-4" /> {t('waitlist.join')}
+                    </button>
+                  ) : waitlistEntry ? (
+                    <div className="flex items-center justify-center gap-2 text-sm text-primary-600 dark:text-primary-400 font-medium">
+                      <Check className="w-4 h-4" />
+                      {waitlistEntry.status === 'notified' ? t('waitlist.notified') : t('waitlist.joined')}
+                      <button
+                        onClick={async () => { setWaitlistBusy(true); try { await leaveWaitlist() } finally { setWaitlistBusy(false) } }}
+                        disabled={waitlistBusy}
+                        className="text-gray-400 hover:text-red-500 underline text-xs disabled:opacity-50 ml-1"
+                      >
+                        {t('waitlist.leave')}
+                      </button>
+                    </div>
+                  ) : (
+                    <button
+                      onClick={async () => { setWaitlistBusy(true); try { await joinWaitlist() } finally { setWaitlistBusy(false) } }}
+                      disabled={waitlistBusy}
+                      className="w-full py-2.5 bg-primary-50 text-primary-700 border border-primary-200 rounded-xl text-sm font-medium hover:bg-primary-100 disabled:opacity-50 flex items-center justify-center gap-2"
+                    >
+                      {waitlistBusy ? <Loader2 className="w-4 h-4 animate-spin" /> : <BellRing className="w-4 h-4" />} {t('waitlist.join')}
+                    </button>
+                  )}
+                </div>
               )}
 
               {isHost && !isCancelled && (

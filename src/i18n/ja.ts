@@ -302,6 +302,12 @@ export const ja = {
     doneDesc: '条件に合うテーブルが公開され次第、通知が届きます。',
     close: '了解',
   },
+  waitlist: {
+    join: 'キャンセル待ちに登録する',
+    joined: 'キャンセル待ちに登録済みです',
+    notified: '順番が来ました！空席があります',
+    leave: '取り消す',
+  },
   card: {
     available: '利用可能',
     full: '満席',

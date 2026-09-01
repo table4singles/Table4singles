@@ -302,6 +302,12 @@ export const sv = {
     doneDesc: 'Så snart ett bord som matchar det du söker publiceras får du en avisering.',
     close: 'Uppfattat',
   },
+  waitlist: {
+    join: 'Gå med i väntelistan',
+    joined: 'Du står på väntelistan',
+    notified: 'Din tur! En plats är ledig',
+    leave: 'Lämna',
+  },
   card: {
     available: 'Tillgänglig',
     full: 'Fullbokad',

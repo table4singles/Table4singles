@@ -302,6 +302,12 @@ export const de = {
     doneDesc: 'Sobald ein passender Tisch veröffentlicht wird, erhältst du eine Benachrichtigung.',
     close: 'Verstanden',
   },
+  waitlist: {
+    join: 'Zur Warteliste hinzufügen',
+    joined: 'Du bist auf der Warteliste',
+    notified: 'Du bist dran! Ein Platz ist frei',
+    leave: 'Verlassen',
+  },
   card: {
     available: 'Verfügbar',
     full: 'Voll',

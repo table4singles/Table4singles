@@ -302,6 +302,12 @@ export const fr = {
     doneDesc: "Dès qu'une table correspondant à votre recherche sera publiée, vous recevrez une notification.",
     close: 'Compris',
   },
+  waitlist: {
+    join: "Rejoindre la liste d'attente",
+    joined: "Vous êtes sur la liste d'attente",
+    notified: "C'est votre tour ! Une place est libre",
+    leave: 'Quitter',
+  },
   card: {
     available: 'Disponible',
     full: 'Complète',

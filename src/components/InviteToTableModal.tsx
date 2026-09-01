@@ -4,6 +4,8 @@ import { useAuth } from '@/contexts/AuthContext'
 import { usePendingInvite } from '@/contexts/PendingInviteContext'
 import { useInvitations } from '@/hooks/useInvitations'
 import { useInvitableTables, type InvitableTable } from '@/hooks/useInvitableTables'
+import { useLanguage } from '@/contexts/LanguageContext'
+import { resolveDateLocale } from '@/lib/dateLocale'
 
 interface InviteToTableModalProps {
   inviteeId: string
@@ -12,15 +14,17 @@ interface InviteToTableModalProps {
   onNavigate: (page: string, id?: string) => void
 }
 
-function formatTableDate(t: InvitableTable): string {
+function formatTableDate(t: InvitableTable, locale: string): string {
   const date = new Date(`${t.date}T${t.time || '12:00'}`)
   if (Number.isNaN(date.getTime())) return t.date
-  const label = date.toLocaleDateString('es-ES', { weekday: 'long', day: 'numeric', month: 'short' })
+  const label = date.toLocaleDateString(locale, { weekday: 'long', day: 'numeric', month: 'short' })
   return t.time ? `${label} ${t.time.slice(0, 5)}` : label
 }
 
 export function InviteToTableModal({ inviteeId, inviteeName, onClose, onNavigate }: InviteToTableModalProps) {
   const { user } = useAuth()
+  const { t, language } = useLanguage()
+  const locale = resolveDateLocale(language)
   const { tables, loading } = useInvitableTables(user?.id ?? null)
   const { sendInvitation } = useInvitations(null)
   const { setPendingInvite } = usePendingInvite()
@@ -42,7 +46,7 @@ export function InviteToTableModal({ inviteeId, inviteeName, onClose, onNavigate
       await sendInvitation(selectedTable.id, inviteeId, paymentCovered)
       setSuccess(true)
     } catch {
-      setError('No se ha podido enviar la invitación. Inténtalo de nuevo.')
+      setError(t('inviteModal.sendError'))
     }
     setSending(false)
   }
@@ -58,8 +62,8 @@ export function InviteToTableModal({ inviteeId, inviteeName, onClose, onNavigate
       <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl w-full max-w-md" onClick={e => e.stopPropagation()}>
         <div className="flex items-center justify-between p-6 pb-4">
           <div>
-            <h2 className="text-xl font-display font-bold text-gray-900 dark:text-white">Invitar a una cena</h2>
-            <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">Invita a {inviteeName} a compartir mesa contigo</p>
+            <h2 className="text-xl font-display font-bold text-gray-900 dark:text-white">{t('inviteModal.title')}</h2>
+            <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">{t('inviteModal.subtitle').replace('{name}', inviteeName)}</p>
           </div>
           <button onClick={onClose} className="p-2 hover:bg-gray-100 dark:hover:bg-gray-600 rounded-full">
             <X className="w-5 h-5" />
@@ -72,10 +76,10 @@ export function InviteToTableModal({ inviteeId, inviteeName, onClose, onNavigate
               <div className="w-14 h-14 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-3">
                 <Check className="w-7 h-7 text-green-600" />
               </div>
-              <p className="font-medium text-gray-900 dark:text-white mb-1">Invitación enviada</p>
-              <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">{inviteeName} recibirá tu invitación y podrá aceptarla o rechazarla.</p>
+              <p className="font-medium text-gray-900 dark:text-white mb-1">{t('inviteModal.sentTitle')}</p>
+              <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">{t('inviteModal.sentDesc').replace('{name}', inviteeName)}</p>
               <button onClick={onClose} className="w-full py-3 bg-primary-500 text-white rounded-xl font-medium hover:bg-primary-600 transition-colors">
-                Cerrar
+                {t('inviteModal.close')}
               </button>
             </div>
           ) : loading ? (
@@ -87,27 +91,27 @@ export function InviteToTableModal({ inviteeId, inviteeName, onClose, onNavigate
               <div className="w-14 h-14 bg-gray-100 dark:bg-gray-700 rounded-full flex items-center justify-center mx-auto mb-3">
                 <UtensilsCrossed className="w-7 h-7 text-gray-400 dark:text-gray-500" />
               </div>
-              <p className="font-medium text-gray-900 dark:text-white mb-1">Aún no tienes mesa</p>
+              <p className="font-medium text-gray-900 dark:text-white mb-1">{t('inviteModal.noTableTitle')}</p>
               <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
-                Necesitas tener una mesa reservada con plazas libres para poder invitar a {inviteeName}.
+                {t('inviteModal.noTableDesc').replace('{name}', inviteeName)}
               </p>
               <button onClick={goToRestaurants} className="w-full py-3 bg-primary-500 text-white rounded-xl font-medium hover:bg-primary-600 transition-colors">
-                Buscar restaurante para invitar
+                {t('inviteModal.findRestaurant')}
               </button>
             </div>
           ) : !selectedTable ? (
             <div className="space-y-2">
-              <p className="text-sm font-medium text-gray-700 dark:text-gray-200 mb-2">Elige a qué mesa invitar</p>
-              {tables.map(t => (
+              <p className="text-sm font-medium text-gray-700 dark:text-gray-200 mb-2">{t('inviteModal.chooseTable')}</p>
+              {tables.map(tbl => (
                 <button
-                  key={t.id}
-                  onClick={() => setSelectedTable(t)}
+                  key={tbl.id}
+                  onClick={() => setSelectedTable(tbl)}
                   className="w-full text-left px-3 py-2.5 rounded-xl text-sm border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors flex items-center gap-2"
                 >
                   <CalendarDays className="w-4 h-4 text-primary-500 flex-shrink-0" />
                   <span>
-                    <span className="font-medium text-gray-900 dark:text-white">{t.restaurant_name}</span>
-                    <span className="text-gray-400 dark:text-gray-500 ml-1.5">{formatTableDate(t)}</span>
+                    <span className="font-medium text-gray-900 dark:text-white">{tbl.restaurant_name}</span>
+                    <span className="text-gray-400 dark:text-gray-500 ml-1.5">{formatTableDate(tbl, locale)}</span>
                   </span>
                 </button>
               ))}
@@ -116,21 +120,21 @@ export function InviteToTableModal({ inviteeId, inviteeName, onClose, onNavigate
             <>
               <div className="bg-gray-50 dark:bg-gray-900 rounded-xl p-3 mb-4 text-sm">
                 <p className="font-medium text-gray-900 dark:text-white">{selectedTable.restaurant_name}</p>
-                <p className="text-gray-500 dark:text-gray-400">{formatTableDate(selectedTable)}</p>
+                <p className="text-gray-500 dark:text-gray-400">{formatTableDate(selectedTable, locale)}</p>
                 {tables.length > 1 && (
-                  <button onClick={() => setSelectedTable(null)} className="text-xs text-primary-600 font-medium mt-1">Cambiar mesa</button>
+                  <button onClick={() => setSelectedTable(null)} className="text-xs text-primary-600 font-medium mt-1">{t('inviteModal.changeTable')}</button>
                 )}
               </div>
 
-              <p className="text-sm font-medium text-gray-700 dark:text-gray-200 mb-2">Tipo de invitación</p>
+              <p className="text-sm font-medium text-gray-700 dark:text-gray-200 mb-2">{t('inviteModal.invitationType')}</p>
               <div className="space-y-2 mb-4">
                 <button onClick={() => setPaymentCovered(true)} className={`w-full text-left p-3 rounded-xl border-2 transition-all ${paymentCovered ? 'border-primary-500 bg-primary-50' : 'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-500'}`}>
-                  <p className={`font-medium text-sm ${paymentCovered ? 'text-primary-700' : 'text-gray-700 dark:text-gray-200'}`}>Yo invito</p>
-                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">Te haces cargo del depósito de {inviteeName}</p>
+                  <p className={`font-medium text-sm ${paymentCovered ? 'text-primary-700' : 'text-gray-700 dark:text-gray-200'}`}>{t('inviteModal.iInvite')}</p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">{t('inviteModal.iInviteDesc').replace('{name}', inviteeName)}</p>
                 </button>
                 <button onClick={() => setPaymentCovered(false)} className={`w-full text-left p-3 rounded-xl border-2 transition-all ${!paymentCovered ? 'border-primary-500 bg-primary-50' : 'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-500'}`}>
-                  <p className={`font-medium text-sm ${!paymentCovered ? 'text-primary-700' : 'text-gray-700 dark:text-gray-200'}`}>Cada uno paga su parte</p>
-                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">{inviteeName} paga su propio depósito si acepta</p>
+                  <p className={`font-medium text-sm ${!paymentCovered ? 'text-primary-700' : 'text-gray-700 dark:text-gray-200'}`}>{t('inviteModal.eachPays')}</p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">{t('inviteModal.eachPaysDesc').replace('{name}', inviteeName)}</p>
                 </button>
               </div>
 
@@ -141,7 +145,7 @@ export function InviteToTableModal({ inviteeId, inviteeName, onClose, onNavigate
                 disabled={sending}
                 className="w-full py-3 bg-primary-500 text-white rounded-xl font-medium hover:bg-primary-600 disabled:opacity-50 transition-colors"
               >
-                {sending ? 'Enviando...' : 'Enviar invitación'}
+                {sending ? t('inviteModal.sending') : t('inviteModal.send')}
               </button>
             </>
           )}

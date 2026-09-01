@@ -5,11 +5,13 @@ import { useDinerTrustScore } from '@/hooks/useDinerReviews'
 import { InviteToTableModal } from '@/components/InviteToTableModal'
 import { Avatar } from '@/components/Avatar'
 import { publicAge, publicLocation } from '@/lib/privacy'
+import { useLanguage } from '@/contexts/LanguageContext'
+import { resolveDateLocale } from '@/lib/dateLocale'
 
-function formatMemberSince(createdAt: string): string {
+function formatMemberSince(createdAt: string, locale: string): string {
   const date = new Date(createdAt)
   if (Number.isNaN(date.getTime())) return ''
-  return date.toLocaleDateString('es-ES', { month: 'long', year: 'numeric' })
+  return date.toLocaleDateString(locale, { month: 'long', year: 'numeric' })
 }
 
 interface CompanionProfileModalProps {
@@ -19,6 +21,7 @@ interface CompanionProfileModalProps {
 }
 
 export function CompanionProfileModal({ companion, onClose, onNavigate }: CompanionProfileModalProps) {
+  const { t, language } = useLanguage()
   const age = publicAge(companion)
   const { score } = useDinerTrustScore(companion.id)
   const location = publicLocation(companion)
@@ -36,7 +39,7 @@ export function CompanionProfileModal({ companion, onClose, onNavigate }: Compan
             <Avatar src={companion.avatar_url} name={companion.display_name} className="w-full h-full" textClassName="text-3xl" />
           </div>
           <h3 className="text-lg font-display font-bold text-gray-900 dark:text-gray-100">
-            {companion.display_name || 'Usuario'}{age !== null && <span className="font-normal text-gray-500 dark:text-gray-400">, {age}</span>}
+            {companion.display_name || t('restaurantProfile.user')}{age !== null && <span className="font-normal text-gray-500 dark:text-gray-400">, {age}</span>}
           </h3>
           {location && (
             <p className="text-sm text-gray-500 dark:text-gray-400 flex items-center gap-1 mt-1">
@@ -46,21 +49,21 @@ export function CompanionProfileModal({ companion, onClose, onNavigate }: Compan
           {score && score.reviewCount > 0 && (
             <div className="flex items-center gap-1 mt-2 text-sm text-green-600 dark:text-green-400">
               <ShieldCheck className="w-4 h-4" />
-              <span>Confianza {score.avgRating.toFixed(1)}/5 ({score.reviewCount} valoraciones)</span>
+              <span>{t('companions.trustScore').replace('{rating}', score.avgRating.toFixed(1)).replace('{count}', String(score.reviewCount))}</span>
             </div>
           )}
         </div>
 
         {companion.bio && (
           <div className="mb-4">
-            <h4 className="text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wide mb-1">Sobre mí</h4>
+            <h4 className="text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wide mb-1">{t('companions.aboutMe')}</h4>
             <p className="text-sm text-gray-700 dark:text-gray-200 whitespace-pre-wrap">{companion.bio}</p>
           </div>
         )}
 
         {companion.languages && companion.languages.length > 0 && (
           <div className="mb-4">
-            <h4 className="text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wide mb-2">Idiomas</h4>
+            <h4 className="text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wide mb-2">{t('companions.languagesLabel')}</h4>
             <div className="flex flex-wrap gap-1.5">
               {companion.languages.map(l => (
                 <span key={l} className="text-xs px-2.5 py-1 rounded-full bg-blue-50 dark:bg-blue-950 text-blue-600 dark:text-blue-300">{l}</span>
@@ -71,7 +74,7 @@ export function CompanionProfileModal({ companion, onClose, onNavigate }: Compan
 
         {companion.interests && companion.interests.length > 0 && (
           <div className="mb-4">
-            <h4 className="text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wide mb-2">Intereses</h4>
+            <h4 className="text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wide mb-2">{t('companions.interestsLabel')}</h4>
             <div className="flex flex-wrap gap-1.5">
               {companion.interests.map(i => (
                 <span key={i} className="text-xs px-2.5 py-1 rounded-full bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300">{i}</span>
@@ -84,18 +87,18 @@ export function CompanionProfileModal({ companion, onClose, onNavigate }: Compan
           onClick={() => setShowInvite(true)}
           className="w-full py-2.5 mb-3 bg-primary-50 dark:bg-primary-950 text-primary-600 dark:text-primary-300 rounded-xl text-sm font-medium hover:bg-primary-100 dark:hover:bg-primary-900 flex items-center justify-center gap-2"
         >
-          <Mail className="w-4 h-4" /> Invitar a una cena
+          <Mail className="w-4 h-4" /> {t('companions.inviteToDinner')}
         </button>
 
         <p className="text-xs text-gray-400 dark:text-gray-500 text-center pt-2 border-t border-gray-100 dark:border-gray-800">
-          Miembro desde {formatMemberSince(companion.created_at)}
+          {t('companions.memberSince').replace('{date}', formatMemberSince(companion.created_at, resolveDateLocale(language)))}
         </p>
       </div>
 
       {showInvite && (
         <InviteToTableModal
           inviteeId={companion.id}
-          inviteeName={companion.display_name || 'este usuario'}
+          inviteeName={companion.display_name || t('companions.thisUser')}
           onClose={() => setShowInvite(false)}
           onNavigate={onNavigate}
         />

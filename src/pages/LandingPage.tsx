@@ -128,6 +128,15 @@ export function LandingPage({ onNavigate, onAuthClick }: LandingPageProps) {
         </div>
       </section>
 
+      {/* Brand mark — full logo, shown large before asking for the sign-up */}
+      <section className="py-20 bg-navy-900 flex items-center justify-center">
+        <img
+          src="/icons/logo-brand-full.jpg"
+          alt="Table4Singles — Meet, Connect, Share"
+          className="w-64 md:w-80 rounded-3xl shadow-e4"
+        />
+      </section>
+
       {/* FAQ */}
       <section className="py-20 bg-navy-950">
         <div className="max-w-2xl mx-auto px-4">

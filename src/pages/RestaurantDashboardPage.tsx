@@ -9,6 +9,7 @@ import { useAuth } from '@/contexts/AuthContext'
 import { useViewMode } from '@/contexts/ViewModeContext'
 import { useMyTables } from '@/hooks/useTables'
 import { supabase } from '@/lib/supabase'
+import { resolveDateLocale } from '@/lib/dateLocale'
 
 interface RestaurantDashboardPageProps {
   onNavigate: (page: string, id?: string) => void
@@ -24,7 +25,7 @@ export function RestaurantDashboardPage({ onNavigate, onAuthClick }: RestaurantD
   const [avgRating, setAvgRating] = useState<number | null>(null)
   const [reviewCount, setReviewCount] = useState(0)
 
-  const locale = language === 'de' ? 'de-DE' : language === 'en' ? 'en-GB' : 'es-ES'
+  const locale = resolveDateLocale(language)
 
   useEffect(() => {
     if (!user) return

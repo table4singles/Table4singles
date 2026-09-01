@@ -12,6 +12,7 @@ import { useAuth } from '@/contexts/AuthContext'
 import { useLanguage } from '@/contexts/LanguageContext'
 import type { RestaurantReview } from '@/types/database'
 import { restaurantPublicLocation } from '@/lib/privacy'
+import { resolveDateLocale } from '@/lib/dateLocale'
 
 interface RestaurantProfilePageProps {
   restaurantId: string
@@ -19,15 +20,23 @@ interface RestaurantProfilePageProps {
   onAuthClick: (mode?: 'signin' | 'signup') => void
 }
 
-const MONTH_NAMES = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre']
-const DAY_LABELS = ['L','M','X','J','V','S','D']
-
 export function RestaurantProfilePage({ restaurantId, onNavigate, onAuthClick }: RestaurantProfilePageProps) {
   const { user, profile: myProfile } = useAuth()
   const { restaurant, tables, loading, error } = useRestaurantProfile(restaurantId)
   const { reviews, avgRating, submitReview, submitReply, submitting } = useRestaurantPublicReviews(restaurantId)
   const { isFavorite, toggleFavorite } = useFavorites()
-  const { t } = useLanguage()
+  const { t, language } = useLanguage()
+  const locale = resolveDateLocale(language)
+  const dayLabels = useMemo(() => {
+    const today = new Date()
+    const monday = new Date(today)
+    monday.setDate(today.getDate() - ((today.getDay() + 6) % 7))
+    return Array.from({ length: 7 }, (_, i) => {
+      const d = new Date(monday)
+      d.setDate(monday.getDate() + i)
+      return d.toLocaleDateString(locale, { weekday: 'narrow' })
+    })
+  }, [locale])
 
   // Carousel
   const photos = useMemo(() => {
@@ -122,8 +131,8 @@ export function RestaurantProfilePage({ restaurantId, onNavigate, onAuthClick }:
   }, [tables, selectedDate, selectedTime, showTables])
 
   const dateLabel = selectedDate
-    ? new Date(selectedDate + 'T12:00:00').toLocaleDateString('es-ES', { weekday: 'short', day: 'numeric', month: 'short' })
-    : 'Elige un día'
+    ? new Date(selectedDate + 'T12:00:00').toLocaleDateString(locale, { weekday: 'short', day: 'numeric', month: 'short' })
+    : t('restaurantProfile.chooseDay')
   const timeLabel = selectedTime === 'midday' ? `☀️ ${t('browse.midday')}` : selectedTime === 'evening' ? `🌙 ${t('browse.evening')}` : null
 
   if (loading) {
@@ -140,7 +149,7 @@ export function RestaurantProfilePage({ restaurantId, onNavigate, onAuthClick }:
       <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
         <Navbar currentPage="browse" onNavigate={onNavigate} onAuthClick={onAuthClick} />
         <div className="max-w-3xl mx-auto px-4 py-8">
-          <ErrorBanner message={error || 'Restaurante no encontrado'} />
+          <ErrorBanner message={error || t('restaurantProfile.notFound')} />
         </div>
       </div>
     )
@@ -262,7 +271,7 @@ export function RestaurantProfilePage({ restaurantId, onNavigate, onAuthClick }:
               {restaurant.restaurant_menu_url && (
                 <a href={restaurant.restaurant_menu_url} target="_blank" rel="noopener noreferrer"
                   className="flex items-center gap-2 text-xs text-[#129a93] hover:underline">
-                  <Link className="w-3.5 h-3.5 flex-shrink-0" />Ver menú
+                  <Link className="w-3.5 h-3.5 flex-shrink-0" />{t('restaurantProfile.viewMenu')}
                 </a>
               )}
               {restaurant.restaurant_specialties && restaurant.restaurant_specialties.length > 0 && (
@@ -281,7 +290,7 @@ export function RestaurantProfilePage({ restaurantId, onNavigate, onAuthClick }:
           {/* ── Selector de fecha y hora (obligatorio) ───────── */}
           {tables.length > 0 && (
             <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 p-5">
-              <h2 className="text-sm font-semibold text-gray-900 dark:text-white mb-4">¿Cuándo quieres ir?</h2>
+              <h2 className="text-sm font-semibold text-gray-900 dark:text-white mb-4">{t('restaurantProfile.whenToGo')}</h2>
 
               <div className="flex flex-col sm:flex-row gap-3">
                 {/* Date pill */}
@@ -309,13 +318,13 @@ export function RestaurantProfilePage({ restaurantId, onNavigate, onAuthClick }:
                         <button onClick={prevMonth} disabled={calYear === new Date().getFullYear() && calMonth === new Date().getMonth()} className="p-1 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 disabled:opacity-30">
                           <ChevronLeft className="w-4 h-4 text-gray-500 dark:text-gray-400" />
                         </button>
-                        <span className="text-xs font-semibold text-gray-700 dark:text-white">{MONTH_NAMES[calMonth]} {calYear}</span>
+                        <span className="text-xs font-semibold text-gray-700 dark:text-white">{new Date(calYear, calMonth, 1).toLocaleDateString(locale, { month: 'long' })} {calYear}</span>
                         <button onClick={nextMonth} className="p-1 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700">
                           <ChevronRight className="w-4 h-4 text-gray-500 dark:text-gray-400" />
                         </button>
                       </div>
                       <div className="grid grid-cols-7 mb-1">
-                        {DAY_LABELS.map(l => <div key={l} className="text-center text-[10px] font-medium text-gray-400 dark:text-gray-500 py-0.5">{l}</div>)}
+                        {dayLabels.map((l, i) => <div key={i} className="text-center text-[10px] font-medium text-gray-400 dark:text-gray-500 py-0.5">{l}</div>)}
                       </div>
                       <div className="grid grid-cols-7 gap-y-0.5">
                         {calDays.map((d, i) => {
@@ -473,13 +482,13 @@ export function RestaurantProfilePage({ restaurantId, onNavigate, onAuthClick }:
 }
 
 function PublicReviewCard({ review, isRestaurant, onReply }: { review: RestaurantReview; isRestaurant: boolean; onReply: (reviewId: string, reply: string) => Promise<void> }) {
-  const { t } = useLanguage()
+  const { t, language } = useLanguage()
   const existingReply = review.restaurant_review_replies?.[0]
   const [showReplyBox, setShowReplyBox] = useState(false)
   const [replyText, setReplyText] = useState('')
   const [saving, setSaving] = useState(false)
   const profile = review.profiles
-  const date = new Date(review.created_at).toLocaleDateString('es-ES', { day: 'numeric', month: 'short' })
+  const date = new Date(review.created_at).toLocaleDateString(resolveDateLocale(language), { day: 'numeric', month: 'short' })
 
   const handleSave = async () => {
     if (!replyText.trim()) return

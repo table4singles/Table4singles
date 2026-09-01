@@ -21,6 +21,7 @@ import { useAnalytics } from '@/hooks/useAnalytics'
 import { useWaitlist } from '@/hooks/useWaitlist'
 import { supabase } from '@/lib/supabase'
 import { restaurantPublicLocation } from '@/lib/privacy'
+import { resolveDateLocale } from '@/lib/dateLocale'
 
 interface TableDetailPageProps {
   tableId: string
@@ -101,7 +102,7 @@ export function TableDetailPage({ tableId, paymentSuccess, paymentCancelled, onN
     if (paymentSuccess && pendingInvite) setShowAutoInvite(true)
   }, [paymentSuccess, pendingInvite])
 
-  const locale = language === 'de' ? 'de-DE' : language === 'en' ? 'en-GB' : 'es-ES'
+  const locale = resolveDateLocale(language)
   const myParticipation = participants.find(p => p.user_id === user?.id)
   const isParticipant = !!myParticipation
   const isHost = table?.host_id === user?.id

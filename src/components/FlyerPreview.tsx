@@ -2,8 +2,9 @@ import type { BrandPalette } from '@/lib/extractBrandColors'
 import type { FlyerFormat } from '@/lib/flyerFormats'
 import { Heart, Globe, MapPin, Users, UtensilsCrossed, Download } from 'lucide-react'
 
-const QR_SRC = '/icons/qr-app-logo.png'
 const T4S_LOGO = '/icons/logo-full.png'
+/** Fallback mientras se genera el QR real (o si el restaurantId no está disponible) */
+const QR_FALLBACK_SRC = '/icons/qr-app-logo.png'
 
 interface FlyerPreviewProps {
   format: FlyerFormat
@@ -11,13 +12,15 @@ interface FlyerPreviewProps {
   logo: string | null
   heroPhoto: string
   brand: BrandPalette
+  qrSrc?: string
 }
 
 /** Contenedor externo que fija el ratio y limita el tamaño en pantalla */
-export function FlyerPreview({ format, name, logo, heroPhoto, brand }: FlyerPreviewProps) {
+export function FlyerPreview({ format, name, logo, heroPhoto, brand, qrSrc }: FlyerPreviewProps) {
   const isTable = format.category === 'table'
   const isLandscape = format.orientation === 'landscape'
   const maxW = isTable ? (isLandscape ? 560 : 340) : (isLandscape ? 720 : 500)
+  const resolvedQr = qrSrc || QR_FALLBACK_SRC
 
   return (
     <div
@@ -26,8 +29,8 @@ export function FlyerPreview({ format, name, logo, heroPhoto, brand }: FlyerPrev
     >
       <div id="flyer" className="w-full h-full bg-white overflow-hidden">
         {isTable
-          ? <TableLayout format={format} name={name} logo={logo} heroPhoto={heroPhoto} brand={brand} />
-          : <PosterLayout format={format} name={name} logo={logo} heroPhoto={heroPhoto} brand={brand} />}
+          ? <TableLayout format={format} name={name} logo={logo} heroPhoto={heroPhoto} brand={brand} qrSrc={resolvedQr} />
+          : <PosterLayout format={format} name={name} logo={logo} heroPhoto={heroPhoto} brand={brand} qrSrc={resolvedQr} />}
       </div>
     </div>
   )
@@ -35,7 +38,7 @@ export function FlyerPreview({ format, name, logo, heroPhoto, brand }: FlyerPrev
 
 /* ─────────────────────────── CARTEL ─────────────────────────── */
 
-function PosterLayout({ format, name, logo, heroPhoto, brand }: FlyerPreviewProps) {
+function PosterLayout({ format, name, logo, heroPhoto, brand, qrSrc }: FlyerPreviewProps & { qrSrc: string }) {
   const landscape = format.orientation === 'landscape'
   const accent = brand.primary
   const accentLight = brand.primaryLight
@@ -81,7 +84,7 @@ function PosterLayout({ format, name, logo, heroPhoto, brand }: FlyerPreviewProp
               Conecta, disfruta y conoce gente nueva en los mejores restaurantes.
             </p>
             <div className="rounded-xl p-2 bg-white shadow-lg border border-gray-100 mt-1">
-              <img src={QR_SRC} alt="QR" className="w-32 h-32 block" crossOrigin="anonymous" />
+              <img src={qrSrc} alt="QR" className="w-32 h-32 block" crossOrigin="anonymous" />
             </div>
             <p className="font-black uppercase leading-tight text-xs text-gray-900" style={{ fontFamily: 'Arial Black, sans-serif' }}>
               Escanea y descarga la app
@@ -137,7 +140,7 @@ function PosterLayout({ format, name, logo, heroPhoto, brand }: FlyerPreviewProp
         {/* QR centrado sobre la foto */}
         <div className="absolute inset-0 flex items-center justify-center">
           <div className="relative z-10 rounded-2xl p-2.5 shadow-2xl" style={{ backgroundColor: 'rgba(255,255,255,0.97)' }}>
-            <img src={QR_SRC} alt="QR Table4Singles" className="w-[140px] h-[140px] block" crossOrigin="anonymous" />
+            <img src={qrSrc} alt="QR Table4Singles" className="w-[140px] h-[140px] block" crossOrigin="anonymous" />
           </div>
         </div>
 
@@ -194,7 +197,7 @@ function PosterLayout({ format, name, logo, heroPhoto, brand }: FlyerPreviewProp
 
 /* ─────────────────────────── MESA ─────────────────────────── */
 
-function TableLayout({ format, name, logo, heroPhoto, brand }: FlyerPreviewProps) {
+function TableLayout({ format, name, logo, heroPhoto, brand, qrSrc }: FlyerPreviewProps & { qrSrc: string }) {
   const landscape = format.orientation === 'landscape'
   const accent = brand.primary
 
@@ -225,7 +228,7 @@ function TableLayout({ format, name, logo, heroPhoto, brand }: FlyerPreviewProps
         <div className="flex-1 flex flex-col items-center justify-center px-4 py-3 gap-2 bg-white">
           <img src={T4S_LOGO} alt="Table4Singles" className="h-8 w-auto max-w-full object-contain" crossOrigin="anonymous" />
           <div className="rounded-xl p-2 bg-white shadow-md border border-gray-100">
-            <img src={QR_SRC} alt="QR" className="w-32 h-32 block" crossOrigin="anonymous" />
+            <img src={qrSrc} alt="QR" className="w-32 h-32 block" crossOrigin="anonymous" />
           </div>
           <p className="text-center font-black uppercase leading-tight text-gray-900 text-xs" style={{ fontFamily: 'Arial Black, sans-serif' }}>
             Escanea y descarga la app
@@ -263,7 +266,7 @@ function TableLayout({ format, name, logo, heroPhoto, brand }: FlyerPreviewProps
           {name}
         </p>
         <div className="rounded-xl p-2 bg-white shadow-md border border-gray-100">
-          <img src={QR_SRC} alt="QR" className="w-36 h-36 block" crossOrigin="anonymous" />
+          <img src={qrSrc} alt="QR" className="w-36 h-36 block" crossOrigin="anonymous" />
         </div>
         <p className="text-center font-black uppercase leading-tight text-gray-900 text-xs" style={{ fontFamily: 'Arial Black, sans-serif' }}>
           Escanea y descarga Table4Singles

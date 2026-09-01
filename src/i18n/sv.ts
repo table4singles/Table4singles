@@ -716,6 +716,7 @@ export const sv = {
     kpiReservations: 'Bokningar',
     kpiOccupancy: 'Beläggning',
     kpiRating: 'Betyg',
+    kpiQrScans: 'Skanningar av din QR',
     chartReservations: 'Bokningar per dag',
     chartRatings: 'Betygsfördelning',
     chartSlots: 'Bord per tidsintervall',
@@ -1069,5 +1070,6 @@ export const sv = {
     funnelChartTitle: 'Händelser per dag',
     funnelEmptyTitle: 'Inga händelser än',
     funnelEmptyDesc: 'Händelser visas här allteftersom folk använder appen.',
+    funnelQrScans: 'Bord-QR-skanningar',
   },
 }

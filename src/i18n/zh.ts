@@ -716,6 +716,7 @@ export const zh = {
     kpiReservations: '预订',
     kpiOccupancy: '上座率',
     kpiRating: '评分',
+    kpiQrScans: '你的二维码扫描次数',
     chartReservations: '每日预订',
     chartRatings: '评分分布',
     chartSlots: '按时段餐桌',
@@ -1069,5 +1070,6 @@ export const zh = {
     funnelChartTitle: '每日事件数',
     funnelEmptyTitle: '暂无事件',
     funnelEmptyDesc: '随着人们使用应用，事件将显示在这里。',
+    funnelQrScans: '餐桌二维码扫描次数',
   },
 }

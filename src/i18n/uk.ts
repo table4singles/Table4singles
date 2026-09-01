@@ -716,6 +716,7 @@ export const uk = {
     kpiReservations: 'Бронювання',
     kpiOccupancy: 'Завантаженість',
     kpiRating: 'Оцінка',
+    kpiQrScans: 'Скани твого QR',
     chartReservations: 'Бронювання по днях',
     chartRatings: 'Розподіл оцінок',
     chartSlots: 'Столи за часовими слотами',
@@ -1069,5 +1070,6 @@ export const uk = {
     funnelChartTitle: 'Події за днями',
     funnelEmptyTitle: 'Поки що немає подій',
     funnelEmptyDesc: 'Події з’являтимуться тут у міру використання застосунку.',
+    funnelQrScans: 'Скани QR столика',
   },
 }

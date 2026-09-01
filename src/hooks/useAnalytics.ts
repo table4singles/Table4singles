@@ -12,6 +12,7 @@ export type AnalyticsEventName =
   | 'INVITATION_CLICKED'
   | 'REFERRED_SIGNUP'
   | 'DEMAND_REQUEST_CREATED'
+  | 'QR_SCAN'
 
 export function useAnalytics() {
   const { user } = useAuth()

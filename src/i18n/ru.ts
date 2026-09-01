@@ -716,6 +716,7 @@ export const ru = {
     kpiReservations: 'Брони',
     kpiOccupancy: 'Загрузка',
     kpiRating: 'Оценка',
+    kpiQrScans: 'Сканирования твоего QR',
     chartReservations: 'Брони по дням',
     chartRatings: 'Распределение оценок',
     chartSlots: 'Столы по временным слотам',
@@ -1069,5 +1070,6 @@ export const ru = {
     funnelChartTitle: 'События по дням',
     funnelEmptyTitle: 'Пока нет событий',
     funnelEmptyDesc: 'События будут появляться здесь по мере использования приложения.',
+    funnelQrScans: 'Сканирования QR столика',
   },
 }

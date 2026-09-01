@@ -11,6 +11,7 @@ import {
   type FlyerSlot,
 } from '@/lib/flyer'
 import { downloadFlyerPng } from '@/lib/exportFlyer'
+import { generateFlyerQrDataUrl } from '@/lib/flyerQr'
 import { FlyerPreview } from '@/components/FlyerPreview'
 import {
   DEFAULT_FLYER_FORMAT_ID,
@@ -45,6 +46,7 @@ export function FlyerPage({ restaurantId }: FlyerPageProps) {
     3: STOCK_HERO,
   })
   const [existingSlots, setExistingSlots] = useState<Set<FlyerSlot>>(new Set())
+  const [qrDataUrl, setQrDataUrl] = useState<string | undefined>(undefined)
 
   // Estado de generación por slot
   const [generatingSlot, setGeneratingSlot] = useState<FlyerSlot | null>(null)
@@ -98,6 +100,13 @@ export function FlyerPage({ restaurantId }: FlyerPageProps) {
         setLoading(false)
       }
     })()
+    return () => { cancelled = true }
+  }, [restaurantId])
+
+  // QR único por restaurante — enlaza a su perfil público con atribución (?qr=restaurantId)
+  useEffect(() => {
+    let cancelled = false
+    generateFlyerQrDataUrl(restaurantId).then(url => { if (!cancelled) setQrDataUrl(url) })
     return () => { cancelled = true }
   }, [restaurantId])
 
@@ -387,6 +396,7 @@ export function FlyerPage({ restaurantId }: FlyerPageProps) {
           logo={logo}
           heroPhoto={heroUrl}
           brand={brand}
+          qrSrc={qrDataUrl}
         />
       </div>
 

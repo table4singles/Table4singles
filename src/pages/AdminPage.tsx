@@ -2,7 +2,7 @@ import { useState, useMemo } from 'react'
 import {
   Users, UtensilsCrossed, Award, CreditCard, Loader2, RefreshCw,
   TrendingUp, Euro, CheckCircle, ShieldAlert, BellRing, Eye, MousePointerClick,
-  UserPlus, Filter,
+  UserPlus, Filter, QrCode,
 } from 'lucide-react'
 import {
   BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid,
@@ -361,6 +361,7 @@ function TabFunnel({ events, t, language }: { events: AdminAnalyticsEvent[]; t: 
   const invitationsClicked = counts.INVITATION_CLICKED ?? 0
   const referredSignups = counts.REFERRED_SIGNUP ?? 0
   const demandCreated = counts.DEMAND_REQUEST_CREATED ?? 0
+  const qrScans = counts.QR_SCAN ?? 0
 
   const pct = (num: number, den: number) => den > 0 ? Math.round((num / den) * 100) : 0
 
@@ -372,6 +373,7 @@ function TabFunnel({ events, t, language }: { events: AdminAnalyticsEvent[]; t: 
     { label: t('admin.funnelInvitationsClicked'),   value: invitationsClicked,icon: <MousePointerClick className="w-5 h-5 text-teal-500" />, bg: 'bg-teal-50 dark:bg-teal-900/20' },
     { label: t('admin.funnelReferredSignups'),      value: referredSignups,   icon: <Users className="w-5 h-5 text-pink-500" />,              bg: 'bg-pink-50 dark:bg-pink-900/20' },
     { label: t('admin.funnelDemandRequests'),       value: demandCreated,     icon: <BellRing className="w-5 h-5 text-yellow-500" />,         bg: 'bg-yellow-50 dark:bg-yellow-900/20' },
+    { label: t('admin.funnelQrScans'),               value: qrScans,           icon: <QrCode className="w-5 h-5 text-[#129a93]" />,            bg: 'bg-teal-50 dark:bg-teal-900/20' },
   ]
 
   return (

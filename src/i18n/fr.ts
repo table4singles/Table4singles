@@ -716,6 +716,7 @@ export const fr = {
     kpiReservations: 'Réservations',
     kpiOccupancy: 'Occupation',
     kpiRating: 'Évaluation',
+    kpiQrScans: 'Scans de ton QR',
     chartReservations: 'Réservations par jour',
     chartRatings: 'Distribution des évaluations',
     chartSlots: 'Tables par créneau horaire',
@@ -1069,5 +1070,6 @@ export const fr = {
     funnelChartTitle: 'Événements par jour',
     funnelEmptyTitle: "Aucun événement pour l'instant",
     funnelEmptyDesc: "Les événements apparaîtront ici au fur et à mesure de l'utilisation de l'app.",
+    funnelQrScans: 'Scans du QR de table',
   },
 }

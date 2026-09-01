@@ -716,6 +716,7 @@ export const ar = {
     kpiReservations: 'الحجوزات',
     kpiOccupancy: 'الإشغال',
     kpiRating: 'التقييم',
+    kpiQrScans: 'مسح رمز QR الخاص بك',
     chartReservations: 'الحجوزات يومياً',
     chartRatings: 'توزيع التقييمات',
     chartSlots: 'الطاولات حسب الفترة الزمنية',
@@ -1069,5 +1070,6 @@ export const ar = {
     funnelChartTitle: 'الأحداث يوميًا',
     funnelEmptyTitle: 'لا توجد أحداث بعد',
     funnelEmptyDesc: 'ستظهر الأحداث هنا مع استخدام الأشخاص للتطبيق.',
+    funnelQrScans: 'مسح رمز QR الخاص بالطاولة',
   },
 }

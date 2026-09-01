@@ -716,6 +716,7 @@ export const ja = {
     kpiReservations: '予約数',
     kpiOccupancy: '稼働率',
     kpiRating: '評価',
+    kpiQrScans: 'あなたのQRスキャン数',
     chartReservations: '日別予約数',
     chartRatings: '評価の分布',
     chartSlots: '時間帯別テーブル',
@@ -1069,5 +1070,6 @@ export const ja = {
     funnelChartTitle: '日別イベント数',
     funnelEmptyTitle: 'まだイベントがありません',
     funnelEmptyDesc: 'アプリの利用が進むとここにイベントが表示されます。',
+    funnelQrScans: 'テーブルQRスキャン数',
   },
 }

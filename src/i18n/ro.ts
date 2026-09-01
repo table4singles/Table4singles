@@ -716,6 +716,7 @@ export const ro = {
     kpiReservations: 'Rezervări',
     kpiOccupancy: 'Ocupare',
     kpiRating: 'Evaluare',
+    kpiQrScans: 'Scanări ale codului tău QR',
     chartReservations: 'Rezervări pe zi',
     chartRatings: 'Distribuția evaluărilor',
     chartSlots: 'Mese pe interval orar',
@@ -1069,5 +1070,6 @@ export const ro = {
     funnelChartTitle: 'Evenimente pe zi',
     funnelEmptyTitle: 'Încă nu există evenimente',
     funnelEmptyDesc: 'Evenimentele vor apărea aici pe măsură ce oamenii folosesc aplicația.',
+    funnelQrScans: 'Scanări QR masă',
   },
 }

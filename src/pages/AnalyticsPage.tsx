@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react'
-import { ArrowLeft, TrendingUp, Users, Star, CalendarDays, Loader2 } from 'lucide-react'
+import { ArrowLeft, TrendingUp, Users, Star, CalendarDays, Loader2, QrCode } from 'lucide-react'
 import { Navbar } from '@/components/Navbar'
 import { PageHeader } from '@/components/PageHeader'
 import { useAuth } from '@/contexts/AuthContext'
@@ -34,17 +34,19 @@ export function AnalyticsPage({ onNavigate, onAuthClick }: AnalyticsPageProps) {
     const since = new Date(Date.now() - days * 86400000).toISOString().split('T')[0]
     const locale = language === 'zh' ? 'zh-CN' : language === 'ja' ? 'ja-JP' : language === 'ar' ? 'ar' : language
 
-    const [tablesRes, participantsRes, reviewsRes, paymentsRes] = await Promise.all([
+    const [tablesRes, participantsRes, reviewsRes, paymentsRes, qrScansRes] = await Promise.all([
       supabase.from('dining_tables').select('id, date, status, max_seats, available_seats, time').eq('host_id', user.id).gte('date', since).order('date'),
       supabase.from('table_participants').select('table_id, status, created_at, dining_tables!inner(host_id, date)').eq('dining_tables.host_id', user.id).gte('created_at', `${since}T00:00:00`),
       supabase.from('restaurant_reviews').select('rating, created_at').eq('restaurant_id', user.id).gte('created_at', `${since}T00:00:00`),
       supabase.from('reservation_payments').select('amount, status, created_at, dining_tables!inner(host_id)').eq('dining_tables.host_id', user.id).eq('status', 'completed').gte('created_at', `${since}T00:00:00`),
+      supabase.from('analytics_events').select('id, created_at').eq('event_name', 'QR_SCAN').eq('metadata->>restaurant_id', user.id).gte('created_at', `${since}T00:00:00`),
     ])
 
     const tables = tablesRes.data || []
     const participants = (participantsRes.data || []).filter((p: any) => p.status === 'approved')
     const reviews = reviewsRes.data || []
     const payments = paymentsRes.data || []
+    const qrScans = qrScansRes.data || []
 
     const reservasByDay: Record<string, number> = {}
     participants.forEach((p: any) => {
@@ -83,6 +85,7 @@ export function AnalyticsPage({ onNavigate, onAuthClick }: AnalyticsPageProps) {
       totalParticipants: participants.length,
       ocupacion,
       ingresos: payments.length * 2,
+      qrScans: qrScans.length,
       avgRating,
       reservasChart,
       ratingDist,
@@ -133,11 +136,12 @@ export function AnalyticsPage({ onNavigate, onAuthClick }: AnalyticsPageProps) {
           <div className="flex justify-center py-20"><Loader2 className="w-8 h-8 text-[#129a93] animate-spin" /></div>
         ) : data ? (
           <div className="space-y-6">
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+            <div className="grid grid-cols-2 sm:grid-cols-5 gap-4">
               <KpiCard icon={<CalendarDays className="w-5 h-5 text-blue-500" />} label={t('analytics.kpiTables')} value={data.totalTables} bg="bg-blue-50 dark:bg-blue-900/20" />
               <KpiCard icon={<Users className="w-5 h-5 text-green-500" />} label={t('analytics.kpiReservations')} value={data.totalParticipants} bg="bg-green-50 dark:bg-green-900/20" />
               <KpiCard icon={<TrendingUp className="w-5 h-5 text-orange-500" />} label={t('analytics.kpiOccupancy')} value={`${data.ocupacion}%`} bg="bg-orange-50 dark:bg-orange-900/20" />
               <KpiCard icon={<Star className="w-5 h-5 text-yellow-500" />} label={t('analytics.kpiRating')} value={data.avgRating ?? '—'} bg="bg-yellow-50 dark:bg-yellow-900/20" />
+              <KpiCard icon={<QrCode className="w-5 h-5 text-[#129a93]" />} label={t('analytics.kpiQrScans')} value={data.qrScans} bg="bg-teal-50 dark:bg-teal-900/20" />
             </div>
 
             {data.reservasChart.length > 0 && (

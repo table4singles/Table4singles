@@ -56,7 +56,7 @@ function AppRouter() {
         : profile.role
       setPage(savedMode === 'restaurant' ? 'restaurant-dashboard' : 'browse')
     }
-    if (!loading && !user && !['landing', 'restaurant-landing', 'politica-privacidad', 'aviso-legal', 'flyer', 'table-detail'].includes(page)) setPage('landing')
+    if (!loading && !user && !['landing', 'restaurant-landing', 'politica-privacidad', 'aviso-legal', 'flyer', 'table-detail', 'restaurant-profile'].includes(page)) setPage('landing')
   }, [user, loading, profile])
 
   // Landing de captación para restaurantes (/restaurantes) — ruta pública sin login
@@ -127,6 +127,22 @@ function AppRouter() {
       setSelectedId(flyerId)
       setPage('flyer')
       window.history.replaceState({}, '', window.location.pathname)
+    }
+  }, [])
+
+  // Escaneo de QR de mesa de un restaurante (?qr=restaurantId) — atribuye el escaneo y
+  // lleva directo al perfil público de ESE restaurante, no a la landing genérica.
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search)
+    const qrRestaurantId = params.get('qr')
+    if (qrRestaurantId) {
+      localStorage.setItem('t4s_qr_source', qrRestaurantId)
+      track('QR_SCAN', { restaurant_id: qrRestaurantId })
+      setSelectedId(qrRestaurantId)
+      setPage('restaurant-profile')
+      params.delete('qr')
+      const newSearch = params.toString()
+      window.history.replaceState({}, '', window.location.pathname + (newSearch ? `?${newSearch}` : ''))
     }
   }, [])
 

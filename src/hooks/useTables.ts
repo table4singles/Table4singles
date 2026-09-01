@@ -95,7 +95,7 @@ export function useTables(options: UseTablesOptions = {}) {
     const tableIds = rawTables.map(t => t.id)
     const { data: partData } = await supabase
       .from('table_participants')
-      .select('table_id, user_id, status, profiles(id, display_name, avatar_url)')
+      .select('table_id, user_id, status, profiles(id, display_name, avatar_url, interests)')
       .in('table_id', tableIds)
       .eq('status', 'approved')
 

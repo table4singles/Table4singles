@@ -869,6 +869,7 @@ export const ru = {
     readyForAnother: 'Готовы к следующему ужину?',
     becauseYouLikeCuisine: 'Потому что вы часто выбираете {cuisine} кухню',
     becauseYourCity: 'Потому что вы ужинали в этом городе',
+    becauseSameTime: 'Потому что это твоё привычное время',
     reservePrice: 'Забронировать · 2 €',
     guaranteedSpot: 'Место гарантировано после бронирования.',
     spotReserved: 'Место забронировано',

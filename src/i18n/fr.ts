@@ -869,6 +869,7 @@ export const fr = {
     readyForAnother: 'Prêt pour un autre dîner ?',
     becauseYouLikeCuisine: 'Parce que vous choisissez souvent la cuisine {cuisine}',
     becauseYourCity: 'Parce que vous avez dîné dans cette ville',
+    becauseSameTime: "Parce que c'est ton créneau habituel",
     reservePrice: 'Réserver une place · 2 €',
     guaranteedSpot: 'Votre place est garantie lors de la réservation.',
     spotReserved: 'Place réservée',

@@ -869,6 +869,7 @@ export const ja = {
     readyForAnother: '次のディナーの準備はできましたか？',
     becauseYouLikeCuisine: 'よく{cuisine}料理を選ばれるので',
     becauseYourCity: 'この街で食事をされたので',
+    becauseSameTime: 'いつもの時間帯だから',
     reservePrice: '席を予約 · 2 €',
     guaranteedSpot: '予約すると席が確保されます。',
     spotReserved: '席を予約済み',

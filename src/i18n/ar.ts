@@ -869,6 +869,7 @@ export const ar = {
     readyForAnother: 'مستعد لعشاء آخر؟',
     becauseYouLikeCuisine: 'لأنك تفضل عادةً المطبخ {cuisine}',
     becauseYourCity: 'لأنك تناولت العشاء في هذه المدينة',
+    becauseSameTime: 'لأنه وقتك المعتاد',
     reservePrice: 'احجز مقعدًا · 2 €',
     guaranteedSpot: 'مقعدك مضمون عند الحجز.',
     spotReserved: 'تم حجز المقعد',

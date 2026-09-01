@@ -869,6 +869,7 @@ export const sv = {
     readyForAnother: 'Redo för en till middag?',
     becauseYouLikeCuisine: 'Eftersom du ofta väljer {cuisine} kök',
     becauseYourCity: 'Eftersom du åt middag i den här staden',
+    becauseSameTime: 'Eftersom det är din vanliga tid',
     reservePrice: 'Boka plats · 2 €',
     guaranteedSpot: 'Din plats garanteras när du bokar.',
     spotReserved: 'Plats bokad',

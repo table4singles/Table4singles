@@ -869,6 +869,7 @@ export const ro = {
     readyForAnother: 'Gata pentru o altă cină?',
     becauseYouLikeCuisine: 'Pentru că alegi des bucătăria {cuisine}',
     becauseYourCity: 'Pentru că ai luat cina în acest oraș',
+    becauseSameTime: 'Pentru că e intervalul tău obișnuit',
     reservePrice: 'Rezervă loc · 2 €',
     guaranteedSpot: 'Locul tău este garantat la rezervare.',
     spotReserved: 'Loc rezervat',

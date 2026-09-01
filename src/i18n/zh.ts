@@ -869,6 +869,7 @@ export const zh = {
     readyForAnother: '准备好下一次晚餐了吗？',
     becauseYouLikeCuisine: '因为你常选{cuisine}菜系',
     becauseYourCity: '因为你在这座城市吃过晚餐',
+    becauseSameTime: '因为这是你常订的时段',
     reservePrice: '预订座位 · 2 €',
     guaranteedSpot: '预订后座位有保障。',
     spotReserved: '已预订座位',

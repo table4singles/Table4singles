@@ -915,6 +915,7 @@ export const en = {
     readyForAnother: 'Ready for another dinner?',
     becauseYouLikeCuisine: 'Because you tend to pick {cuisine} cuisine',
     becauseYourCity: 'Because you had dinner in this city',
+    becauseSameTime: "Because it's your usual time slot",
     reservePrice: 'Reserve seat · €2',
     guaranteedSpot: 'Your seat is guaranteed when you book.',
     spotReserved: 'Seat reserved',

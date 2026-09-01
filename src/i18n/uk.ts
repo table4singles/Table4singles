@@ -869,6 +869,7 @@ export const uk = {
     readyForAnother: 'Готові до наступної вечері?',
     becauseYouLikeCuisine: 'Тому що ви часто обираєте {cuisine} кухню',
     becauseYourCity: 'Тому що ви вечеряли в цьому місті',
+    becauseSameTime: 'Бо це твій звичний час',
     reservePrice: 'Забронювати · 2 €',
     guaranteedSpot: 'Місце гарантовано після бронювання.',
     spotReserved: 'Місце заброньовано',

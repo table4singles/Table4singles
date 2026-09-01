@@ -469,7 +469,14 @@ export function TableDetailPage({ tableId, paymentSuccess, paymentCancelled, onN
 
             {/* Ready for another dinner? */}
             {isPast && !isCancelled && (isParticipant || isHost) && table && (
-              <RecommendedDinners excludeTableId={table.id} city={table.restaurant_city} cuisine={table.cuisine_type} onNavigate={onNavigate} />
+              <RecommendedDinners
+                excludeTableId={table.id}
+                city={table.restaurant_city}
+                cuisine={table.cuisine_type}
+                time={table.time}
+                myInterests={myInterests}
+                onNavigate={onNavigate}
+              />
             )}
           </div>
 
@@ -757,32 +764,70 @@ function InfoBox({ icon, label }: { icon: React.ReactNode; label: string }) {
   )
 }
 
-/** "¿Listo para otra cena?" — 3 mesas en la misma ciudad (y misma cocina si hay
- * suficientes resultados), para cerrar el ciclo post-cena con una siguiente reserva. */
-function RecommendedDinners({ excludeTableId, city, cuisine, onNavigate }: {
+function timeSlotOf(time: string | null): 'midday' | 'evening' | null {
+  if (!time) return null
+  const h = parseInt(time.slice(0, 2))
+  if (h >= 12 && h < 17) return 'midday'
+  if (h >= 17) return 'evening'
+  return null
+}
+
+/** "¿Listo para otra cena?" — recomendación puntuada (no solo mismo cuisine/ciudad):
+ * mismo cuisine, mismo franja horaria habitual, e intereses en común con quien YA
+ * está apuntado a la mesa candidata (señal real de "gente parecida a ti"), para
+ * cerrar el ciclo post-cena con una siguiente reserva relevante. */
+function RecommendedDinners({ excludeTableId, city, cuisine, time, myInterests, onNavigate }: {
   excludeTableId: string
   city: string
   cuisine: string | null
+  time: string | null
+  myInterests: string[]
   onNavigate: (page: string, id?: string) => void
 }) {
   const { t } = useLanguage()
-  const { tables: sameCuisine } = useTables({ city, cuisine: cuisine ? [cuisine] : undefined })
-  const { tables: sameCity } = useTables({ city })
+  const { tables: candidates } = useTables({ city, withParticipants: true })
+  const slot = timeSlotOf(time)
 
-  const candidates = [...sameCuisine, ...sameCity].filter(tb => tb.id !== excludeTableId)
-  const seen = new Set<string>()
-  const recommended = candidates.filter(tb => (seen.has(tb.id) ? false : (seen.add(tb.id), true))).slice(0, 3)
+  const scored = candidates
+    .filter(tb => tb.id !== excludeTableId)
+    .map(tb => {
+      let score = 0
+      let topReason: 'cuisine' | 'interests' | 'time' | 'city' = 'city'
+      let sharedCount = 0
 
-  if (recommended.length === 0) return null
+      if (cuisine && tb.cuisine_type === cuisine) { score += 3; topReason = 'cuisine' }
+
+      const candidateInterests = new Set(
+        (tb.table_participants ?? []).flatMap(p => p.profiles?.interests ?? [])
+      )
+      sharedCount = myInterests.filter(i => candidateInterests.has(i)).length
+      if (sharedCount > 0) {
+        score += sharedCount
+        if (sharedCount >= 2 || !(cuisine && tb.cuisine_type === cuisine)) topReason = 'interests'
+      }
+
+      if (slot && timeSlotOf(tb.time) === slot) { score += 1; if (topReason === 'city') topReason = 'time' }
+
+      return { table: tb, score, topReason, sharedCount }
+    })
+    .sort((a, b) => b.score - a.score)
+    .slice(0, 3)
+
+  if (scored.length === 0) return null
+
+  const top = scored[0]
+  const subtitle =
+    top.topReason === 'interests' ? t(top.sharedCount === 1 ? 'tableDetail.sharedInterestSingular' : 'tableDetail.sharedInterestPlural').replace('{count}', String(top.sharedCount)) :
+    top.topReason === 'cuisine' ? t('tableDetail.becauseYouLikeCuisine').replace('{cuisine}', cuisine ?? '') :
+    top.topReason === 'time' ? t('tableDetail.becauseSameTime') :
+    t('tableDetail.becauseYourCity')
 
   return (
     <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 p-6">
       <h3 className="font-semibold text-gray-900 dark:text-white mb-1">{t('tableDetail.readyForAnother')}</h3>
-      <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
-        {cuisine ? t('tableDetail.becauseYouLikeCuisine').replace('{cuisine}', cuisine) : t('tableDetail.becauseYourCity')}
-      </p>
+      <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">{subtitle}</p>
       <div className="space-y-3">
-        {recommended.map(tb => (
+        {scored.map(({ table: tb }) => (
           <TableCard key={tb.id} table={tb} showRestaurant onClick={() => onNavigate('table-detail', tb.id)} />
         ))}
       </div>

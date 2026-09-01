@@ -8,7 +8,7 @@ export type RestaurantWithDistance = Profile & { distanceKm?: number }
 export type TableParticipantBasic = {
   user_id: string
   status: string
-  profiles: { id: string; display_name: string | null; avatar_url: string | null } | null
+  profiles: { id: string; display_name: string | null; avatar_url: string | null; interests?: string[] | null } | null
 }
 
 export type DiningTableWithParticipants = DiningTable & {

@@ -857,6 +857,11 @@ export const pt = {
     dismiss: 'Não me interessa',
   },
   tableDetail: {
+    sharedInterestSingular: 'Vocês têm 1 interesse em comum',
+    sharedInterestPlural: 'Vocês têm {count} interesses em comum',
+    readyForAnother: 'Pronto para outro jantar?',
+    becauseYouLikeCuisine: 'Porque costuma escolher culinária {cuisine}',
+    becauseYourCity: 'Porque jantou nesta cidade',
     reservePrice: 'Reservar lugar · 2 €',
     guaranteedSpot: 'O seu lugar fica garantido ao reservar.',
     spotReserved: 'Lugar reservado',

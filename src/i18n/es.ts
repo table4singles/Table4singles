@@ -596,6 +596,11 @@ export const es = {
     },
   },
   tableDetail: {
+    sharedInterestSingular: 'Tenéis 1 interés en común',
+    sharedInterestPlural: 'Tenéis {count} intereses en común',
+    readyForAnother: '¿Listo para otra cena?',
+    becauseYouLikeCuisine: 'Porque sueles elegir cocina {cuisine}',
+    becauseYourCity: 'Porque cenaste en esta ciudad',
     reservePrice: 'Reservar plaza · 2 €',
     guaranteedSpot: 'Tu plaza queda garantizada al reservar.',
     spotReserved: 'Plaza reservada',

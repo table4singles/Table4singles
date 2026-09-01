@@ -857,6 +857,11 @@ export const uk = {
     dismiss: 'Не цікавить',
   },
   tableDetail: {
+    sharedInterestSingular: 'У вас 1 спільний інтерес',
+    sharedInterestPlural: 'У вас {count} спільних інтересів',
+    readyForAnother: 'Готові до наступної вечері?',
+    becauseYouLikeCuisine: 'Тому що ви часто обираєте {cuisine} кухню',
+    becauseYourCity: 'Тому що ви вечеряли в цьому місті',
     reservePrice: 'Забронювати · 2 €',
     guaranteedSpot: 'Місце гарантовано після бронювання.',
     spotReserved: 'Місце заброньовано',

@@ -857,6 +857,11 @@ export const ro = {
     dismiss: 'Nu mă interesează',
   },
   tableDetail: {
+    sharedInterestSingular: 'Aveți 1 interes comun',
+    sharedInterestPlural: 'Aveți {count} interese comune',
+    readyForAnother: 'Gata pentru o altă cină?',
+    becauseYouLikeCuisine: 'Pentru că alegi des bucătăria {cuisine}',
+    becauseYourCity: 'Pentru că ai luat cina în acest oraș',
     reservePrice: 'Rezervă loc · 2 €',
     guaranteedSpot: 'Locul tău este garantat la rezervare.',
     spotReserved: 'Loc rezervat',

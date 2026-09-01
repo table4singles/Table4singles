@@ -10,7 +10,6 @@ import { EmptyStateIllustration } from '@/components/EmptyStateIllustration'
 import { DemandRequestModal } from '@/components/DemandRequestModal'
 import { useLanguage } from '@/contexts/LanguageContext'
 import { useTables, type QuickDateFilter } from '@/hooks/useTables'
-import { useAnalytics } from '@/hooks/useAnalytics'
 import { CUISINE_OPTIONS } from '@/lib/options'
 
 interface BrowsePageProps {
@@ -20,7 +19,6 @@ interface BrowsePageProps {
 
 export function BrowsePage({ onNavigate, onAuthClick }: BrowsePageProps) {
   const { t } = useLanguage()
-  const { track } = useAnalytics()
   const [search, setSearch] = useState('')
   const [cuisines, setCuisines] = useState<string[]>([])
   const [dateFilter, setDateFilter] = useState<QuickDateFilter | undefined>(undefined)
@@ -146,7 +144,7 @@ export function BrowsePage({ onNavigate, onAuthClick }: BrowsePageProps) {
                   table={table}
                   participants={table.table_participants}
                   showRestaurant
-                  onClick={() => { track('TABLE_VIEW', { table_id: table.id, source: 'upcoming_dinners' }); onNavigate('table-detail', table.id) }}
+                  onClick={() => onNavigate('table-detail', table.id)}
                 />
               ))}
             </div>

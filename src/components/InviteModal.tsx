@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { X, Search, Loader2, Check } from 'lucide-react'
 import { useLanguage } from '@/contexts/LanguageContext'
 import { useInvitations } from '@/hooks/useInvitations'
+import { useAnalytics } from '@/hooks/useAnalytics'
 import { openWhatsAppInvite } from '@/lib/inviteLink'
 import type { Profile } from '@/types/database'
 
@@ -13,6 +14,7 @@ interface InviteModalProps {
 export function InviteModal({ tableId, onClose }: InviteModalProps) {
   const { t } = useLanguage()
   const { searchUsers, sendInvitation } = useInvitations(null)
+  const { track } = useAnalytics()
   const [query, setQuery] = useState('')
   const [results, setResults] = useState<Profile[]>([])
   const [searching, setSearching] = useState(false)
@@ -45,6 +47,7 @@ export function InviteModal({ tableId, onClose }: InviteModalProps) {
     setError(null)
     try {
       await sendInvitation(tableId, selected.id, paymentCovered)
+      track('INVITATION_CREATED', { table_id: tableId, source: 'invite_modal' })
       setSuccess(true)
     } catch {
       setError(t('invite.errorSend'))

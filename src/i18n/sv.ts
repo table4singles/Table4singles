@@ -857,6 +857,11 @@ export const sv = {
     dismiss: 'Inte intresserad',
   },
   tableDetail: {
+    sharedInterestSingular: 'Ni har 1 gemensamt intresse',
+    sharedInterestPlural: 'Ni har {count} gemensamma intressen',
+    readyForAnother: 'Redo för en till middag?',
+    becauseYouLikeCuisine: 'Eftersom du ofta väljer {cuisine} kök',
+    becauseYourCity: 'Eftersom du åt middag i den här staden',
     reservePrice: 'Boka plats · 2 €',
     guaranteedSpot: 'Din plats garanteras när du bokar.',
     spotReserved: 'Plats bokad',

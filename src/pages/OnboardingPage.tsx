@@ -8,6 +8,7 @@ import { supabase } from '@/lib/supabase'
 import { ErrorBanner } from '@/components/ErrorBanner'
 import { RestaurantHoursPicker } from '@/components/RestaurantHoursPicker'
 import { LANGUAGE_OPTIONS, INTEREST_OPTIONS } from '@/lib/options'
+import { useAnalytics } from '@/hooks/useAnalytics'
 
 const ADMIN_EMAIL = 'joseviangles@gmail.com'
 // Nota: estos valores se guardan tal cual en la base de datos (restaurant_cuisine) y se usan
@@ -19,6 +20,7 @@ const PRICE_RANGES = ['0€-50€', '50€-100€', '100€-200€', '+200€']
 export function OnboardingPage({ onNavigate }: { onNavigate: (page: string, id?: string) => void }) {
   const { t } = useLanguage()
   const { user, profile, refreshProfile, signOut } = useAuth()
+  const { track } = useAnalytics()
   const isAdmin = user?.email === ADMIN_EMAIL
   const isRestaurant = profile?.role === 'restaurant'
 
@@ -158,6 +160,9 @@ export function OnboardingPage({ onNavigate }: { onNavigate: (page: string, id?:
       return
     }
     await refreshProfile()
+
+    const referredBy = localStorage.getItem('t4s_referred_by')
+    if (referredBy) track('REFERRED_SIGNUP', { referred_by: referredBy, role: isRestaurant ? 'restaurant' : 'user' })
 
     // Enviar email de bienvenida con flyer personalizado al restaurante
     // Se hace AWAIT para evitar que el navegador cancele la petición al navegar (EarlyDrop)

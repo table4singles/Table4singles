@@ -29,10 +29,12 @@ import { AdminPage } from '@/pages/AdminPage'
 import { AnalyticsPage } from '@/pages/AnalyticsPage'
 import { ResetPasswordPage } from '@/pages/ResetPasswordPage'
 import { FlyerPage } from '@/pages/FlyerPage'
+import { useAnalytics } from '@/hooks/useAnalytics'
 
 function AppRouter() {
   const { user, profile, loading, isPasswordRecovery } = useAuth()
   const { effectiveRole } = useViewMode()
+  const { track } = useAnalytics()
   const [page, setPage] = useState('landing')
   const [selectedId, setSelectedId] = useState<string | null>(null)
   const [authModal, setAuthModal] = useState(false)
@@ -136,6 +138,7 @@ function AppRouter() {
       localStorage.setItem('t4s_invite_table', inviteId)
       setSelectedId(inviteId)
       setPage('table-detail')
+      track('INVITATION_CLICKED', { table_id: inviteId })
       params.delete('invite')
       const newSearch = params.toString()
       window.history.replaceState({}, '', window.location.pathname + (newSearch ? `?${newSearch}` : ''))

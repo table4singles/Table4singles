@@ -857,6 +857,11 @@ export const ru = {
     dismiss: 'Не интересует',
   },
   tableDetail: {
+    sharedInterestSingular: 'У вас 1 общий интерес',
+    sharedInterestPlural: 'У вас {count} общих интереса',
+    readyForAnother: 'Готовы к следующему ужину?',
+    becauseYouLikeCuisine: 'Потому что вы часто выбираете {cuisine} кухню',
+    becauseYourCity: 'Потому что вы ужинали в этом городе',
     reservePrice: 'Забронировать · 2 €',
     guaranteedSpot: 'Место гарантировано после бронирования.',
     spotReserved: 'Место забронировано',

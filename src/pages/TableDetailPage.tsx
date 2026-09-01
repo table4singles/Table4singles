@@ -12,10 +12,12 @@ import { useLanguage } from '@/contexts/LanguageContext'
 import { useAuth } from '@/contexts/AuthContext'
 import { useViewMode } from '@/contexts/ViewModeContext'
 import { usePendingInvite } from '@/contexts/PendingInviteContext'
-import { useTableDetail } from '@/hooks/useTables'
+import { useTableDetail, useTables } from '@/hooks/useTables'
+import { TableCard } from '@/components/TableCard'
 import { useReviews } from '@/hooks/useReviews'
 import { useMessages } from '@/hooks/useMessages'
 import { useInvitations } from '@/hooks/useInvitations'
+import { useAnalytics } from '@/hooks/useAnalytics'
 import { supabase } from '@/lib/supabase'
 import { restaurantPublicLocation } from '@/lib/privacy'
 
@@ -36,6 +38,7 @@ export function TableDetailPage({ tableId, paymentSuccess, paymentCancelled, onN
   const { reviews, submitReview } = useReviews(tableId)
   const { messages, sendMessage } = useMessages(tableId)
   const { sendInvitation } = useInvitations(null)
+  const { track } = useAnalytics()
   const { pendingInvite, clearPendingInvite } = usePendingInvite()
   const [joining, setJoining] = useState(false)
   const [joinError, setJoinError] = useState<string | null>(null)
@@ -59,6 +62,13 @@ export function TableDetailPage({ tableId, paymentSuccess, paymentCancelled, onN
   const [editError, setEditError] = useState<string | null>(null)
   const [removingParticipantId, setRemovingParticipantId] = useState<string | null>(null)
 
+  const trackedView = useRef(false)
+  useEffect(() => {
+    if (!table || trackedView.current) return
+    trackedView.current = true
+    track('TABLE_VIEW', { table_id: table.id, restaurant_city: table.restaurant_city, cuisine_type: table.cuisine_type })
+  }, [table, track])
+
   // Cuando el usuario vuelve del pago: reconciliar (por si el webhook falló) y refrescar.
   const refreshedAfterPayment = useRef(false)
   useEffect(() => {
@@ -73,13 +83,14 @@ export function TableDetailPage({ tableId, paymentSuccess, paymentCancelled, onN
       } catch (err) {
         console.warn('reconcile-reservation:', err)
       }
+      track('RESERVATION_COMPLETED', { table_id: tableId })
       await refresh()
       // Por si el webhook llega un poco más tarde
       setTimeout(() => refresh(), 2000)
       setTimeout(() => refresh(), 5000)
     }
     run()
-  }, [paymentSuccess, user, tableId, refresh])
+  }, [paymentSuccess, user, tableId, refresh, track])
 
   // Si venias de "Comensales" con la intencion de invitar a alguien y aun no tenias mesa,
   // en cuanto confirmas el pago con deposito (redirect de Stripe) ofrecemos enviar la invitacion.
@@ -109,9 +120,13 @@ export function TableDetailPage({ tableId, paymentSuccess, paymentCancelled, onN
   ]
   const canReviewDiners = (isParticipant || isHost) && isPast && !isCancelled && coDiners.length > 0
 
+  const myInterests = profile?.interests ?? []
+  const sharedInterests = myInterests.filter(i => coDiners.some(d => (d.interests ?? []).includes(i)))
+
   const handleJoinWord = async () => {
     setJoining(true)
     setJoinError(null)
+    track('RESERVATION_STARTED', { table_id: tableId, join_type: 'word' })
     try {
       await joinTable('word')
       if (pendingInvite) setShowAutoInvite(true)
@@ -133,6 +148,7 @@ export function TableDetailPage({ tableId, paymentSuccess, paymentCancelled, onN
     setAutoInviteError(null)
     try {
       await sendInvitation(table.id, pendingInvite.inviteeId, autoInvitePaymentCovered)
+      track('INVITATION_CREATED', { table_id: table.id, source: 'post_reservation' })
       setAutoInviteSuccess(true)
       clearPendingInvite()
     } catch {
@@ -145,6 +161,7 @@ export function TableDetailPage({ tableId, paymentSuccess, paymentCancelled, onN
     if (!user || !table) return
     setJoining(true)
     setJoinError(null)
+    track('RESERVATION_STARTED', { table_id: table.id, join_type: 'deposit' })
     try {
       const { data, error: fnError } = await supabase.functions.invoke('create-reservation-checkout', {
         body: { tableId: table.id },
@@ -388,6 +405,22 @@ export function TableDetailPage({ tableId, paymentSuccess, paymentCancelled, onN
               )}
             </div>
 
+            {/* Shared interests */}
+            {sharedInterests.length > 0 && (
+              <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 p-6">
+                <h3 className="font-semibold text-gray-900 dark:text-white mb-3">
+                  {sharedInterests.length === 1 ? t('tableDetail.sharedInterestSingular') : t('tableDetail.sharedInterestPlural').replace('{count}', String(sharedInterests.length))}
+                </h3>
+                <div className="flex flex-wrap gap-2">
+                  {sharedInterests.map(i => (
+                    <span key={i} className="px-3 py-1.5 bg-primary-50 dark:bg-primary-950/30 text-primary-700 dark:text-primary-400 rounded-full text-sm font-medium">
+                      {i}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )}
+
             {/* Reviews */}
             {reviews.length > 0 && (
               <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 p-6">
@@ -429,6 +462,11 @@ export function TableDetailPage({ tableId, paymentSuccess, paymentCancelled, onN
                   })}
                 </div>
               </div>
+            )}
+
+            {/* Ready for another dinner? */}
+            {isPast && !isCancelled && (isParticipant || isHost) && table && (
+              <RecommendedDinners excludeTableId={table.id} city={table.restaurant_city} cuisine={table.cuisine_type} onNavigate={onNavigate} />
             )}
           </div>
 
@@ -685,6 +723,39 @@ function InfoBox({ icon, label }: { icon: React.ReactNode; label: string }) {
     <div className="bg-gray-50 dark:bg-gray-900 rounded-xl p-3 text-center">
       <div className="flex items-center justify-center text-gray-400 dark:text-gray-500 mb-1">{icon}</div>
       <p className="text-sm text-gray-700 dark:text-gray-200 font-medium">{label}</p>
+    </div>
+  )
+}
+
+/** "¿Listo para otra cena?" — 3 mesas en la misma ciudad (y misma cocina si hay
+ * suficientes resultados), para cerrar el ciclo post-cena con una siguiente reserva. */
+function RecommendedDinners({ excludeTableId, city, cuisine, onNavigate }: {
+  excludeTableId: string
+  city: string
+  cuisine: string | null
+  onNavigate: (page: string, id?: string) => void
+}) {
+  const { t } = useLanguage()
+  const { tables: sameCuisine } = useTables({ city, cuisine: cuisine ? [cuisine] : undefined })
+  const { tables: sameCity } = useTables({ city })
+
+  const candidates = [...sameCuisine, ...sameCity].filter(tb => tb.id !== excludeTableId)
+  const seen = new Set<string>()
+  const recommended = candidates.filter(tb => (seen.has(tb.id) ? false : (seen.add(tb.id), true))).slice(0, 3)
+
+  if (recommended.length === 0) return null
+
+  return (
+    <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 p-6">
+      <h3 className="font-semibold text-gray-900 dark:text-white mb-1">{t('tableDetail.readyForAnother')}</h3>
+      <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
+        {cuisine ? t('tableDetail.becauseYouLikeCuisine').replace('{cuisine}', cuisine) : t('tableDetail.becauseYourCity')}
+      </p>
+      <div className="space-y-3">
+        {recommended.map(tb => (
+          <TableCard key={tb.id} table={tb} showRestaurant onClick={() => onNavigate('table-detail', tb.id)} />
+        ))}
+      </div>
     </div>
   )
 }

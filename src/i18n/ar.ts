@@ -857,6 +857,11 @@ export const ar = {
     dismiss: 'غير مهتم',
   },
   tableDetail: {
+    sharedInterestSingular: 'لديكما اهتمام مشترك واحد',
+    sharedInterestPlural: 'لديكما {count} اهتمامات مشتركة',
+    readyForAnother: 'مستعد لعشاء آخر؟',
+    becauseYouLikeCuisine: 'لأنك تفضل عادةً المطبخ {cuisine}',
+    becauseYourCity: 'لأنك تناولت العشاء في هذه المدينة',
     reservePrice: 'احجز مقعدًا · 2 €',
     guaranteedSpot: 'مقعدك مضمون عند الحجز.',
     spotReserved: 'تم حجز المقعد',

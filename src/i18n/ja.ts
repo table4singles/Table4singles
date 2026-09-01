@@ -857,6 +857,11 @@ export const ja = {
     dismiss: '興味なし',
   },
   tableDetail: {
+    sharedInterestSingular: '共通の興味が1つあります',
+    sharedInterestPlural: '共通の興味が{count}個あります',
+    readyForAnother: '次のディナーの準備はできましたか？',
+    becauseYouLikeCuisine: 'よく{cuisine}料理を選ばれるので',
+    becauseYourCity: 'この街で食事をされたので',
     reservePrice: '席を予約 · 2 €',
     guaranteedSpot: '予約すると席が確保されます。',
     spotReserved: '席を予約済み',

@@ -74,6 +74,14 @@ export interface AdminDemandRequest {
   created_at: string
 }
 
+export interface AdminAnalyticsEvent {
+  id: string
+  event_name: string
+  user_id: string | null
+  metadata: Record<string, unknown>
+  created_at: string
+}
+
 export interface AdminData {
   stats: AdminStats | null
   users: AdminUser[]
@@ -81,6 +89,7 @@ export interface AdminData {
   ambassadors: AdminAmbassador[]
   payments: AdminPayment[]
   demandRequests: AdminDemandRequest[]
+  analyticsEvents: AdminAnalyticsEvent[]
   loading: boolean
   error: string | null
   refresh: () => void
@@ -99,6 +108,7 @@ export function useAdminData(isAdmin: boolean): AdminData {
   const [ambassadors, setAmbassadors] = useState<AdminAmbassador[]>([])
   const [payments, setPayments] = useState<AdminPayment[]>([])
   const [demandRequests, setDemandRequests] = useState<AdminDemandRequest[]>([])
+  const [analyticsEvents, setAnalyticsEvents] = useState<AdminAnalyticsEvent[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [tick, setTick] = useState(0)
@@ -120,7 +130,11 @@ export function useAdminData(isAdmin: boolean): AdminData {
         .select('id, user_id, city, date_pref, day_of_week, time_pref, cuisine, interests, language, status, created_at, profiles(display_name, email)')
         .order('created_at', { ascending: false })
         .limit(200),
-    ]).then(([statsRes, usersRes, restRes, ambRes, payRes, demandRes]) => {
+      supabase.from('analytics_events')
+        .select('id, event_name, user_id, metadata, created_at')
+        .order('created_at', { ascending: false })
+        .limit(5000),
+    ]).then(([statsRes, usersRes, restRes, ambRes, payRes, demandRes, eventsRes]) => {
       if (statsRes.error) setError(statsRes.error.message)
       else setStats({ ...EMPTY_STATS, ...(statsRes.data as AdminStats) })
 
@@ -166,9 +180,11 @@ export function useAdminData(isAdmin: boolean): AdminData {
         status: d.status,
         created_at: d.created_at,
       })))
+
+      setAnalyticsEvents((eventsRes.data as AdminAnalyticsEvent[]) ?? [])
       setLoading(false)
     })
   }, [isAdmin, tick])
 
-  return { stats, users, restaurants, ambassadors, payments, demandRequests, loading, error, refresh: () => setTick(t => t + 1) }
+  return { stats, users, restaurants, ambassadors, payments, demandRequests, analyticsEvents, loading, error, refresh: () => setTick(t => t + 1) }
 }

@@ -1,19 +1,23 @@
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import {
   Users, UtensilsCrossed, Award, CreditCard, Loader2, RefreshCw,
-  TrendingUp, Euro, CheckCircle, ShieldAlert, BellRing,
+  TrendingUp, Euro, CheckCircle, ShieldAlert, BellRing, Eye, MousePointerClick,
+  UserPlus, Filter,
 } from 'lucide-react'
+import {
+  BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid,
+} from 'recharts'
 import { Navbar } from '@/components/Navbar'
 import { useAuth } from '@/contexts/AuthContext'
 import { useLanguage } from '@/contexts/LanguageContext'
-import { useAdminData } from '@/hooks/useAdminData'
+import { useAdminData, type AdminAnalyticsEvent } from '@/hooks/useAdminData'
 
 interface AdminPageProps {
   onNavigate: (page: string, id?: string) => void
   onAuthClick: (mode?: 'signin' | 'signup') => void
 }
 
-type Tab = 'resumen' | 'usuarios' | 'restaurantes' | 'embajadores' | 'movimientos' | 'demanda'
+type Tab = 'resumen' | 'usuarios' | 'restaurantes' | 'embajadores' | 'movimientos' | 'demanda' | 'funnel'
 
 const DAY_KEYS = ['demand.dayMon', 'demand.dayTue', 'demand.dayWed', 'demand.dayThu', 'demand.dayFri', 'demand.daySat', 'demand.daySun']
 
@@ -36,7 +40,7 @@ export function AdminPage({ onNavigate, onAuthClick }: AdminPageProps) {
   const { profile } = useAuth()
   const [tab, setTab] = useState<Tab>('resumen')
   const isAdmin = profile?.is_admin === true
-  const { stats, users, restaurants, ambassadors, payments, demandRequests, loading, error, refresh } = useAdminData(isAdmin)
+  const { stats, users, restaurants, ambassadors, payments, demandRequests, analyticsEvents, loading, error, refresh } = useAdminData(isAdmin)
 
   const SUB_BADGE: Record<string, { label: string; color: string }> = {
     active:     { label: t('admin.subActive'),    color: 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' },
@@ -67,6 +71,7 @@ export function AdminPage({ onNavigate, onAuthClick }: AdminPageProps) {
     { id: 'embajadores',  label: t('admin.tabEmbajadores').replace('{count}', String(ambassadors.length)),                             icon: <Award className="w-4 h-4" /> },
     { id: 'movimientos',  label: t('admin.tabMovimientos').replace('{count}', String(payments.length)),                                icon: <CreditCard className="w-4 h-4" /> },
     { id: 'demanda',      label: t('admin.tabDemanda').replace('{count}', String(demandRequests.filter(d => d.status === 'active').length)), icon: <BellRing className="w-4 h-4" /> },
+    { id: 'funnel',       label: t('admin.tabFunnel'),                                                                                   icon: <Filter className="w-4 h-4" /> },
   ]
 
   return (
@@ -103,6 +108,7 @@ export function AdminPage({ onNavigate, onAuthClick }: AdminPageProps) {
             {tab === 'embajadores'  && <TabEmbajadores ambassadors={ambassadors} t={t} dateLocale={dateLocale} />}
             {tab === 'movimientos'  && <TabMovimientos payments={payments} t={t} dateLocale={dateLocale} />}
             {tab === 'demanda'      && <TabDemanda requests={demandRequests} t={t} dateLocale={dateLocale} />}
+            {tab === 'funnel'       && <TabFunnel events={analyticsEvents} t={t} language={language} />}
           </>
         )}
       </main>
@@ -309,6 +315,136 @@ function TabDemanda({ requests, t, dateLocale }: { requests: any[]; t: (key: str
             </tbody>
           </table>
         </div>
+      </div>
+    </div>
+  )
+}
+
+const FUNNEL_RANGES = ['7d', '30d', '90d', 'all'] as const
+type FunnelRange = typeof FUNNEL_RANGES[number]
+
+function TabFunnel({ events, t, language }: { events: AdminAnalyticsEvent[]; t: (key: string) => string; language: string }) {
+  const [range, setRange] = useState<FunnelRange>('30d')
+  const locale = language === 'zh' ? 'zh-CN' : language === 'ja' ? 'ja-JP' : language === 'ar' ? 'ar' : language
+
+  const filtered = useMemo(() => {
+    if (range === 'all') return events
+    const days = range === '7d' ? 7 : range === '30d' ? 30 : 90
+    const since = Date.now() - days * 86400000
+    return events.filter(e => new Date(e.created_at).getTime() >= since)
+  }, [events, range])
+
+  const counts = useMemo(() => {
+    const byName: Record<string, number> = {}
+    filtered.forEach(e => { byName[e.event_name] = (byName[e.event_name] ?? 0) + 1 })
+    return byName
+  }, [filtered])
+
+  const dailyChart = useMemo(() => {
+    const byDay: Record<string, number> = {}
+    filtered.forEach(e => {
+      const day = e.created_at.split('T')[0]
+      byDay[day] = (byDay[day] ?? 0) + 1
+    })
+    return Object.entries(byDay)
+      .sort(([a], [b]) => a.localeCompare(b))
+      .map(([date, count]) => ({
+        date: new Date(date + 'T12:00:00').toLocaleDateString(locale, { day: 'numeric', month: 'short' }),
+        [t('admin.funnelChartTitle')]: count,
+      }))
+  }, [filtered, locale, t])
+
+  const views = counts.TABLE_VIEW ?? 0
+  const started = counts.RESERVATION_STARTED ?? 0
+  const completed = counts.RESERVATION_COMPLETED ?? 0
+  const invitationsCreated = counts.INVITATION_CREATED ?? 0
+  const invitationsClicked = counts.INVITATION_CLICKED ?? 0
+  const referredSignups = counts.REFERRED_SIGNUP ?? 0
+  const demandCreated = counts.DEMAND_REQUEST_CREATED ?? 0
+
+  const pct = (num: number, den: number) => den > 0 ? Math.round((num / den) * 100) : 0
+
+  const kpis = [
+    { label: t('admin.funnelTableViews'),           value: views,             icon: <Eye className="w-5 h-5 text-blue-500" />,               bg: 'bg-blue-50 dark:bg-blue-900/20' },
+    { label: t('admin.funnelReservationsStarted'),  value: started,           icon: <TrendingUp className="w-5 h-5 text-orange-500" />,       bg: 'bg-orange-50 dark:bg-orange-900/20' },
+    { label: t('admin.funnelReservationsCompleted'),value: completed,         icon: <CheckCircle className="w-5 h-5 text-green-500" />,       bg: 'bg-green-50 dark:bg-green-900/20' },
+    { label: t('admin.funnelInvitationsCreated'),   value: invitationsCreated,icon: <UserPlus className="w-5 h-5 text-purple-500" />,         bg: 'bg-purple-50 dark:bg-purple-900/20' },
+    { label: t('admin.funnelInvitationsClicked'),   value: invitationsClicked,icon: <MousePointerClick className="w-5 h-5 text-teal-500" />, bg: 'bg-teal-50 dark:bg-teal-900/20' },
+    { label: t('admin.funnelReferredSignups'),      value: referredSignups,   icon: <Users className="w-5 h-5 text-pink-500" />,              bg: 'bg-pink-50 dark:bg-pink-900/20' },
+    { label: t('admin.funnelDemandRequests'),       value: demandCreated,     icon: <BellRing className="w-5 h-5 text-yellow-500" />,         bg: 'bg-yellow-50 dark:bg-yellow-900/20' },
+  ]
+
+  return (
+    <div className="space-y-6">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+        <p className="text-sm text-gray-500 dark:text-gray-400 max-w-2xl">{t('admin.funnelIntro')}</p>
+        <div className="flex gap-1 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-1 flex-shrink-0">
+          {FUNNEL_RANGES.map(r => (
+            <button key={r} onClick={() => setRange(r)}
+              className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${range === r ? 'bg-[#129a93] text-white' : 'text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'}`}>
+              {r === 'all' ? t('admin.rangeAll') : t(`analytics.range${r}`)}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        {kpis.map(k => (
+          <div key={k.label} className="bg-white dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-gray-700 p-4">
+            <div className={`w-10 h-10 rounded-lg ${k.bg} flex items-center justify-center mb-3`}>{k.icon}</div>
+            <p className="text-2xl font-bold text-gray-900 dark:text-white">{k.value}</p>
+            <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">{k.label}</p>
+          </div>
+        ))}
+      </div>
+
+      {(views > 0 || started > 0 || completed > 0) && (
+        <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-gray-700 p-5">
+          <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-4">
+            {t('admin.funnelTableViews')} → {t('admin.funnelReservationsStarted')} → {t('admin.funnelReservationsCompleted')}
+          </h3>
+          <div className="space-y-3">
+            <FunnelBar label={t('admin.funnelTableViews')} value={views} max={Math.max(views, 1)} color="bg-blue-500" />
+            <FunnelBar label={t('admin.funnelReservationsStarted')} value={started} max={Math.max(views, 1)} color="bg-orange-500" suffix={`(${pct(started, views)}% ${t('admin.funnelViewToStart')})`} />
+            <FunnelBar label={t('admin.funnelReservationsCompleted')} value={completed} max={Math.max(views, 1)} color="bg-green-500" suffix={`(${pct(completed, started)}% ${t('admin.funnelStartToComplete')})`} />
+          </div>
+        </div>
+      )}
+
+      {dailyChart.length > 0 ? (
+        <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-gray-700 p-5">
+          <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-4">{t('admin.funnelChartTitle')}</h3>
+          <ResponsiveContainer width="100%" height={220}>
+            <BarChart data={dailyChart} margin={{ top: 5, right: 10, left: -20, bottom: 5 }}>
+              <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+              <XAxis dataKey="date" tick={{ fontSize: 11 }} />
+              <YAxis tick={{ fontSize: 11 }} allowDecimals={false} />
+              <Tooltip />
+              <Bar dataKey={t('admin.funnelChartTitle')} fill="#129a93" radius={[4, 4, 0, 0]} />
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
+      ) : (
+        <div className="text-center py-16 bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700">
+          <Filter className="w-10 h-10 text-gray-200 dark:text-gray-600 mx-auto mb-3" />
+          <p className="text-gray-500 dark:text-gray-400 font-medium">{t('admin.funnelEmptyTitle')}</p>
+          <p className="text-sm text-gray-400 dark:text-gray-500 mt-1">{t('admin.funnelEmptyDesc')}</p>
+        </div>
+      )}
+    </div>
+  )
+}
+
+function FunnelBar({ label, value, max, color, suffix }: { label: string; value: number; max: number; color: string; suffix?: string }) {
+  const width = max > 0 ? Math.max((value / max) * 100, value > 0 ? 4 : 0) : 0
+  return (
+    <div>
+      <div className="flex items-center justify-between text-xs mb-1">
+        <span className="text-gray-600 dark:text-gray-300 font-medium">{label}</span>
+        <span className="text-gray-500 dark:text-gray-400">{value} {suffix}</span>
+      </div>
+      <div className="h-2.5 bg-gray-100 dark:bg-gray-700 rounded-full overflow-hidden">
+        <div className={`h-full ${color} rounded-full transition-all`} style={{ width: `${width}%` }} />
       </div>
     </div>
   )

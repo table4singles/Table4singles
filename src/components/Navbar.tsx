@@ -69,7 +69,7 @@ export function Navbar({ currentPage, onNavigate, onAuthClick }: NavbarProps) {
             </div>
           )}
           {(!user || effectiveRole === 'user') && currentPage !== 'restaurant-landing' && (
-            <NavLink active={currentPage === 'browse' || currentPage === 'restaurant-profile'} onClick={() => onNavigate('browse')} icon={<LayoutGrid className="w-4 h-4" />} label={t('nav.restaurants')} />
+            <NavLink active={currentPage === 'browse' || currentPage === 'restaurant-profile'} onClick={() => onNavigate('browse')} icon={<LayoutGrid className="w-4 h-4" />} label={t('nav.dinners')} />
           )}
           {user && effectiveRole === 'restaurant' && (
             <>
@@ -209,7 +209,7 @@ export function Navbar({ currentPage, onNavigate, onAuthClick }: NavbarProps) {
         <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-navy-950 border-t border-gold-500/10 z-50 px-2 pb-safe">
           <div className="flex justify-around py-2">
             {effectiveRole !== 'restaurant' && (
-              <MobileNavButton active={currentPage === 'browse' || currentPage === 'restaurant-profile'} onClick={() => onNavigate('browse')} icon={<Search className="w-5 h-5" />} label={t('nav.restaurants')} />
+              <MobileNavButton active={currentPage === 'browse' || currentPage === 'restaurant-profile'} onClick={() => onNavigate('browse')} icon={<Search className="w-5 h-5" />} label={t('nav.dinners')} />
             )}
             {effectiveRole === 'restaurant' ? (
               <>

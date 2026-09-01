@@ -2,6 +2,42 @@ import { useState, useEffect, useCallback, useRef } from 'react'
 import { supabase } from '@/lib/supabase'
 import type { DiningTable, TableParticipant, Profile } from '@/types/database'
 import { sanitizePublicDiner } from '@/lib/privacy'
+import type { DiningTableWithParticipants, TableParticipantBasic } from '@/hooks/useRestaurants'
+
+export type QuickDateFilter = 'today' | 'tomorrow' | 'week' | 'weekend'
+
+function toDateStr(d: Date) {
+  return d.toISOString().split('T')[0]
+}
+
+/** Rango [desde, hasta] (inclusive) en formato YYYY-MM-DD para un filtro rápido. */
+function quickDateRange(filter: QuickDateFilter): { from: string; to: string } {
+  const today = new Date()
+  today.setHours(0, 0, 0, 0)
+
+  if (filter === 'today') return { from: toDateStr(today), to: toDateStr(today) }
+
+  if (filter === 'tomorrow') {
+    const d = new Date(today)
+    d.setDate(d.getDate() + 1)
+    return { from: toDateStr(d), to: toDateStr(d) }
+  }
+
+  if (filter === 'week') {
+    const to = new Date(today)
+    to.setDate(to.getDate() + 6)
+    return { from: toDateStr(today), to: toDateStr(to) }
+  }
+
+  // weekend: próximo sábado y domingo (incluye hoy si hoy ya es sábado o domingo)
+  const dow = today.getDay() // 0=domingo, 6=sábado
+  const daysUntilSaturday = dow === 6 ? 0 : dow === 0 ? -1 : 6 - dow
+  const saturday = new Date(today)
+  saturday.setDate(saturday.getDate() + daysUntilSaturday)
+  const sunday = new Date(saturday)
+  sunday.setDate(sunday.getDate() + 1)
+  return { from: toDateStr(saturday), to: toDateStr(sunday) }
+}
 
 interface UseTablesOptions {
   city?: string
@@ -9,10 +45,12 @@ interface UseTablesOptions {
   language?: string
   search?: string
   status?: string
+  dateFilter?: QuickDateFilter
+  withParticipants?: boolean
 }
 
 export function useTables(options: UseTablesOptions = {}) {
-  const [tables, setTables] = useState<DiningTable[]>([])
+  const [tables, setTables] = useState<DiningTableWithParticipants[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const cuisineKey = options.cuisine?.join(',') ?? ''
@@ -25,20 +63,53 @@ export function useTables(options: UseTablesOptions = {}) {
       .select('*')
       .eq('status', options.status || 'open')
       .eq('is_active', true)
+      .gt('available_seats', 0)
       .order('date', { ascending: true })
 
     if (options.city) query = query.eq('restaurant_city', options.city)
     if (options.cuisine && options.cuisine.length > 0) query = query.in('cuisine_type', options.cuisine)
+    if (options.language) query = query.contains('languages', [options.language])
     if (options.search) {
       query = query.or(`restaurant_name.ilike.%${options.search}%,restaurant_city.ilike.%${options.search}%`)
     }
+    if (options.dateFilter) {
+      const { from, to } = quickDateRange(options.dateFilter)
+      query = query.gte('date', from).lte('date', to)
+    }
 
     const { data, error: err } = await query
-    if (!err) setTables(data || [])
-    else setError(err.message)
+    if (err) {
+      setError(err.message)
+      setLoading(false)
+      return
+    }
+
+    const rawTables: DiningTable[] = data || []
+
+    if (!options.withParticipants || rawTables.length === 0) {
+      setTables(rawTables)
+      setLoading(false)
+      return
+    }
+
+    const tableIds = rawTables.map(t => t.id)
+    const { data: partData } = await supabase
+      .from('table_participants')
+      .select('table_id, user_id, status, profiles(id, display_name, avatar_url)')
+      .in('table_id', tableIds)
+      .eq('status', 'approved')
+
+    const byTable: Record<string, TableParticipantBasic[]> = {}
+    for (const p of (partData ?? [])) {
+      const tid = (p as { table_id: string }).table_id
+      if (!byTable[tid]) byTable[tid] = []
+      byTable[tid].push(p as unknown as TableParticipantBasic)
+    }
+
+    setTables(rawTables.map(t => ({ ...t, table_participants: byTable[t.id] ?? [] })))
     setLoading(false)
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [options.city, cuisineKey, options.search, options.status])
+  }, [options.city, cuisineKey, options.language, options.search, options.status, options.dateFilter, options.withParticipants])
 
   useEffect(() => { fetchTables() }, [fetchTables])
 

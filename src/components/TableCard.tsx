@@ -11,9 +11,13 @@ interface TableCardProps {
   table: DiningTable
   participants?: TableParticipantBasic[]
   onClick: () => void
+  /** Muestra cabecera con foto/nombre/cocina del restaurante — para listados que
+   * cruzan mesas de varios restaurantes (p.ej. "Próximas Cenas"), donde el
+   * restaurante no es ya obvio por el contexto de la página. */
+  showRestaurant?: boolean
 }
 
-export function TableCard({ table, participants, onClick }: TableCardProps) {
+export function TableCard({ table, participants, onClick, showRestaurant }: TableCardProps) {
   const { t, language } = useLanguage()
   const [modalProfile, setModalProfile] = useState<{ id?: string; display_name: string | null; avatar_url: string | null } | null>(null)
 
@@ -36,11 +40,31 @@ export function TableCard({ table, participants, onClick }: TableCardProps) {
 
   return (
     <>
-      <button
+      <div
+        role="button"
+        tabIndex={0}
         onClick={onClick}
-        className="w-full text-left bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 hover:border-[#129a93]/30 hover:shadow-md transition-all group px-5 py-4"
+        onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onClick() } }}
+        className="w-full text-left bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 hover:border-[#129a93]/30 hover:shadow-md transition-all group overflow-hidden cursor-pointer"
       >
-        <div className="flex items-start justify-between gap-3">
+        {showRestaurant && (
+          <div className="flex items-center gap-3 px-5 pt-4 pb-3 border-b border-gray-100 dark:border-gray-700">
+            {table.restaurant_image_url ? (
+              <img src={table.restaurant_image_url} alt="" className="w-10 h-10 rounded-lg object-cover flex-shrink-0" />
+            ) : (
+              <div className="w-10 h-10 rounded-lg bg-primary-50 dark:bg-primary-950/30 flex items-center justify-center flex-shrink-0 text-primary-500 dark:text-primary-400 font-display font-bold text-sm">
+                {table.restaurant_name?.[0]?.toUpperCase() ?? '?'}
+              </div>
+            )}
+            <div className="min-w-0">
+              <p className="font-semibold text-gray-900 dark:text-white text-sm truncate">{table.restaurant_name}</p>
+              <p className="text-xs text-gray-400 dark:text-gray-500 truncate">
+                {[table.cuisine_type, table.restaurant_city].filter(Boolean).join(' · ')}
+              </p>
+            </div>
+          </div>
+        )}
+        <div className="flex items-start justify-between gap-3 px-5 py-4">
           <div className="flex-1 min-w-0">
             {/* Time + date */}
             <div className="flex items-center gap-2 mb-2">
@@ -100,7 +124,7 @@ export function TableCard({ table, participants, onClick }: TableCardProps) {
             </span>
           </div>
         </div>
-      </button>
+      </div>
 
       {modalProfile && (
         <CommensalModal

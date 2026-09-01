@@ -29,8 +29,6 @@ import { AdminPage } from '@/pages/AdminPage'
 import { AnalyticsPage } from '@/pages/AnalyticsPage'
 import { ResetPasswordPage } from '@/pages/ResetPasswordPage'
 import { FlyerPage } from '@/pages/FlyerPage'
-// Suppress unused import warning – BrowsePage kept for future use
-void BrowsePage
 
 function AppRouter() {
   const { user, profile, loading, isPasswordRecovery } = useAuth()
@@ -179,7 +177,9 @@ function AppRouter() {
       case 'browse':
         return effectiveRole === 'restaurant'
           ? <RestaurantDashboardPage onNavigate={navigate} onAuthClick={openAuth} />
-          : <RestaurantsBrowsePage onNavigate={navigate} onAuthClick={openAuth} />
+          : <BrowsePage onNavigate={navigate} onAuthClick={openAuth} />
+      case 'restaurants-list':
+        return <RestaurantsBrowsePage onNavigate={navigate} onAuthClick={openAuth} />
       case 'restaurant-profile':
         return selectedId ? <RestaurantProfilePage restaurantId={selectedId} onNavigate={navigate} onAuthClick={openAuth} /> : null
       case 'companions':

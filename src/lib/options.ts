@@ -9,6 +9,28 @@ export const LANGUAGE_OPTIONS = [
   'Otro',
 ] as const
 
+// Mismos valores que usa CreateTablePage/OnboardingPage para `restaurant_cuisine`/
+// `cuisine_type` — deben coincidir literalmente con lo guardado en BD para que
+// cualquier filtro por cocina (Browse, Avísame) encuentre resultados reales.
+export const CUISINE_OPTIONS = [
+  'Italiana',
+  'Japonesa',
+  'Mexicana',
+  'Francesa',
+  'Tailandesa',
+  'India',
+  'China',
+  'Española',
+  'Mediterránea',
+  'Americana',
+  'Coreana',
+  'Vietnamita',
+  'Griega',
+  'Turca',
+  'Fusión',
+  'Otra',
+] as const
+
 export const INTEREST_OPTIONS = [
   'Viajar',
   'Deporte',

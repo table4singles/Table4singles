@@ -77,7 +77,7 @@ export function AdminPage({ onNavigate, onAuthClick }: AdminPageProps) {
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       <Navbar currentPage="admin" onNavigate={onNavigate} onAuthClick={onAuthClick} />
-      <main className="max-w-7xl mx-auto px-4 py-6 pb-24 md:pb-8">
+      <main className="max-w-7xl mx-auto px-4 py-6 pb-24 lg:pb-8">
         <div className="flex items-center justify-between mb-6">
           <div>
             <h1 className="text-2xl font-display font-bold text-gray-900 dark:text-white">{t('admin.title')}</h1>

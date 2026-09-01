@@ -57,7 +57,7 @@ export function MyTablesPage({ onNavigate, onAuthClick, initialTab }: MyTablesPa
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       <Navbar currentPage="my-tables" onNavigate={onNavigate} onAuthClick={onAuthClick} />
-      <main className="max-w-4xl mx-auto px-4 py-6 pb-24 md:pb-8">
+      <main className="max-w-4xl mx-auto px-4 py-6 pb-24 lg:pb-8">
         <PageHeader
           title={isRestaurant ? t('myTables.title') : t('myTables.titleUser')}
           subtitle={isRestaurant ? t('myTables.subtitle') : t('myTables.subtitleUser')}

@@ -61,7 +61,7 @@ export function CompanionsPage({ onNavigate, onAuthClick }: CompanionsPageProps)
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       <Navbar currentPage="companions" onNavigate={onNavigate} onAuthClick={onAuthClick} />
 
-      <main className="max-w-5xl mx-auto px-4 py-6 pb-24 md:pb-8">
+      <main className="max-w-5xl mx-auto px-4 py-6 pb-24 lg:pb-8">
         <PageHeader title={t('nav.companions')} subtitle={t('companions.subtitle')} />
 
         <div className="flex gap-3 mb-6">

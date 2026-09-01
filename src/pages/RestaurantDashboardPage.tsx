@@ -72,7 +72,7 @@ export function RestaurantDashboardPage({ onNavigate, onAuthClick }: RestaurantD
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       <Navbar currentPage="restaurant-dashboard" onNavigate={onNavigate} onAuthClick={onAuthClick} />
-      <main className="max-w-6xl mx-auto px-4 py-6 pb-24 md:pb-8">
+      <main className="max-w-6xl mx-auto px-4 py-6 pb-24 lg:pb-8">
         <PageHeader title={t('restaurantDashboard.title')} subtitle={profile?.restaurant_name || t('restaurantDashboard.subtitle')} variant="restaurant" />
 
         {error && <div className="bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-300 text-sm rounded-xl p-3 mb-4">{error}</div>}

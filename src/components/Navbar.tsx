@@ -50,7 +50,7 @@ export function Navbar({ currentPage, onNavigate, onAuthClick }: NavbarProps) {
           <span className="font-display font-bold text-lg text-white whitespace-nowrap">Table4Singles</span>
         </button>
 
-        <nav className="hidden md:flex items-center gap-1">
+        <nav className="hidden lg:flex items-center gap-1">
           {/* Toggle de vista para admins */}
           {isAdminSwitcher && (
             <div className="flex items-center bg-white/5 rounded-full p-0.5 mr-2">
@@ -207,7 +207,7 @@ export function Navbar({ currentPage, onNavigate, onAuthClick }: NavbarProps) {
 
       {/* Mobile bottom nav */}
       {user && (
-        <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-navy-950 border-t border-gold-500/10 z-50 px-2 pb-safe">
+        <nav className="lg:hidden fixed bottom-0 left-0 right-0 bg-navy-950 border-t border-gold-500/10 z-50 px-2 pb-safe">
           <div className="flex justify-around py-2">
             {effectiveRole !== 'restaurant' && (
               <MobileNavButton active={currentPage === 'browse' || currentPage === 'restaurant-profile'} onClick={() => onNavigate('browse')} icon={<Search className="w-5 h-5" />} label={t('nav.dinners')} />

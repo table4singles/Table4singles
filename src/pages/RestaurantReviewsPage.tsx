@@ -45,7 +45,7 @@ export function RestaurantReviewsPage({ onNavigate, onAuthClick }: RestaurantRev
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       <Navbar currentPage="reviews" onNavigate={onNavigate} onAuthClick={onAuthClick} />
-      <main className="max-w-3xl mx-auto px-4 py-6 pb-24 md:pb-8 space-y-6">
+      <main className="max-w-3xl mx-auto px-4 py-6 pb-24 lg:pb-8 space-y-6">
 
         <PageHeader title={t('restaurantProfile.reviews')} subtitle={t('restaurantReviews.subtitle')} variant="restaurant" />
 

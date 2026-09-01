@@ -96,7 +96,7 @@ export function SubscriptionPage({ onNavigate, onAuthClick }: SubscriptionPagePr
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       <Navbar currentPage="subscription" onNavigate={onNavigate} onAuthClick={onAuthClick} />
-      <main className="max-w-2xl mx-auto px-4 py-8 pb-24 md:pb-8">
+      <main className="max-w-2xl mx-auto px-4 py-8 pb-24 lg:pb-8">
         <button
           onClick={() => onNavigate('restaurant-dashboard')}
           className="flex items-center gap-2 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 mb-6 text-sm"

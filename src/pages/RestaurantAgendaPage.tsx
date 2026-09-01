@@ -288,7 +288,7 @@ export function RestaurantAgendaPage({ onNavigate, onAuthClick }: RestaurantAgen
       {/* Live notification toasts */}
       <LiveNotificationStack notifications={notifications} onDismiss={dismissNotification} t={t} />
 
-      <main className="max-w-3xl mx-auto px-4 py-6 pb-24 md:pb-8">
+      <main className="max-w-3xl mx-auto px-4 py-6 pb-24 lg:pb-8">
         {/* Header */}
         <PageHeader
           title={t('agenda.title')}

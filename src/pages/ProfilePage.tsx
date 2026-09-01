@@ -218,7 +218,7 @@ export function ProfilePage({ onNavigate, onAuthClick }: ProfilePageProps) {
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       <Navbar currentPage="profile" onNavigate={onNavigate} onAuthClick={onAuthClick} />
-      <main className="max-w-2xl mx-auto px-4 py-8 pb-24 md:pb-8">
+      <main className="max-w-2xl mx-auto px-4 py-8 pb-24 lg:pb-8">
         <PageHeader
           title={isRestaurant ? t('profile.titleRestaurant') : t('profile.title')}
           subtitle={isRestaurant ? t('profile.subtitleRestaurant') : t('profile.subtitle')}

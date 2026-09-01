@@ -129,7 +129,7 @@ export function AmbassadorPage({ onNavigate, onAuthClick }: AmbassadorPageProps)
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       <Navbar currentPage="ambassador" onNavigate={onNavigate} onAuthClick={onAuthClick} />
-      <main className="max-w-2xl mx-auto px-4 py-8 pb-24 md:pb-8">
+      <main className="max-w-2xl mx-auto px-4 py-8 pb-24 lg:pb-8">
         <button onClick={() => onNavigate('profile')} className="flex items-center gap-1.5 text-sm text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition-colors mb-6">
           <ChevronLeft className="w-4 h-4" /> {t('ambassador.backToProfile')}
         </button>

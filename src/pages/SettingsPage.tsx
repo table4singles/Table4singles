@@ -36,7 +36,7 @@ export function SettingsPage({ onNavigate, onAuthClick }: SettingsPageProps) {
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors">
       <Navbar currentPage="settings" onNavigate={onNavigate} onAuthClick={onAuthClick} />
-      <main className="max-w-2xl mx-auto px-4 py-8 pb-24 md:pb-8">
+      <main className="max-w-2xl mx-auto px-4 py-8 pb-24 lg:pb-8">
         <PageHeader title={t('settings.title')} subtitle={t('settings.subtitle')} variant={effectiveRole === 'restaurant' ? 'restaurant' : 'user'} />
 
         {error && <ErrorBanner message={error} className="mb-4" />}

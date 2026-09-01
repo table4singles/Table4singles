@@ -162,7 +162,7 @@ export function RestaurantProfilePage({ restaurantId, onNavigate, onAuthClick }:
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       <Navbar currentPage="browse" onNavigate={onNavigate} onAuthClick={onAuthClick} />
 
-      <main className="max-w-5xl mx-auto pb-24 md:pb-8">
+      <main className="max-w-5xl mx-auto pb-24 lg:pb-8">
 
         {/* ── Carrusel de fotos ────────────────────────────── */}
         <div className="relative h-64 sm:h-80 bg-gray-200 dark:bg-gray-800 overflow-hidden">

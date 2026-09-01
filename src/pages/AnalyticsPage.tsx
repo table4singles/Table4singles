@@ -16,7 +16,7 @@ interface AnalyticsPageProps {
   onAuthClick: (mode?: 'signin' | 'signup') => void
 }
 
-const COLORS = ['#e94560', '#f97316', '#22c55e', '#3b82f6', '#a855f7']
+const COLORS = ['#129a93', '#f97316', '#22c55e', '#3b82f6', '#a855f7']
 
 export function AnalyticsPage({ onNavigate, onAuthClick }: AnalyticsPageProps) {
   const { user } = useAuth()
@@ -130,7 +130,7 @@ export function AnalyticsPage({ onNavigate, onAuthClick }: AnalyticsPageProps) {
         />
 
         {loading ? (
-          <div className="flex justify-center py-20"><Loader2 className="w-8 h-8 text-[#e94560] animate-spin" /></div>
+          <div className="flex justify-center py-20"><Loader2 className="w-8 h-8 text-[#129a93] animate-spin" /></div>
         ) : data ? (
           <div className="space-y-6">
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
@@ -148,7 +148,7 @@ export function AnalyticsPage({ onNavigate, onAuthClick }: AnalyticsPageProps) {
                     <XAxis dataKey="date" tick={{ fontSize: 11 }} />
                     <YAxis tick={{ fontSize: 11 }} allowDecimals={false} />
                     <Tooltip />
-                    <Bar dataKey={data.reservasKey} fill="#e94560" radius={[4, 4, 0, 0]} />
+                    <Bar dataKey={data.reservasKey} fill="#129a93" radius={[4, 4, 0, 0]} />
                   </BarChart>
                 </ResponsiveContainer>
               </ChartCard>

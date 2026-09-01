@@ -100,7 +100,7 @@ export function RestaurantReviewsPage({ onNavigate, onAuthClick }: RestaurantRev
                   ))}
                 </div>
                 <div className="text-center">
-                  <BarChart2 className="w-8 h-8 text-[#e94560] mx-auto mb-1" />
+                  <BarChart2 className="w-8 h-8 text-[#129a93] mx-auto mb-1" />
                   <p className="text-xs text-gray-500 dark:text-gray-400">{t('restaurantReviews.avgScoreLabel')}</p>
                 </div>
               </div>
@@ -212,10 +212,10 @@ function DinnerReviewCard({ review, onReply }: { review: Review; onReply: (revie
 
         {/* Respuesta existente */}
         {existingReply && !showReplyBox && (
-          <div className="mt-3 pl-4 border-l-2 border-[#e94560]/30">
-            <p className="text-xs font-semibold text-[#e94560] mb-1">{t('restaurantReviews.yourReplyLabel')}</p>
+          <div className="mt-3 pl-4 border-l-2 border-[#129a93]/30">
+            <p className="text-xs font-semibold text-[#129a93] mb-1">{t('restaurantReviews.yourReplyLabel')}</p>
             <p className="text-sm text-gray-600 dark:text-gray-300">{existingReply.reply}</p>
-            <button onClick={() => setShowReplyBox(true)} className="text-xs text-gray-400 hover:text-[#e94560] mt-1 transition-colors">{t('restaurantReviews.editShort')}</button>
+            <button onClick={() => setShowReplyBox(true)} className="text-xs text-gray-400 hover:text-[#129a93] mt-1 transition-colors">{t('restaurantReviews.editShort')}</button>
           </div>
         )}
 
@@ -223,7 +223,7 @@ function DinnerReviewCard({ review, onReply }: { review: Review; onReply: (revie
         {showReplyBox && (
           <div className="mt-3">
             <div className="flex items-center gap-1.5 mb-1.5">
-              <MessageSquare className="w-3.5 h-3.5 text-[#e94560]" />
+              <MessageSquare className="w-3.5 h-3.5 text-[#129a93]" />
               <span className="text-xs font-semibold text-gray-700 dark:text-gray-200">{existingReply ? t('restaurantReviews.editReplyLabel') : t('restaurantProfile.reply')}</span>
             </div>
             <textarea
@@ -231,7 +231,7 @@ function DinnerReviewCard({ review, onReply }: { review: Review; onReply: (revie
               onChange={e => setReplyText(e.target.value)}
               rows={2}
               placeholder={t('restaurantReviews.replyPlaceholderShort')}
-              className="w-full px-3 py-2 border border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-900 dark:text-white rounded-xl text-sm focus:ring-2 focus:ring-[#e94560] outline-none resize-none"
+              className="w-full px-3 py-2 border border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-900 dark:text-white rounded-xl text-sm focus:ring-2 focus:ring-[#129a93] outline-none resize-none"
             />
             <div className="flex justify-end gap-2 mt-1.5">
               {existingReply && (
@@ -240,7 +240,7 @@ function DinnerReviewCard({ review, onReply }: { review: Review; onReply: (revie
               <button
                 onClick={handleSave}
                 disabled={saving || !replyText.trim()}
-                className="flex items-center gap-1 px-3 py-1 bg-[#e94560] text-white text-xs font-medium rounded-lg hover:bg-[#d63d56] disabled:opacity-50 transition-colors"
+                className="flex items-center gap-1 px-3 py-1 bg-[#129a93] text-white text-xs font-medium rounded-lg hover:bg-[#0b7f79] disabled:opacity-50 transition-colors"
               >
                 {saving ? <Loader2 className="w-3 h-3 animate-spin" /> : <Send className="w-3 h-3" />} {t('common.save')}
               </button>
@@ -250,7 +250,7 @@ function DinnerReviewCard({ review, onReply }: { review: Review; onReply: (revie
 
         {/* CTA de responder si no existe */}
         {!existingReply && !showReplyBox && (
-          <button onClick={() => setShowReplyBox(true)} className="mt-2 flex items-center gap-1 text-xs text-[#e94560] hover:text-[#d63d56] font-medium transition-colors">
+          <button onClick={() => setShowReplyBox(true)} className="mt-2 flex items-center gap-1 text-xs text-[#129a93] hover:text-[#0b7f79] font-medium transition-colors">
             <MessageSquare className="w-3.5 h-3.5" /> {t('restaurantProfile.reply')}
           </button>
         )}
@@ -308,12 +308,12 @@ function ReviewCard({ review, onReply }: { review: RestaurantReview; onReply: (r
 
         {/* Existing reply */}
         {existingReply && !showReplyBox && (
-          <div className="mt-4 pl-4 border-l-2 border-[#e94560]/30">
-            <p className="text-xs font-semibold text-[#e94560] mb-1">{t('restaurantReviews.yourReplyLabel')}</p>
+          <div className="mt-4 pl-4 border-l-2 border-[#129a93]/30">
+            <p className="text-xs font-semibold text-[#129a93] mb-1">{t('restaurantReviews.yourReplyLabel')}</p>
             <p className="text-sm text-gray-600 dark:text-gray-300">{existingReply.reply}</p>
             <button
               onClick={() => setShowReplyBox(true)}
-              className="text-xs text-gray-400 hover:text-[#e94560] mt-1.5 transition-colors"
+              className="text-xs text-gray-400 hover:text-[#129a93] mt-1.5 transition-colors"
             >
               {t('restaurantReviews.editReplyLabel')}
             </button>
@@ -324,7 +324,7 @@ function ReviewCard({ review, onReply }: { review: RestaurantReview; onReply: (r
         {showReplyBox && (
           <div className="mt-4">
             <div className="flex items-center gap-1.5 mb-2">
-              <MessageSquare className="w-3.5 h-3.5 text-[#e94560]" />
+              <MessageSquare className="w-3.5 h-3.5 text-[#129a93]" />
               <span className="text-xs font-semibold text-gray-700 dark:text-gray-200">
                 {existingReply ? t('restaurantReviews.editReplyLabel') : t('restaurantProfile.reply')}
               </span>
@@ -334,7 +334,7 @@ function ReviewCard({ review, onReply }: { review: RestaurantReview; onReply: (r
               onChange={e => setReplyText(e.target.value)}
               rows={3}
               placeholder={t('restaurantReviews.replyPlaceholderLong')}
-              className="w-full px-4 py-2.5 border border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-900 dark:text-white rounded-xl text-sm focus:ring-2 focus:ring-[#e94560] outline-none resize-none"
+              className="w-full px-4 py-2.5 border border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-900 dark:text-white rounded-xl text-sm focus:ring-2 focus:ring-[#129a93] outline-none resize-none"
             />
             <div className="flex justify-end gap-2 mt-2">
               {existingReply && (
@@ -348,7 +348,7 @@ function ReviewCard({ review, onReply }: { review: RestaurantReview; onReply: (r
               <button
                 onClick={handleSave}
                 disabled={saving || !replyText.trim()}
-                className="flex items-center gap-1.5 px-4 py-1.5 bg-[#e94560] text-white text-sm font-medium rounded-lg hover:bg-[#d63d56] disabled:opacity-50 transition-colors"
+                className="flex items-center gap-1.5 px-4 py-1.5 bg-[#129a93] text-white text-sm font-medium rounded-lg hover:bg-[#0b7f79] disabled:opacity-50 transition-colors"
               >
                 {saving ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Send className="w-3.5 h-3.5" />}
                 {t('common.save')}
@@ -361,7 +361,7 @@ function ReviewCard({ review, onReply }: { review: RestaurantReview; onReply: (r
         {!existingReply && !showReplyBox && (
           <button
             onClick={() => setShowReplyBox(true)}
-            className="mt-3 flex items-center gap-1.5 text-xs text-[#e94560] hover:text-[#d63d56] font-medium transition-colors"
+            className="mt-3 flex items-center gap-1.5 text-xs text-[#129a93] hover:text-[#0b7f79] font-medium transition-colors"
           >
             <MessageSquare className="w-3.5 h-3.5" /> {t('restaurantProfile.reply')}
           </button>

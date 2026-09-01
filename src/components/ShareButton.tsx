@@ -58,7 +58,7 @@ export function ShareButton({ url, message, tweetMessage, variant = 'outline', l
         onClick={() => setOpen(!open)}
         className={
           variant === 'solid'
-            ? 'flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-primary-500 text-white font-semibold text-sm shadow-glow-coral hover:bg-primary-600 active:scale-95 transition-all w-full'
+            ? 'flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-primary-500 text-white font-semibold text-sm shadow-glow-teal hover:bg-primary-600 active:scale-95 transition-all w-full'
             : 'flex items-center gap-2 px-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-200 font-medium text-sm hover:bg-gray-50 dark:hover:bg-gray-700 active:scale-95 transition-all'
         }
       >

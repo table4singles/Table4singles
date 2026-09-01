@@ -41,7 +41,7 @@ export function Navbar({ currentPage, onNavigate, onAuthClick }: NavbarProps) {
 
   return (
     <>
-    <header className="sticky top-0 z-50 bg-gray-950 border-b border-gold-500/10">
+    <header className="sticky top-0 z-50 bg-navy-950 border-b border-gold-500/10">
       <div className="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
         <button onClick={() => onNavigate(user ? 'browse' : 'landing')} className="flex items-center gap-2">
           <span className="h-9 w-9 rounded-xl overflow-hidden flex-shrink-0">
@@ -56,13 +56,13 @@ export function Navbar({ currentPage, onNavigate, onAuthClick }: NavbarProps) {
             <div className="flex items-center bg-white/5 rounded-full p-0.5 mr-2">
               <button
                 onClick={() => switchToMode('user')}
-                className={`flex items-center gap-1 px-3 py-1 rounded-full text-xs font-semibold transition-all ${effectiveRole === 'user' ? 'bg-gray-800 text-sky-400 shadow-sm' : 'text-gray-400 hover:text-gray-200'}`}
+                className={`flex items-center gap-1 px-3 py-1 rounded-full text-xs font-semibold transition-all ${effectiveRole === 'user' ? 'bg-navy-800 text-sky-400 shadow-sm' : 'text-gray-400 hover:text-gray-200'}`}
               >
                 <User className="w-3 h-3" /> {t('nav.user')}
               </button>
               <button
                 onClick={() => switchToMode('restaurant')}
-                className={`flex items-center gap-1 px-3 py-1 rounded-full text-xs font-semibold transition-all ${effectiveRole === 'restaurant' ? 'bg-gray-800 text-orange-400 shadow-sm' : 'text-gray-400 hover:text-gray-200'}`}
+                className={`flex items-center gap-1 px-3 py-1 rounded-full text-xs font-semibold transition-all ${effectiveRole === 'restaurant' ? 'bg-navy-800 text-orange-400 shadow-sm' : 'text-gray-400 hover:text-gray-200'}`}
               >
                 <LayoutDashboard className="w-3 h-3" /> {t('nav.restaurant')}
               </button>
@@ -102,7 +102,7 @@ export function Navbar({ currentPage, onNavigate, onAuthClick }: NavbarProps) {
                 <button onClick={() => setShowNotifications(!showNotifications)} className="relative p-2 rounded-lg hover:bg-white/5 transition-colors">
                   <Bell className="w-5 h-5 text-gray-400" />
                   {unreadCount > 0 && (
-                    <span className="absolute -top-0.5 -right-0.5 w-5 h-5 bg-gold-500 text-gray-900 text-xs rounded-full flex items-center justify-center font-bold">
+                    <span className="absolute -top-0.5 -right-0.5 w-5 h-5 bg-gold-500 text-navy-900 text-xs rounded-full flex items-center justify-center font-bold">
                       {unreadCount > 9 ? '9+' : unreadCount}
                     </span>
                   )}
@@ -133,7 +133,7 @@ export function Navbar({ currentPage, onNavigate, onAuthClick }: NavbarProps) {
                   </span>
                 </button>
                 {showMenu && (
-                  <div className="absolute right-0 top-full mt-1 bg-gray-900 rounded-xl shadow-e4 border border-gold-500/15 overflow-hidden z-50 w-52 animate-fade-in">
+                  <div className="absolute right-0 top-full mt-1 bg-navy-900 rounded-xl shadow-e4 border border-gold-500/15 overflow-hidden z-50 w-52 animate-fade-in">
                     {/* Switcher de vista para admins */}
                     {isAdminSwitcher && (
                       <div className="px-4 py-3 border-b border-white/10">
@@ -141,13 +141,13 @@ export function Navbar({ currentPage, onNavigate, onAuthClick }: NavbarProps) {
                         <div className="flex gap-1 bg-white/5 rounded-full p-0.5">
                           <button
                             onClick={() => switchToMode('user')}
-                            className={`flex-1 flex items-center justify-center gap-1 py-1 rounded-full text-xs font-semibold transition-all ${effectiveRole === 'user' ? 'bg-gray-800 text-sky-400 shadow-sm' : 'text-gray-500'}`}
+                            className={`flex-1 flex items-center justify-center gap-1 py-1 rounded-full text-xs font-semibold transition-all ${effectiveRole === 'user' ? 'bg-navy-800 text-sky-400 shadow-sm' : 'text-gray-500'}`}
                           >
                             <User className="w-3 h-3" /> {t('nav.user')}
                           </button>
                           <button
                             onClick={() => switchToMode('restaurant')}
-                            className={`flex-1 flex items-center justify-center gap-1 py-1 rounded-full text-xs font-semibold transition-all ${effectiveRole === 'restaurant' ? 'bg-gray-800 text-orange-400 shadow-sm' : 'text-gray-500'}`}
+                            className={`flex-1 flex items-center justify-center gap-1 py-1 rounded-full text-xs font-semibold transition-all ${effectiveRole === 'restaurant' ? 'bg-navy-800 text-orange-400 shadow-sm' : 'text-gray-500'}`}
                           >
                             <LayoutDashboard className="w-3 h-3" /> {t('nav.restaurant')}
                           </button>
@@ -196,7 +196,7 @@ export function Navbar({ currentPage, onNavigate, onAuthClick }: NavbarProps) {
               <button onClick={() => onAuthClick('signin')} className="px-4 py-2 text-sm font-semibold text-gray-300 hover:text-white transition-colors">
                 {t('nav.signIn')}
               </button>
-              <button onClick={() => onAuthClick('signup')} className="px-5 py-2 text-sm font-bold text-gray-900 bg-gradient-to-r from-gold-300 to-gold-500 hover:from-gold-200 hover:to-gold-400 rounded-full transition-all shadow-glow-gold">
+              <button onClick={() => onAuthClick('signup')} className="px-5 py-2 text-sm font-bold text-navy-900 bg-gradient-to-r from-gold-300 to-gold-500 hover:from-gold-200 hover:to-gold-400 rounded-full transition-all shadow-glow-gold">
                 {t('nav.signUp')}
               </button>
             </div>
@@ -206,7 +206,7 @@ export function Navbar({ currentPage, onNavigate, onAuthClick }: NavbarProps) {
 
       {/* Mobile bottom nav */}
       {user && (
-        <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-gray-950 border-t border-gold-500/10 z-50 px-2 pb-safe">
+        <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-navy-950 border-t border-gold-500/10 z-50 px-2 pb-safe">
           <div className="flex justify-around py-2">
             {effectiveRole !== 'restaurant' && (
               <MobileNavButton active={currentPage === 'browse' || currentPage === 'restaurant-profile'} onClick={() => onNavigate('browse')} icon={<Search className="w-5 h-5" />} label={t('nav.restaurants')} />

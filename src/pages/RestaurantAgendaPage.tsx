@@ -56,10 +56,10 @@ function LiveRoom({ tables, onNavigate, t }: LiveRoomProps) {
       {/* Live header */}
       <div className="flex items-center gap-2 mb-5">
         <span className="relative flex h-3 w-3">
-          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#e94560] opacity-60" />
-          <span className="relative inline-flex rounded-full h-3 w-3 bg-[#e94560]" />
+          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#129a93] opacity-60" />
+          <span className="relative inline-flex rounded-full h-3 w-3 bg-[#129a93]" />
         </span>
-        <span className="text-sm font-bold text-[#e94560] uppercase tracking-wider">{t('agenda.liveNow')}</span>
+        <span className="text-sm font-bold text-[#129a93] uppercase tracking-wider">{t('agenda.liveNow')}</span>
         <span className="text-sm text-gray-400 dark:text-gray-500">·</span>
         <span className="text-sm text-gray-500 dark:text-gray-400">{t('agenda.todayDate')}</span>
       </div>
@@ -191,7 +191,7 @@ function HourlyList({ byDate, datesWithTables, locale, onNavigate, t }: HourlyLi
         <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2 px-1">
           {formatDateHeading(date, locale)}
           {date === today && (
-            <span className="ml-2 text-xs text-[#e94560] font-bold">{t('agenda.today')}</span>
+            <span className="ml-2 text-xs text-[#129a93] font-bold">{t('agenda.today')}</span>
           )}
         </h3>
         <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-gray-700 overflow-hidden divide-y divide-gray-50 dark:divide-gray-700">
@@ -334,7 +334,7 @@ export function RestaurantAgendaPage({ onNavigate, onAuthClick }: RestaurantAgen
               onClick={() => setView(tab.id)}
               className={`flex-1 flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
                 view === tab.id
-                  ? 'bg-[#e94560] text-white shadow-sm'
+                  ? 'bg-[#129a93] text-white shadow-sm'
                   : 'text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700'
               }`}
             >
@@ -357,7 +357,7 @@ export function RestaurantAgendaPage({ onNavigate, onAuthClick }: RestaurantAgen
         {/* Loading */}
         {loading ? (
           <div className="flex justify-center py-16">
-            <Loader2 className="w-8 h-8 text-[#e94560] animate-spin" />
+            <Loader2 className="w-8 h-8 text-[#129a93] animate-spin" />
           </div>
         ) : isEmpty && view !== 'live' ? (
           <div className="text-center py-16">
@@ -368,7 +368,7 @@ export function RestaurantAgendaPage({ onNavigate, onAuthClick }: RestaurantAgen
             <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">{t('agenda.noTablesDesc')}</p>
             <button
               onClick={() => onNavigate('create')}
-              className="px-6 py-2.5 bg-[#e94560] text-white rounded-xl text-sm font-medium hover:bg-[#d63d56]"
+              className="px-6 py-2.5 bg-[#129a93] text-white rounded-xl text-sm font-medium hover:bg-[#0b7f79]"
             >
               {t('agenda.newTable')}
             </button>

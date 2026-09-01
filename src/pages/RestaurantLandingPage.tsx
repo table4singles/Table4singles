@@ -15,15 +15,15 @@ interface RestaurantLandingPageProps {
 export function RestaurantLandingPage({ onNavigate, onAuthClick }: RestaurantLandingPageProps) {
   const { t } = useLanguage()
   return (
-    <div className="min-h-screen bg-gray-950">
+    <div className="min-h-screen bg-navy-950">
       <Navbar currentPage="restaurant-landing" onNavigate={onNavigate} onAuthClick={onAuthClick} />
 
       {/* HERO — full-bleed photo + dark gold gradient */}
       <section className="relative overflow-hidden text-white">
         <img src="/hero-dinner.jpg" alt="" className="absolute inset-0 w-full h-full object-cover" />
-        <div className="absolute inset-0 bg-gradient-to-br from-black/90 via-gray-950/85 to-amber-950/70" />
+        <div className="absolute inset-0 bg-gradient-to-br from-black/90 via-navy-950/85 to-primary-950/70" />
         <div className="absolute -top-24 -right-16 w-96 h-96 rounded-full bg-gold-400/10 blur-3xl" />
-        <div className="absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-gray-950 to-transparent" />
+        <div className="absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-navy-950 to-transparent" />
 
         <div className="relative max-w-4xl mx-auto px-4 pt-20 pb-28 md:pt-28 md:pb-36 text-center">
           <p className="inline-flex items-center gap-2 text-xs font-bold tracking-[0.18em] uppercase text-gold-300 bg-gold-400/10 border border-gold-400/30 rounded-full px-4 py-1.5 mb-6">
@@ -39,7 +39,7 @@ export function RestaurantLandingPage({ onNavigate, onAuthClick }: RestaurantLan
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-12">
             <button
               onClick={() => onAuthClick('signup')}
-              className="inline-flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-gold-300 to-gold-500 text-gray-900 hover:from-gold-200 hover:to-gold-400 rounded-full font-bold text-lg shadow-glow-gold hover:-translate-y-0.5 transition-all"
+              className="inline-flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-gold-300 to-gold-500 text-navy-900 hover:from-gold-200 hover:to-gold-400 rounded-full font-bold text-lg shadow-glow-gold hover:-translate-y-0.5 transition-all"
             >
               {t('restaurantLanding.hero.cta')} <ArrowRight className="w-5 h-5" />
             </button>
@@ -57,7 +57,7 @@ export function RestaurantLandingPage({ onNavigate, onAuthClick }: RestaurantLan
       </section>
 
       {/* PROBLEMA → SOLUCIÓN */}
-      <section className="relative py-20 bg-gray-950">
+      <section className="relative py-20 bg-navy-950">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <span className="inline-flex items-center gap-2 text-xs font-bold tracking-[0.16em] uppercase text-gold-300 bg-gold-400/10 border border-gold-400/25 rounded-full px-4 py-1.5 mb-6">
             <TrendingDown className="w-3.5 h-3.5" /> {t('restaurantLanding.problem.eyebrow')}
@@ -72,7 +72,7 @@ export function RestaurantLandingPage({ onNavigate, onAuthClick }: RestaurantLan
       </section>
 
       {/* HOW IT WORKS — alternating rows */}
-      <section id="como-funciona" className="py-20 bg-gray-900 scroll-mt-16">
+      <section id="como-funciona" className="py-20 bg-navy-900 scroll-mt-16">
         <div className="max-w-5xl mx-auto px-4">
           <div className="text-center mb-16">
             <h2 className="font-display text-3xl md:text-4xl italic text-white mb-3">{t('restaurantLanding.steps.title')}</h2>
@@ -83,7 +83,7 @@ export function RestaurantLandingPage({ onNavigate, onAuthClick }: RestaurantLan
             <StepRow
               number={1}
               stepLabel={t('restaurantLanding.steps.step')}
-              icon={<UserPlus className="w-7 h-7 text-gray-900" />}
+              icon={<UserPlus className="w-7 h-7 text-navy-900" />}
               bg="from-gold-300 to-gold-500"
               title={t('restaurantLanding.steps.step1Title')}
               desc={t('restaurantLanding.steps.step1Desc')}
@@ -91,7 +91,7 @@ export function RestaurantLandingPage({ onNavigate, onAuthClick }: RestaurantLan
             <StepRow
               number={2}
               stepLabel={t('restaurantLanding.steps.step')}
-              icon={<CalendarPlus className="w-7 h-7 text-gray-900" />}
+              icon={<CalendarPlus className="w-7 h-7 text-navy-900" />}
               bg="from-gold-300 to-gold-500"
               title={t('restaurantLanding.steps.step2Title')}
               desc={t('restaurantLanding.steps.step2Desc')}
@@ -100,7 +100,7 @@ export function RestaurantLandingPage({ onNavigate, onAuthClick }: RestaurantLan
             <StepRow
               number={3}
               stepLabel={t('restaurantLanding.steps.step')}
-              icon={<Users className="w-7 h-7 text-gray-900" />}
+              icon={<Users className="w-7 h-7 text-navy-900" />}
               bg="from-gold-300 to-gold-500"
               title={t('restaurantLanding.steps.step3Title')}
               desc={t('restaurantLanding.steps.step3Desc')}
@@ -110,7 +110,7 @@ export function RestaurantLandingPage({ onNavigate, onAuthClick }: RestaurantLan
       </section>
 
       {/* TOOLS — what's actually in the restaurant panel */}
-      <section className="py-20 bg-gray-950">
+      <section className="py-20 bg-navy-950">
         <div className="max-w-5xl mx-auto px-4">
           <div className="text-center mb-14">
             <h2 className="font-display text-3xl md:text-4xl font-bold text-white mb-3">{t('restaurantLanding.tools.title')}</h2>
@@ -128,8 +128,8 @@ export function RestaurantLandingPage({ onNavigate, onAuthClick }: RestaurantLan
       {/* BENEFITS — photo backdrop */}
       <section className="relative py-24 overflow-hidden">
         <img src="/hero-flyer-default.jpg" alt="" className="absolute inset-0 w-full h-full object-cover" />
-        <div className="absolute inset-0 bg-gray-950/90" />
-        <div className="absolute inset-0 bg-gradient-to-b from-gray-950 via-gray-950/70 to-gray-950" />
+        <div className="absolute inset-0 bg-navy-950/90" />
+        <div className="absolute inset-0 bg-gradient-to-b from-navy-950 via-navy-950/70 to-navy-950" />
         <div className="relative max-w-5xl mx-auto px-4">
           <div className="text-center mb-14">
             <h2 className="font-display text-3xl md:text-4xl font-bold text-white mb-3 drop-shadow-lg">{t('restaurantLanding.benefits.title')}</h2>
@@ -145,7 +145,7 @@ export function RestaurantLandingPage({ onNavigate, onAuthClick }: RestaurantLan
       </section>
 
       {/* FAQ */}
-      <section className="py-20 bg-gray-950">
+      <section className="py-20 bg-navy-950">
         <div className="max-w-2xl mx-auto px-4">
           <div className="text-center mb-12">
             <h2 className="font-display text-3xl md:text-4xl font-bold text-white mb-3">{t('restaurantLanding.faq.title')}</h2>
@@ -162,7 +162,7 @@ export function RestaurantLandingPage({ onNavigate, onAuthClick }: RestaurantLan
       </section>
 
       {/* OFFER / FINAL CTA */}
-      <section className="relative py-20 bg-gradient-to-br from-gray-950 via-gray-900 to-amber-950 text-white text-center overflow-hidden border-t border-gold-500/10">
+      <section className="relative py-20 bg-gradient-to-br from-navy-950 via-navy-900 to-primary-950 text-white text-center overflow-hidden border-t border-gold-500/10">
         <div className="absolute -bottom-20 -left-16 w-80 h-80 rounded-full bg-gold-400/10 blur-3xl" />
         <div className="relative max-w-2xl mx-auto px-4">
           <span className="inline-flex items-center gap-2 text-xs font-bold tracking-[0.16em] uppercase text-gold-300 bg-gold-400/10 border border-gold-400/30 rounded-full px-4 py-1.5 mb-6">
@@ -174,7 +174,7 @@ export function RestaurantLandingPage({ onNavigate, onAuthClick }: RestaurantLan
           </p>
           <button
             onClick={() => onAuthClick('signup')}
-            className="inline-flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-gold-300 to-gold-500 text-gray-900 hover:from-gold-200 hover:to-gold-400 rounded-full font-bold text-lg shadow-glow-gold hover:-translate-y-0.5 transition-all"
+            className="inline-flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-gold-300 to-gold-500 text-navy-900 hover:from-gold-200 hover:to-gold-400 rounded-full font-bold text-lg shadow-glow-gold hover:-translate-y-0.5 transition-all"
           >
             {t('restaurantLanding.finalCta.button')} <ArrowRight className="w-5 h-5" />
           </button>
@@ -211,7 +211,7 @@ function StepRow({ number, stepLabel, icon, bg, title, desc, reverse }: { number
 
 function BenefitCard({ icon, title, desc }: { icon: React.ReactNode; title: string; desc: string }) {
   return (
-    <div className="flex items-start gap-4 bg-gray-900/90 backdrop-blur rounded-2xl shadow-e3 border border-gold-500/15 p-5 hover:-translate-y-0.5 hover:border-gold-500/30 transition-all">
+    <div className="flex items-start gap-4 bg-navy-900/90 backdrop-blur rounded-2xl shadow-e3 border border-gold-500/15 p-5 hover:-translate-y-0.5 hover:border-gold-500/30 transition-all">
       <span className="w-10 h-10 rounded-xl bg-gold-400/10 text-gold-400 flex items-center justify-center flex-shrink-0">
         {icon}
       </span>
@@ -226,7 +226,7 @@ function BenefitCard({ icon, title, desc }: { icon: React.ReactNode; title: stri
 function FaqItem({ q, a }: { q: string; a: string }) {
   const [open, setOpen] = useState(false)
   return (
-    <div className="bg-gray-900 rounded-2xl shadow-e2 border border-gold-500/15 overflow-hidden">
+    <div className="bg-navy-900 rounded-2xl shadow-e2 border border-gold-500/15 overflow-hidden">
       <button
         onClick={() => setOpen(!open)}
         className="w-full flex items-center justify-between gap-4 px-5 py-4 text-left"

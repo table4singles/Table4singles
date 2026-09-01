@@ -84,7 +84,7 @@ export function AdminPage({ onNavigate, onAuthClick }: AdminPageProps) {
 
         <div className="flex gap-1 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-1 mb-6 overflow-x-auto">
           {tabs.map(tb => (
-            <button key={tb.id} onClick={() => setTab(tb.id)} className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition-colors flex-shrink-0 ${tab === tb.id ? 'bg-[#e94560] text-white' : 'text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'}`}>
+            <button key={tb.id} onClick={() => setTab(tb.id)} className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition-colors flex-shrink-0 ${tab === tb.id ? 'bg-[#129a93] text-white' : 'text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'}`}>
               {tb.icon} {tb.label}
             </button>
           ))}

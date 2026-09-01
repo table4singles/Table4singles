@@ -128,7 +128,7 @@ export function SubscriptionPage({ onNavigate, onAuthClick }: SubscriptionPagePr
         {/* Card de plan */}
         <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden mb-6">
           {/* Header plan */}
-          <div className="bg-gradient-to-br from-[#e94560] to-[#c73652] px-6 py-6 text-white">
+          <div className="bg-gradient-to-br from-[#129a93] to-[#c73652] px-6 py-6 text-white">
             <div className="flex items-center gap-2 mb-1">
               <Zap className="w-5 h-5" />
               <span className="text-sm font-semibold uppercase tracking-wide opacity-90">{t('subscription.title')}</span>
@@ -202,7 +202,7 @@ export function SubscriptionPage({ onNavigate, onAuthClick }: SubscriptionPagePr
               <button
                 onClick={handleSubscribe}
                 disabled={loading}
-                className="w-full py-3.5 bg-[#e94560] hover:bg-[#d63d56] disabled:opacity-60 text-white rounded-xl font-semibold text-sm transition-colors flex items-center justify-center gap-2"
+                className="w-full py-3.5 bg-[#129a93] hover:bg-[#0b7f79] disabled:opacity-60 text-white rounded-xl font-semibold text-sm transition-colors flex items-center justify-center gap-2"
               >
                 {loading ? (
                   <>

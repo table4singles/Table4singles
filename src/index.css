@@ -30,7 +30,7 @@ body {
 }
 .phone-input-custom:focus-within {
   outline: none;
-  box-shadow: 0 0 0 2px #e94560;
+  box-shadow: 0 0 0 2px #129a93;
   border-color: transparent;
 }
 .phone-input-custom .PhoneInputInput {

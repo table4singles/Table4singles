@@ -87,7 +87,7 @@ export function BrowsePage({ onNavigate, onAuthClick }: BrowsePageProps) {
             </div>
             <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-2">{t('browse.noResults')}</h3>
             <p className="text-gray-500 dark:text-gray-400 mb-6">{hasFilters ? t('browse.adjustFilters') : t('browse.beFirst')}</p>
-            <button onClick={() => onNavigate('create')} className="px-8 py-3 bg-[#e94560] text-white rounded-xl font-medium hover:bg-[#d63d56] transition-colors inline-flex items-center gap-2">
+            <button onClick={() => onNavigate('create')} className="px-8 py-3 bg-[#129a93] text-white rounded-xl font-medium hover:bg-[#0b7f79] transition-colors inline-flex items-center gap-2">
               <Plus className="w-5 h-5" /> {t('browse.createTable')}
             </button>
 

@@ -85,7 +85,7 @@ export function CreateTablePage({ onNavigate, onAuthClick }: CreateTablePageProp
           <div className="flex justify-center gap-3">
             <button
               onClick={() => onNavigate('agenda')}
-              className="px-6 py-3 bg-[#e94560] text-white rounded-xl font-medium hover:bg-[#d63d56] transition-colors"
+              className="px-6 py-3 bg-[#129a93] text-white rounded-xl font-medium hover:bg-[#0b7f79] transition-colors"
             >
               {t('createTable.success.viewAgenda')}
             </button>
@@ -135,7 +135,7 @@ export function CreateTablePage({ onNavigate, onAuthClick }: CreateTablePageProp
                   value={availableFrom}
                   min={new Date().toISOString().split('T')[0]}
                   onChange={e => setAvailableFrom(e.target.value)}
-                  className="w-full px-3 py-2.5 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 dark:text-white rounded-xl text-sm focus:ring-2 focus:ring-[#e94560] outline-none"
+                  className="w-full px-3 py-2.5 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 dark:text-white rounded-xl text-sm focus:ring-2 focus:ring-[#129a93] outline-none"
                 />
               </div>
               <div>
@@ -145,7 +145,7 @@ export function CreateTablePage({ onNavigate, onAuthClick }: CreateTablePageProp
                   value={availableUntil}
                   min={availableFrom || new Date().toISOString().split('T')[0]}
                   onChange={e => setAvailableUntil(e.target.value)}
-                  className="w-full px-3 py-2.5 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 dark:text-white rounded-xl text-sm focus:ring-2 focus:ring-[#e94560] outline-none"
+                  className="w-full px-3 py-2.5 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 dark:text-white rounded-xl text-sm focus:ring-2 focus:ring-[#129a93] outline-none"
                 />
               </div>
             </div>
@@ -184,8 +184,8 @@ export function CreateTablePage({ onNavigate, onAuthClick }: CreateTablePageProp
                   onClick={() => setZone(id)}
                   className={`py-2.5 px-4 rounded-xl text-sm font-medium border transition-colors text-left ${
                     zone === id
-                      ? 'bg-[#e94560] text-white border-[#e94560]'
-                      : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border-gray-200 dark:border-gray-600 hover:border-[#e94560]/50'
+                      ? 'bg-[#129a93] text-white border-[#129a93]'
+                      : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border-gray-200 dark:border-gray-600 hover:border-[#129a93]/50'
                   }`}
                 >
                   {t(`createTable.zone.${id}`)}
@@ -198,7 +198,7 @@ export function CreateTablePage({ onNavigate, onAuthClick }: CreateTablePageProp
                 placeholder={t('createTable.customZonePlaceholder')}
                 value={customZone}
                 onChange={e => setCustomZone(e.target.value)}
-                className="mt-2 w-full px-4 py-2.5 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 dark:text-white rounded-xl text-sm focus:ring-2 focus:ring-[#e94560] outline-none"
+                className="mt-2 w-full px-4 py-2.5 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 dark:text-white rounded-xl text-sm focus:ring-2 focus:ring-[#129a93] outline-none"
               />
             )}
           </div>
@@ -208,7 +208,7 @@ export function CreateTablePage({ onNavigate, onAuthClick }: CreateTablePageProp
           <button
             onClick={handleSubmit}
             disabled={!canSubmit || loading}
-            className="w-full py-3.5 bg-[#e94560] text-white rounded-xl font-semibold hover:bg-[#d63d56] disabled:opacity-50 transition-colors flex items-center justify-center gap-2"
+            className="w-full py-3.5 bg-[#129a93] text-white rounded-xl font-semibold hover:bg-[#0b7f79] disabled:opacity-50 transition-colors flex items-center justify-center gap-2"
           >
             {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : t('createTable.submit')}
           </button>

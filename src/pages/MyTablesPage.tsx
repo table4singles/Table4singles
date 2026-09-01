@@ -131,7 +131,7 @@ export function MyTablesPage({ onNavigate, onAuthClick, initialTab }: MyTablesPa
               {t2 === 'hosting' && ` (${hosting.length})`}
               {t2 === 'reservations' && ` (${reservations.length})`}
               {t2 === 'invitations' && invitations.length > 0 && (
-                <span className="ml-1.5 w-5 h-5 bg-[#e94560] text-white rounded-full text-xs inline-flex items-center justify-center">{invitations.length}</span>
+                <span className="ml-1.5 w-5 h-5 bg-[#129a93] text-white rounded-full text-xs inline-flex items-center justify-center">{invitations.length}</span>
               )}
             </button>
           ))}
@@ -310,7 +310,7 @@ function EmptyState({ icon, title, desc, action, onAction }: { icon: React.React
       <h3 className="font-semibold text-gray-900 dark:text-white mb-1">{title}</h3>
       <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">{desc}</p>
       {action && onAction && (
-        <button onClick={onAction} className="px-6 py-2.5 bg-[#e94560] text-white rounded-xl text-sm font-medium hover:bg-[#d63d56]">{action}</button>
+        <button onClick={onAction} className="px-6 py-2.5 bg-[#129a93] text-white rounded-xl text-sm font-medium hover:bg-[#0b7f79]">{action}</button>
       )}
     </div>
   )

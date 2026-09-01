@@ -63,7 +63,7 @@ export function LiveNotificationToast({ notification, onDismiss, t }: LiveNotifi
       {/* Progress bar */}
       <div className="h-1 bg-gray-100 dark:bg-gray-700">
         <div
-          className="h-full bg-[#e94560] transition-none"
+          className="h-full bg-[#129a93] transition-none"
           style={{ width: `${progress}%` }}
         />
       </div>
@@ -76,7 +76,7 @@ export function LiveNotificationToast({ notification, onDismiss, t }: LiveNotifi
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75" />
               <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500" />
             </span>
-            <span className="text-xs font-bold text-[#e94560] uppercase tracking-wider">
+            <span className="text-xs font-bold text-[#129a93] uppercase tracking-wider">
               {t('agenda.newReservation')}
             </span>
           </div>
@@ -94,7 +94,7 @@ export function LiveNotificationToast({ notification, onDismiss, t }: LiveNotifi
             <Avatar
               src={profile.avatar_url}
               name={displayName}
-              className="w-14 h-14 ring-2 ring-[#e94560]/30"
+              className="w-14 h-14 ring-2 ring-[#129a93]/30"
               textClassName="text-xl"
             />
             <span className="absolute -bottom-0.5 -right-0.5 w-4 h-4 bg-green-500 rounded-full border-2 border-white dark:border-gray-800" />
@@ -123,7 +123,7 @@ export function LiveNotificationToast({ notification, onDismiss, t }: LiveNotifi
           <span className="text-xs text-gray-500 dark:text-gray-400">
             {t('agenda.joinedTable')}{table.time ? <> · <span className="font-medium text-gray-700 dark:text-gray-300">{table.time.slice(0, 5)}</span></> : null}
           </span>
-          <span className="text-xs font-bold text-[#e94560] bg-[#e94560]/10 px-2.5 py-1 rounded-full">
+          <span className="text-xs font-bold text-[#129a93] bg-[#129a93]/10 px-2.5 py-1 rounded-full">
             {occupied}/{table.max_seats}
           </span>
         </div>

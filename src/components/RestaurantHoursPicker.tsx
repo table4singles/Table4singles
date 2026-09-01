@@ -90,7 +90,7 @@ export function RestaurantHoursPicker({ value, onChange, className = '' }: Resta
           <button
             type="button"
             onClick={startEditing}
-            className="text-xs font-medium text-[#e94560] hover:underline"
+            className="text-xs font-medium text-[#129a93] hover:underline"
           >
             Reemplazar con selector de días y horas
           </button>
@@ -128,8 +128,8 @@ export function RestaurantHoursPicker({ value, onChange, className = '' }: Resta
                     onClick={() => toggleDay(block.id, day)}
                     className={`min-w-[2.5rem] px-2 py-1.5 rounded-lg text-xs font-medium transition-colors ${
                       active
-                        ? 'bg-[#e94560] text-white'
-                        : 'bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-300 border border-gray-200 dark:border-gray-600 hover:border-[#e94560]'
+                        ? 'bg-[#129a93] text-white'
+                        : 'bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-300 border border-gray-200 dark:border-gray-600 hover:border-[#129a93]'
                     }`}
                   >
                     {WEEKDAY_LABELS[day]}
@@ -145,7 +145,7 @@ export function RestaurantHoursPicker({ value, onChange, className = '' }: Resta
               <select
                 value={block.open}
                 onChange={e => updateBlock(block.id, { open: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 dark:text-white rounded-xl text-sm focus:ring-2 focus:ring-[#e94560] outline-none"
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 dark:text-white rounded-xl text-sm focus:ring-2 focus:ring-[#129a93] outline-none"
               >
                 {TIME_OPTIONS.filter(t => t !== '24:00').map(t => (
                   <option key={t} value={t}>{t}</option>
@@ -157,7 +157,7 @@ export function RestaurantHoursPicker({ value, onChange, className = '' }: Resta
               <select
                 value={block.close}
                 onChange={e => updateBlock(block.id, { close: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 dark:text-white rounded-xl text-sm focus:ring-2 focus:ring-[#e94560] outline-none"
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 dark:text-white rounded-xl text-sm focus:ring-2 focus:ring-[#129a93] outline-none"
               >
                 {TIME_OPTIONS.map(t => (
                   <option key={t} value={t}>{t}</option>
@@ -171,7 +171,7 @@ export function RestaurantHoursPicker({ value, onChange, className = '' }: Resta
       <button
         type="button"
         onClick={addBlock}
-        className="inline-flex items-center gap-1.5 text-sm font-medium text-[#e94560] hover:underline"
+        className="inline-flex items-center gap-1.5 text-sm font-medium text-[#129a93] hover:underline"
       >
         <Plus className="w-4 h-4" />
         {blocks.length === 0 ? 'Añadir horario' : 'Añadir otro tramo'}

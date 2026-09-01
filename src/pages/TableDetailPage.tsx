@@ -469,7 +469,7 @@ export function TableDetailPage({ tableId, paymentSuccess, paymentCancelled, onN
               {isHost && !isCancelled && (
                 <>
                   {!isPast && (
-                    <button onClick={openEdit} className="w-full py-2.5 bg-[#e94560] text-white rounded-xl text-sm font-medium hover:bg-[#d63d56] flex items-center justify-center gap-2">
+                    <button onClick={openEdit} className="w-full py-2.5 bg-[#129a93] text-white rounded-xl text-sm font-medium hover:bg-[#0b7f79] flex items-center justify-center gap-2">
                       <Pencil className="w-4 h-4" /> Editar mesa
                     </button>
                   )}
@@ -590,11 +590,11 @@ export function TableDetailPage({ tableId, paymentSuccess, paymentCancelled, onN
               <div className="space-y-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1.5">Fecha</label>
-                  <input type="date" value={editDate} onChange={e => setEditDate(e.target.value)} className="w-full px-4 py-2.5 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 dark:text-white rounded-xl text-sm focus:ring-2 focus:ring-[#e94560] outline-none" />
+                  <input type="date" value={editDate} onChange={e => setEditDate(e.target.value)} className="w-full px-4 py-2.5 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 dark:text-white rounded-xl text-sm focus:ring-2 focus:ring-[#129a93] outline-none" />
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1.5">Hora</label>
-                  <input type="time" value={editTime} onChange={e => setEditTime(e.target.value)} className="w-full px-4 py-2.5 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 dark:text-white rounded-xl text-sm focus:ring-2 focus:ring-[#e94560] outline-none" />
+                  <input type="time" value={editTime} onChange={e => setEditTime(e.target.value)} className="w-full px-4 py-2.5 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 dark:text-white rounded-xl text-sm focus:ring-2 focus:ring-[#129a93] outline-none" />
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1.5">Máximo de comensales</label>
@@ -608,16 +608,16 @@ export function TableDetailPage({ tableId, paymentSuccess, paymentCancelled, onN
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1.5">Zona</label>
                   <div className="flex flex-wrap gap-2">
                     {['Salón', 'Salón VIP', 'Terraza'].map(z => (
-                      <button key={z} type="button" onClick={() => setEditZone(z)} className={`px-3 py-1.5 rounded-full text-sm font-medium transition-colors ${editZone === z ? 'bg-[#e94560] text-white' : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200'}`}>{z}</button>
+                      <button key={z} type="button" onClick={() => setEditZone(z)} className={`px-3 py-1.5 rounded-full text-sm font-medium transition-colors ${editZone === z ? 'bg-[#129a93] text-white' : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200'}`}>{z}</button>
                     ))}
                   </div>
-                  <input value={editZone} onChange={e => setEditZone(e.target.value)} placeholder="O escribe una zona específica..." className="mt-2 w-full px-4 py-2.5 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 dark:text-white rounded-xl text-sm focus:ring-2 focus:ring-[#e94560] outline-none" />
+                  <input value={editZone} onChange={e => setEditZone(e.target.value)} placeholder="O escribe una zona específica..." className="mt-2 w-full px-4 py-2.5 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 dark:text-white rounded-xl text-sm focus:ring-2 focus:ring-[#129a93] outline-none" />
                 </div>
                 {editError && <p className="text-sm text-red-600 bg-red-50 px-3 py-2 rounded-lg">{editError}</p>}
               </div>
               <div className="flex gap-3 mt-6">
                 <button onClick={() => setShowEdit(false)} className="flex-1 py-2.5 border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-200 rounded-xl text-sm font-medium hover:bg-gray-50 dark:hover:bg-gray-700">Cancelar</button>
-                <button onClick={handleSaveEdit} disabled={editSaving} className="flex-1 py-2.5 bg-[#e94560] text-white rounded-xl text-sm font-semibold hover:bg-[#d63d56] disabled:opacity-50 flex items-center justify-center gap-2">
+                <button onClick={handleSaveEdit} disabled={editSaving} className="flex-1 py-2.5 bg-[#129a93] text-white rounded-xl text-sm font-semibold hover:bg-[#0b7f79] disabled:opacity-50 flex items-center justify-center gap-2">
                   {editSaving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />} Guardar
                 </button>
               </div>

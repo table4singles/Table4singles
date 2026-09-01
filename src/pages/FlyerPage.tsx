@@ -232,7 +232,7 @@ export function FlyerPage({ restaurantId }: FlyerPageProps) {
                   <div
                     key={slot}
                     className={`rounded-xl border-2 overflow-hidden transition-all ${
-                      isActive ? 'border-[#e94560] shadow-md' : 'border-gray-200'
+                      isActive ? 'border-[#129a93] shadow-md' : 'border-gray-200'
                     }`}
                   >
                     {/* Miniatura */}
@@ -250,8 +250,8 @@ export function FlyerPage({ restaurantId }: FlyerPageProps) {
                             className="w-full h-full object-cover"
                           />
                           {isActive && (
-                            <div className="absolute inset-0 bg-[#e94560]/20 flex items-center justify-center">
-                              <span className="bg-[#e94560] text-white text-[10px] font-bold px-2 py-0.5 rounded-full">Activa</span>
+                            <div className="absolute inset-0 bg-[#129a93]/20 flex items-center justify-center">
+                              <span className="bg-[#129a93] text-white text-[10px] font-bold px-2 py-0.5 rounded-full">Activa</span>
                             </div>
                           )}
                         </>
@@ -428,18 +428,18 @@ function FormatGroup({
               onClick={() => onSelect(format.id)}
               className={`text-left rounded-xl border p-2.5 transition-all ${
                 selected
-                  ? 'border-[#e94560] bg-red-50 ring-1 ring-[#e94560]/30'
+                  ? 'border-[#129a93] bg-red-50 ring-1 ring-[#129a93]/30'
                   : 'border-gray-200 bg-gray-50 hover:border-gray-300 hover:bg-white'
               }`}
             >
               <div className="flex items-center gap-2 mb-1.5">
                 <span
                   className={`inline-block border-2 rounded-sm flex-shrink-0 ${
-                    selected ? 'border-[#e94560]' : 'border-gray-400'
+                    selected ? 'border-[#129a93]' : 'border-gray-400'
                   } ${isLandscape ? 'w-5 h-3.5' : 'w-3.5 h-5'}`}
                   aria-hidden
                 />
-                <span className={`text-xs font-semibold leading-tight ${selected ? 'text-[#e94560]' : 'text-gray-800'}`}>
+                <span className={`text-xs font-semibold leading-tight ${selected ? 'text-[#129a93]' : 'text-gray-800'}`}>
                   {format.label}
                 </span>
               </div>

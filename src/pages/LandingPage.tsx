@@ -12,15 +12,15 @@ export function LandingPage({ onNavigate, onAuthClick }: LandingPageProps) {
   const { t } = useLanguage()
 
   return (
-    <div className="min-h-screen bg-gray-950">
+    <div className="min-h-screen bg-navy-950">
       <Navbar currentPage="landing" onNavigate={onNavigate} onAuthClick={onAuthClick} />
 
       {/* Hero — full-bleed photo */}
       <section className="relative overflow-hidden text-white">
         <img src="/hero-dinner.jpg" alt="" className="absolute inset-0 w-full h-full object-cover" />
-        <div className="absolute inset-0 bg-gradient-to-b from-black/85 via-gray-950/75 to-amber-950/70" />
+        <div className="absolute inset-0 bg-gradient-to-b from-black/85 via-navy-950/75 to-primary-950/70" />
         <div className="absolute -top-24 -left-16 w-96 h-96 rounded-full bg-gold-400/10 blur-3xl" />
-        <div className="absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-gray-950 to-transparent" />
+        <div className="absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-navy-950 to-transparent" />
 
         <div className="relative max-w-5xl mx-auto px-4 pt-24 pb-28 md:pt-32 md:pb-36 text-center">
           <h1 className="font-display text-4xl md:text-6xl font-bold mb-6 leading-tight whitespace-pre-line drop-shadow-sm">
@@ -32,7 +32,7 @@ export function LandingPage({ onNavigate, onAuthClick }: LandingPageProps) {
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-12">
             <button
               onClick={() => onNavigate('browse')}
-              className="px-8 py-3.5 bg-gradient-to-r from-gold-300 to-gold-500 text-gray-900 hover:from-gold-200 hover:to-gold-400 rounded-full font-bold text-lg shadow-glow-gold hover:-translate-y-0.5 transition-all flex items-center gap-2"
+              className="px-8 py-3.5 bg-gradient-to-r from-gold-300 to-gold-500 text-navy-900 hover:from-gold-200 hover:to-gold-400 rounded-full font-bold text-lg shadow-glow-gold hover:-translate-y-0.5 transition-all flex items-center gap-2"
             >
               {t('landing.hero.browseTables')} <ArrowRight className="w-5 h-5" />
             </button>
@@ -52,7 +52,7 @@ export function LandingPage({ onNavigate, onAuthClick }: LandingPageProps) {
       </section>
 
       {/* WHY US — differentiation */}
-      <section className="relative py-20 bg-gray-950">
+      <section className="relative py-20 bg-navy-950">
         <div className="max-w-5xl mx-auto px-4 text-center">
           <span className="inline-flex items-center text-xs font-bold tracking-[0.16em] uppercase text-gold-300 bg-gold-400/10 border border-gold-400/25 rounded-full px-4 py-1.5 mb-6">
             {t('landing.whyUs.eyebrow')}
@@ -69,25 +69,25 @@ export function LandingPage({ onNavigate, onAuthClick }: LandingPageProps) {
       </section>
 
       {/* How it works */}
-      <section className="py-20 bg-gray-900">
+      <section className="py-20 bg-navy-900">
         <div className="max-w-5xl mx-auto px-4 text-center">
           <h2 className="font-display text-3xl md:text-4xl italic text-white mb-3">{t('landing.howItWorks.title')}</h2>
           <p className="text-gray-400 text-lg mb-14">{t('landing.howItWorks.subtitle')}</p>
           <div className="grid md:grid-cols-3 gap-10">
             <StepCard
-              icon={<Globe className="w-7 h-7 text-gray-900" />}
+              icon={<Globe className="w-7 h-7 text-navy-900" />}
               number={1}
               title={t('landing.step1.title')}
               desc={t('landing.step1.desc')}
             />
             <StepCard
-              icon={<Heart className="w-7 h-7 text-gray-900" />}
+              icon={<Heart className="w-7 h-7 text-navy-900" />}
               number={2}
               title={t('landing.step2.title')}
               desc={t('landing.step2.desc')}
             />
             <StepCard
-              icon={<UtensilsCrossed className="w-7 h-7 text-gray-900" />}
+              icon={<UtensilsCrossed className="w-7 h-7 text-navy-900" />}
               number={3}
               title={t('landing.step3.title')}
               desc={t('landing.step3.desc')}
@@ -103,7 +103,7 @@ export function LandingPage({ onNavigate, onAuthClick }: LandingPageProps) {
           alt=""
           className="absolute inset-0 w-full h-full object-cover"
         />
-        <div className="absolute inset-0 bg-gradient-to-b from-gray-950/90 via-black/75 to-gray-950/90" />
+        <div className="absolute inset-0 bg-gradient-to-b from-navy-950/90 via-black/75 to-navy-950/90" />
         <div className="relative max-w-3xl mx-auto px-4 py-24 text-center">
           <div className="flex items-center justify-center gap-3 mb-6">
             <span className="w-10 h-10 rounded-full bg-gold-400/15 border border-gold-400/40 flex items-center justify-center"><Wine className="w-5 h-5 text-gold-300" /></span>
@@ -115,13 +115,13 @@ export function LandingPage({ onNavigate, onAuthClick }: LandingPageProps) {
           <h2 className="font-display text-3xl md:text-4xl font-bold mb-4 text-gold-100">{t('landing.sunset.title')}</h2>
           <p className="text-lg text-white/75 max-w-xl mx-auto mb-8">{t('landing.sunset.desc')}</p>
           <div className="flex items-center justify-center -space-x-3 mb-8">
-            <span className="w-11 h-11 rounded-full bg-gold-500 border-2 border-gray-950 flex items-center justify-center font-bold text-gray-900 text-sm">M</span>
-            <span className="w-11 h-11 rounded-full bg-gold-400 border-2 border-gray-950 flex items-center justify-center font-bold text-gray-900 text-sm">L</span>
-            <span className="w-11 h-11 rounded-full bg-gold-300 border-2 border-gray-950 flex items-center justify-center font-bold text-gray-900 text-sm">J</span>
+            <span className="w-11 h-11 rounded-full bg-gold-500 border-2 border-navy-950 flex items-center justify-center font-bold text-navy-900 text-sm">M</span>
+            <span className="w-11 h-11 rounded-full bg-gold-400 border-2 border-navy-950 flex items-center justify-center font-bold text-navy-900 text-sm">L</span>
+            <span className="w-11 h-11 rounded-full bg-gold-300 border-2 border-navy-950 flex items-center justify-center font-bold text-navy-900 text-sm">J</span>
           </div>
           <button
             onClick={() => onNavigate('browse')}
-            className="px-8 py-3.5 bg-gradient-to-r from-gold-300 to-gold-500 text-gray-900 hover:from-gold-200 hover:to-gold-400 rounded-full font-bold text-lg shadow-glow-gold transition-all inline-flex items-center gap-2"
+            className="px-8 py-3.5 bg-gradient-to-r from-gold-300 to-gold-500 text-navy-900 hover:from-gold-200 hover:to-gold-400 rounded-full font-bold text-lg shadow-glow-gold transition-all inline-flex items-center gap-2"
           >
             {t('landing.sunset.button')} <ArrowRight className="w-5 h-5" />
           </button>
@@ -129,7 +129,7 @@ export function LandingPage({ onNavigate, onAuthClick }: LandingPageProps) {
       </section>
 
       {/* FAQ */}
-      <section className="py-20 bg-gray-950">
+      <section className="py-20 bg-navy-950">
         <div className="max-w-2xl mx-auto px-4">
           <div className="text-center mb-12">
             <h2 className="font-display text-3xl md:text-4xl font-bold text-white mb-3">{t('landing.faq.title')}</h2>
@@ -146,14 +146,14 @@ export function LandingPage({ onNavigate, onAuthClick }: LandingPageProps) {
       </section>
 
       {/* CTA */}
-      <section className="relative py-20 bg-gradient-to-br from-gray-950 via-gray-900 to-amber-950 text-white text-center overflow-hidden border-t border-gold-500/10">
+      <section className="relative py-20 bg-gradient-to-br from-navy-950 via-navy-900 to-primary-950 text-white text-center overflow-hidden border-t border-gold-500/10">
         <div className="absolute -bottom-20 -right-16 w-80 h-80 rounded-full bg-gold-400/10 blur-3xl" />
         <div className="relative max-w-3xl mx-auto px-4">
           <h2 className="font-display text-3xl md:text-4xl font-bold mb-4 text-gold-200">{t('landing.cta.title')}</h2>
           <p className="text-lg text-white/80 mb-8">{t('landing.cta.desc')}</p>
           <button
             onClick={() => onAuthClick('signup')}
-            className="px-8 py-3.5 bg-gradient-to-r from-gold-300 to-gold-500 text-gray-900 hover:from-gold-200 hover:to-gold-400 rounded-full font-semibold text-lg shadow-glow-gold hover:-translate-y-0.5 transition-all inline-flex items-center gap-2"
+            className="px-8 py-3.5 bg-gradient-to-r from-gold-300 to-gold-500 text-navy-900 hover:from-gold-200 hover:to-gold-400 rounded-full font-semibold text-lg shadow-glow-gold hover:-translate-y-0.5 transition-all inline-flex items-center gap-2"
           >
             {t('landing.cta.button')} <ArrowRight className="w-5 h-5" />
           </button>
@@ -195,7 +195,7 @@ function StepCard({ icon, number, title, desc }: { icon: React.ReactNode; number
 
 function WhyCard({ icon, title, desc }: { icon: React.ReactNode; title: string; desc: string }) {
   return (
-    <div className="bg-gray-900/90 backdrop-blur rounded-2xl shadow-e3 border border-gold-500/15 p-6 text-left hover:-translate-y-0.5 hover:border-gold-500/30 transition-all">
+    <div className="bg-navy-900/90 backdrop-blur rounded-2xl shadow-e3 border border-gold-500/15 p-6 text-left hover:-translate-y-0.5 hover:border-gold-500/30 transition-all">
       <span className="w-11 h-11 rounded-xl bg-gold-400/10 text-gold-400 flex items-center justify-center mb-4">
         {icon}
       </span>
@@ -208,7 +208,7 @@ function WhyCard({ icon, title, desc }: { icon: React.ReactNode; title: string; 
 function FaqItem({ q, a }: { q: string; a: string }) {
   const [open, setOpen] = useState(false)
   return (
-    <div className="bg-gray-900 rounded-2xl shadow-e2 border border-gold-500/15 overflow-hidden">
+    <div className="bg-navy-900 rounded-2xl shadow-e2 border border-gold-500/15 overflow-hidden">
       <button
         onClick={() => setOpen(!open)}
         className="w-full flex items-center justify-between gap-4 px-5 py-4 text-left"

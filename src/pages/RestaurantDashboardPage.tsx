@@ -90,15 +90,15 @@ export function RestaurantDashboardPage({ onNavigate, onAuthClick }: RestaurantD
             <button onClick={() => onNavigate('subscription')} className="ml-auto text-xs text-orange-700 dark:text-orange-400 hover:underline font-medium">{t('restaurantDashboard.viewSubscription')}</button>
           </div>
         ) : (
-          <div className="flex items-center gap-3 bg-[#e94560]/5 border border-[#e94560]/20 rounded-xl px-4 py-3 mb-6">
-            <CreditCard className="w-4 h-4 text-[#e94560] flex-shrink-0" />
+          <div className="flex items-center gap-3 bg-[#129a93]/5 border border-[#129a93]/20 rounded-xl px-4 py-3 mb-6">
+            <CreditCard className="w-4 h-4 text-[#129a93] flex-shrink-0" />
             <div className="flex-1 min-w-0">
               <p className="text-sm font-medium text-gray-900 dark:text-white">{t('restaurantDashboard.subscriptionInactive')}</p>
               <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">{t('restaurantDashboard.subscriptionNote')}</p>
             </div>
             <button
               onClick={() => onNavigate('subscription')}
-              className="flex-shrink-0 px-3 py-1.5 bg-[#e94560] text-white rounded-lg text-xs font-semibold hover:bg-[#d63d56] transition-colors"
+              className="flex-shrink-0 px-3 py-1.5 bg-[#129a93] text-white rounded-lg text-xs font-semibold hover:bg-[#0b7f79] transition-colors"
             >
               {t('restaurantDashboard.subscribeAction')}
             </button>
@@ -151,11 +151,11 @@ export function RestaurantDashboardPage({ onNavigate, onAuthClick }: RestaurantD
         <div className="grid grid-cols-2 gap-4 mb-8">
           <button
             onClick={() => onNavigate('agenda')}
-            className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-4 text-left hover:shadow-md hover:border-[#e94560]/40 transition-all group"
+            className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-4 text-left hover:shadow-md hover:border-[#129a93]/40 transition-all group"
           >
             <div className="flex items-center gap-2 mb-2">
-              <div className="w-8 h-8 rounded-lg bg-[#e94560]/10 flex items-center justify-center">
-                <CalendarClock className="w-4 h-4 text-[#e94560]" />
+              <div className="w-8 h-8 rounded-lg bg-[#129a93]/10 flex items-center justify-center">
+                <CalendarClock className="w-4 h-4 text-[#129a93]" />
               </div>
               <span className="font-semibold text-sm text-gray-900 dark:text-white">{t('nav.agenda')}</span>
             </div>
@@ -164,12 +164,12 @@ export function RestaurantDashboardPage({ onNavigate, onAuthClick }: RestaurantD
                 ? `${upcoming.length} ${upcoming.length !== 1 ? t('restaurantDashboard.tablePlural') : t('restaurantDashboard.tableSingular')} ${upcoming.length !== 1 ? t('restaurantDashboard.upcomingHintPlural') : t('restaurantDashboard.upcomingHint')}`
                 : t('restaurantDashboard.liveRoom')}
             </p>
-            <span className="text-[#e94560] text-xs font-medium mt-2 inline-block group-hover:underline">{t('restaurantDashboard.goToAgenda')} →</span>
+            <span className="text-[#129a93] text-xs font-medium mt-2 inline-block group-hover:underline">{t('restaurantDashboard.goToAgenda')} →</span>
           </button>
 
           <button
             onClick={() => onNavigate('my-tables')}
-            className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-4 text-left hover:shadow-md hover:border-[#e94560]/40 transition-all group"
+            className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-4 text-left hover:shadow-md hover:border-[#129a93]/40 transition-all group"
           >
             <div className="flex items-center gap-2 mb-2">
               <div className="w-8 h-8 rounded-lg bg-blue-50 dark:bg-blue-900/30 flex items-center justify-center">
@@ -221,7 +221,7 @@ export function RestaurantDashboardPage({ onNavigate, onAuthClick }: RestaurantD
             <EmptyStateIllustration className="w-24 h-24 mx-auto mb-4" />
             <h3 className="font-semibold text-gray-900 dark:text-white mb-1">{t('restaurantDashboard.noTables')}</h3>
             <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">{t('restaurantDashboard.noTablesDesc')}</p>
-            <button onClick={() => onNavigate('my-tables')} className="px-6 py-2.5 bg-primary-500 text-white rounded-xl text-sm font-medium shadow-glow-coral hover:bg-primary-600 transition-colors">{t('restaurantDashboard.newTable')}</button>
+            <button onClick={() => onNavigate('my-tables')} className="px-6 py-2.5 bg-primary-500 text-white rounded-xl text-sm font-medium shadow-glow-teal hover:bg-primary-600 transition-colors">{t('restaurantDashboard.newTable')}</button>
           </div>
         ) : (
           <div>

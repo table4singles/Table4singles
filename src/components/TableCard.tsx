@@ -38,7 +38,7 @@ export function TableCard({ table, participants, onClick }: TableCardProps) {
     <>
       <button
         onClick={onClick}
-        className="w-full text-left bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 hover:border-[#e94560]/30 hover:shadow-md transition-all group px-5 py-4"
+        className="w-full text-left bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 hover:border-[#129a93]/30 hover:shadow-md transition-all group px-5 py-4"
       >
         <div className="flex items-start justify-between gap-3">
           <div className="flex-1 min-w-0">

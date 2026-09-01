@@ -66,7 +66,7 @@ export function CommensalModal({ profile, onClose }: CommensalModalProps) {
         className="relative bg-white dark:bg-gray-800 rounded-2xl shadow-2xl w-full max-w-sm overflow-hidden"
         onClick={e => e.stopPropagation()}
       >
-        <div className="h-20 bg-gradient-to-br from-[#e94560]/80 to-[#c23352]/90" />
+        <div className="h-20 bg-gradient-to-br from-[#129a93]/80 to-[#c23352]/90" />
 
         <button
           onClick={onClose}
@@ -90,13 +90,13 @@ export function CommensalModal({ profile, onClose }: CommensalModalProps) {
 
           {loadingStats ? (
             <div className="flex justify-center py-4">
-              <Loader2 className="w-5 h-5 text-[#e94560] animate-spin" />
+              <Loader2 className="w-5 h-5 text-[#129a93] animate-spin" />
             </div>
           ) : stats ? (
             <div className="mt-4 grid grid-cols-2 gap-3">
               <div className="bg-gray-50 dark:bg-gray-700/50 rounded-xl p-3 text-center">
                 <div className="flex items-center justify-center gap-1 mb-1">
-                  <UtensilsCrossed className="w-4 h-4 text-[#e94560]" />
+                  <UtensilsCrossed className="w-4 h-4 text-[#129a93]" />
                 </div>
                 <p className="text-xl font-bold text-gray-900 dark:text-white">{stats.totalDinners}</p>
                 <p className="text-xs text-gray-500 dark:text-gray-400">

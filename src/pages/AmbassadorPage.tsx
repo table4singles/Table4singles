@@ -182,7 +182,7 @@ export function AmbassadorPage({ onNavigate, onAuthClick }: AmbassadorPageProps)
 
               {referralCode && (
                 <div className="flex items-center gap-3 mb-5">
-                  <div className="px-6 py-3 bg-[#e94560]/10 dark:bg-[#e94560]/20 border-2 border-dashed border-[#e94560]/40 rounded-xl text-2xl font-bold font-mono tracking-widest text-[#e94560] select-all">
+                  <div className="px-6 py-3 bg-[#129a93]/10 dark:bg-[#129a93]/20 border-2 border-dashed border-[#129a93]/40 rounded-xl text-2xl font-bold font-mono tracking-widest text-[#129a93] select-all">
                     {referralCode}
                   </div>
                   <button
@@ -226,7 +226,7 @@ export function AmbassadorPage({ onNavigate, onAuthClick }: AmbassadorPageProps)
               <div className="flex items-center justify-between mb-4">
                 <h2 className="font-semibold text-gray-900 dark:text-white">{t('ambassador.restaurantsTitle')}</h2>
                 {restaurants.length > 0 && (
-                  <span className="text-xs px-2.5 py-1 bg-[#e94560]/10 text-[#e94560] rounded-full font-semibold">
+                  <span className="text-xs px-2.5 py-1 bg-[#129a93]/10 text-[#129a93] rounded-full font-semibold">
                     {restaurants.length} {restaurants.length !== 1 ? t('ambassador.registeredCountPlural') : t('ambassador.registeredCount')}
                   </span>
                 )}

@@ -152,7 +152,7 @@ export function LiveTableCard({ table, onNavigate, t }: LiveTableCardProps) {
         <span className="text-xs text-gray-400 dark:text-gray-500">
           {t('agenda.clickForDetail')}
         </span>
-        <span className="text-xs text-gray-400 dark:text-gray-500 group-hover:text-[#e94560] transition-colors">→</span>
+        <span className="text-xs text-gray-400 dark:text-gray-500 group-hover:text-[#129a93] transition-colors">→</span>
       </div>
     </div>
   )

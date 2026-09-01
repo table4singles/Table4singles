@@ -98,7 +98,7 @@ export function useRestaurantPublicReviews(restaurantId: string | null) {
     setLoading(true)
     const { data } = await supabase
       .from('restaurant_reviews')
-      .select('*, profiles(id, display_name, avatar_url), restaurant_review_replies(*)')
+      .select('*, profiles!restaurant_reviews_user_id_fkey(id, display_name, avatar_url), restaurant_review_replies(*)')
       .eq('restaurant_id', restaurantId)
       .order('created_at', { ascending: false })
     if (data) setReviews(data as RestaurantReview[])

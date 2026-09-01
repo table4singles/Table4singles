@@ -11,6 +11,7 @@ import { useAuth } from '@/contexts/AuthContext'
 import { useViewMode } from '@/contexts/ViewModeContext'
 import { useRestaurantAgenda } from '@/hooks/useRestaurantAgenda'
 import { usePushSubscription } from '@/hooks/usePushSubscription'
+import { resolveDateLocale } from '@/lib/dateLocale'
 
 interface RestaurantAgendaPageProps {
   onNavigate: (page: string, id?: string) => void
@@ -250,12 +251,7 @@ export function RestaurantAgendaPage({ onNavigate, onAuthClick }: RestaurantAgen
   const [month, setMonth] = useState(() => new Date())
   const [selectedDate, setSelectedDate] = useState<string>(todayStr())
 
-  const localeMap: Record<string, string> = {
-    es: 'es-ES', en: 'en-GB', de: 'de-DE', fr: 'fr-FR', it: 'it-IT',
-    ru: 'ru-RU', pt: 'pt-PT', uk: 'uk-UA', ro: 'ro-RO', ar: 'ar-SA',
-    sv: 'sv-SE', zh: 'zh-CN', ja: 'ja-JP',
-  }
-  const locale = localeMap[language] ?? 'es-ES'
+  const locale = resolveDateLocale(language)
 
   const selectedDayTables = byDate[selectedDate] || []
 
@@ -288,7 +284,7 @@ export function RestaurantAgendaPage({ onNavigate, onAuthClick }: RestaurantAgen
       {/* Live notification toasts */}
       <LiveNotificationStack notifications={notifications} onDismiss={dismissNotification} t={t} />
 
-      <main className="max-w-3xl mx-auto px-4 py-6 pb-24 lg:pb-8">
+      <main className="max-w-4xl mx-auto px-4 py-6 pb-24 lg:pb-8">
         {/* Header */}
         <PageHeader
           title={t('agenda.title')}
@@ -384,8 +380,8 @@ export function RestaurantAgendaPage({ onNavigate, onAuthClick }: RestaurantAgen
             t={t}
           />
         ) : (
-          /* Calendar view */
-          <div className="space-y-4">
+          /* Calendar view — calendario a la izquierda, mesas del día elegido a la derecha en desktop */
+          <div className="lg:grid lg:grid-cols-2 lg:gap-6 lg:items-start space-y-4 lg:space-y-0">
             <AgendaCalendar
               month={month}
               onMonthChange={setMonth}
@@ -394,7 +390,7 @@ export function RestaurantAgendaPage({ onNavigate, onAuthClick }: RestaurantAgen
               byDate={byDate}
               locale={locale}
             />
-            <div>
+            <div className="lg:sticky lg:top-6">
               <h2 className="text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-3 px-1">
                 {formatDateHeading(selectedDate, locale)}
               </h2>

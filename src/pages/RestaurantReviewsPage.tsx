@@ -9,6 +9,7 @@ import { useAuth } from '@/contexts/AuthContext'
 import { useLanguage } from '@/contexts/LanguageContext'
 import { useRestaurantPublicReviews, useRestaurantReviews } from '@/hooks/useReviews'
 import type { RestaurantReview, Review } from '@/types/database'
+import { resolveDateLocale } from '@/lib/dateLocale'
 
 type Tab = 'venue' | 'dinner'
 
@@ -45,7 +46,7 @@ export function RestaurantReviewsPage({ onNavigate, onAuthClick }: RestaurantRev
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       <Navbar currentPage="reviews" onNavigate={onNavigate} onAuthClick={onAuthClick} />
-      <main className="max-w-3xl mx-auto px-4 py-6 pb-24 lg:pb-8 space-y-6">
+      <main className="max-w-5xl mx-auto px-4 py-6 pb-24 lg:pb-8 space-y-6">
 
         <PageHeader title={t('restaurantProfile.reviews')} subtitle={t('restaurantReviews.subtitle')} variant="restaurant" />
 
@@ -115,7 +116,7 @@ export function RestaurantReviewsPage({ onNavigate, onAuthClick }: RestaurantRev
                 <p className="text-sm text-gray-400 dark:text-gray-500 mt-1">{t('restaurantReviews.emptyVenueDesc')}</p>
               </div>
             ) : (
-              <div className="space-y-4">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                 {reviews.map(review => (
                   <ReviewCard key={review.id} review={review} onReply={submitReply} />
                 ))}
@@ -152,7 +153,7 @@ export function RestaurantReviewsPage({ onNavigate, onAuthClick }: RestaurantRev
                     </div>
                   </div>
                 )}
-                <div className="space-y-3">
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
                   {dinnerReviews.map(r => (
                     <DinnerReviewCard key={r.id} review={r} onReply={submitDinnerReply} />
                   ))}
@@ -166,15 +167,9 @@ export function RestaurantReviewsPage({ onNavigate, onAuthClick }: RestaurantRev
   )
 }
 
-const DATE_LOCALE_MAP: Record<string, string> = {
-  es: 'es-ES', en: 'en-GB', de: 'de-DE', fr: 'fr-FR', it: 'it-IT',
-  ru: 'ru-RU', pt: 'pt-PT', uk: 'uk-UA', ro: 'ro-RO', ar: 'ar-SA',
-  sv: 'sv-SE', zh: 'zh-CN', ja: 'ja-JP',
-}
-
 function DinnerReviewCard({ review, onReply }: { review: Review; onReply: (reviewId: string, reply: string) => Promise<void> }) {
   const { t, language } = useLanguage()
-  const dateLocale = DATE_LOCALE_MAP[language] ?? 'es-ES'
+  const dateLocale = resolveDateLocale(language)
   const existingReply = (review as any).review_replies?.[0]
   const [showReplyBox, setShowReplyBox] = useState(!existingReply)
   const [replyText, setReplyText] = useState(existingReply?.reply || '')
@@ -261,7 +256,7 @@ function DinnerReviewCard({ review, onReply }: { review: Review; onReply: (revie
 
 function ReviewCard({ review, onReply }: { review: RestaurantReview; onReply: (reviewId: string, reply: string) => Promise<void> }) {
   const { t, language } = useLanguage()
-  const dateLocale = DATE_LOCALE_MAP[language] ?? 'es-ES'
+  const dateLocale = resolveDateLocale(language)
   const existingReply = review.restaurant_review_replies?.[0]
   const [showReplyBox, setShowReplyBox] = useState(!existingReply)
   const [replyText, setReplyText] = useState(existingReply?.reply || '')

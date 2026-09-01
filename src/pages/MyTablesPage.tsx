@@ -306,7 +306,7 @@ export function MyTablesPage({ onNavigate, onAuthClick, initialTab }: MyTablesPa
 function EmptyState({ icon, title, desc, action, onAction }: { icon: React.ReactNode; title: string; desc: string; action?: string; onAction?: () => void }) {
   return (
     <div className="text-center py-16">
-      <div className="w-16 h-16 rounded-full bg-gray-100 dark:bg-gray-700 flex items-center justify-center mx-auto mb-4 text-gray-400 dark:text-gray-500">{icon}</div>
+      <div className="w-16 h-16 rounded-full bg-primary-50 dark:bg-primary-950/30 flex items-center justify-center mx-auto mb-4 text-primary-500 dark:text-primary-400">{icon}</div>
       <h3 className="font-semibold text-gray-900 dark:text-white mb-1">{title}</h3>
       <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">{desc}</p>
       {action && onAction && (

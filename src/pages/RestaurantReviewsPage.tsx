@@ -108,7 +108,9 @@ export function RestaurantReviewsPage({ onNavigate, onAuthClick }: RestaurantRev
 
             {reviews.length === 0 ? (
               <div className="text-center py-16 bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700">
-                <Star className="w-10 h-10 text-gray-200 dark:text-gray-600 mx-auto mb-3" />
+                <div className="w-16 h-16 rounded-full bg-primary-50 dark:bg-primary-950/30 flex items-center justify-center mx-auto mb-3">
+                  <Star className="w-8 h-8 text-primary-500 dark:text-primary-400" />
+                </div>
                 <p className="text-gray-500 dark:text-gray-400 font-medium">{t('restaurantReviews.emptyVenueTitle')}</p>
                 <p className="text-sm text-gray-400 dark:text-gray-500 mt-1">{t('restaurantReviews.emptyVenueDesc')}</p>
               </div>
@@ -129,7 +131,9 @@ export function RestaurantReviewsPage({ onNavigate, onAuthClick }: RestaurantRev
               <LoadingSpinner className="py-16" />
             ) : dinnerReviews.length === 0 ? (
               <div className="text-center py-16 bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700">
-                <UtensilsCrossed className="w-10 h-10 text-gray-200 dark:text-gray-600 mx-auto mb-3" />
+                <div className="w-16 h-16 rounded-full bg-primary-50 dark:bg-primary-950/30 flex items-center justify-center mx-auto mb-3">
+                  <UtensilsCrossed className="w-8 h-8 text-primary-500 dark:text-primary-400" />
+                </div>
                 <p className="text-gray-500 dark:text-gray-400 font-medium">{t('restaurantReviews.emptyDinnerTitle')}</p>
                 <p className="text-sm text-gray-400 dark:text-gray-500 mt-1">{t('restaurantReviews.emptyDinnerDesc')}</p>
               </div>

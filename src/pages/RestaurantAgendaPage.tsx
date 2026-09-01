@@ -66,8 +66,8 @@ function LiveRoom({ tables, onNavigate, t }: LiveRoomProps) {
 
       {todayTables.length === 0 ? (
         <div className="text-center py-14 bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700">
-          <div className="w-16 h-16 rounded-full bg-gray-100 dark:bg-gray-700 flex items-center justify-center mx-auto mb-4">
-            <Tv2 className="w-8 h-8 text-gray-400" />
+          <div className="w-16 h-16 rounded-full bg-primary-50 dark:bg-primary-950/30 flex items-center justify-center mx-auto mb-4">
+            <Tv2 className="w-8 h-8 text-primary-500 dark:text-primary-400" />
           </div>
           <h3 className="font-semibold text-gray-900 dark:text-white mb-1">{t('agenda.noTablesToday')}</h3>
           <p className="text-sm text-gray-500 dark:text-gray-400 mb-5">{t('agenda.noTablesTodayDesc')}</p>
@@ -361,7 +361,7 @@ export function RestaurantAgendaPage({ onNavigate, onAuthClick }: RestaurantAgen
           </div>
         ) : isEmpty && view !== 'live' ? (
           <div className="text-center py-16">
-            <div className="w-16 h-16 rounded-full bg-gray-100 dark:bg-gray-700 flex items-center justify-center mx-auto mb-4 text-gray-400 dark:text-gray-500">
+            <div className="w-16 h-16 rounded-full bg-primary-50 dark:bg-primary-950/30 flex items-center justify-center mx-auto mb-4 text-primary-500 dark:text-primary-400">
               <CalendarX className="w-9 h-9" />
             </div>
             <h3 className="font-semibold text-gray-900 dark:text-white mb-1">{t('agenda.noTables')}</h3>

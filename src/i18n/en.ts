@@ -652,6 +652,9 @@ export const en = {
     goToAnalytics: 'View analytics',
     goToSubscription: 'View plan',
     analyticsDesc: 'Occupancy, bookings and ratings',
+    flyerTitle: 'Poster & QR',
+    flyerDesc: 'Download your poster with a unique table QR',
+    goToFlyer: 'Go to generator',
     subscriptionDesc: 'Manage your plan and billing',
   },
   agenda: {

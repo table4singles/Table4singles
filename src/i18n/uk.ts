@@ -606,6 +606,9 @@ export const uk = {
     goToAnalytics: 'Переглянути статистику',
     goToSubscription: 'Переглянути план',
     analyticsDesc: 'Заповнюваність, бронювання та оцінки',
+    flyerTitle: 'Постер і QR',
+    flyerDesc: 'Завантаж постер з унікальним QR для столика',
+    goToFlyer: 'Перейти до генератора',
     subscriptionDesc: 'Керування планом і оплатою',
   },
   agenda: {

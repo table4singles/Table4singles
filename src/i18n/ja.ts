@@ -606,6 +606,9 @@ export const ja = {
     goToAnalytics: '統計を見る',
     goToSubscription: 'プランを見る',
     analyticsDesc: '稼働率・予約・評価',
+    flyerTitle: 'ポスターとQR',
+    flyerDesc: 'テーブル専用QR付きのポスターをダウンロード',
+    goToFlyer: 'ジェネレーターへ',
     subscriptionDesc: 'プランと請求の管理',
   },
   agenda: {

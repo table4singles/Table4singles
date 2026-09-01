@@ -1,5 +1,5 @@
 import { useState, useMemo, useEffect } from 'react'
-import { UtensilsCrossed, Users, Star, Loader2, XCircle, Calendar, Clock, CalendarClock, CalendarDays, AlertCircle, CheckCircle, CreditCard, TrendingUp } from 'lucide-react'
+import { UtensilsCrossed, Users, Star, Loader2, XCircle, Calendar, Clock, CalendarClock, CalendarDays, AlertCircle, CheckCircle, CreditCard, TrendingUp, QrCode } from 'lucide-react'
 import { Navbar } from '@/components/Navbar'
 import { PageHeader } from '@/components/PageHeader'
 import { CancelModal } from '@/components/CancelModal'
@@ -212,6 +212,22 @@ export function RestaurantDashboardPage({ onNavigate, onAuthClick }: RestaurantD
             <p className="text-xs text-gray-500 dark:text-gray-400">{t('restaurantDashboard.subscriptionDesc')}</p>
             <span className="text-green-600 dark:text-green-400 text-xs font-medium mt-2 inline-block group-hover:underline">{t('restaurantDashboard.goToSubscription')} →</span>
           </button>
+
+          {user && (
+            <button
+              onClick={() => onNavigate('flyer', user.id)}
+              className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-4 text-left hover:shadow-md hover:border-[#129a93]/40 transition-all group"
+            >
+              <div className="flex items-center gap-2 mb-2">
+                <div className="w-8 h-8 rounded-lg bg-teal-50 dark:bg-teal-900/30 flex items-center justify-center">
+                  <QrCode className="w-4 h-4 text-[#129a93]" />
+                </div>
+                <span className="font-semibold text-sm text-gray-900 dark:text-white">{t('restaurantDashboard.flyerTitle')}</span>
+              </div>
+              <p className="text-xs text-gray-500 dark:text-gray-400">{t('restaurantDashboard.flyerDesc')}</p>
+              <span className="text-[#129a93] text-xs font-medium mt-2 inline-block group-hover:underline">{t('restaurantDashboard.goToFlyer')} →</span>
+            </button>
+          )}
         </div>
 
         {loading ? (

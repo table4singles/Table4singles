@@ -606,6 +606,9 @@ export const ro = {
     goToAnalytics: 'Vezi statistici',
     goToSubscription: 'Vezi planul',
     analyticsDesc: 'Ocupare, rezervări și evaluări',
+    flyerTitle: 'Afiș și QR',
+    flyerDesc: 'Descarcă afișul tău cu QR unic pentru masă',
+    goToFlyer: 'Mergi la generator',
     subscriptionDesc: 'Gestionează planul și facturarea',
   },
   agenda: {

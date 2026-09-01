@@ -606,6 +606,9 @@ export const ru = {
     goToAnalytics: 'Смотреть статистику',
     goToSubscription: 'Смотреть план',
     analyticsDesc: 'Заполняемость, брони и оценки',
+    flyerTitle: 'Постер и QR',
+    flyerDesc: 'Скачай постер с уникальным QR для столика',
+    goToFlyer: 'Перейти к генератору',
     subscriptionDesc: 'Управление планом и оплатой',
   },
   agenda: {

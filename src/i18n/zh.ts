@@ -606,6 +606,9 @@ export const zh = {
     goToAnalytics: '查看统计',
     goToSubscription: '查看套餐',
     analyticsDesc: '上座率、预订与评价',
+    flyerTitle: '海报和二维码',
+    flyerDesc: '下载带有专属餐桌二维码的海报',
+    goToFlyer: '前往生成器',
     subscriptionDesc: '管理套餐与账单',
   },
   agenda: {

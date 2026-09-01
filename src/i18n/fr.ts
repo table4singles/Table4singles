@@ -606,6 +606,9 @@ export const fr = {
     goToAnalytics: 'Voir les statistiques',
     goToSubscription: 'Voir le forfait',
     analyticsDesc: 'Occupation, réservations et notes',
+    flyerTitle: 'Affiche & QR',
+    flyerDesc: 'Télécharge ton affiche avec un QR unique pour la table',
+    goToFlyer: 'Aller au générateur',
     subscriptionDesc: 'Gérez votre forfait et la facturation',
   },
   agenda: {

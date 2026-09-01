@@ -606,6 +606,9 @@ export const sv = {
     goToAnalytics: 'Visa statistik',
     goToSubscription: 'Visa plan',
     analyticsDesc: 'Beläggning, bokningar och betyg',
+    flyerTitle: 'Affisch & QR',
+    flyerDesc: 'Ladda ner din affisch med unik QR för bordet',
+    goToFlyer: 'Till generatorn',
     subscriptionDesc: 'Hantera plan och fakturering',
   },
   agenda: {

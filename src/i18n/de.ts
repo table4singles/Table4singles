@@ -606,6 +606,9 @@ export const de = {
     goToAnalytics: 'Statistiken ansehen',
     goToSubscription: 'Plan ansehen',
     analyticsDesc: 'Auslastung, Reservierungen und Bewertungen',
+    flyerTitle: 'Plakat & QR',
+    flyerDesc: 'Lade dein Plakat mit einzigartigem Tisch-QR herunter',
+    goToFlyer: 'Zum Generator',
     subscriptionDesc: 'Verwalte deinen Plan und die Abrechnung',
   },
   agenda: {

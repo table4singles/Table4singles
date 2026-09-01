@@ -606,6 +606,9 @@ export const ar = {
     goToAnalytics: 'عرض الإحصاءات',
     goToSubscription: 'عرض الخطة',
     analyticsDesc: 'الإشغال والحجوزات والتقييمات',
+    flyerTitle: 'ملصق ورمز QR',
+    flyerDesc: 'حمّل ملصقك برمز QR فريد للطاولة',
+    goToFlyer: 'الذهاب إلى المولّد',
     subscriptionDesc: 'إدارة خطتك والفواتير',
   },
   agenda: {

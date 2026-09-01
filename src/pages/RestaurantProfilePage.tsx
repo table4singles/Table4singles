@@ -162,7 +162,7 @@ export function RestaurantProfilePage({ restaurantId, onNavigate, onAuthClick }:
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       <Navbar currentPage="browse" onNavigate={onNavigate} onAuthClick={onAuthClick} />
 
-      <main className="max-w-3xl mx-auto pb-24 md:pb-8">
+      <main className="max-w-5xl mx-auto pb-24 md:pb-8">
 
         {/* ── Carrusel de fotos ────────────────────────────── */}
         <div className="relative h-64 sm:h-80 bg-gray-200 dark:bg-gray-800 overflow-hidden">
@@ -228,10 +228,14 @@ export function RestaurantProfilePage({ restaurantId, onNavigate, onAuthClick }:
           </div>
         </div>
 
-        <div className="px-4 pt-4 space-y-5">
+        {/* Desktop: info + reseñas a la izquierda (2/3), selector de fecha/hora y mesas
+            disponibles fijos a la derecha (1/3) como panel de reserva — igual que en cualquier
+            web de reservas. Móvil: todo apilado en el mismo orden de siempre (info, selector,
+            mesas, reseñas); el grid solo actúa a partir de lg:. */}
+        <div className="px-4 pt-4 space-y-5 lg:space-y-0 lg:grid lg:grid-cols-3 lg:gap-6 lg:items-start">
 
           {/* ── Info del restaurante ─────────────────────────── */}
-          <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 p-5">
+          <div className="lg:col-start-1 lg:col-span-2 lg:row-start-1 bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 p-5">
             <div className="flex items-center gap-2 flex-wrap mb-3">
               {restaurant.restaurant_cuisine && (
                 <span className="text-xs px-2.5 py-1 bg-orange-50 text-orange-600 dark:bg-orange-900/30 dark:text-orange-400 rounded-full font-medium">{restaurant.restaurant_cuisine}</span>
@@ -287,12 +291,15 @@ export function RestaurantProfilePage({ restaurantId, onNavigate, onAuthClick }:
             </div>
           </div>
 
+          {/* ── Panel de reserva: selector de fecha/hora + mesas — sidebar fijo en desktop ── */}
+          <div className="lg:col-start-3 lg:col-span-1 lg:row-start-1 lg:row-span-2 lg:sticky lg:top-6 space-y-5">
+
           {/* ── Selector de fecha y hora (obligatorio) ───────── */}
           {tables.length > 0 && (
             <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 p-5">
               <h2 className="text-sm font-semibold text-gray-900 dark:text-white mb-4">{t('restaurantProfile.whenToGo')}</h2>
 
-              <div className="flex flex-col sm:flex-row gap-3">
+              <div className="flex flex-col sm:flex-row lg:flex-col gap-3">
                 {/* Date pill */}
                 <div className="relative flex-1" ref={pickerRef}>
                   <button
@@ -421,9 +428,10 @@ export function RestaurantProfilePage({ restaurantId, onNavigate, onAuthClick }:
               </div>
             </div>
           )}
+          </div>
 
           {/* ── Reseñas ──────────────────────────────────────── */}
-          <div className="pb-4">
+          <div className="lg:col-start-1 lg:col-span-2 lg:row-start-2 pb-4">
             <div className="flex items-center gap-2 mb-4">
               <h2 className="text-sm font-semibold text-gray-900 dark:text-white">{t('restaurantProfile.reviews')}</h2>
               {avgRating !== null && (

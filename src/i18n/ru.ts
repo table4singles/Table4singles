@@ -998,6 +998,22 @@ export const ru = {
   agendaExtra: {
     inactive: 'Неактивен',
   },
+  hoursPicker: {
+    legacyLabel: 'Текущий график (свободный текст):',
+    replaceWithPicker: 'Заменить выбором дней и времени',
+    slotLabel: 'Интервал {n}',
+    removeSlotAria: 'Удалить интервал',
+    daysLabel: 'Дни',
+    openLabel: 'Открытие',
+    closeLabel: 'Закрытие',
+    addFirst: 'Добавить график',
+    addAnother: 'Добавить ещё интервал',
+    willSaveAs: 'Будет сохранено как:',
+  },
+  pendingInvite: {
+    searching: 'Поиск столика, чтобы пригласить {name}',
+    cancelAria: 'Отменить ожидающее приглашение',
+  },
   onboardingExtra: {
     titleUser: 'Заполните профиль',
     subtitleRestaurant: 'Укажите данные вашего заведения, чтобы гости могли вас найти',

@@ -11,7 +11,7 @@ interface AgendaTableCardProps {
 
 function StatusBadge({ status, isActive, t }: { status: AgendaTable['status']; isActive: boolean; t: (key: string) => string }) {
   if (!isActive && status !== 'cancelled' && status !== 'completed') {
-    return <span className="text-xs px-2 py-1 rounded-full flex-shrink-0 bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400">Inactiva</span>
+    return <span className="text-xs px-2 py-1 rounded-full flex-shrink-0 bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400">{t('agendaExtra.inactive')}</span>
   }
   const map: Record<AgendaTable['status'], string> = {
     open: 'bg-green-50 dark:bg-green-900/30 text-green-600 dark:text-green-400',
@@ -38,7 +38,7 @@ export function AgendaTableCard({ table, onNavigate, t }: AgendaTableCardProps) 
       <button onClick={() => setExpanded(!expanded)} className="w-full text-left p-4 flex items-center justify-between gap-3">
         <div className="min-w-0 flex-1">
           <div className="flex items-center gap-3 text-sm text-gray-900 dark:text-white font-semibold">
-            <span className="flex items-center gap-1"><Clock className="w-3.5 h-3.5 text-gray-400" />{table.time ? table.time.slice(0, 5) : (table.description || 'Mesa')}</span>
+            <span className="flex items-center gap-1"><Clock className="w-3.5 h-3.5 text-gray-400" />{table.time ? table.time.slice(0, 5) : (table.description || t('restaurantDashboard.tableSingular'))}</span>
             <span className="flex items-center gap-1 text-gray-500 dark:text-gray-400 font-normal">
               <Users className="w-3.5 h-3.5" />{occupied}/{table.max_seats} {t('agenda.seats')}
             </span>

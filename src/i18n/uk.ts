@@ -998,6 +998,22 @@ export const uk = {
   agendaExtra: {
     inactive: 'Неактивний',
   },
+  hoursPicker: {
+    legacyLabel: 'Поточний графік (довільний текст):',
+    replaceWithPicker: 'Замінити вибором днів і часу',
+    slotLabel: 'Інтервал {n}',
+    removeSlotAria: 'Видалити інтервал',
+    daysLabel: 'Дні',
+    openLabel: 'Відкриття',
+    closeLabel: 'Закриття',
+    addFirst: 'Додати графік',
+    addAnother: 'Додати ще інтервал',
+    willSaveAs: 'Буде збережено як:',
+  },
+  pendingInvite: {
+    searching: 'Пошук столика, щоб запросити {name}',
+    cancelAria: 'Скасувати запрошення, що очікує',
+  },
   onboardingExtra: {
     titleUser: 'Заповніть профіль',
     subtitleRestaurant: 'Вкажіть дані вашого закладу, щоб гості могли вас знайти',

@@ -998,6 +998,22 @@ export const zh = {
   agendaExtra: {
     inactive: '未激活',
   },
+  hoursPicker: {
+    legacyLabel: '当前营业时间（自由文本）：',
+    replaceWithPicker: '替换为日期/时间选择器',
+    slotLabel: '时段 {n}',
+    removeSlotAria: '删除时段',
+    daysLabel: '天数',
+    openLabel: '开始',
+    closeLabel: '结束',
+    addFirst: '添加营业时间',
+    addAnother: '添加另一个时段',
+    willSaveAs: '将保存为：',
+  },
+  pendingInvite: {
+    searching: '正在寻找餐桌以邀请 {name}',
+    cancelAria: '取消待处理的邀请',
+  },
   onboardingExtra: {
     titleUser: '完善你的资料',
     subtitleRestaurant: '填写你的餐厅信息，让用餐者能找到你',

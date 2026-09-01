@@ -1020,6 +1020,22 @@ export const en = {
   agendaExtra: {
     inactive: 'Inactive',
   },
+  hoursPicker: {
+    legacyLabel: 'Current hours (free text):',
+    replaceWithPicker: 'Replace with day/time picker',
+    slotLabel: 'Slot {n}',
+    removeSlotAria: 'Remove slot',
+    daysLabel: 'Days',
+    openLabel: 'Opens',
+    closeLabel: 'Closes',
+    addFirst: 'Add hours',
+    addAnother: 'Add another slot',
+    willSaveAs: 'Will be saved as:',
+  },
+  pendingInvite: {
+    searching: 'Looking for a table to invite {name}',
+    cancelAria: 'Cancel pending invitation',
+  },
   onboardingExtra: {
     titleUser: 'Complete your profile',
     subtitleRestaurant: 'Fill in your venue details so diners can find you',

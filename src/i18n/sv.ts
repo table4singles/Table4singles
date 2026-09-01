@@ -998,6 +998,22 @@ export const sv = {
   agendaExtra: {
     inactive: 'Inaktiv',
   },
+  hoursPicker: {
+    legacyLabel: 'Aktuella öppettider (fritext):',
+    replaceWithPicker: 'Ersätt med dag-/tidsväljare',
+    slotLabel: 'Tidsintervall {n}',
+    removeSlotAria: 'Ta bort intervall',
+    daysLabel: 'Dagar',
+    openLabel: 'Öppnar',
+    closeLabel: 'Stänger',
+    addFirst: 'Lägg till öppettider',
+    addAnother: 'Lägg till ett till intervall',
+    willSaveAs: 'Sparas som:',
+  },
+  pendingInvite: {
+    searching: 'Letar efter ett bord för att bjuda in {name}',
+    cancelAria: 'Avbryt väntande inbjudan',
+  },
   onboardingExtra: {
     titleUser: 'Fyll i din profil',
     subtitleRestaurant: 'Fyll i uppgifterna om din restaurang så att gäster kan hitta dig',

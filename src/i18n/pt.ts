@@ -998,6 +998,22 @@ export const pt = {
   agendaExtra: {
     inactive: 'Inativa',
   },
+  hoursPicker: {
+    legacyLabel: 'Horário atual (texto livre):',
+    replaceWithPicker: 'Substituir por seletor de dias/horas',
+    slotLabel: 'Intervalo {n}',
+    removeSlotAria: 'Remover intervalo',
+    daysLabel: 'Dias',
+    openLabel: 'Abertura',
+    closeLabel: 'Fecho',
+    addFirst: 'Adicionar horário',
+    addAnother: 'Adicionar outro intervalo',
+    willSaveAs: 'Será guardado como:',
+  },
+  pendingInvite: {
+    searching: 'A procurar mesa para convidar {name}',
+    cancelAria: 'Cancelar convite pendente',
+  },
   onboardingExtra: {
     titleUser: 'Complete o seu perfil',
     subtitleRestaurant: 'Preencha os dados do seu espaço para que os comensais o encontrem',

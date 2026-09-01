@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Plus, Trash2 } from 'lucide-react'
+import { useLanguage } from '@/contexts/LanguageContext'
 import {
   WEEKDAYS,
   WEEKDAY_LABELS,
@@ -20,6 +21,7 @@ interface RestaurantHoursPickerProps {
 }
 
 export function RestaurantHoursPicker({ value, onChange, className = '' }: RestaurantHoursPickerProps) {
+  const { t } = useLanguage()
   const [blocks, setBlocks] = useState<HoursBlock[]>(() => parseHoursString(value))
   const [legacyText, setLegacyText] = useState(() => {
     const parsed = parseHoursString(value)
@@ -86,13 +88,13 @@ export function RestaurantHoursPicker({ value, onChange, className = '' }: Resta
     <div className={`space-y-3 ${className}`}>
       {legacyText && (
         <div className="rounded-xl border border-amber-200 dark:border-amber-800 bg-amber-50 dark:bg-amber-950/40 px-3 py-2.5 text-sm text-amber-900 dark:text-amber-100">
-          <p className="mb-2">Horario actual (texto libre): <span className="font-medium">{legacyText}</span></p>
+          <p className="mb-2">{t('hoursPicker.legacyLabel')} <span className="font-medium">{legacyText}</span></p>
           <button
             type="button"
             onClick={startEditing}
             className="text-xs font-medium text-[#129a93] hover:underline"
           >
-            Reemplazar con selector de días y horas
+            {t('hoursPicker.replaceWithPicker')}
           </button>
         </div>
       )}
@@ -104,20 +106,20 @@ export function RestaurantHoursPicker({ value, onChange, className = '' }: Resta
         >
           <div className="flex items-center justify-between gap-2">
             <span className="text-xs font-medium text-gray-500 dark:text-gray-400">
-              Tramo {index + 1}
+              {t('hoursPicker.slotLabel').replace('{n}', String(index + 1))}
             </span>
             <button
               type="button"
               onClick={() => removeBlock(block.id)}
               className="p-1.5 rounded-lg text-gray-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-950/40 transition-colors"
-              aria-label="Eliminar tramo"
+              aria-label={t('hoursPicker.removeSlotAria')}
             >
               <Trash2 className="w-3.5 h-3.5" />
             </button>
           </div>
 
           <div>
-            <p className="text-xs text-gray-500 dark:text-gray-400 mb-1.5">Días</p>
+            <p className="text-xs text-gray-500 dark:text-gray-400 mb-1.5">{t('hoursPicker.daysLabel')}</p>
             <div className="flex flex-wrap gap-1.5">
               {WEEKDAYS.map(day => {
                 const active = block.days.includes(day)
@@ -141,7 +143,7 @@ export function RestaurantHoursPicker({ value, onChange, className = '' }: Resta
 
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="block text-xs text-gray-500 dark:text-gray-400 mb-1">Apertura</label>
+              <label className="block text-xs text-gray-500 dark:text-gray-400 mb-1">{t('hoursPicker.openLabel')}</label>
               <select
                 value={block.open}
                 onChange={e => updateBlock(block.id, { open: e.target.value })}
@@ -153,7 +155,7 @@ export function RestaurantHoursPicker({ value, onChange, className = '' }: Resta
               </select>
             </div>
             <div>
-              <label className="block text-xs text-gray-500 dark:text-gray-400 mb-1">Cierre</label>
+              <label className="block text-xs text-gray-500 dark:text-gray-400 mb-1">{t('hoursPicker.closeLabel')}</label>
               <select
                 value={block.close}
                 onChange={e => updateBlock(block.id, { close: e.target.value })}
@@ -174,12 +176,12 @@ export function RestaurantHoursPicker({ value, onChange, className = '' }: Resta
         className="inline-flex items-center gap-1.5 text-sm font-medium text-[#129a93] hover:underline"
       >
         <Plus className="w-4 h-4" />
-        {blocks.length === 0 ? 'Añadir horario' : 'Añadir otro tramo'}
+        {blocks.length === 0 ? t('hoursPicker.addFirst') : t('hoursPicker.addAnother')}
       </button>
 
       {blocks.length > 0 && (
         <p className="text-xs text-gray-500 dark:text-gray-400">
-          Se guardará como:{' '}
+          {t('hoursPicker.willSaveAs')}{' '}
           <span className="font-medium text-gray-700 dark:text-gray-200">
             {formatHoursBlocks(blocks) || '—'}
           </span>

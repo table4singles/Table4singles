@@ -998,6 +998,22 @@ export const it = {
   agendaExtra: {
     inactive: 'Inattiva',
   },
+  hoursPicker: {
+    legacyLabel: 'Orario attuale (testo libero):',
+    replaceWithPicker: 'Sostituisci con il selettore di giorni/orari',
+    slotLabel: 'Fascia {n}',
+    removeSlotAria: 'Rimuovi fascia',
+    daysLabel: 'Giorni',
+    openLabel: 'Apertura',
+    closeLabel: 'Chiusura',
+    addFirst: 'Aggiungi orario',
+    addAnother: "Aggiungi un'altra fascia",
+    willSaveAs: 'Verrà salvato come:',
+  },
+  pendingInvite: {
+    searching: 'Cerca un tavolo per invitare {name}',
+    cancelAria: 'Annulla invito in sospeso',
+  },
   onboardingExtra: {
     titleUser: 'Completa il tuo profilo',
     subtitleRestaurant: 'Inserisci i dati del tuo locale così i commensali potranno trovarti',

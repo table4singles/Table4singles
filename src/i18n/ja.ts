@@ -998,6 +998,22 @@ export const ja = {
   agendaExtra: {
     inactive: '非公開',
   },
+  hoursPicker: {
+    legacyLabel: '現在の営業時間（自由記述）：',
+    replaceWithPicker: '曜日・時間選択に置き換える',
+    slotLabel: '時間帯 {n}',
+    removeSlotAria: '時間帯を削除',
+    daysLabel: '曜日',
+    openLabel: '開店',
+    closeLabel: '閉店',
+    addFirst: '営業時間を追加',
+    addAnother: '別の時間帯を追加',
+    willSaveAs: '次のように保存されます：',
+  },
+  pendingInvite: {
+    searching: '{name}を招待するテーブルを探しています',
+    cancelAria: '保留中の招待をキャンセル',
+  },
   onboardingExtra: {
     titleUser: 'プロフィールを完成させましょう',
     subtitleRestaurant: 'お店の情報を入力すると、参加者があなたを見つけられます',

@@ -998,6 +998,22 @@ export const ro = {
   agendaExtra: {
     inactive: 'Inactivă',
   },
+  hoursPicker: {
+    legacyLabel: 'Program actual (text liber):',
+    replaceWithPicker: 'Înlocuiește cu selector de zile/ore',
+    slotLabel: 'Interval {n}',
+    removeSlotAria: 'Elimină intervalul',
+    daysLabel: 'Zile',
+    openLabel: 'Deschidere',
+    closeLabel: 'Închidere',
+    addFirst: 'Adaugă program',
+    addAnother: 'Adaugă alt interval',
+    willSaveAs: 'Se va salva ca:',
+  },
+  pendingInvite: {
+    searching: 'Se caută o masă pentru a-l invita pe {name}',
+    cancelAria: 'Anulează invitația în așteptare',
+  },
   onboardingExtra: {
     titleUser: 'Completează-ți profilul',
     subtitleRestaurant: 'Completează datele localului tău pentru ca comesenii să te găsească',

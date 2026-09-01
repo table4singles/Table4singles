@@ -998,6 +998,22 @@ export const ar = {
   agendaExtra: {
     inactive: 'غير نشطة',
   },
+  hoursPicker: {
+    legacyLabel: 'الجدول الحالي (نص حر):',
+    replaceWithPicker: 'استبدال بمحدد الأيام/الأوقات',
+    slotLabel: 'الفترة {n}',
+    removeSlotAria: 'حذف الفترة',
+    daysLabel: 'الأيام',
+    openLabel: 'الافتتاح',
+    closeLabel: 'الإغلاق',
+    addFirst: 'إضافة جدول',
+    addAnother: 'إضافة فترة أخرى',
+    willSaveAs: 'سيتم الحفظ كـ:',
+  },
+  pendingInvite: {
+    searching: 'البحث عن طاولة لدعوة {name}',
+    cancelAria: 'إلغاء الدعوة المعلقة',
+  },
   onboardingExtra: {
     titleUser: 'أكمل ملفك الشخصي',
     subtitleRestaurant: 'أدخل بيانات مكانك حتى يتمكن الضيوف من إيجادك',

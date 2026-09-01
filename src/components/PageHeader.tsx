@@ -6,12 +6,15 @@ interface PageHeaderProps {
 }
 
 /** Gradient hero band used at the top of every internal page, echoing the
- * landing hero. `variant` differentiates the user app (sky→orange) from the
- * restaurant management side (indigo→amber) so switching modes feels distinct. */
+ * dark+gold landing hero. `variant` differentiates the user app (coral→gold)
+ * from the restaurant management side (gold→coral) so switching modes feels
+ * distinct while staying in the same coral/gold palette as the landings —
+ * stops stay in the 500-700 range on both ends so white text keeps enough
+ * contrast throughout. */
 export function PageHeader({ title, subtitle, variant = 'user', action }: PageHeaderProps) {
   const gradient = variant === 'restaurant'
-    ? 'from-indigo-600 via-violet-500 to-amber-400'
-    : 'from-sky-500 via-sky-400 to-orange-300'
+    ? 'from-gold-700 via-gold-600 to-primary-600'
+    : 'from-primary-600 via-primary-500 to-gold-500'
 
   return (
     <div className={`-mx-4 sm:mx-0 sm:rounded-3xl overflow-hidden bg-gradient-to-r ${gradient} px-4 sm:px-8 py-7 mb-6`}>

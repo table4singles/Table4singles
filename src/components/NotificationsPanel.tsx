@@ -1,14 +1,17 @@
 import { X, Bell } from 'lucide-react'
 import type { Notification } from '@/types/database'
+import { resolveDateLocale } from '@/lib/dateLocale'
 
 interface NotificationsPanelProps {
   notifications: Notification[]
   onMarkAllRead: () => void
   onClose: () => void
   t: (key: string) => string
+  language: string
 }
 
-export function NotificationsPanel({ notifications, onMarkAllRead, onClose, t }: NotificationsPanelProps) {
+export function NotificationsPanel({ notifications, onMarkAllRead, onClose, t, language }: NotificationsPanelProps) {
+  const locale = resolveDateLocale(language)
   return (
     <>
       <div className="fixed inset-0 z-40" onClick={onClose} />
@@ -37,7 +40,7 @@ export function NotificationsPanel({ notifications, onMarkAllRead, onClose, t }:
               <div key={n.id} className={`px-4 py-3 border-b border-gray-50 dark:border-gray-800 ${!n.read ? 'bg-primary-50/30' : ''}`}>
                 <p className="text-sm font-medium text-gray-900 dark:text-white">{n.title}</p>
                 <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">{n.body}</p>
-                <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">{new Date(n.created_at).toLocaleDateString()}</p>
+                <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">{new Date(n.created_at).toLocaleDateString(locale)}</p>
               </div>
             ))
           )}

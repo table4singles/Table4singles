@@ -18,7 +18,7 @@ interface NavbarProps {
 
 export function Navbar({ currentPage, onNavigate, onAuthClick }: NavbarProps) {
   const { user, profile, signOut } = useAuth()
-  const { t } = useLanguage()
+  const { t, language } = useLanguage()
   const { effectiveRole, setViewMode, isAdminSwitcher } = useViewMode()
   const [showNotifications, setShowNotifications] = useState(false)
   const [showMenu, setShowMenu] = useState(false)
@@ -113,6 +113,7 @@ export function Navbar({ currentPage, onNavigate, onAuthClick }: NavbarProps) {
                     onMarkAllRead={markAllRead}
                     onClose={() => setShowNotifications(false)}
                     t={t}
+                    language={language}
                   />
                 )}
               </div>

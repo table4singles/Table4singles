@@ -106,6 +106,18 @@ export const es = {
       step3Title: 'Recibe comensales en tu agenda',
       step3Desc: 'Los solteros que reservan aparecen al instante en tu panel, en tiempo real, listos para su mesa.',
     },
+    tools: {
+      title: 'Todo lo que tienes en tu panel',
+      subtitle: 'No es solo un listado — es gestión real, incluida en tu suscripción',
+      t1Title: 'Agenda en tiempo real',
+      t1Desc: 'Vista en vivo de la mesa de hoy, más lista y calendario. Sabes quién viene antes de que llegue.',
+      t2Title: 'Analytics de tu restaurante',
+      t2Desc: 'Mesas y reservas por rango de 7, 30 o 90 días, para medir si te está compensando.',
+      t3Title: 'Flyer con QR para tu local',
+      t3Desc: 'Cartel imprimible generado automáticamente con los colores de tu marca, listo para poner en la puerta.',
+      t4Title: 'Reseñas de tus comensales',
+      t4Desc: 'Valoraciones reales de quienes han pasado por tus mesas, visibles directamente en tu panel.',
+    },
     benefits: {
       title: 'Por qué unirte',
       subtitle: 'Pensado para no dar trabajo extra a tu restaurante',

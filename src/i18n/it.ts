@@ -122,6 +122,18 @@ export const it = {
       step3Title: 'Ricevi commensali nella tua agenda',
       step3Desc: 'I single che prenotano appaiono all\'istante nel tuo pannello, in tempo reale, pronti per il loro tavolo.',
     },
+    tools: {
+      title: 'Tutto quello che hai nel tuo pannello',
+      subtitle: 'Non è solo un elenco — gestione vera, inclusa nel tuo abbonamento',
+      t1Title: 'Agenda in tempo reale',
+      t1Desc: 'Vista live del tavolo di oggi, più lista e calendario. Sai chi arriva prima che arrivi.',
+      t2Title: 'Analytics del tuo ristorante',
+      t2Desc: 'Tavoli e prenotazioni su un intervallo di 7, 30 o 90 giorni, per capire se ti sta convenendo.',
+      t3Title: 'Flyer con QR per il tuo locale',
+      t3Desc: "Un poster stampabile generato automaticamente con i colori del tuo marchio, pronto da mettere all'ingresso.",
+      t4Title: 'Recensioni dei tuoi commensali',
+      t4Desc: 'Valutazioni reali di chi è stato ai tuoi tavoli, visibili direttamente nel tuo pannello.',
+    },
     benefits: {
       title: 'Perché unirti',
       subtitle: 'Pensato per non dare lavoro extra al tuo ristorante',

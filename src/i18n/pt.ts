@@ -122,6 +122,18 @@ export const pt = {
       step3Title: 'Receba clientes na sua agenda',
       step3Desc: 'Os solteiros que reservam aparecem instantaneamente no seu painel, em tempo real, prontos para a sua mesa.',
     },
+    tools: {
+      title: 'Tudo o que você tem no seu painel',
+      subtitle: 'Não é só uma lista — gestão de verdade, incluída na sua assinatura',
+      t1Title: 'Agenda em tempo real',
+      t1Desc: 'Visão ao vivo da mesa de hoje, além de lista e calendário. Você sabe quem vem antes de chegar.',
+      t2Title: 'Analytics do seu restaurante',
+      t2Desc: 'Mesas e reservas em períodos de 7, 30 ou 90 dias, para ver se está valendo a pena.',
+      t3Title: 'Flyer com QR para o seu local',
+      t3Desc: 'Um cartaz para imprimir, gerado automaticamente nas cores da sua marca, pronto para colocar na porta.',
+      t4Title: 'Avaliações dos seus clientes',
+      t4Desc: 'Avaliações reais de quem já esteve nas suas mesas, visíveis direto no seu painel.',
+    },
     benefits: {
       title: 'Porquê aderir',
       subtitle: 'Pensado para não dar trabalho extra ao seu restaurante',

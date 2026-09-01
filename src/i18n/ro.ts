@@ -122,6 +122,18 @@ export const ro = {
       step3Title: 'Primești comeseni în agenda ta',
       step3Desc: 'Persoanele singure care rezervă apar instant în panoul tău, în timp real, gata pentru masa lor.',
     },
+    tools: {
+      title: 'Tot ce ai în panoul tău',
+      subtitle: 'Nu e doar o listă — administrare reală, inclusă în abonament',
+      t1Title: 'Agendă în timp real',
+      t1Desc: 'Vedere live a mesei de azi, plus listă și calendar. Știi cine vine înainte să ajungă.',
+      t2Title: 'Analize pentru restaurantul tău',
+      t2Desc: 'Mese și rezervări pe 7, 30 sau 90 de zile, ca să vezi dacă merită.',
+      t3Title: 'Flyer cu cod QR pentru local',
+      t3Desc: 'Un afiș de printat, generat automat în culorile brandului tău, gata de pus la intrare.',
+      t4Title: 'Recenzii de la clienți',
+      t4Desc: 'Evaluări reale de la cei care au fost la mesele tale, vizibile direct în panoul tău.',
+    },
     benefits: {
       title: 'De ce să te alături',
       subtitle: 'Gândit să nu adauge muncă în plus restaurantului tău',

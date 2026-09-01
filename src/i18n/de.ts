@@ -122,6 +122,18 @@ export const de = {
       step3Title: 'Gäste erscheinen in deiner Agenda',
       step3Desc: 'Singles, die buchen, erscheinen sofort in Echtzeit in deinem Panel, bereit für ihren Tisch.',
     },
+    tools: {
+      title: 'Alles, was du im Dashboard hast',
+      subtitle: 'Kein reines Verzeichnis — echte Verwaltung, in deinem Abo inbegriffen',
+      t1Title: 'Agenda in Echtzeit',
+      t1Desc: 'Live-Ansicht des heutigen Tisches, plus Listen- und Kalenderansicht. Du weißt, wer kommt, bevor er da ist.',
+      t2Title: 'Analytics für dein Restaurant',
+      t2Desc: 'Tische und Reservierungen über 7, 30 oder 90 Tage, damit du siehst, ob es sich lohnt.',
+      t3Title: 'QR-Flyer für dein Lokal',
+      t3Desc: 'Ein druckbares Plakat, automatisch in deinen Markenfarben erstellt, bereit für die Eingangstür.',
+      t4Title: 'Bewertungen deiner Gäste',
+      t4Desc: 'Echte Bewertungen von Leuten, die an deinen Tischen waren, direkt in deinem Dashboard sichtbar.',
+    },
     benefits: {
       title: 'Warum mitmachen',
       subtitle: 'Ohne zusätzlichen Aufwand für dein Restaurant konzipiert',

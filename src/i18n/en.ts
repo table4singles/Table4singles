@@ -122,6 +122,18 @@ export const en = {
       step3Title: 'Get diners on your agenda',
       step3Desc: 'Singles who book show up instantly on your panel, in real time, ready for their table.',
     },
+    tools: {
+      title: 'Everything you get in your panel',
+      subtitle: 'Not just a listing — real management tools, included in your subscription',
+      t1Title: 'Real-time agenda',
+      t1Desc: "Live view of today's table, plus a list and calendar. You know who's coming before they arrive.",
+      t2Title: 'Analytics for your restaurant',
+      t2Desc: 'Tables and reservations over 7, 30 or 90 days, so you can see whether it\'s paying off.',
+      t3Title: 'QR flyer for your venue',
+      t3Desc: 'A printable poster generated automatically in your own brand colors, ready to put up at the door.',
+      t4Title: 'Reviews from your diners',
+      t4Desc: 'Real ratings from people who\'ve been at your tables, visible right in your panel.',
+    },
     benefits: {
       title: 'Why join',
       subtitle: 'Built to add zero extra work for your restaurant',

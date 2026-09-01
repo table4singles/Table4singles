@@ -122,6 +122,18 @@ export const sv = {
       step3Title: 'Få gäster i din kalender',
       step3Desc: 'Singlar som bokar dyker upp direkt i din panel, i realtid, redo för sitt bord.',
     },
+    tools: {
+      title: 'Allt du får i din panel',
+      subtitle: 'Inte bara en lista — riktig hantering, ingår i ditt abonnemang',
+      t1Title: 'Realtidsschema',
+      t1Desc: 'Live-vy av dagens bord, plus lista och kalender. Du vet vem som kommer innan de är där.',
+      t2Title: 'Analys för din restaurang',
+      t2Desc: 'Bord och bokningar över 7, 30 eller 90 dagar, så du ser om det lönar sig.',
+      t3Title: 'QR-flygblad för din lokal',
+      t3Desc: 'En utskrivbar affisch som skapas automatiskt i dina varumärkesfärger, redo att sätta upp vid dörren.',
+      t4Title: 'Recensioner från dina gäster',
+      t4Desc: 'Riktiga betyg från de som suttit vid dina bord, synliga direkt i din panel.',
+    },
     benefits: {
       title: 'Varför gå med',
       subtitle: 'Byggt för att inte ge din restaurang extra arbete',

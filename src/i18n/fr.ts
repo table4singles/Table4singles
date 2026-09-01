@@ -122,6 +122,18 @@ export const fr = {
       step3Title: 'Recevez des convives dans votre agenda',
       step3Desc: 'Les célibataires qui réservent apparaissent instantanément dans votre panneau, en temps réel, prêts pour leur table.',
     },
+    tools: {
+      title: 'Tout ce que vous avez dans votre tableau de bord',
+      subtitle: 'Pas juste une liste — une vraie gestion, incluse dans votre abonnement',
+      t1Title: 'Agenda en temps réel',
+      t1Desc: "Vue en direct de la table du jour, plus une liste et un calendrier. Vous savez qui arrive avant que la personne soit là.",
+      t2Title: 'Analyses de votre restaurant',
+      t2Desc: 'Tables et réservations sur 7, 30 ou 90 jours, pour voir si ça vous rapporte.',
+      t3Title: 'Flyer avec QR code pour votre établissement',
+      t3Desc: "Une affiche imprimable générée automatiquement aux couleurs de votre marque, prête à afficher à l'entrée.",
+      t4Title: 'Avis de vos convives',
+      t4Desc: 'De vraies notes laissées par les personnes venues à vos tables, visibles directement dans votre tableau de bord.',
+    },
     benefits: {
       title: 'Pourquoi nous rejoindre',
       subtitle: 'Pensé pour ne pas ajouter de travail à votre restaurant',

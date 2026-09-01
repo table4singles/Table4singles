@@ -2,6 +2,7 @@ import { useState } from 'react'
 import {
   Clock, Megaphone, CalendarCheck, Ban, UserPlus, CalendarPlus, Users,
   ArrowRight, Sparkles, TrendingDown, ChevronDown, Euro, ShieldCheck, Smartphone,
+  CalendarClock, BarChart3, QrCode, Star,
 } from 'lucide-react'
 import { Navbar } from '@/components/Navbar'
 import { useLanguage } from '@/contexts/LanguageContext'
@@ -104,6 +105,22 @@ export function RestaurantLandingPage({ onNavigate, onAuthClick }: RestaurantLan
               title={t('restaurantLanding.steps.step3Title')}
               desc={t('restaurantLanding.steps.step3Desc')}
             />
+          </div>
+        </div>
+      </section>
+
+      {/* TOOLS — what's actually in the restaurant panel */}
+      <section className="py-20 bg-gray-950">
+        <div className="max-w-5xl mx-auto px-4">
+          <div className="text-center mb-14">
+            <h2 className="font-display text-3xl md:text-4xl font-bold text-white mb-3">{t('restaurantLanding.tools.title')}</h2>
+            <p className="text-gray-400 text-lg">{t('restaurantLanding.tools.subtitle')}</p>
+          </div>
+          <div className="grid sm:grid-cols-2 gap-5">
+            <BenefitCard icon={<CalendarClock className="w-5 h-5" />} title={t('restaurantLanding.tools.t1Title')} desc={t('restaurantLanding.tools.t1Desc')} />
+            <BenefitCard icon={<BarChart3 className="w-5 h-5" />} title={t('restaurantLanding.tools.t2Title')} desc={t('restaurantLanding.tools.t2Desc')} />
+            <BenefitCard icon={<QrCode className="w-5 h-5" />} title={t('restaurantLanding.tools.t3Title')} desc={t('restaurantLanding.tools.t3Desc')} />
+            <BenefitCard icon={<Star className="w-5 h-5" />} title={t('restaurantLanding.tools.t4Title')} desc={t('restaurantLanding.tools.t4Desc')} />
           </div>
         </div>
       </section>

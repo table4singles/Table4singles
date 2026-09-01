@@ -994,6 +994,7 @@ export const it = {
     tabRestaurantes: 'Ristoranti ({count})',
     tabEmbajadores: 'Ambasciatori ({count})',
     tabMovimientos: 'Movimenti ({count})',
+    tabDemanda: 'Domanda ({count})',
     title: 'Pannello di amministrazione',
     subtitle: 'Table4Singles · Vista globale',
     refresh: 'Aggiorna',
@@ -1044,5 +1045,8 @@ export const it = {
     thAmount: 'Importo',
     thDate: 'Data',
     noPayments: 'Nessun movimento',
+    thWhen: 'Quando',
+    noDemand: 'Ancora nessuna richiesta "Avvisami"',
+    demandIntro: 'Utenti che hanno chiesto di essere avvisati quando appare un tavolo adatto — utile per sapere cosa cercare quando si acquisiscono ristoranti.',
   },
 }

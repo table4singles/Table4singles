@@ -1040,6 +1040,7 @@ export const en = {
     tabRestaurantes: 'Restaurants ({count})',
     tabEmbajadores: 'Ambassadors ({count})',
     tabMovimientos: 'Transactions ({count})',
+    tabDemanda: 'Demand ({count})',
     title: 'Admin panel',
     subtitle: 'Table4Singles · Global view',
     refresh: 'Refresh',
@@ -1090,5 +1091,8 @@ export const en = {
     thAmount: 'Amount',
     thDate: 'Date',
     noPayments: 'No transactions',
+    thWhen: 'When',
+    noDemand: 'No "Notify me" requests yet',
+    demandIntro: "Users who asked to be notified when a matching table shows up — use it to know what to look for when signing up restaurants.",
   },
 }

@@ -994,6 +994,7 @@ export const pt = {
     tabRestaurantes: 'Restaurantes ({count})',
     tabEmbajadores: 'Embaixadores ({count})',
     tabMovimientos: 'Movimentos ({count})',
+    tabDemanda: 'Demanda ({count})',
     title: 'Painel de administração',
     subtitle: 'Table4Singles · Vista global',
     refresh: 'Atualizar',
@@ -1044,5 +1045,8 @@ export const pt = {
     thAmount: 'Valor',
     thDate: 'Data',
     noPayments: 'Sem movimentos',
+    thWhen: 'Quando',
+    noDemand: 'Ainda não há pedidos "Avise-me"',
+    demandIntro: 'Usuários que pediram para ser avisados quando surgir uma mesa que combine — use para saber o que procurar ao captar restaurantes.',
   },
 }

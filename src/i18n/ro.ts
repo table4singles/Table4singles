@@ -994,6 +994,7 @@ export const ro = {
     tabRestaurantes: 'Restaurante ({count})',
     tabEmbajadores: 'Ambasadori ({count})',
     tabMovimientos: 'Tranzacții ({count})',
+    tabDemanda: 'Cerere ({count})',
     title: 'Panou de administrare',
     subtitle: 'Table4Singles · Vedere globală',
     refresh: 'Actualizează',
@@ -1044,5 +1045,8 @@ export const ro = {
     thAmount: 'Sumă',
     thDate: 'Dată',
     noPayments: 'Nicio tranzacție',
+    thWhen: 'Când',
+    noDemand: 'Încă nu există cereri „Anunță-mă"',
+    demandIntro: 'Utilizatori care au cerut să fie anunțați când apare o masă potrivită — folosește asta pentru a ști ce să cauți atunci când atragi restaurante.',
   },
 }

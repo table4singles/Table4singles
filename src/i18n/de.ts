@@ -994,6 +994,7 @@ export const de = {
     tabRestaurantes: 'Restaurants ({count})',
     tabEmbajadores: 'Botschafter ({count})',
     tabMovimientos: 'Transaktionen ({count})',
+    tabDemanda: 'Bedarf ({count})',
     title: 'Admin-Panel',
     subtitle: 'Table4Singles · Globale Ansicht',
     refresh: 'Aktualisieren',
@@ -1044,5 +1045,8 @@ export const de = {
     thAmount: 'Betrag',
     thDate: 'Datum',
     noPayments: 'Keine Transaktionen',
+    thWhen: 'Wann',
+    noDemand: 'Noch keine „Benachrichtige mich"-Anfragen',
+    demandIntro: 'Nutzer, die gebeten haben, benachrichtigt zu werden, sobald ein passender Tisch erscheint — nutze das, um zu wissen, wonach du bei der Restaurant-Akquise suchen solltest.',
   },
 }

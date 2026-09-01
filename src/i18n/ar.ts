@@ -994,6 +994,7 @@ export const ar = {
     tabRestaurantes: 'المطاعم ({count})',
     tabEmbajadores: 'السفراء ({count})',
     tabMovimientos: 'الحركات ({count})',
+    tabDemanda: 'الطلب ({count})',
     title: 'لوحة الإدارة',
     subtitle: 'Table4Singles · نظرة عامة شاملة',
     refresh: 'تحديث',
@@ -1044,5 +1045,8 @@ export const ar = {
     thAmount: 'المبلغ',
     thDate: 'التاريخ',
     noPayments: 'لا توجد حركات',
+    thWhen: 'متى',
+    noDemand: 'لا توجد طلبات "نبّهني" بعد',
+    demandIntro: 'مستخدمون طلبوا تنبيههم عند توفر طاولة مناسبة — استخدم هذا لمعرفة ما تبحث عنه عند استقطاب المطاعم.',
   },
 }

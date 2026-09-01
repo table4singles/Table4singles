@@ -994,6 +994,7 @@ export const fr = {
     tabRestaurantes: 'Restaurants ({count})',
     tabEmbajadores: 'Ambassadeurs ({count})',
     tabMovimientos: 'Transactions ({count})',
+    tabDemanda: 'Demande ({count})',
     title: 'Panneau d’administration',
     subtitle: 'Table4Singles · Vue globale',
     refresh: 'Actualiser',
@@ -1044,5 +1045,8 @@ export const fr = {
     thAmount: 'Montant',
     thDate: 'Date',
     noPayments: 'Aucune transaction',
+    thWhen: 'Quand',
+    noDemand: "Pas encore de demandes « Prévenez-moi »",
+    demandIntro: "Utilisateurs ayant demandé à être prévenus dès qu'une table correspondante apparaît — utile pour savoir quoi chercher lors du démarchage des restaurants.",
   },
 }

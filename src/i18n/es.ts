@@ -1004,6 +1004,7 @@ export const es = {
     tabRestaurantes: 'Restaurantes ({count})',
     tabEmbajadores: 'Embajadores ({count})',
     tabMovimientos: 'Movimientos ({count})',
+    tabDemanda: 'Demanda ({count})',
     title: 'Panel de administración',
     subtitle: 'Table4Singles · Vista global',
     refresh: 'Actualizar',
@@ -1054,5 +1055,8 @@ export const es = {
     thAmount: 'Importe',
     thDate: 'Fecha',
     noPayments: 'Sin movimientos',
+    thWhen: 'Cuándo',
+    noDemand: 'Todavía no hay peticiones de "Avísame"',
+    demandIntro: 'Usuarios que han pedido que se les avise cuando aparezca una mesa que encaje — úsalo para saber qué buscar al captar restaurantes.',
   },
 }

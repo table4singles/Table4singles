@@ -994,6 +994,7 @@ export const zh = {
     tabRestaurantes: '餐厅（{count}）',
     tabEmbajadores: '大使（{count}）',
     tabMovimientos: '交易记录（{count}）',
+    tabDemanda: '需求（{count}）',
     title: '管理面板',
     subtitle: 'Table4Singles · 全局视图',
     refresh: '刷新',
@@ -1044,5 +1045,8 @@ export const zh = {
     thAmount: '金额',
     thDate: '日期',
     noPayments: '暂无交易',
+    thWhen: '时间',
+    noDemand: '暂无"提醒我"请求',
+    demandIntro: '要求在出现合适餐桌时收到通知的用户——可用于了解招募餐厅时应关注的方向。',
   },
 }

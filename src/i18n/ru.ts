@@ -994,6 +994,7 @@ export const ru = {
     tabRestaurantes: 'Рестораны ({count})',
     tabEmbajadores: 'Амбассадоры ({count})',
     tabMovimientos: 'Операции ({count})',
+    tabDemanda: 'Спрос ({count})',
     title: 'Панель администратора',
     subtitle: 'Table4Singles · Общий обзор',
     refresh: 'Обновить',
@@ -1044,5 +1045,8 @@ export const ru = {
     thAmount: 'Сумма',
     thDate: 'Дата',
     noPayments: 'Нет операций',
+    thWhen: 'Когда',
+    noDemand: 'Пока нет запросов «Уведомить меня»',
+    demandIntro: 'Пользователи, попросившие уведомить их о подходящем столике — используйте это, чтобы знать, что искать при привлечении ресторанов.',
   },
 }

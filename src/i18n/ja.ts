@@ -994,6 +994,7 @@ export const ja = {
     tabRestaurantes: 'レストラン（{count}）',
     tabEmbajadores: 'アンバサダー（{count}）',
     tabMovimientos: '取引（{count}）',
+    tabDemanda: 'リクエスト（{count}）',
     title: '管理パネル',
     subtitle: 'Table4Singles・全体ビュー',
     refresh: '更新',
@@ -1044,5 +1045,8 @@ export const ja = {
     thAmount: '金額',
     thDate: '日付',
     noPayments: '取引がありません',
+    thWhen: '希望日時',
+    noDemand: '「通知を受け取る」のリクエストはまだありません',
+    demandIntro: '条件に合うテーブルが見つかったら通知してほしいと希望したユーザーです。レストラン開拓の際に何を探すべきかの参考にできます。',
   },
 }

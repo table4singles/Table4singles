@@ -994,6 +994,7 @@ export const sv = {
     tabRestaurantes: 'Restauranger ({count})',
     tabEmbajadores: 'Ambassadörer ({count})',
     tabMovimientos: 'Transaktioner ({count})',
+    tabDemanda: 'Efterfrågan ({count})',
     title: 'Adminpanel',
     subtitle: 'Table4Singles · Global vy',
     refresh: 'Uppdatera',
@@ -1044,5 +1045,8 @@ export const sv = {
     thAmount: 'Belopp',
     thDate: 'Datum',
     noPayments: 'Inga transaktioner',
+    thWhen: 'När',
+    noDemand: 'Inga "meddela mig"-förfrågningar än',
+    demandIntro: 'Användare som bett om att meddelas när ett matchande bord dyker upp — använd det för att veta vad du ska leta efter när du värvar restauranger.',
   },
 }

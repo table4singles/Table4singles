@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import {
   Users, UtensilsCrossed, Award, CreditCard, Loader2, RefreshCw,
-  TrendingUp, Euro, CheckCircle, ShieldAlert,
+  TrendingUp, Euro, CheckCircle, ShieldAlert, BellRing,
 } from 'lucide-react'
 import { Navbar } from '@/components/Navbar'
 import { useAuth } from '@/contexts/AuthContext'
@@ -13,7 +13,9 @@ interface AdminPageProps {
   onAuthClick: (mode?: 'signin' | 'signup') => void
 }
 
-type Tab = 'resumen' | 'usuarios' | 'restaurantes' | 'embajadores' | 'movimientos'
+type Tab = 'resumen' | 'usuarios' | 'restaurantes' | 'embajadores' | 'movimientos' | 'demanda'
+
+const DAY_KEYS = ['demand.dayMon', 'demand.dayTue', 'demand.dayWed', 'demand.dayThu', 'demand.dayFri', 'demand.daySat', 'demand.daySun']
 
 const DATE_LOCALE_MAP: Record<string, string> = {
   es: 'es-ES', en: 'en-GB', de: 'de-DE', fr: 'fr-FR', it: 'it-IT',
@@ -34,7 +36,7 @@ export function AdminPage({ onNavigate, onAuthClick }: AdminPageProps) {
   const { profile } = useAuth()
   const [tab, setTab] = useState<Tab>('resumen')
   const isAdmin = profile?.is_admin === true
-  const { stats, users, restaurants, ambassadors, payments, loading, error, refresh } = useAdminData(isAdmin)
+  const { stats, users, restaurants, ambassadors, payments, demandRequests, loading, error, refresh } = useAdminData(isAdmin)
 
   const SUB_BADGE: Record<string, { label: string; color: string }> = {
     active:     { label: t('admin.subActive'),    color: 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' },
@@ -64,6 +66,7 @@ export function AdminPage({ onNavigate, onAuthClick }: AdminPageProps) {
     { id: 'restaurantes', label: t('admin.tabRestaurantes').replace('{count}', String(restaurants.length)),                            icon: <UtensilsCrossed className="w-4 h-4" /> },
     { id: 'embajadores',  label: t('admin.tabEmbajadores').replace('{count}', String(ambassadors.length)),                             icon: <Award className="w-4 h-4" /> },
     { id: 'movimientos',  label: t('admin.tabMovimientos').replace('{count}', String(payments.length)),                                icon: <CreditCard className="w-4 h-4" /> },
+    { id: 'demanda',      label: t('admin.tabDemanda').replace('{count}', String(demandRequests.filter(d => d.status === 'active').length)), icon: <BellRing className="w-4 h-4" /> },
   ]
 
   return (
@@ -99,6 +102,7 @@ export function AdminPage({ onNavigate, onAuthClick }: AdminPageProps) {
             {tab === 'restaurantes' && <TabRestaurantes restaurants={restaurants} t={t} dateLocale={dateLocale} subBadge={SUB_BADGE} />}
             {tab === 'embajadores'  && <TabEmbajadores ambassadors={ambassadors} t={t} dateLocale={dateLocale} />}
             {tab === 'movimientos'  && <TabMovimientos payments={payments} t={t} dateLocale={dateLocale} />}
+            {tab === 'demanda'      && <TabDemanda requests={demandRequests} t={t} dateLocale={dateLocale} />}
           </>
         )}
       </main>
@@ -253,6 +257,53 @@ function TabMovimientos({ payments, t, dateLocale }: { payments: any[]; t: (key:
                     <Td><span className="font-semibold">{(p.amount / 100).toFixed(2)} {p.currency.toUpperCase()}</span></Td>
                     <Td><span className={`text-xs px-2 py-0.5 rounded-full font-medium ${PAYMENT_BADGE[p.status] ?? 'bg-gray-100 text-gray-600'}`}>{p.status}</span></Td>
                     <Td>{fmtDate(p.created_at, dateLocale)}</Td>
+                  </tr>
+                ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+const DEMAND_STATUS_BADGE: Record<string, string> = {
+  active:    'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400',
+  matched:   'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400',
+  expired:   'bg-gray-100 text-gray-500',
+  cancelled: 'bg-gray-100 text-gray-400',
+}
+
+function TabDemanda({ requests, t, dateLocale }: { requests: any[]; t: (key: string) => string; dateLocale: string }) {
+  const fmtWhen = (r: any) => {
+    if (r.date_pref) return fmtDate(r.date_pref, dateLocale)
+    if (r.day_of_week !== null && r.day_of_week !== undefined) return t(DAY_KEYS[r.day_of_week])
+    return '—'
+  }
+  return (
+    <div className="space-y-4">
+      <p className="text-sm text-gray-500 dark:text-gray-400">{t('admin.demandIntro')}</p>
+      <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-gray-700 overflow-hidden">
+        <div className="overflow-x-auto">
+          <table className="w-full text-sm">
+            <thead><tr className="border-b border-gray-100 dark:border-gray-700 bg-gray-50 dark:bg-gray-900">
+              <Th>{t('admin.thName')}</Th><Th>{t('demand.city')}</Th><Th>{t('admin.thWhen')}</Th>
+              <Th>{t('demand.time')}</Th><Th>{t('demand.cuisine')}</Th><Th>{t('demand.language')}</Th>
+              <Th>{t('admin.thStatus')}</Th><Th>{t('admin.thDate')}</Th>
+            </tr></thead>
+            <tbody>
+              {requests.length === 0
+                ? <tr><td colSpan={8} className="text-center py-10 text-gray-400">{t('admin.noDemand')}</td></tr>
+                : requests.map(r => (
+                  <tr key={r.id} className="border-b border-gray-50 dark:border-gray-700/50 hover:bg-gray-50 dark:hover:bg-gray-700/30">
+                    <Td><span className="font-medium">{r.display_name || r.email || '—'}</span></Td>
+                    <Td>{r.city}</Td>
+                    <Td>{fmtWhen(r)}</Td>
+                    <Td>{r.time_pref ? t(r.time_pref === 'midday' ? 'browse.midday' : 'browse.evening') : '—'}</Td>
+                    <Td>{r.cuisine || <span className="text-gray-400">{t('demand.anyCuisine')}</span>}</Td>
+                    <Td>{r.language || <span className="text-gray-400">{t('demand.anyLanguage')}</span>}</Td>
+                    <Td><span className={`text-xs px-2 py-0.5 rounded-full font-medium ${DEMAND_STATUS_BADGE[r.status] ?? 'bg-gray-100 text-gray-600'}`}>{r.status}</span></Td>
+                    <Td>{fmtDate(r.created_at, dateLocale)}</Td>
                   </tr>
                 ))}
             </tbody>

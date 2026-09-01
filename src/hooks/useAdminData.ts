@@ -58,12 +58,29 @@ export interface AdminPayment {
   stripe_payment_intent_id: string | null
 }
 
+export interface AdminDemandRequest {
+  id: string
+  user_id: string
+  display_name: string | null
+  email: string | null
+  city: string
+  date_pref: string | null
+  day_of_week: number | null
+  time_pref: string | null
+  cuisine: string | null
+  interests: string[]
+  language: string | null
+  status: string
+  created_at: string
+}
+
 export interface AdminData {
   stats: AdminStats | null
   users: AdminUser[]
   restaurants: AdminRestaurant[]
   ambassadors: AdminAmbassador[]
   payments: AdminPayment[]
+  demandRequests: AdminDemandRequest[]
   loading: boolean
   error: string | null
   refresh: () => void
@@ -81,6 +98,7 @@ export function useAdminData(isAdmin: boolean): AdminData {
   const [restaurants, setRestaurants] = useState<AdminRestaurant[]>([])
   const [ambassadors, setAmbassadors] = useState<AdminAmbassador[]>([])
   const [payments, setPayments] = useState<AdminPayment[]>([])
+  const [demandRequests, setDemandRequests] = useState<AdminDemandRequest[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [tick, setTick] = useState(0)
@@ -98,7 +116,11 @@ export function useAdminData(isAdmin: boolean): AdminData {
       supabase.rpc('get_admin_restaurants'),
       supabase.rpc('get_admin_ambassadors'),
       supabase.from('reservation_payments').select('*').order('created_at', { ascending: false }).limit(200),
-    ]).then(([statsRes, usersRes, restRes, ambRes, payRes]) => {
+      supabase.from('demand_requests')
+        .select('id, user_id, city, date_pref, day_of_week, time_pref, cuisine, interests, language, status, created_at, profiles(display_name, email)')
+        .order('created_at', { ascending: false })
+        .limit(200),
+    ]).then(([statsRes, usersRes, restRes, ambRes, payRes, demandRes]) => {
       if (statsRes.error) setError(statsRes.error.message)
       else setStats({ ...EMPTY_STATS, ...(statsRes.data as AdminStats) })
 
@@ -128,9 +150,25 @@ export function useAdminData(isAdmin: boolean): AdminData {
       })))
 
       setPayments((payRes.data as AdminPayment[]) ?? [])
+
+      setDemandRequests(((demandRes.data ?? []) as any[]).map(d => ({
+        id: d.id,
+        user_id: d.user_id,
+        display_name: d.profiles?.display_name ?? null,
+        email: d.profiles?.email ?? null,
+        city: d.city,
+        date_pref: d.date_pref,
+        day_of_week: d.day_of_week,
+        time_pref: d.time_pref,
+        cuisine: d.cuisine,
+        interests: d.interests ?? [],
+        language: d.language,
+        status: d.status,
+        created_at: d.created_at,
+      })))
       setLoading(false)
     })
   }, [isAdmin, tick])
 
-  return { stats, users, restaurants, ambassadors, payments, loading, error, refresh: () => setTick(t => t + 1) }
+  return { stats, users, restaurants, ambassadors, payments, demandRequests, loading, error, refresh: () => setTick(t => t + 1) }
 }

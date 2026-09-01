@@ -994,6 +994,7 @@ export const uk = {
     tabRestaurantes: 'Ресторани ({count})',
     tabEmbajadores: 'Амбасадори ({count})',
     tabMovimientos: 'Операції ({count})',
+    tabDemanda: 'Попит ({count})',
     title: 'Панель адміністратора',
     subtitle: 'Table4Singles · Загальний огляд',
     refresh: 'Оновити',
@@ -1044,5 +1045,8 @@ export const uk = {
     thAmount: 'Сума',
     thDate: 'Дата',
     noPayments: 'Немає операцій',
+    thWhen: 'Коли',
+    noDemand: 'Поки що немає запитів «Повідомити мене»',
+    demandIntro: 'Користувачі, які попросили повідомити їх про відповідний столик — використовуйте це, щоб знати, що шукати під час залучення ресторанів.',
   },
 }

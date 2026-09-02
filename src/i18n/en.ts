@@ -134,6 +134,8 @@ export const en = {
       t3Desc: 'A printable poster generated automatically in your own brand colors, ready to put up at the door.',
       t4Title: 'Reviews from your diners',
       t4Desc: 'Real ratings from people who\'ve been at your tables, visible right in your panel.',
+      t5Title: 'Special guest dinners',
+      t5Desc: 'Feature a table with someone special — a chef, a sommelier, whoever you choose — and set the price that experience is worth, not the standard deposit.',
     },
     benefits: {
       title: 'Why join',

@@ -118,6 +118,8 @@ export const es = {
       t3Desc: 'Cartel imprimible generado automáticamente con los colores de tu marca, listo para poner en la puerta.',
       t4Title: 'Reseñas de tus comensales',
       t4Desc: 'Valoraciones reales de quienes han pasado por tus mesas, visibles directamente en tu panel.',
+      t5Title: 'Cenas con invitado especial',
+      t5Desc: 'Destaca una mesa con alguien especial — un chef, un sumiller, quien tú decidas — y pon el precio que corresponda a esa experiencia, no el depósito estándar.',
     },
     benefits: {
       title: 'Por qué unirte',

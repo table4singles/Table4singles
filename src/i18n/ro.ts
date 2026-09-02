@@ -134,6 +134,8 @@ export const ro = {
       t3Desc: 'Un afiș de printat, generat automat în culorile brandului tău, gata de pus la intrare.',
       t4Title: 'Recenzii de la clienți',
       t4Desc: 'Evaluări reale de la cei care au fost la mesele tale, vizibile direct în panoul tău.',
+      t5Title: 'Cine cu invitat special',
+      t5Desc: 'Evidențiază o masă cu cineva special — un chef, un somelier, pe cine alegi tu — și stabilește prețul potrivit acelei experiențe, nu depozitul standard.',
     },
     benefits: {
       title: 'De ce să te alături',

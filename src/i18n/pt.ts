@@ -134,6 +134,8 @@ export const pt = {
       t3Desc: 'Um cartaz para imprimir, gerado automaticamente nas cores da sua marca, pronto para colocar na porta.',
       t4Title: 'Avaliações dos seus clientes',
       t4Desc: 'Avaliações reais de quem já esteve nas suas mesas, visíveis direto no seu painel.',
+      t5Title: 'Jantares com convidado especial',
+      t5Desc: 'Destaca uma mesa com alguém especial — um chef, um sommelier, quem decidires — e define o preço que essa experiência merece, em vez do depósito padrão.',
     },
     benefits: {
       title: 'Porquê aderir',

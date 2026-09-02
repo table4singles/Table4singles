@@ -134,6 +134,8 @@ export const sv = {
       t3Desc: 'En utskrivbar affisch som skapas automatiskt i dina varumärkesfärger, redo att sätta upp vid dörren.',
       t4Title: 'Recensioner från dina gäster',
       t4Desc: 'Riktiga betyg från de som suttit vid dina bord, synliga direkt i din panel.',
+      t5Title: 'Middagar med specialgäst',
+      t5Desc: 'Lyft fram ett bord med någon speciell — en kock, en sommelier, vem du vill — och sätt det pris som upplevelsen är värd, istället för standarddepositionen.',
     },
     benefits: {
       title: 'Varför gå med',

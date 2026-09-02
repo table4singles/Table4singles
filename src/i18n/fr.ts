@@ -134,6 +134,8 @@ export const fr = {
       t3Desc: "Une affiche imprimable générée automatiquement aux couleurs de votre marque, prête à afficher à l'entrée.",
       t4Title: 'Avis de vos convives',
       t4Desc: 'De vraies notes laissées par les personnes venues à vos tables, visibles directement dans votre tableau de bord.',
+      t5Title: 'Dîners avec invité spécial',
+      t5Desc: 'Mettez en avant une table avec quelqu\'un de spécial — un chef, un sommelier, qui vous voulez — et fixez le prix que mérite cette expérience, au lieu du dépôt standard.',
     },
     benefits: {
       title: 'Pourquoi nous rejoindre',

@@ -134,6 +134,8 @@ export const it = {
       t3Desc: "Un poster stampabile generato automaticamente con i colori del tuo marchio, pronto da mettere all'ingresso.",
       t4Title: 'Recensioni dei tuoi commensali',
       t4Desc: 'Valutazioni reali di chi è stato ai tuoi tavoli, visibili direttamente nel tuo pannello.',
+      t5Title: 'Cene con ospite speciale',
+      t5Desc: 'Metti in risalto un tavolo con qualcuno di speciale — uno chef, un sommelier, chi preferisci — e fissa il prezzo che merita quell\'esperienza, non il deposito standard.',
     },
     benefits: {
       title: 'Perché unirti',

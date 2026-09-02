@@ -121,6 +121,9 @@ export function RestaurantLandingPage({ onNavigate, onAuthClick }: RestaurantLan
             <BenefitCard icon={<BarChart3 className="w-5 h-5" />} title={t('restaurantLanding.tools.t2Title')} desc={t('restaurantLanding.tools.t2Desc')} />
             <BenefitCard icon={<QrCode className="w-5 h-5" />} title={t('restaurantLanding.tools.t3Title')} desc={t('restaurantLanding.tools.t3Desc')} />
             <BenefitCard icon={<Star className="w-5 h-5" />} title={t('restaurantLanding.tools.t4Title')} desc={t('restaurantLanding.tools.t4Desc')} />
+            <div className="sm:col-span-2">
+              <BenefitCard icon={<Sparkles className="w-5 h-5" />} title={t('restaurantLanding.tools.t5Title')} desc={t('restaurantLanding.tools.t5Desc')} />
+            </div>
           </div>
         </div>
       </section>

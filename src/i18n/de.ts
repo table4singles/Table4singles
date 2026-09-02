@@ -134,6 +134,8 @@ export const de = {
       t3Desc: 'Ein druckbares Plakat, automatisch in deinen Markenfarben erstellt, bereit für die Eingangstür.',
       t4Title: 'Bewertungen deiner Gäste',
       t4Desc: 'Echte Bewertungen von Leuten, die an deinen Tischen waren, direkt in deinem Dashboard sichtbar.',
+      t5Title: 'Dinner mit besonderem Gast',
+      t5Desc: 'Hebe einen Tisch mit jemandem Besonderem hervor — ein Koch, ein Sommelier, wen du möchtest — und setze den Preis, der diesem Erlebnis entspricht, statt der üblichen Kaution.',
     },
     benefits: {
       title: 'Warum mitmachen',

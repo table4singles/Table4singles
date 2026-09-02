@@ -2,7 +2,7 @@ import { useState, useMemo } from 'react'
 import {
   Users, UtensilsCrossed, Award, CreditCard, Loader2, RefreshCw,
   TrendingUp, Euro, CheckCircle, ShieldAlert, BellRing, Eye, MousePointerClick,
-  UserPlus, Filter, QrCode, Sparkles, Search, Check,
+  UserPlus, Filter, QrCode, Sparkles, Search, Check, Flag, X,
 } from 'lucide-react'
 import {
   BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid,
@@ -10,7 +10,7 @@ import {
 import { Navbar } from '@/components/Navbar'
 import { useAuth } from '@/contexts/AuthContext'
 import { useLanguage } from '@/contexts/LanguageContext'
-import { useAdminData, type AdminAnalyticsEvent, type AdminRestaurant } from '@/hooks/useAdminData'
+import { useAdminData, type AdminAnalyticsEvent, type AdminRestaurant, type AdminReport } from '@/hooks/useAdminData'
 import { supabase } from '@/lib/supabase'
 import type { DiningTable } from '@/types/database'
 
@@ -19,7 +19,7 @@ interface AdminPageProps {
   onAuthClick: (mode?: 'signin' | 'signup') => void
 }
 
-type Tab = 'resumen' | 'usuarios' | 'restaurantes' | 'embajadores' | 'movimientos' | 'demanda' | 'funnel' | 'especiales'
+type Tab = 'resumen' | 'usuarios' | 'restaurantes' | 'embajadores' | 'movimientos' | 'demanda' | 'funnel' | 'especiales' | 'reportes'
 
 const DAY_KEYS = ['demand.dayMon', 'demand.dayTue', 'demand.dayWed', 'demand.dayThu', 'demand.dayFri', 'demand.daySat', 'demand.daySun']
 
@@ -42,7 +42,7 @@ export function AdminPage({ onNavigate, onAuthClick }: AdminPageProps) {
   const { profile } = useAuth()
   const [tab, setTab] = useState<Tab>('resumen')
   const isAdmin = profile?.is_admin === true
-  const { stats, users, restaurants, ambassadors, payments, demandRequests, analyticsEvents, loading, error, refresh } = useAdminData(isAdmin)
+  const { stats, users, restaurants, ambassadors, payments, demandRequests, analyticsEvents, reports, loading, error, refresh } = useAdminData(isAdmin)
 
   const SUB_BADGE: Record<string, { label: string; color: string }> = {
     active:     { label: t('admin.subActive'),    color: 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' },
@@ -75,6 +75,7 @@ export function AdminPage({ onNavigate, onAuthClick }: AdminPageProps) {
     { id: 'demanda',      label: t('admin.tabDemanda').replace('{count}', String(demandRequests.filter(d => d.status === 'active').length)), icon: <BellRing className="w-4 h-4" /> },
     { id: 'funnel',       label: t('admin.tabFunnel'),                                                                                   icon: <Filter className="w-4 h-4" /> },
     { id: 'especiales',   label: t('specialGuest.adminTabLabel'),                                                                        icon: <Sparkles className="w-4 h-4" /> },
+    { id: 'reportes',     label: t('admin.tabReportes').replace('{count}', String(reports.filter(r => r.status === 'pending').length)), icon: <Flag className="w-4 h-4" /> },
   ]
 
   return (
@@ -113,6 +114,7 @@ export function AdminPage({ onNavigate, onAuthClick }: AdminPageProps) {
             {tab === 'demanda'      && <TabDemanda requests={demandRequests} t={t} dateLocale={dateLocale} />}
             {tab === 'funnel'       && <TabFunnel events={analyticsEvents} t={t} language={language} />}
             {tab === 'especiales'   && <TabEspeciales restaurants={restaurants} t={t} dateLocale={dateLocale} />}
+            {tab === 'reportes'     && <TabReportes reports={reports} t={t} dateLocale={dateLocale} onChanged={refresh} />}
           </>
         )}
       </main>
@@ -314,6 +316,74 @@ function TabDemanda({ requests, t, dateLocale }: { requests: any[]; t: (key: str
                     <Td>{r.language || <span className="text-gray-400">{t('demand.anyLanguage')}</span>}</Td>
                     <Td><span className={`text-xs px-2 py-0.5 rounded-full font-medium ${DEMAND_STATUS_BADGE[r.status] ?? 'bg-gray-100 text-gray-600'}`}>{r.status}</span></Td>
                     <Td>{fmtDate(r.created_at, dateLocale)}</Td>
+                  </tr>
+                ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+const REPORT_STATUS_BADGE: Record<string, string> = {
+  pending: 'bg-amber-100 text-amber-700',
+  reviewed: 'bg-green-100 text-green-700',
+  dismissed: 'bg-gray-100 text-gray-500',
+}
+
+function TabReportes({ reports, t, dateLocale, onChanged }: { reports: AdminReport[]; t: (key: string) => string; dateLocale: string; onChanged: () => void }) {
+  const [updatingId, setUpdatingId] = useState<string | null>(null)
+
+  const setStatus = async (id: string, status: 'reviewed' | 'dismissed') => {
+    setUpdatingId(id)
+    await supabase.from('reports').update({ status, reviewed_at: new Date().toISOString() }).eq('id', id)
+    setUpdatingId(null)
+    onChanged()
+  }
+
+  return (
+    <div className="space-y-4">
+      <p className="text-sm text-gray-500 dark:text-gray-400">{t('admin.reportsIntro')}</p>
+      <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-gray-700 overflow-hidden">
+        <div className="overflow-x-auto">
+          <table className="w-full text-sm">
+            <thead><tr className="border-b border-gray-100 dark:border-gray-700 bg-gray-50 dark:bg-gray-900">
+              <Th>{t('admin.thDate')}</Th><Th>{t('admin.thReporter')}</Th><Th>{t('admin.thReported')}</Th>
+              <Th>{t('admin.thRestaurant')}</Th><Th>{t('report.categoryLabel')}</Th><Th>{t('report.detailsLabel')}</Th>
+              <Th>{t('admin.thStatus')}</Th><Th>{''}</Th></tr></thead>
+            <tbody>
+              {reports.length === 0
+                ? <tr><td colSpan={8} className="text-center py-10 text-gray-400">{t('admin.noReports')}</td></tr>
+                : reports.map(r => (
+                  <tr key={r.id} className="border-b border-gray-50 dark:border-gray-700/50 hover:bg-gray-50 dark:hover:bg-gray-700/30 align-top">
+                    <Td>{fmtDate(r.created_at, dateLocale)}</Td>
+                    <Td><span className="font-medium">{r.reporter_name || '—'}</span></Td>
+                    <Td><span className="font-medium">{r.reported_name || '—'}</span></Td>
+                    <Td>{r.restaurant_name || '—'}</Td>
+                    <Td>{t(`report.categories.${r.category}`)}</Td>
+                    <Td><span className="line-clamp-2 max-w-xs block" title={r.details ?? ''}>{r.details || '—'}</span></Td>
+                    <Td><span className={`text-xs px-2 py-0.5 rounded-full font-medium ${REPORT_STATUS_BADGE[r.status] ?? 'bg-gray-100 text-gray-600'}`}>{t(`admin.reportStatus.${r.status}`)}</span></Td>
+                    <Td>
+                      {r.status === 'pending' && (
+                        <div className="flex items-center gap-1.5 whitespace-nowrap">
+                          <button
+                            onClick={() => setStatus(r.id, 'reviewed')}
+                            disabled={updatingId === r.id}
+                            className="flex items-center gap-1 text-xs text-green-600 hover:text-green-700 font-medium px-2 py-1 rounded-lg hover:bg-green-50 dark:hover:bg-green-900/20 disabled:opacity-40"
+                          >
+                            <Check className="w-3.5 h-3.5" /> {t('admin.markReviewed')}
+                          </button>
+                          <button
+                            onClick={() => setStatus(r.id, 'dismissed')}
+                            disabled={updatingId === r.id}
+                            className="flex items-center gap-1 text-xs text-gray-400 hover:text-gray-600 font-medium px-2 py-1 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 disabled:opacity-40"
+                          >
+                            <X className="w-3.5 h-3.5" /> {t('admin.dismiss')}
+                          </button>
+                        </div>
+                      )}
+                    </Td>
                   </tr>
                 ))}
             </tbody>

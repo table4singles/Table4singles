@@ -1,10 +1,11 @@
 import { useState, useEffect, useRef } from 'react'
-import { ArrowLeft, MapPin, Clock, Users, Calendar, Loader2, MessageSquare, Star, Download, UserPlus, XCircle, PartyPopper, Check, Mail, Pencil, Save, UserMinus, BellRing, Sparkles } from 'lucide-react'
+import { ArrowLeft, MapPin, Clock, Users, Calendar, Loader2, MessageSquare, Star, Download, UserPlus, XCircle, PartyPopper, Check, Mail, Pencil, Save, UserMinus, BellRing, Sparkles, Flag } from 'lucide-react'
 import { Navbar } from '@/components/Navbar'
 import { ShareButton } from '@/components/ShareButton'
 import { StarRating } from '@/components/StarRating'
 import { InviteModal } from '@/components/InviteModal'
 import { CancelModal } from '@/components/CancelModal'
+import { ReportModal } from '@/components/ReportModal'
 import { ParticipantCard } from '@/components/ParticipantCard'
 import { PostDinnerReviewModal } from '@/components/PostDinnerReviewModal'
 import { Avatar } from '@/components/Avatar'
@@ -51,6 +52,7 @@ export function TableDetailPage({ tableId, paymentSuccess, paymentCancelled, onN
   const [showPostDinnerReview, setShowPostDinnerReview] = useState(false)
   const [showInvite, setShowInvite] = useState(false)
   const [showCancel, setShowCancel] = useState(false)
+  const [reportTarget, setReportTarget] = useState<{ id: string; name: string } | null>(null)
   const [showCancelTable, setShowCancelTable] = useState(false)
   const [chatInput, setChatInput] = useState('')
   const [showAutoInvite, setShowAutoInvite] = useState(false)
@@ -426,17 +428,28 @@ export function TableDetailPage({ tableId, paymentSuccess, paymentCancelled, onN
                         profile={p.profiles}
                         badge={null}
                       />
-                      {isHost && !isPast && !isCancelled && (
-                        <button
-                          onClick={() => handleRemoveParticipant(p.id)}
-                          disabled={removingParticipantId === p.id}
-                          className="absolute top-3 right-0 opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1 text-xs text-red-500 hover:text-red-700 font-medium px-2 py-1 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/20"
-                          title="Eliminar comensal"
-                        >
-                          {removingParticipantId === p.id
-                            ? <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                            : <UserMinus className="w-3.5 h-3.5" />}
-                        </button>
+                      {isHost && (
+                        <div className="absolute top-3 right-0 opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1">
+                          <button
+                            onClick={() => setReportTarget({ id: p.user_id, name: p.profiles!.display_name ?? '' })}
+                            className="flex items-center gap-1 text-xs text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 font-medium px-2 py-1 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700"
+                            title={t('report.reportDiner')}
+                          >
+                            <Flag className="w-3.5 h-3.5" />
+                          </button>
+                          {!isPast && !isCancelled && (
+                            <button
+                              onClick={() => handleRemoveParticipant(p.id)}
+                              disabled={removingParticipantId === p.id}
+                              className="flex items-center gap-1 text-xs text-red-500 hover:text-red-700 font-medium px-2 py-1 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/20"
+                              title="Eliminar comensal"
+                            >
+                              {removingParticipantId === p.id
+                                ? <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                                : <UserMinus className="w-3.5 h-3.5" />}
+                            </button>
+                          )}
+                        </div>
                       )}
                     </div>
                   ))}
@@ -539,11 +552,21 @@ export function TableDetailPage({ tableId, paymentSuccess, paymentCancelled, onN
               {isParticipant && (
                 <div className="text-center py-2 space-y-2">
                   <p className="text-sm font-medium text-green-600">{t('tableDetail.spotReserved')}</p>
-                  {!isPast && (
-                    <button onClick={() => setShowCancel(true)} className="text-xs text-red-500 hover:text-red-600 font-medium">
-                      {t('card.cancelReservation')}
-                    </button>
-                  )}
+                  <div className="flex items-center justify-center gap-4">
+                    {!isPast && (
+                      <button onClick={() => setShowCancel(true)} className="text-xs text-red-500 hover:text-red-600 font-medium">
+                        {t('card.cancelReservation')}
+                      </button>
+                    )}
+                    {table && (
+                      <button
+                        onClick={() => setReportTarget({ id: table.host_id, name: table.restaurant_name })}
+                        className="text-xs text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 font-medium flex items-center gap-1"
+                      >
+                        <Flag className="w-3 h-3" /> {t('report.reportRestaurant')}
+                      </button>
+                    )}
+                  </div>
                 </div>
               )}
               {isFull && !isParticipant && !isHost && !isCancelled && !isPast && (
@@ -675,6 +698,15 @@ export function TableDetailPage({ tableId, paymentSuccess, paymentCancelled, onN
         )}
 
         {showInvite && <InviteModal tableId={table.id} onClose={() => setShowInvite(false)} />}
+
+        {reportTarget && table && (
+          <ReportModal
+            tableId={table.id}
+            reportedId={reportTarget.id}
+            reportedName={reportTarget.name}
+            onClose={() => setReportTarget(null)}
+          />
+        )}
 
         {showCancel && myParticipation && (
           <CancelModal

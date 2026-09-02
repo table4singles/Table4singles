@@ -74,6 +74,21 @@ export interface AdminDemandRequest {
   created_at: string
 }
 
+export interface AdminReport {
+  id: string
+  table_id: string
+  restaurant_name: string | null
+  reporter_id: string
+  reporter_name: string | null
+  reported_id: string
+  reported_name: string | null
+  category: string
+  details: string | null
+  status: string
+  admin_notes: string | null
+  created_at: string
+}
+
 export interface AdminAnalyticsEvent {
   id: string
   event_name: string
@@ -90,6 +105,7 @@ export interface AdminData {
   payments: AdminPayment[]
   demandRequests: AdminDemandRequest[]
   analyticsEvents: AdminAnalyticsEvent[]
+  reports: AdminReport[]
   loading: boolean
   error: string | null
   refresh: () => void
@@ -109,6 +125,7 @@ export function useAdminData(isAdmin: boolean): AdminData {
   const [payments, setPayments] = useState<AdminPayment[]>([])
   const [demandRequests, setDemandRequests] = useState<AdminDemandRequest[]>([])
   const [analyticsEvents, setAnalyticsEvents] = useState<AdminAnalyticsEvent[]>([])
+  const [reports, setReports] = useState<AdminReport[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [tick, setTick] = useState(0)
@@ -134,7 +151,16 @@ export function useAdminData(isAdmin: boolean): AdminData {
         .select('id, event_name, user_id, metadata, created_at')
         .order('created_at', { ascending: false })
         .limit(5000),
-    ]).then(([statsRes, usersRes, restRes, ambRes, payRes, demandRes, eventsRes]) => {
+      supabase.from('reports')
+        .select(`
+          id, table_id, reporter_id, reported_id, category, details, status, admin_notes, created_at,
+          dining_tables(restaurant_name),
+          reporter:profiles!reports_reporter_id_fkey(display_name),
+          reported:profiles!reports_reported_id_fkey(display_name)
+        `)
+        .order('created_at', { ascending: false })
+        .limit(200),
+    ]).then(([statsRes, usersRes, restRes, ambRes, payRes, demandRes, eventsRes, reportsRes]) => {
       if (statsRes.error) setError(statsRes.error.message)
       else setStats({ ...EMPTY_STATS, ...(statsRes.data as AdminStats) })
 
@@ -182,9 +208,25 @@ export function useAdminData(isAdmin: boolean): AdminData {
       })))
 
       setAnalyticsEvents((eventsRes.data as AdminAnalyticsEvent[]) ?? [])
+
+      setReports(((reportsRes.data ?? []) as any[]).map(r => ({
+        id: r.id,
+        table_id: r.table_id,
+        restaurant_name: r.dining_tables?.restaurant_name ?? null,
+        reporter_id: r.reporter_id,
+        reporter_name: r.reporter?.display_name ?? null,
+        reported_id: r.reported_id,
+        reported_name: r.reported?.display_name ?? null,
+        category: r.category,
+        details: r.details,
+        status: r.status,
+        admin_notes: r.admin_notes,
+        created_at: r.created_at,
+      })))
+
       setLoading(false)
     })
   }, [isAdmin, tick])
 
-  return { stats, users, restaurants, ambassadors, payments, demandRequests, analyticsEvents, loading, error, refresh: () => setTick(t => t + 1) }
+  return { stats, users, restaurants, ambassadors, payments, demandRequests, analyticsEvents, reports, loading, error, refresh: () => setTick(t => t + 1) }
 }

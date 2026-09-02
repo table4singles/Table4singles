@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { ArrowLeft, Check, Loader2, Users, MapPin, CalendarDays, CalendarRange } from 'lucide-react'
+import { ArrowLeft, Check, Loader2, Users, MapPin, CalendarDays, CalendarRange, Sparkles } from 'lucide-react'
 import { Navbar } from '@/components/Navbar'
 import { PageHeader } from '@/components/PageHeader'
 import { ErrorBanner } from '@/components/ErrorBanner'
@@ -23,13 +23,17 @@ export function CreateTablePage({ onNavigate, onAuthClick }: CreateTablePageProp
   const [maxSeats, setMaxSeats] = useState(6)
   const [zone, setZone] = useState('salon')
   const [customZone, setCustomZone] = useState('')
+  const [isSpecial, setIsSpecial] = useState(false)
+  const [guestName, setGuestName] = useState('')
+  const [guestBio, setGuestBio] = useState('')
+  const [guestPhotoUrl, setGuestPhotoUrl] = useState('')
   const [loading, setLoading] = useState(false)
   const [success, setSuccess] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
   const locationLabel = zone === 'custom' ? customZone : t(`createTable.zone.${zone}`)
 
-  const canSubmit = availableFrom && maxSeats >= 2 && (zone !== 'custom' || customZone.trim().length > 0)
+  const canSubmit = availableFrom && maxSeats >= 2 && (zone !== 'custom' || customZone.trim().length > 0) && (!isSpecial || guestName.trim().length > 0)
 
   const handleSubmit = async () => {
     if (!user || !profile) return
@@ -53,6 +57,10 @@ export function CreateTablePage({ onNavigate, onAuthClick }: CreateTablePageProp
       description: locationLabel,
       cuisine_type: profile.restaurant_cuisine ?? null,
       languages: null,
+      is_special: isSpecial,
+      special_guest_name: isSpecial ? guestName.trim() : null,
+      special_guest_bio: isSpecial ? guestBio.trim() || null : null,
+      special_guest_photo_url: isSpecial ? guestPhotoUrl.trim() || null : null,
     })
 
     setLoading(false)
@@ -67,6 +75,10 @@ export function CreateTablePage({ onNavigate, onAuthClick }: CreateTablePageProp
     setMaxSeats(6)
     setZone('salon')
     setCustomZone('')
+    setIsSpecial(false)
+    setGuestName('')
+    setGuestBio('')
+    setGuestPhotoUrl('')
     setError(null)
   }
 
@@ -200,6 +212,52 @@ export function CreateTablePage({ onNavigate, onAuthClick }: CreateTablePageProp
                 onChange={e => setCustomZone(e.target.value)}
                 className="mt-2 w-full px-4 py-2.5 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 dark:text-white rounded-xl text-sm focus:ring-2 focus:ring-[#129a93] outline-none"
               />
+            )}
+          </div>
+
+          {/* Invitado especial */}
+          <div>
+            <button
+              type="button"
+              onClick={() => setIsSpecial(v => !v)}
+              className={`w-full flex items-center gap-3 py-3 px-4 rounded-xl border text-left transition-colors ${
+                isSpecial ? 'border-[#129a93] bg-[#129a93]/5' : 'border-gray-200 dark:border-gray-600 hover:border-[#129a93]/50'
+              }`}
+            >
+              <Sparkles className={`w-4 h-4 flex-shrink-0 ${isSpecial ? 'text-[#129a93]' : 'text-gray-400'}`} />
+              <span className="flex-1">
+                <span className={`block text-sm font-medium ${isSpecial ? 'text-[#129a93]' : 'text-gray-700 dark:text-gray-200'}`}>{t('specialGuest.toggleLabel')}</span>
+                <span className="block text-xs text-gray-400 dark:text-gray-500 mt-0.5">{t('specialGuest.toggleHint')}</span>
+              </span>
+              <span className={`w-10 h-6 rounded-full flex-shrink-0 relative transition-colors ${isSpecial ? 'bg-[#129a93]' : 'bg-gray-200 dark:bg-gray-600'}`}>
+                <span className={`absolute top-0.5 w-5 h-5 rounded-full bg-white transition-all ${isSpecial ? 'left-[18px]' : 'left-0.5'}`} />
+              </span>
+            </button>
+
+            {isSpecial && (
+              <div className="mt-3 space-y-3 pl-1">
+                <input
+                  type="text"
+                  value={guestName}
+                  onChange={e => setGuestName(e.target.value)}
+                  placeholder={t('specialGuest.namePlaceholder')}
+                  className="w-full px-4 py-2.5 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 dark:text-white rounded-xl text-sm focus:ring-2 focus:ring-[#129a93] outline-none"
+                />
+                <textarea
+                  value={guestBio}
+                  onChange={e => setGuestBio(e.target.value)}
+                  rows={2}
+                  placeholder={t('specialGuest.bioPlaceholder')}
+                  className="w-full px-4 py-2.5 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 dark:text-white rounded-xl text-sm focus:ring-2 focus:ring-[#129a93] outline-none resize-none"
+                />
+                <input
+                  type="url"
+                  value={guestPhotoUrl}
+                  onChange={e => setGuestPhotoUrl(e.target.value)}
+                  placeholder={t('specialGuest.photoPlaceholder')}
+                  className="w-full px-4 py-2.5 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 dark:text-white rounded-xl text-sm focus:ring-2 focus:ring-[#129a93] outline-none"
+                />
+              </div>
             )}
           </div>
 

@@ -72,6 +72,10 @@ export interface DiningTable {
   is_active: boolean
   available_until: string | null
   created_at: string
+  is_special: boolean
+  special_guest_name: string | null
+  special_guest_bio: string | null
+  special_guest_photo_url: string | null
 }
 
 export interface TableParticipant {

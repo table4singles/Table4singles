@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Search, SlidersHorizontal, BellRing, Store } from 'lucide-react'
+import { Search, SlidersHorizontal, BellRing, Store, Sparkles } from 'lucide-react'
 import { Navbar } from '@/components/Navbar'
 import { PageHeader } from '@/components/PageHeader'
 import { ActivitySummaryCard } from '@/components/ActivitySummaryCard'
@@ -30,6 +30,7 @@ export function BrowsePage({ onNavigate, onAuthClick }: BrowsePageProps) {
   }
 
   const { tables, loading, error } = useTables({ search, cuisine: cuisines, dateFilter, withParticipants: true })
+  const specialTables = tables.filter(tb => tb.is_special)
 
   const hasFilters = search || cuisines.length > 0 || !!dateFilter
 
@@ -59,6 +60,29 @@ export function BrowsePage({ onNavigate, onAuthClick }: BrowsePageProps) {
             </button>
           }
         />
+
+        {/* Cenas especiales */}
+        {!hasFilters && specialTables.length > 0 && (
+          <div className="mb-6">
+            <div className="flex items-center gap-1.5 mb-3">
+              <Sparkles className="w-4 h-4 text-[#129a93]" />
+              <h2 className="font-display font-bold text-gray-900 dark:text-white">{t('specialGuest.sectionTitle')}</h2>
+              <span className="text-sm text-gray-400 dark:text-gray-500">— {t('specialGuest.sectionSubtitle')}</span>
+            </div>
+            <div className="flex gap-4 overflow-x-auto pb-2 -mx-4 px-4 sm:mx-0 sm:px-0 sm:grid sm:grid-cols-2 lg:grid-cols-3 sm:overflow-visible">
+              {specialTables.map(table => (
+                <div key={table.id} className="w-72 flex-shrink-0 sm:w-auto">
+                  <TableCard
+                    table={table}
+                    participants={table.table_participants}
+                    showRestaurant
+                    onClick={() => onNavigate('table-detail', table.id)}
+                  />
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
 
         {/* Quick date filters */}
         <div className="flex flex-wrap gap-2 mb-4">

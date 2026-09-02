@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
-import { ArrowLeft, MapPin, Clock, Users, Calendar, Loader2, MessageSquare, Star, Download, UserPlus, XCircle, PartyPopper, Check, Mail, Pencil, Save, UserMinus, BellRing } from 'lucide-react'
+import { ArrowLeft, MapPin, Clock, Users, Calendar, Loader2, MessageSquare, Star, Download, UserPlus, XCircle, PartyPopper, Check, Mail, Pencil, Save, UserMinus, BellRing, Sparkles } from 'lucide-react'
 import { Navbar } from '@/components/Navbar'
 import { ShareButton } from '@/components/ShareButton'
 import { StarRating } from '@/components/StarRating'
@@ -62,6 +62,10 @@ export function TableDetailPage({ tableId, paymentSuccess, paymentCancelled, onN
   const [editTime, setEditTime] = useState('')
   const [editMaxSeats, setEditMaxSeats] = useState(0)
   const [editZone, setEditZone] = useState('')
+  const [editIsSpecial, setEditIsSpecial] = useState(false)
+  const [editGuestName, setEditGuestName] = useState('')
+  const [editGuestBio, setEditGuestBio] = useState('')
+  const [editGuestPhotoUrl, setEditGuestPhotoUrl] = useState('')
   const [editSaving, setEditSaving] = useState(false)
   const [editError, setEditError] = useState<string | null>(null)
   const [removingParticipantId, setRemovingParticipantId] = useState<string | null>(null)
@@ -201,6 +205,10 @@ export function TableDetailPage({ tableId, paymentSuccess, paymentCancelled, onN
     setEditTime(table.time ? table.time.slice(0, 5) : '')
     setEditMaxSeats(table.max_seats)
     setEditZone(table.description || '')
+    setEditIsSpecial(table.is_special)
+    setEditGuestName(table.special_guest_name || '')
+    setEditGuestBio(table.special_guest_bio || '')
+    setEditGuestPhotoUrl(table.special_guest_photo_url || '')
     setEditError(null)
     setShowEdit(true)
   }
@@ -209,7 +217,7 @@ export function TableDetailPage({ tableId, paymentSuccess, paymentCancelled, onN
     if (!table) return
     const occupied = table.max_seats - table.available_seats
     if (editMaxSeats < occupied) {
-      setEditError(`Ya hay ${occupied} comensales apuntados. El máximo no puede ser menor.`)
+      setEditError(t('tableDetail.editMaxSeatsError').replace('{count}', String(occupied)))
       return
     }
     setEditSaving(true)
@@ -222,6 +230,10 @@ export function TableDetailPage({ tableId, paymentSuccess, paymentCancelled, onN
         max_seats: editMaxSeats,
         available_seats: editMaxSeats - occupied,
         description: editZone || null,
+        is_special: editIsSpecial,
+        special_guest_name: editIsSpecial ? editGuestName.trim() || null : null,
+        special_guest_bio: editIsSpecial ? editGuestBio.trim() || null : null,
+        special_guest_photo_url: editIsSpecial ? editGuestPhotoUrl.trim() || null : null,
       })
       .eq('id', table.id)
     if (err) {
@@ -372,6 +384,25 @@ export function TableDetailPage({ tableId, paymentSuccess, paymentCancelled, onN
               )}
             </div>
 
+            {/* Invitado especial */}
+            {table.is_special && (
+              <div className="bg-gradient-to-br from-[#129a93]/10 to-gold-400/10 dark:from-[#129a93]/20 dark:to-gold-400/10 rounded-2xl border border-[#129a93]/20 p-6">
+                <div className="flex items-center gap-1.5 mb-3 text-[#129a93]">
+                  <Sparkles className="w-4 h-4" />
+                  <span className="text-xs font-bold uppercase tracking-wide">{t('specialGuest.detailTitle')}</span>
+                </div>
+                <div className="flex items-start gap-4">
+                  {table.special_guest_photo_url && (
+                    <img src={table.special_guest_photo_url} alt={table.special_guest_name ?? ''} className="w-16 h-16 rounded-full object-cover flex-shrink-0 border-2 border-white dark:border-gray-800 shadow-sm" />
+                  )}
+                  <div className="min-w-0">
+                    {table.special_guest_name && <p className="font-display font-bold text-lg text-gray-900 dark:text-white">{table.special_guest_name}</p>}
+                    {table.special_guest_bio && <p className="text-sm text-gray-600 dark:text-gray-300 mt-1 leading-relaxed">{table.special_guest_bio}</p>}
+                  </div>
+                </div>
+              </div>
+            )}
+
             {/* Participants */}
             <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 p-6">
               <h3 className="font-semibold text-gray-900 dark:text-white mb-3">{t('card.confirmedDiners')}</h3>
@@ -382,7 +413,7 @@ export function TableDetailPage({ tableId, paymentSuccess, paymentCancelled, onN
                   {hostProfile && (
                     <ParticipantCard
                       profile={hostProfile}
-                      badge={<span className="text-xs px-2 py-1 rounded-full flex-shrink-0 bg-primary-50 text-primary-600">Anfitrión</span>}
+                      badge={<span className="text-xs px-2 py-1 rounded-full flex-shrink-0 bg-primary-50 text-primary-600">{t('tableDetail.hostLabel')}</span>}
                     />
                   )}
                   {participants.map(p => p.profiles && (
@@ -661,19 +692,19 @@ export function TableDetailPage({ tableId, paymentSuccess, paymentCancelled, onN
         {/* Edit table modal */}
         {showEdit && (
           <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4" onClick={() => setShowEdit(false)}>
-            <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl w-full max-w-md p-6" onClick={e => e.stopPropagation()}>
-              <h3 className="text-lg font-display font-bold text-gray-900 dark:text-white mb-5">Editar mesa</h3>
+            <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl w-full max-w-md p-6 max-h-[85vh] overflow-y-auto" onClick={e => e.stopPropagation()}>
+              <h3 className="text-lg font-display font-bold text-gray-900 dark:text-white mb-5">{t('tableDetail.editTitle')}</h3>
               <div className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1.5">Fecha</label>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1.5">{t('tableDetail.date')}</label>
                   <input type="date" value={editDate} onChange={e => setEditDate(e.target.value)} className="w-full px-4 py-2.5 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 dark:text-white rounded-xl text-sm focus:ring-2 focus:ring-[#129a93] outline-none" />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1.5">Hora</label>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1.5">{t('tableDetail.time')}</label>
                   <input type="time" value={editTime} onChange={e => setEditTime(e.target.value)} className="w-full px-4 py-2.5 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 dark:text-white rounded-xl text-sm focus:ring-2 focus:ring-[#129a93] outline-none" />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1.5">Máximo de comensales</label>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1.5">{t('tableDetail.editMaxSeatsLabel')}</label>
                   <div className="flex items-center gap-3">
                     <button type="button" onClick={() => setEditMaxSeats(v => Math.max(1, v - 1))} className="w-10 h-10 rounded-xl border border-gray-300 dark:border-gray-600 flex items-center justify-center text-lg font-medium hover:bg-gray-50 dark:hover:bg-gray-700">−</button>
                     <span className="text-xl font-bold text-gray-900 dark:text-white w-8 text-center">{editMaxSeats}</span>
@@ -681,20 +712,65 @@ export function TableDetailPage({ tableId, paymentSuccess, paymentCancelled, onN
                   </div>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1.5">Zona</label>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1.5">{t('tableDetail.editZoneLabel')}</label>
                   <div className="flex flex-wrap gap-2">
-                    {['Salón', 'Salón VIP', 'Terraza'].map(z => (
-                      <button key={z} type="button" onClick={() => setEditZone(z)} className={`px-3 py-1.5 rounded-full text-sm font-medium transition-colors ${editZone === z ? 'bg-[#129a93] text-white' : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200'}`}>{z}</button>
-                    ))}
+                    {(['salon', 'vip', 'terraza'] as const).map(z => {
+                      const label = t(`createTable.zone.${z}`)
+                      return (
+                        <button key={z} type="button" onClick={() => setEditZone(label)} className={`px-3 py-1.5 rounded-full text-sm font-medium transition-colors ${editZone === label ? 'bg-[#129a93] text-white' : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200'}`}>{label}</button>
+                      )
+                    })}
                   </div>
-                  <input value={editZone} onChange={e => setEditZone(e.target.value)} placeholder="O escribe una zona específica..." className="mt-2 w-full px-4 py-2.5 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 dark:text-white rounded-xl text-sm focus:ring-2 focus:ring-[#129a93] outline-none" />
+                  <input value={editZone} onChange={e => setEditZone(e.target.value)} placeholder={t('tableDetail.editZonePlaceholder')} className="mt-2 w-full px-4 py-2.5 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 dark:text-white rounded-xl text-sm focus:ring-2 focus:ring-[#129a93] outline-none" />
                 </div>
+
+                {/* Invitado especial */}
+                <div>
+                  <button
+                    type="button"
+                    onClick={() => setEditIsSpecial(v => !v)}
+                    className={`w-full flex items-center gap-3 py-3 px-4 rounded-xl border text-left transition-colors ${
+                      editIsSpecial ? 'border-[#129a93] bg-[#129a93]/5' : 'border-gray-200 dark:border-gray-600 hover:border-[#129a93]/50'
+                    }`}
+                  >
+                    <span className={`flex-1 text-sm font-medium ${editIsSpecial ? 'text-[#129a93]' : 'text-gray-700 dark:text-gray-200'}`}>{t('specialGuest.toggleLabel')}</span>
+                    <span className={`w-10 h-6 rounded-full flex-shrink-0 relative transition-colors ${editIsSpecial ? 'bg-[#129a93]' : 'bg-gray-200 dark:bg-gray-600'}`}>
+                      <span className={`absolute top-0.5 w-5 h-5 rounded-full bg-white transition-all ${editIsSpecial ? 'left-[18px]' : 'left-0.5'}`} />
+                    </span>
+                  </button>
+                  {editIsSpecial && (
+                    <div className="mt-3 space-y-3">
+                      <input
+                        type="text"
+                        value={editGuestName}
+                        onChange={e => setEditGuestName(e.target.value)}
+                        placeholder={t('specialGuest.namePlaceholder')}
+                        className="w-full px-4 py-2.5 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 dark:text-white rounded-xl text-sm focus:ring-2 focus:ring-[#129a93] outline-none"
+                      />
+                      <textarea
+                        value={editGuestBio}
+                        onChange={e => setEditGuestBio(e.target.value)}
+                        rows={2}
+                        placeholder={t('specialGuest.bioPlaceholder')}
+                        className="w-full px-4 py-2.5 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 dark:text-white rounded-xl text-sm focus:ring-2 focus:ring-[#129a93] outline-none resize-none"
+                      />
+                      <input
+                        type="url"
+                        value={editGuestPhotoUrl}
+                        onChange={e => setEditGuestPhotoUrl(e.target.value)}
+                        placeholder={t('specialGuest.photoPlaceholder')}
+                        className="w-full px-4 py-2.5 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 dark:text-white rounded-xl text-sm focus:ring-2 focus:ring-[#129a93] outline-none"
+                      />
+                    </div>
+                  )}
+                </div>
+
                 {editError && <p className="text-sm text-red-600 bg-red-50 px-3 py-2 rounded-lg">{editError}</p>}
               </div>
               <div className="flex gap-3 mt-6">
-                <button onClick={() => setShowEdit(false)} className="flex-1 py-2.5 border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-200 rounded-xl text-sm font-medium hover:bg-gray-50 dark:hover:bg-gray-700">Cancelar</button>
+                <button onClick={() => setShowEdit(false)} className="flex-1 py-2.5 border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-200 rounded-xl text-sm font-medium hover:bg-gray-50 dark:hover:bg-gray-700">{t('common.cancel')}</button>
                 <button onClick={handleSaveEdit} disabled={editSaving} className="flex-1 py-2.5 bg-[#129a93] text-white rounded-xl text-sm font-semibold hover:bg-[#0b7f79] disabled:opacity-50 flex items-center justify-center gap-2">
-                  {editSaving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />} Guardar
+                  {editSaving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />} {t('common.save')}
                 </button>
               </div>
             </div>

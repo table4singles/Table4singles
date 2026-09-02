@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { ChevronDown, Clock, Users, HandHeart, CreditCard } from 'lucide-react'
+import { ChevronDown, Clock, Users, HandHeart, CreditCard, Sparkles } from 'lucide-react'
 import type { AgendaTable } from '@/hooks/useRestaurantAgenda'
 import { ParticipantCard } from './ParticipantCard'
 
@@ -42,6 +42,7 @@ export function AgendaTableCard({ table, onNavigate, t }: AgendaTableCardProps) 
             <span className="flex items-center gap-1 text-gray-500 dark:text-gray-400 font-normal">
               <Users className="w-3.5 h-3.5" />{occupied}/{table.max_seats} {t('agenda.seats')}
             </span>
+            {table.is_special && <Sparkles className="w-3.5 h-3.5 text-[#129a93] flex-shrink-0" />}
           </div>
           {table.description && (
             <p className="text-xs text-gray-400 dark:text-gray-500 mt-1 truncate">{table.description}</p>

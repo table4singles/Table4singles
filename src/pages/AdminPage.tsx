@@ -2,7 +2,7 @@ import { useState, useMemo } from 'react'
 import {
   Users, UtensilsCrossed, Award, CreditCard, Loader2, RefreshCw,
   TrendingUp, Euro, CheckCircle, ShieldAlert, BellRing, Eye, MousePointerClick,
-  UserPlus, Filter, QrCode,
+  UserPlus, Filter, QrCode, Sparkles, Search, Check,
 } from 'lucide-react'
 import {
   BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid,
@@ -10,14 +10,16 @@ import {
 import { Navbar } from '@/components/Navbar'
 import { useAuth } from '@/contexts/AuthContext'
 import { useLanguage } from '@/contexts/LanguageContext'
-import { useAdminData, type AdminAnalyticsEvent } from '@/hooks/useAdminData'
+import { useAdminData, type AdminAnalyticsEvent, type AdminRestaurant } from '@/hooks/useAdminData'
+import { supabase } from '@/lib/supabase'
+import type { DiningTable } from '@/types/database'
 
 interface AdminPageProps {
   onNavigate: (page: string, id?: string) => void
   onAuthClick: (mode?: 'signin' | 'signup') => void
 }
 
-type Tab = 'resumen' | 'usuarios' | 'restaurantes' | 'embajadores' | 'movimientos' | 'demanda' | 'funnel'
+type Tab = 'resumen' | 'usuarios' | 'restaurantes' | 'embajadores' | 'movimientos' | 'demanda' | 'funnel' | 'especiales'
 
 const DAY_KEYS = ['demand.dayMon', 'demand.dayTue', 'demand.dayWed', 'demand.dayThu', 'demand.dayFri', 'demand.daySat', 'demand.daySun']
 
@@ -72,6 +74,7 @@ export function AdminPage({ onNavigate, onAuthClick }: AdminPageProps) {
     { id: 'movimientos',  label: t('admin.tabMovimientos').replace('{count}', String(payments.length)),                                icon: <CreditCard className="w-4 h-4" /> },
     { id: 'demanda',      label: t('admin.tabDemanda').replace('{count}', String(demandRequests.filter(d => d.status === 'active').length)), icon: <BellRing className="w-4 h-4" /> },
     { id: 'funnel',       label: t('admin.tabFunnel'),                                                                                   icon: <Filter className="w-4 h-4" /> },
+    { id: 'especiales',   label: t('specialGuest.adminTabLabel'),                                                                        icon: <Sparkles className="w-4 h-4" /> },
   ]
 
   return (
@@ -109,6 +112,7 @@ export function AdminPage({ onNavigate, onAuthClick }: AdminPageProps) {
             {tab === 'movimientos'  && <TabMovimientos payments={payments} t={t} dateLocale={dateLocale} />}
             {tab === 'demanda'      && <TabDemanda requests={demandRequests} t={t} dateLocale={dateLocale} />}
             {tab === 'funnel'       && <TabFunnel events={analyticsEvents} t={t} language={language} />}
+            {tab === 'especiales'   && <TabEspeciales restaurants={restaurants} t={t} dateLocale={dateLocale} />}
           </>
         )}
       </main>
@@ -448,6 +452,161 @@ function FunnelBar({ label, value, max, color, suffix }: { label: string; value:
       <div className="h-2.5 bg-gray-100 dark:bg-gray-700 rounded-full overflow-hidden">
         <div className={`h-full ${color} rounded-full transition-all`} style={{ width: `${width}%` }} />
       </div>
+    </div>
+  )
+}
+
+function TabEspeciales({ restaurants, t, dateLocale }: { restaurants: AdminRestaurant[]; t: (key: string) => string; dateLocale: string }) {
+  const [search, setSearch] = useState('')
+  const [selectedRestaurant, setSelectedRestaurant] = useState<AdminRestaurant | null>(null)
+  const [tables, setTables] = useState<DiningTable[]>([])
+  const [loadingTables, setLoadingTables] = useState(false)
+  const [selectedTableId, setSelectedTableId] = useState<string | null>(null)
+  const [guestName, setGuestName] = useState('')
+  const [guestBio, setGuestBio] = useState('')
+  const [guestPhotoUrl, setGuestPhotoUrl] = useState('')
+  const [saving, setSaving] = useState(false)
+  const [saved, setSaved] = useState(false)
+
+  const filteredRestaurants = search.trim()
+    ? restaurants.filter(r => (r.restaurant_name ?? '').toLowerCase().includes(search.toLowerCase()))
+    : restaurants
+
+  const pickRestaurant = async (r: AdminRestaurant) => {
+    setSelectedRestaurant(r)
+    setSelectedTableId(null)
+    setSaved(false)
+    setLoadingTables(true)
+    const today = new Date().toISOString().slice(0, 10)
+    const { data } = await supabase
+      .from('dining_tables')
+      .select('*')
+      .eq('host_id', r.restaurant_id)
+      .eq('status', 'open')
+      .gte('date', today)
+      .order('date', { ascending: true })
+    setTables((data as DiningTable[]) ?? [])
+    setLoadingTables(false)
+  }
+
+  const pickTable = (tb: DiningTable) => {
+    setSelectedTableId(tb.id)
+    setGuestName(tb.special_guest_name ?? '')
+    setGuestBio(tb.special_guest_bio ?? '')
+    setGuestPhotoUrl(tb.special_guest_photo_url ?? '')
+    setSaved(false)
+  }
+
+  const handleSave = async () => {
+    if (!selectedTableId || !guestName.trim()) return
+    setSaving(true)
+    const { error } = await supabase
+      .from('dining_tables')
+      .update({
+        is_special: true,
+        special_guest_name: guestName.trim(),
+        special_guest_bio: guestBio.trim() || null,
+        special_guest_photo_url: guestPhotoUrl.trim() || null,
+      })
+      .eq('id', selectedTableId)
+    setSaving(false)
+    if (!error) {
+      setSaved(true)
+      setTables(prev => prev.map(tb => tb.id === selectedTableId
+        ? { ...tb, is_special: true, special_guest_name: guestName.trim(), special_guest_bio: guestBio.trim() || null, special_guest_photo_url: guestPhotoUrl.trim() || null }
+        : tb))
+    }
+  }
+
+  return (
+    <div className="space-y-4">
+      <p className="text-sm text-gray-500 dark:text-gray-400">{t('specialGuest.adminIntro')}</p>
+
+      <div className="grid md:grid-cols-2 gap-4">
+        {/* Restaurant picker */}
+        <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-gray-700 p-4">
+          <p className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-2">{t('specialGuest.adminPickRestaurant')}</p>
+          <div className="relative mb-3">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+            <input
+              value={search}
+              onChange={e => setSearch(e.target.value)}
+              placeholder={t('specialGuest.adminSearchPlaceholder')}
+              className="w-full pl-9 pr-3 py-2 border border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-900 dark:text-white rounded-lg text-sm focus:ring-2 focus:ring-[#129a93] outline-none"
+            />
+          </div>
+          <div className="max-h-80 overflow-y-auto space-y-1">
+            {filteredRestaurants.map(r => (
+              <button
+                key={r.restaurant_id}
+                onClick={() => pickRestaurant(r)}
+                className={`w-full text-left px-3 py-2 rounded-lg text-sm transition-colors ${selectedRestaurant?.restaurant_id === r.restaurant_id ? 'bg-[#129a93] text-white' : 'hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-200'}`}
+              >
+                {r.restaurant_name || '—'}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Table picker */}
+        <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-gray-700 p-4">
+          <p className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-2">{t('specialGuest.adminPickTable')}</p>
+          {!selectedRestaurant ? (
+            <p className="text-sm text-gray-400 dark:text-gray-500 py-8 text-center">{t('specialGuest.adminPickRestaurant')}</p>
+          ) : loadingTables ? (
+            <div className="flex justify-center py-8"><Loader2 className="w-5 h-5 text-[#129a93] animate-spin" /></div>
+          ) : tables.length === 0 ? (
+            <p className="text-sm text-gray-400 dark:text-gray-500 py-8 text-center">{t('specialGuest.adminNoTables')}</p>
+          ) : (
+            <div className="max-h-80 overflow-y-auto space-y-1">
+              {tables.map(tb => (
+                <button
+                  key={tb.id}
+                  onClick={() => pickTable(tb)}
+                  className={`w-full text-left px-3 py-2 rounded-lg text-sm flex items-center justify-between gap-2 transition-colors ${selectedTableId === tb.id ? 'bg-[#129a93] text-white' : 'hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-200'}`}
+                >
+                  <span>{new Date(tb.date).toLocaleDateString(dateLocale, { day: 'numeric', month: 'short' })} {tb.time?.slice(0, 5) ?? ''}</span>
+                  {tb.is_special && <Sparkles className={`w-3.5 h-3.5 flex-shrink-0 ${selectedTableId === tb.id ? 'text-white' : 'text-[#129a93]'}`} />}
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Guest form */}
+      {selectedTableId && (
+        <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-gray-700 p-5 space-y-3">
+          <input
+            value={guestName}
+            onChange={e => setGuestName(e.target.value)}
+            placeholder={t('specialGuest.namePlaceholder')}
+            className="w-full px-4 py-2.5 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 dark:text-white rounded-xl text-sm focus:ring-2 focus:ring-[#129a93] outline-none"
+          />
+          <textarea
+            value={guestBio}
+            onChange={e => setGuestBio(e.target.value)}
+            rows={2}
+            placeholder={t('specialGuest.bioPlaceholder')}
+            className="w-full px-4 py-2.5 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 dark:text-white rounded-xl text-sm focus:ring-2 focus:ring-[#129a93] outline-none resize-none"
+          />
+          <input
+            type="url"
+            value={guestPhotoUrl}
+            onChange={e => setGuestPhotoUrl(e.target.value)}
+            placeholder={t('specialGuest.photoPlaceholder')}
+            className="w-full px-4 py-2.5 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 dark:text-white rounded-xl text-sm focus:ring-2 focus:ring-[#129a93] outline-none"
+          />
+          <button
+            onClick={handleSave}
+            disabled={saving || !guestName.trim()}
+            className="flex items-center gap-2 px-5 py-2.5 bg-[#129a93] text-white text-sm font-semibold rounded-xl hover:bg-[#0b7f79] disabled:opacity-40 transition-colors"
+          >
+            {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : saved ? <Check className="w-4 h-4" /> : <Sparkles className="w-4 h-4" />}
+            {saved ? t('specialGuest.adminSaved') : t('specialGuest.adminSave')}
+          </button>
+        </div>
+      )}
     </div>
   )
 }

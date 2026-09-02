@@ -1,4 +1,4 @@
-import { Users } from 'lucide-react'
+import { Users, Sparkles } from 'lucide-react'
 import { useState } from 'react'
 import type { DiningTable } from '@/types/database'
 import type { TableParticipantBasic } from '@/hooks/useRestaurants'
@@ -66,6 +66,14 @@ export function TableCard({ table, participants, onClick, showRestaurant }: Tabl
         )}
         <div className="flex items-start justify-between gap-3 px-5 py-4">
           <div className="flex-1 min-w-0">
+            {table.is_special && (
+              <div className="inline-flex items-center gap-1 mb-2 px-2 py-0.5 rounded-full bg-gradient-to-r from-[#129a93]/15 to-gold-400/15 text-[#129a93] dark:text-[#3abfb7]">
+                <Sparkles className="w-3 h-3 flex-shrink-0" />
+                <span className="text-[11px] font-bold uppercase tracking-wide truncate">
+                  {table.special_guest_name || t('specialGuest.badge')}
+                </span>
+              </div>
+            )}
             {/* Time + date */}
             <div className="flex items-center gap-2 mb-2">
               {formattedTime && (

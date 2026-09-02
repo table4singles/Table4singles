@@ -64,6 +64,7 @@ export function useTables(options: UseTablesOptions = {}) {
       .eq('status', options.status || 'open')
       .eq('is_active', true)
       .gt('available_seats', 0)
+      .gte('date', toDateStr(new Date()))
       .order('date', { ascending: true })
 
     if (options.city) query = query.eq('restaurant_city', options.city)

@@ -2,13 +2,14 @@ import { ArrowLeft } from 'lucide-react'
 
 interface Props {
   onNavigate: (page: string) => void
+  returnTo?: string
 }
 
-export function AvisoLegalPage({ onNavigate }: Props) {
+export function AvisoLegalPage({ onNavigate, returnTo = 'landing' }: Props) {
   return (
     <div className="min-h-screen bg-white dark:bg-gray-900">
       <div className="max-w-3xl mx-auto px-4 py-8">
-        <button onClick={() => onNavigate('landing')} className="flex items-center gap-2 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 mb-6 text-sm">
+        <button onClick={() => onNavigate(returnTo)} className="flex items-center gap-2 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 mb-6 text-sm">
           <ArrowLeft className="w-4 h-4" /> Volver
         </button>
         <h1 className="text-3xl font-display font-bold text-gray-900 dark:text-white border-b-2 border-primary-500 pb-3 mb-6">Aviso Legal</h1>

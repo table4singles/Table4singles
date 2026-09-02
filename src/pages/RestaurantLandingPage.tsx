@@ -183,8 +183,13 @@ export function RestaurantLandingPage({ onNavigate, onAuthClick }: RestaurantLan
 
       {/* Footer */}
       <footer className="py-8 bg-black">
-        <div className="max-w-5xl mx-auto px-4 text-center">
-          <p className="text-gray-500 text-sm">
+        <div className="max-w-5xl mx-auto px-4">
+          <div className="flex items-center justify-center gap-4 text-sm text-gray-500 mb-4">
+            <button onClick={() => onNavigate('aviso-legal', 'restaurant-landing')} className="hover:text-gold-400 transition-colors">{t('landing.footer.legal')}</button>
+            <span className="text-gray-700">|</span>
+            <button onClick={() => onNavigate('politica-privacidad', 'restaurant-landing')} className="hover:text-gold-400 transition-colors">{t('landing.footer.privacy')}</button>
+          </div>
+          <p className="text-gray-500 text-sm text-center">
             {t('restaurantLanding.footer.hasAccount')}{' '}
             <button onClick={() => onAuthClick('signin')} className="text-gold-400 font-medium hover:underline">{t('restaurantLanding.footer.signIn')}</button>
           </p>

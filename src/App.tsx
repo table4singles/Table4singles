@@ -227,9 +227,9 @@ function AppRouter() {
       case 'flyer':
         return selectedId ? <FlyerPage restaurantId={selectedId} /> : null
       case 'politica-privacidad':
-        return <PrivacyPolicyPage onNavigate={navigate} />
+        return <PrivacyPolicyPage onNavigate={navigate} returnTo={selectedId ?? 'landing'} />
       case 'aviso-legal':
-        return <AvisoLegalPage onNavigate={navigate} />
+        return <AvisoLegalPage onNavigate={navigate} returnTo={selectedId ?? 'landing'} />
       case 'ambassador':
         return <AmbassadorPage onNavigate={navigate} onAuthClick={openAuth} />
       case 'subscription':

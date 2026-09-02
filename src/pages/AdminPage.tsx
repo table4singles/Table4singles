@@ -465,6 +465,7 @@ function TabEspeciales({ restaurants, t, dateLocale }: { restaurants: AdminResta
   const [guestName, setGuestName] = useState('')
   const [guestBio, setGuestBio] = useState('')
   const [guestPhotoUrl, setGuestPhotoUrl] = useState('')
+  const [guestPrice, setGuestPrice] = useState('2')
   const [saving, setSaving] = useState(false)
   const [saved, setSaved] = useState(false)
 
@@ -494,12 +495,14 @@ function TabEspeciales({ restaurants, t, dateLocale }: { restaurants: AdminResta
     setGuestName(tb.special_guest_name ?? '')
     setGuestBio(tb.special_guest_bio ?? '')
     setGuestPhotoUrl(tb.special_guest_photo_url ?? '')
+    setGuestPrice(tb.is_special && tb.deposit_amount ? String(tb.deposit_amount) : '2')
     setSaved(false)
   }
 
   const handleSave = async () => {
-    if (!selectedTableId || !guestName.trim()) return
+    if (!selectedTableId || !guestName.trim() || !(Number(guestPrice) > 0)) return
     setSaving(true)
+    const price = Number(guestPrice)
     const { error } = await supabase
       .from('dining_tables')
       .update({
@@ -507,13 +510,14 @@ function TabEspeciales({ restaurants, t, dateLocale }: { restaurants: AdminResta
         special_guest_name: guestName.trim(),
         special_guest_bio: guestBio.trim() || null,
         special_guest_photo_url: guestPhotoUrl.trim() || null,
+        deposit_amount: price,
       })
       .eq('id', selectedTableId)
     setSaving(false)
     if (!error) {
       setSaved(true)
       setTables(prev => prev.map(tb => tb.id === selectedTableId
-        ? { ...tb, is_special: true, special_guest_name: guestName.trim(), special_guest_bio: guestBio.trim() || null, special_guest_photo_url: guestPhotoUrl.trim() || null }
+        ? { ...tb, is_special: true, special_guest_name: guestName.trim(), special_guest_bio: guestBio.trim() || null, special_guest_photo_url: guestPhotoUrl.trim() || null, deposit_amount: price }
         : tb))
     }
   }
@@ -597,9 +601,21 @@ function TabEspeciales({ restaurants, t, dateLocale }: { restaurants: AdminResta
             placeholder={t('specialGuest.photoPlaceholder')}
             className="w-full px-4 py-2.5 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 dark:text-white rounded-xl text-sm focus:ring-2 focus:ring-[#129a93] outline-none"
           />
+          <div>
+            <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">{t('specialGuest.priceLabel')}</label>
+            <input
+              type="number"
+              min="1"
+              step="0.5"
+              value={guestPrice}
+              onChange={e => setGuestPrice(e.target.value)}
+              className="w-full px-4 py-2.5 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 dark:text-white rounded-xl text-sm focus:ring-2 focus:ring-[#129a93] outline-none"
+            />
+            <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">{t('specialGuest.priceHint')}</p>
+          </div>
           <button
             onClick={handleSave}
-            disabled={saving || !guestName.trim()}
+            disabled={saving || !guestName.trim() || !(Number(guestPrice) > 0)}
             className="flex items-center gap-2 px-5 py-2.5 bg-[#129a93] text-white text-sm font-semibold rounded-xl hover:bg-[#0b7f79] disabled:opacity-40 transition-colors"
           >
             {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : saved ? <Check className="w-4 h-4" /> : <Sparkles className="w-4 h-4" />}

@@ -31,7 +31,7 @@ export function MyTablesPage({ onNavigate, onAuthClick, initialTab }: MyTablesPa
     if (initialTab) setTab(initialTab)
   }, [initialTab])
   const [cancelTableId, setCancelTableId] = useState<string | null>(null)
-  const [cancelReservationTarget, setCancelReservationTarget] = useState<{ id: string; joinType: 'word' | 'deposit' } | null>(null)
+  const [cancelReservationTarget, setCancelReservationTarget] = useState<{ id: string; joinType: 'word' | 'deposit'; depositAmount: number } | null>(null)
   const [togglingId, setTogglingId] = useState<string | null>(null)
 
   const localeMap: Record<string, string> = {
@@ -238,7 +238,7 @@ export function MyTablesPage({ onNavigate, onAuthClick, initialTab }: MyTablesPa
                             >
                               💬 {t('invite.inviteViaWhatsApp')}
                             </button>
-                            <button onClick={() => setCancelReservationTarget({ id: r.id, joinType: r.join_type })} className="text-xs text-red-500 hover:text-red-600 font-medium flex items-center gap-1">
+                            <button onClick={() => setCancelReservationTarget({ id: r.id, joinType: r.join_type, depositAmount: dt?.is_special && dt?.deposit_amount ? Number(dt.deposit_amount) : 2 })} className="text-xs text-red-500 hover:text-red-600 font-medium flex items-center gap-1">
                               <XCircle className="w-3.5 h-3.5" /> {t('card.cancelReservation')}
                             </button>
                           </div>
@@ -290,7 +290,7 @@ export function MyTablesPage({ onNavigate, onAuthClick, initialTab }: MyTablesPa
         {cancelReservationTarget && (
           <CancelModal
             joinType="deposit"
-            depositAmount={2}
+            depositAmount={cancelReservationTarget.depositAmount}
             onClose={() => setCancelReservationTarget(null)}
             onConfirm={async () => {
               await cancelReservation(cancelReservationTarget.id)

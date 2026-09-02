@@ -36,7 +36,7 @@ export function CancelModal({ joinType, depositAmount = 2, onClose, onConfirm }:
                 <AlertTriangle className="w-5 h-5 text-amber-500 flex-shrink-0 mt-0.5" />
                 <div>
                   <p className="text-sm font-semibold text-amber-800 mb-1">{t('cancel.depositWarning')}</p>
-                  <p className="text-xs text-amber-700">{t('cancel.depositDesc')}</p>
+                  <p className="text-xs text-amber-700">{t('cancel.depositDesc').replace('{amount}', String(depositAmount))}</p>
                 </div>
               </div>
             </>

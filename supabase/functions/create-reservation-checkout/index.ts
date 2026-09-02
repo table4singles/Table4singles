@@ -51,7 +51,7 @@ serve(async (req) => {
     // Verificar mesa disponible
     const { data: table, error: tableError } = await supabase
       .from('dining_tables')
-      .select('id, restaurant_name, available_seats, is_active')
+      .select('id, restaurant_name, available_seats, is_active, is_special, deposit_amount')
       .eq('id', tableId)
       .single()
 
@@ -78,6 +78,13 @@ serve(async (req) => {
 
     const origin = req.headers.get('origin') || 'https://www.table4singles.online'
 
+    // Las mesas normales siempre cuestan 2€. Solo una Cena Especial (is_special)
+    // puede tener un precio distinto, fijado explícitamente por el restaurante o
+    // el admin al crear/editar el invitado especial (columna deposit_amount).
+    const unitAmount = table.is_special && table.deposit_amount
+      ? Math.round(Number(table.deposit_amount) * 100)
+      : 200
+
     const session = await stripe.checkout.sessions.create({
       mode: 'payment',
       payment_method_types: ['card'],
@@ -89,7 +96,7 @@ serve(async (req) => {
               name: `Reserva en ${table.restaurant_name}`,
               description: 'Depósito de reserva reembolsable — Table4Singles',
             },
-            unit_amount: 200, // €2 en céntimos
+            unit_amount: unitAmount,
           },
           quantity: 1,
         },
@@ -112,7 +119,7 @@ serve(async (req) => {
       user_id: user.id,
       table_id: tableId,
       stripe_session_id: session.id,
-      amount: 200,
+      amount: unitAmount,
       currency: 'eur',
       status: 'pending',
     })

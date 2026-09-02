@@ -37,6 +37,7 @@ export function TableDetailPage({ tableId, paymentSuccess, paymentCancelled, onN
   const { effectiveRole } = useViewMode()
   const isRestaurantUser = effectiveRole === 'restaurant'
   const { table, participants, hostProfile, loading, error, joinTable, cancelTable, refresh } = useTableDetail(tableId)
+  const tablePrice = table?.is_special && table.deposit_amount ? Number(table.deposit_amount) : 2
   const { reviews, submitReview } = useReviews(tableId)
   const { messages, sendMessage } = useMessages(tableId)
   const { sendInvitation } = useInvitations(null)
@@ -66,6 +67,7 @@ export function TableDetailPage({ tableId, paymentSuccess, paymentCancelled, onN
   const [editGuestName, setEditGuestName] = useState('')
   const [editGuestBio, setEditGuestBio] = useState('')
   const [editGuestPhotoUrl, setEditGuestPhotoUrl] = useState('')
+  const [editGuestPrice, setEditGuestPrice] = useState('2')
   const [editSaving, setEditSaving] = useState(false)
   const [editError, setEditError] = useState<string | null>(null)
   const [removingParticipantId, setRemovingParticipantId] = useState<string | null>(null)
@@ -209,6 +211,7 @@ export function TableDetailPage({ tableId, paymentSuccess, paymentCancelled, onN
     setEditGuestName(table.special_guest_name || '')
     setEditGuestBio(table.special_guest_bio || '')
     setEditGuestPhotoUrl(table.special_guest_photo_url || '')
+    setEditGuestPrice(table.is_special && table.deposit_amount ? String(table.deposit_amount) : '2')
     setEditError(null)
     setShowEdit(true)
   }
@@ -234,6 +237,7 @@ export function TableDetailPage({ tableId, paymentSuccess, paymentCancelled, onN
         special_guest_name: editIsSpecial ? editGuestName.trim() || null : null,
         special_guest_bio: editIsSpecial ? editGuestBio.trim() || null : null,
         special_guest_photo_url: editIsSpecial ? editGuestPhotoUrl.trim() || null : null,
+        deposit_amount: editIsSpecial ? Number(editGuestPrice) || 2 : 2,
       })
       .eq('id', table.id)
     if (err) {
@@ -523,7 +527,7 @@ export function TableDetailPage({ tableId, paymentSuccess, paymentCancelled, onN
               {user && !isHost && !isParticipant && !isFull && !isCancelled && !isPast && table?.is_active !== false && !isRestaurantUser && (
                 <>
                   <button onClick={handleJoinDeposit} disabled={joining} className="w-full py-3 bg-primary-500 text-white rounded-xl font-medium hover:bg-primary-600 disabled:opacity-50 transition-colors text-sm flex items-center justify-center gap-1.5">
-                    {joining ? t('card.redirecting') : t('tableDetail.reservePrice')}
+                    {joining ? t('card.redirecting') : t('tableDetail.reservePrice').replace('{price}', String(tablePrice))}
                   </button>
                   <p className="text-xs text-gray-400 dark:text-gray-500 text-center">{t('tableDetail.guaranteedSpot')}</p>
                   {joinError && <p className="text-xs text-red-600 text-center">{joinError}</p>}
@@ -675,7 +679,7 @@ export function TableDetailPage({ tableId, paymentSuccess, paymentCancelled, onN
         {showCancel && myParticipation && (
           <CancelModal
             joinType="deposit"
-            depositAmount={2}
+            depositAmount={tablePrice}
             onClose={() => setShowCancel(false)}
             onConfirm={handleCancelReservation}
           />
@@ -761,6 +765,18 @@ export function TableDetailPage({ tableId, paymentSuccess, paymentCancelled, onN
                         placeholder={t('specialGuest.photoPlaceholder')}
                         className="w-full px-4 py-2.5 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 dark:text-white rounded-xl text-sm focus:ring-2 focus:ring-[#129a93] outline-none"
                       />
+                      <div>
+                        <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">{t('specialGuest.priceLabel')}</label>
+                        <input
+                          type="number"
+                          min="1"
+                          step="0.5"
+                          value={editGuestPrice}
+                          onChange={e => setEditGuestPrice(e.target.value)}
+                          className="w-full px-4 py-2.5 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 dark:text-white rounded-xl text-sm focus:ring-2 focus:ring-[#129a93] outline-none"
+                        />
+                        <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">{t('specialGuest.priceHint')}</p>
+                      </div>
                     </div>
                   )}
                 </div>

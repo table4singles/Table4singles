@@ -27,13 +27,14 @@ export function CreateTablePage({ onNavigate, onAuthClick }: CreateTablePageProp
   const [guestName, setGuestName] = useState('')
   const [guestBio, setGuestBio] = useState('')
   const [guestPhotoUrl, setGuestPhotoUrl] = useState('')
+  const [guestPrice, setGuestPrice] = useState('2')
   const [loading, setLoading] = useState(false)
   const [success, setSuccess] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
   const locationLabel = zone === 'custom' ? customZone : t(`createTable.zone.${zone}`)
 
-  const canSubmit = availableFrom && maxSeats >= 2 && (zone !== 'custom' || customZone.trim().length > 0) && (!isSpecial || guestName.trim().length > 0)
+  const canSubmit = availableFrom && maxSeats >= 2 && (zone !== 'custom' || customZone.trim().length > 0) && (!isSpecial || (guestName.trim().length > 0 && Number(guestPrice) > 0))
 
   const handleSubmit = async () => {
     if (!user || !profile) return
@@ -61,6 +62,7 @@ export function CreateTablePage({ onNavigate, onAuthClick }: CreateTablePageProp
       special_guest_name: isSpecial ? guestName.trim() : null,
       special_guest_bio: isSpecial ? guestBio.trim() || null : null,
       special_guest_photo_url: isSpecial ? guestPhotoUrl.trim() || null : null,
+      deposit_amount: isSpecial ? Number(guestPrice) : 2,
     })
 
     setLoading(false)
@@ -257,6 +259,18 @@ export function CreateTablePage({ onNavigate, onAuthClick }: CreateTablePageProp
                   placeholder={t('specialGuest.photoPlaceholder')}
                   className="w-full px-4 py-2.5 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 dark:text-white rounded-xl text-sm focus:ring-2 focus:ring-[#129a93] outline-none"
                 />
+                <div>
+                  <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">{t('specialGuest.priceLabel')}</label>
+                  <input
+                    type="number"
+                    min="1"
+                    step="0.5"
+                    value={guestPrice}
+                    onChange={e => setGuestPrice(e.target.value)}
+                    className="w-full px-4 py-2.5 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 dark:text-white rounded-xl text-sm focus:ring-2 focus:ring-[#129a93] outline-none"
+                  />
+                  <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">{t('specialGuest.priceHint')}</p>
+                </div>
               </div>
             )}
           </div>

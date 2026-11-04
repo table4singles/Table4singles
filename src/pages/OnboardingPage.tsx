@@ -82,11 +82,14 @@ export function OnboardingPage({ onNavigate }: { onNavigate: (page: string, id?:
 
   // Validación por paso
   const step1Valid = restaurantName.trim().length > 0
-  const isValid = isRestaurant ? step1Valid : fullName.trim().length > 0
+  // Restaurantes: dirección, ciudad y país obligatorios (los comensales no los necesitan)
+  const step2Valid = restaurantAddress.trim().length > 0 && restaurantCity.trim().length > 0 && restaurantCountry.trim().length > 0
+  const isValid = isRestaurant ? step1Valid && step2Valid : fullName.trim().length > 0
 
   const canAdvance = () => {
     if (step === 1) return step1Valid
-    return true // steps 2 and 3 are optional
+    if (step === 2) return step2Valid
+    return true // step 3 is optional
   }
 
   const handleAvatarUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -461,10 +464,10 @@ export function OnboardingPage({ onNavigate }: { onNavigate: (page: string, id?:
                   <span className="text-sm font-medium">{t('onboardingExtra.whereIsRestaurant')}</span>
                 </div>
                 <div className="space-y-3">
-                  <Field label={t('onboarding.address')} value={restaurantAddress} onChange={setRestaurantAddress} placeholder={t('onboardingExtra.addressPlaceholder')} />
+                  <Field label={`${t('onboarding.address')} *`} value={restaurantAddress} onChange={setRestaurantAddress} placeholder={t('onboardingExtra.addressPlaceholder')} />
                   <div className="grid grid-cols-2 gap-3">
-                    <Field label={t('onboarding.city')} value={restaurantCity} onChange={setRestaurantCity} placeholder={t('onboardingExtra.cityPlaceholder')} />
-                    <Field label={t('onboarding.country')} value={restaurantCountry} onChange={setRestaurantCountry} placeholder={t('onboardingExtra.countryPlaceholder')} />
+                    <Field label={`${t('onboarding.city')} *`} value={restaurantCity} onChange={setRestaurantCity} placeholder={t('onboardingExtra.cityPlaceholder')} />
+                    <Field label={`${t('onboarding.country')} *`} value={restaurantCountry} onChange={setRestaurantCountry} placeholder={t('onboardingExtra.countryPlaceholder')} />
                   </div>
                 </div>
                 <p className="text-xs text-gray-400 dark:text-gray-500">{t('onboardingExtra.cityHint')}</p>

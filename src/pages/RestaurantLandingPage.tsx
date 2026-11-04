@@ -129,6 +129,26 @@ export function RestaurantLandingPage({ onNavigate, onAuthClick }: RestaurantLan
       </section>
 
       {/* BENEFITS — photo backdrop */}
+      {/* Cenas con invitado especial */}
+      <section className="py-20 bg-navy-900 border-y border-gold-500/20">
+        <div className="max-w-5xl mx-auto px-4">
+          <div className="text-center mb-12">
+            <span className="inline-flex items-center gap-2 text-xs font-semibold tracking-widest uppercase text-gold-300 mb-4"><Sparkles className="w-4 h-4" />{t('restaurantLanding.special.title')}</span>
+            <h2 className="font-display text-3xl md:text-4xl font-bold text-white mb-3">{t('restaurantLanding.special.subtitle')}</h2>
+            <p className="text-gray-400 text-lg max-w-2xl mx-auto">{t('restaurantLanding.special.desc')}</p>
+          </div>
+          <div className="grid sm:grid-cols-3 gap-5">
+            {[1, 2, 3].map(n => (
+              <div key={n} className="rounded-2xl border border-gold-500/25 bg-navy-950/60 p-6">
+                <div className="font-display text-3xl text-gold-300 mb-3">{n}</div>
+                <h3 className="font-semibold text-white mb-2">{t(`restaurantLanding.special.p${n}Title`)}</h3>
+                <p className="text-sm text-gray-400">{t(`restaurantLanding.special.p${n}Desc`)}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       <section className="relative py-24 overflow-hidden">
         <img src="/hero-flyer-default.jpg" alt="" className="absolute inset-0 w-full h-full object-cover" />
         <div className="absolute inset-0 bg-navy-950/90" />

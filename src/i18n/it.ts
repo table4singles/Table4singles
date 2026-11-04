@@ -466,6 +466,7 @@ export const it = {
     addPhoto: 'Aggiungi',
   },
   myTables: {
+    cancelDeadline: 'Non è più possibile annullare: bisogna farlo almeno un giorno prima.',
     title: 'I miei tavoli',
     subtitle: 'Gestisci i tuoi tavoli e prenotazioni',
     create: 'Crea tavolo',
@@ -869,7 +870,7 @@ export const it = {
       portalFailed: "Errore nell'apertura del portale di fatturazione.",
     },
     usersPayTitle: 'Quanto pagano gli utenti?',
-    usersPayBody: "Ogni utente versa una caparra di 2 € a prenotazione. È rimborsabile se l'utente cancella con sufficiente anticipo.",
+    usersPayBody: 'Ogni utente versa un deposito di 2 € per prenotazione. È una commissione di gestione non rimborsabile.',
     features: {
       tables: 'Crea e gestisci tavoli illimitati',
       reservations: 'Sistema di prenotazione con deposito',
@@ -1194,7 +1195,7 @@ export const it = {
     photoLabel: "Foto dell'ospite (URL)",
     photoPlaceholder: 'https://...',
     priceLabel: 'Prezzo della prenotazione (€)',
-    priceHint: 'Sostituisce il deposito standard di 2€ solo per questo tavolo. Il commensale paga questo importo alla prenotazione; resta rimborsabile in caso di cancellazione, come il deposito normale.',
+    priceHint: 'Sostituisce il deposito standard di 2 € solo per questo tavolo. Il commensale paga questo importo alla prenotazione; è una commissione di gestione non rimborsabile, come il deposito normale.',
     badge: 'Ospite speciale',
     sectionTitle: 'Cene speciali',
     sectionSubtitle: 'Tavoli con un ospite in evidenza',

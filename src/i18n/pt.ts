@@ -466,6 +466,7 @@ export const pt = {
     addPhoto: 'Adicionar',
   },
   myTables: {
+    cancelDeadline: 'Já não é possível cancelar: tem de ser feito pelo menos um dia antes.',
     title: 'As minhas mesas',
     subtitle: 'Gere as tuas mesas e reservas',
     create: 'Criar mesa',
@@ -869,7 +870,7 @@ export const pt = {
       portalFailed: 'Erro ao abrir o portal de faturação.',
     },
     usersPayTitle: 'Quanto pagam os utilizadores?',
-    usersPayBody: 'Cada utilizador paga um depósito de 2 € por reserva. É reembolsável se cancelar com antecedência suficiente.',
+    usersPayBody: 'Cada utilizador paga um depósito de 2 € por reserva. É uma taxa de gestão não reembolsável.',
     features: {
       tables: 'Cria e gere mesas ilimitadas',
       reservations: 'Sistema de reservas com depósito',
@@ -1194,7 +1195,7 @@ export const pt = {
     photoLabel: 'Foto do convidado (URL)',
     photoPlaceholder: 'https://...',
     priceLabel: 'Preço da reserva (€)',
-    priceHint: 'Substitui o depósito padrão de 2€ apenas para esta mesa. O convidado paga este valor ao reservar; continua reembolsável se cancelar, tal como o depósito normal.',
+    priceHint: 'Substitui o depósito padrão de 2 € apenas para esta mesa. O comensal paga este valor ao reservar; é uma taxa de gestão não reembolsável, tal como o depósito normal.',
     badge: 'Convidado especial',
     sectionTitle: 'Jantares especiais',
     sectionSubtitle: 'Mesas com um convidado em destaque',

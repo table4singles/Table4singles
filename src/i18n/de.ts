@@ -466,6 +466,7 @@ export const de = {
     addPhoto: 'Hinzufügen',
   },
   myTables: {
+    cancelDeadline: 'Eine Stornierung ist nicht mehr möglich: sie muss mindestens einen Tag vorher erfolgen.',
     title: 'Meine Tische',
     subtitle: 'Verwalte deine Tische und Reservierungen',
     create: 'Tisch erstellen',
@@ -869,7 +870,7 @@ export const de = {
       portalFailed: 'Fehler beim Öffnen des Abrechnungsportals.',
     },
     usersPayTitle: 'Wie viel zahlen die Nutzer?',
-    usersPayBody: 'Jeder Nutzer zahlt eine Kaution von 2 € pro Reservierung. Der Betrag wird erstattet, wenn rechtzeitig storniert wird.',
+    usersPayBody: 'Jeder Nutzer zahlt pro Reservierung eine Anzahlung von 2 €. Sie ist eine nicht erstattungsfähige Bearbeitungsgebühr.',
     features: {
       tables: 'Unbegrenzte Tische erstellen und verwalten',
       reservations: 'Reservierungssystem mit Kaution',
@@ -1194,7 +1195,7 @@ export const de = {
     photoLabel: 'Foto des Gastes (URL)',
     photoPlaceholder: 'https://...',
     priceLabel: 'Buchungspreis (€)',
-    priceHint: 'Ersetzt die übliche Kaution von 2€ nur für diesen Tisch. Der Gast zahlt diesen Betrag bei der Buchung; er wird bei Stornierung genauso erstattet wie die normale Kaution.',
+    priceHint: 'Ersetzt die Standardanzahlung von 2 € nur für diesen Tisch. Der Gast zahlt diesen Betrag bei der Buchung; er ist eine nicht erstattungsfähige Bearbeitungsgebühr, wie die normale Anzahlung.',
     badge: 'Besonderer Gast',
     sectionTitle: 'Besondere Dinner',
     sectionSubtitle: 'Tische mit besonderem Gast',

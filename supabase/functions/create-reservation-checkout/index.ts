@@ -94,7 +94,7 @@ serve(async (req) => {
             currency: 'eur',
             product_data: {
               name: `Reserva en ${table.restaurant_name}`,
-              description: 'Depósito de reserva reembolsable — Table4Singles',
+              description: 'Depósito de reserva no reembolsable — Table4Singles',
             },
             unit_amount: unitAmount,
           },

@@ -466,6 +466,7 @@ export const ro = {
     addPhoto: 'Adaugă',
   },
   myTables: {
+    cancelDeadline: 'Nu se mai poate anula: anularea trebuie făcută cu cel puțin o zi înainte.',
     title: 'Mesele mele',
     subtitle: 'Gestionează-ți mesele și rezervările',
     create: 'Creează masă',
@@ -869,7 +870,7 @@ export const ro = {
       portalFailed: 'Eroare la deschiderea portalului de facturare.',
     },
     usersPayTitle: 'Cât plătesc utilizatorii?',
-    usersPayBody: 'Fiecare utilizator plătește un depozit de 2 € per rezervare. Suma este rambursabilă dacă anulează din timp.',
+    usersPayBody: 'Fiecare utilizator plătește un depozit de 2 € per rezervare. Este o taxă de gestionare nerambursabilă.',
     features: {
       tables: 'Mese nelimitate',
       reservations: 'Rezervări cu depozit',
@@ -1194,7 +1195,7 @@ export const ro = {
     photoLabel: 'Poza invitatului (URL)',
     photoPlaceholder: 'https://...',
     priceLabel: 'Preț rezervare (€)',
-    priceHint: 'Înlocuiește depozitul standard de 2€ doar pentru această masă. Comeseanul plătește această sumă la rezervare; rămâne rambursabilă dacă anulează, la fel ca depozitul normal.',
+    priceHint: 'Înlocuiește depozitul standard de 2 € doar pentru această masă. Comesenul plătește această sumă la rezervare; este o taxă de gestionare nerambursabilă, ca depozitul normal.',
     badge: 'Invitat special',
     sectionTitle: 'Cine speciale',
     sectionSubtitle: 'Mese cu un invitat special',

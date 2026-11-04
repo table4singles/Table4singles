@@ -488,6 +488,7 @@ export const en = {
     addPhoto: 'Add',
   },
   myTables: {
+    cancelDeadline: 'It can no longer be cancelled: cancellations must be made at least one day before.',
     title: 'My tables',
     subtitle: 'Manage your tables and reservations',
     create: 'Create table',
@@ -891,7 +892,7 @@ export const en = {
       portalFailed: 'Error opening the billing portal.',
     },
     usersPayTitle: 'How much do users pay?',
-    usersPayBody: 'Each user pays a €2 deposit per reservation. It is refunded if the user cancels with enough notice.',
+    usersPayBody: 'Each user pays a €2 deposit per reservation. It is a non-refundable management fee.',
     features: {
       tables: 'Create and manage unlimited tables',
       reservations: 'Reservation system with deposit',
@@ -1216,7 +1217,7 @@ export const en = {
     photoLabel: 'Guest photo (URL)',
     photoPlaceholder: 'https://...',
     priceLabel: 'Booking price (€)',
-    priceHint: 'Replaces the standard €2 deposit for this table only. The diner pays this amount when booking; it\'s still refundable if they cancel, same as the normal deposit.',
+    priceHint: 'Replaces the standard €2 deposit for this table only. The diner pays this amount when booking; it is a non-refundable management fee, same as the normal deposit.',
     badge: 'Special guest',
     sectionTitle: 'Special dinners',
     sectionSubtitle: 'Tables with a featured guest',

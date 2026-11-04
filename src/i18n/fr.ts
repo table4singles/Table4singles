@@ -466,6 +466,7 @@ export const fr = {
     addPhoto: 'Ajouter',
   },
   myTables: {
+    cancelDeadline: 'Annulation impossible : elle doit se faire au moins un jour avant.',
     title: 'Mes tables',
     subtitle: 'Gérez vos tables et réservations',
     create: 'Créer une table',
@@ -869,7 +870,7 @@ export const fr = {
       portalFailed: "Erreur lors de l'ouverture du portail de facturation.",
     },
     usersPayTitle: 'Combien paient les utilisateurs ?',
-    usersPayBody: "Chaque utilisateur verse une caution de 2 € par réservation. Elle est remboursée en cas d'annulation avec suffisamment de préavis.",
+    usersPayBody: 'Chaque utilisateur verse un acompte de 2 € par réservation. C’est des frais de gestion non remboursables.',
     features: {
       tables: 'Créez et gérez des tables illimitées',
       reservations: 'Système de réservation avec dépôt',
@@ -1194,7 +1195,7 @@ export const fr = {
     photoLabel: "Photo de l'invité (URL)",
     photoPlaceholder: 'https://...',
     priceLabel: 'Prix de la réservation (€)',
-    priceHint: 'Remplace la caution standard de 2 € uniquement pour cette table. Le convive paie ce montant à la réservation ; il reste remboursable en cas d\'annulation, comme la caution normale.',
+    priceHint: 'Remplace l’acompte standard de 2 € uniquement pour cette table. Le convive paie ce montant à la réservation ; ce sont des frais de gestion non remboursables, comme l’acompte normal.',
     badge: 'Invité spécial',
     sectionTitle: 'Dîners spéciaux',
     sectionSubtitle: 'Tables avec un invité vedette',

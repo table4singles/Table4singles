@@ -466,6 +466,7 @@ export const sv = {
     addPhoto: 'Lägg till',
   },
   myTables: {
+    cancelDeadline: 'Det går inte längre att avboka: avbokning måste ske minst en dag innan.',
     title: 'Mina bord',
     subtitle: 'Hantera dina bord och bokningar',
     create: 'Skapa bord',
@@ -869,7 +870,7 @@ export const sv = {
       portalFailed: 'Fel vid öppning av faktureringsportalen.',
     },
     usersPayTitle: 'Hur mycket betalar användarna?',
-    usersPayBody: 'Varje användare betalar en deposition på 2 € per bokning. Beloppet återbetalas om avbokning sker i tid.',
+    usersPayBody: 'Varje användare betalar en deposition på 2 € per bokning. Det är en icke återbetalningsbar hanteringsavgift.',
     features: {
       tables: 'Obegränsat antal bord',
       reservations: 'Bokningar med deposition',
@@ -1194,7 +1195,7 @@ export const sv = {
     photoLabel: 'Gästens foto (URL)',
     photoPlaceholder: 'https://...',
     priceLabel: 'Bokningspris (€)',
-    priceHint: 'Ersätter standarddepositionen på 2€ endast för det här bordet. Gästen betalar detta belopp vid bokning; det är fortfarande återbetalningsbart vid avbokning, precis som den vanliga depositionen.',
+    priceHint: 'Ersätter standarddepositionen på 2 € endast för det här bordet. Gästen betalar detta belopp vid bokning; det är en icke återbetalningsbar hanteringsavgift, precis som den vanliga depositionen.',
     badge: 'Specialgäst',
     sectionTitle: 'Specialmiddagar',
     sectionSubtitle: 'Bord med en utvald gäst',

@@ -466,6 +466,7 @@ export const zh = {
     addPhoto: '添加',
   },
   myTables: {
+    cancelDeadline: '已无法取消：必须至少提前一天取消。',
     title: '我的餐桌',
     subtitle: '管理您的餐桌和预订',
     create: '创建餐桌',
@@ -869,7 +870,7 @@ export const zh = {
       portalFailed: '打开账单门户时出错。',
     },
     usersPayTitle: '用户需要支付多少？',
-    usersPayBody: '每位用户每次预订需支付2€押金，如提前足够时间取消可退还。',
+    usersPayBody: '每位用户每次预订支付2欧元押金。这是不可退还的管理费。',
     features: {
       tables: '无限餐桌',
       reservations: '押金预订',
@@ -1194,7 +1195,7 @@ export const zh = {
     photoLabel: '嘉宾照片（链接）',
     photoPlaceholder: 'https://...',
     priceLabel: '预订价格（€）',
-    priceHint: '仅对此餐桌替代标准的2€押金。食客预订时支付此金额；取消预订时仍可退还，与普通押金规则相同。',
+    priceHint: '仅对这张餐桌取代标准的2欧元押金。用餐者在预订时支付该金额；这是不可退还的管理费，与普通押金相同。',
     badge: '特别嘉宾',
     sectionTitle: '特别晚宴',
     sectionSubtitle: '有特邀嘉宾的餐桌',

@@ -211,7 +211,9 @@ export function MyTablesPage({ onNavigate, onAuthClick, initialTab }: MyTablesPa
                 <div className="space-y-4">
                   {reservations.map(r => {
                     const dt = r.dining_tables as any
-                    const isPast = dt?.date && dt?.time ? new Date(`${dt.date}T${dt.time}`) < new Date() : false
+                    const isPast = dt?.date && dt?.time ? new Date(`${dt.date}T${dt.time}`) < new Date() : (dt?.date ? new Date(`${dt.date}T00:00:00`) < new Date(new Date().setHours(0, 0, 0, 0)) : false)
+                    // Regla: solo se puede cancelar hasta el día anterior a la cena (también en cenas especiales)
+                    const canCancel = dt?.date ? new Date(`${dt.date}T00:00:00`).getTime() >= new Date(new Date().setHours(24, 0, 0, 0)).getTime() : true
                     const dateStr = dt?.date ? new Date(dt.date + 'T12:00:00').toLocaleDateString(locale, { weekday: 'short', day: 'numeric', month: 'short' }) : ''
                     const timeStr = dt?.time ? dt.time.slice(0, 5) : ''
                     return (
@@ -238,9 +240,13 @@ export function MyTablesPage({ onNavigate, onAuthClick, initialTab }: MyTablesPa
                             >
                               💬 {t('invite.inviteViaWhatsApp')}
                             </button>
+                            {canCancel ? (
                             <button onClick={() => setCancelReservationTarget({ id: r.id, joinType: r.join_type, depositAmount: dt?.is_special && dt?.deposit_amount ? Number(dt.deposit_amount) : 2 })} className="text-xs text-red-500 hover:text-red-600 font-medium flex items-center gap-1">
                               <XCircle className="w-3.5 h-3.5" /> {t('card.cancelReservation')}
                             </button>
+                            ) : (
+                              <span className="text-xs text-gray-400 dark:text-gray-500">{t('myTables.cancelDeadline')}</span>
+                            )}
                           </div>
                         )}
                       </div>

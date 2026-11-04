@@ -599,7 +599,7 @@ export const es = {
       portalFailed: 'Error al abrir el portal de facturación.',
     },
     usersPayTitle: '¿Cuánto pagan los usuarios?',
-    usersPayBody: 'Cada usuario abona un depósito de 2 € por reserva. Este importe es reembolsable si el usuario cancela con suficiente antelación.',
+    usersPayBody: 'Cada usuario abona un depósito de 2 € por reserva. Es una tasa de gestión no reembolsable.',
     features: {
       tables: 'Crea y gestiona mesas ilimitadas',
       reservations: 'Sistema de reservas con depósito',
@@ -672,6 +672,7 @@ export const es = {
     activate: 'Activar',
   },
   myTables: {
+    cancelDeadline: 'Ya no se puede cancelar: hay que hacerlo al menos un día antes.',
     title: 'Mis mesas',
     titleUser: 'Mis reservas',
     subtitle: 'Gestiona tus mesas y reservas',
@@ -1180,7 +1181,7 @@ export const es = {
     photoLabel: 'Foto del invitado (URL)',
     photoPlaceholder: 'https://...',
     priceLabel: 'Precio de la reserva (€)',
-    priceHint: 'Sustituye el depósito estándar de 2€ solo para esta mesa. El comensal paga este importe al reservar; sigue siendo reembolsable si cancela, igual que el depósito normal.',
+    priceHint: 'Sustituye el depósito estándar de 2€ solo para esta mesa. El comensal paga este importe al reservar; es una tasa de gestión no reembolsable, igual que el depósito normal.',
     badge: 'Invitado especial',
     sectionTitle: 'Cenas especiales',
     sectionSubtitle: 'Mesas con un invitado destacado',

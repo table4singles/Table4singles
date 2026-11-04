@@ -466,6 +466,7 @@ export const ja = {
     addPhoto: '追加',
   },
   myTables: {
+    cancelDeadline: 'キャンセルはできません。最低1日前までにお願いします。',
     title: 'マイテーブル',
     subtitle: 'テーブルと予約を管理',
     create: 'テーブルを作成',
@@ -869,7 +870,7 @@ export const ja = {
       portalFailed: '請求ポータルを開く際にエラーが発生しました。',
     },
     usersPayTitle: 'ユーザーはいくら支払いますか？',
-    usersPayBody: '各ユーザーは予約ごとに2€のデポジットを支払います。十分な余裕を持ってキャンセルした場合は返金されます。',
+    usersPayBody: 'ユーザーは予約ごとに2ユーロのデポジットを支払います。これは返金不可の管理手数料です。',
     features: {
       tables: 'テーブル数無制限',
       reservations: 'デポジット付き予約',
@@ -1194,7 +1195,7 @@ export const ja = {
     photoLabel: 'ゲストの写真（URL）',
     photoPlaceholder: 'https://...',
     priceLabel: '予約価格（€）',
-    priceHint: 'このテーブルに限り、通常の2€のデポジットの代わりになります。参加者は予約時にこの金額を支払います。キャンセルした場合は通常のデポジットと同様に返金されます。',
+    priceHint: 'このテーブルに限り、標準の2ユーロのデポジットの代わりになります。利用者は予約時にこの金額を支払います。通常のデポジットと同じく返金不可の管理手数料です。',
     badge: '特別ゲスト',
     sectionTitle: '特別ディナー',
     sectionSubtitle: '特別ゲストのいるテーブル',

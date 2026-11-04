@@ -51,7 +51,7 @@ serve(async (req) => {
     // Verificar mesa disponible
     const { data: table, error: tableError } = await supabase
       .from('dining_tables')
-      .select('id, restaurant_name, available_seats, is_active, is_special, deposit_amount')
+      .select('id, restaurant_name, available_seats, is_active, is_special, deposit_amount, special_guest_name, special_price_by')
       .eq('id', tableId)
       .single()
 
@@ -78,29 +78,49 @@ serve(async (req) => {
 
     const origin = req.headers.get('origin') || 'https://www.table4singles.online'
 
-    // Las mesas normales siempre cuestan 2€. Solo una Cena Especial (is_special)
-    // puede tener un precio distinto, fijado explícitamente por el restaurante o
-    // el admin al crear/editar el invitado especial (columna deposit_amount).
-    const unitAmount = table.is_special && table.deposit_amount
-      ? Math.round(Number(table.deposit_amount) * 100)
-      : 200
+    // Mesas normales: 2€ no reembolsables, todo para Table4Singles.
+    // Cena Especial con precio del restaurante: el comensal paga ese precio + 10 % de gestión (todo a
+    // Table4Singles, que después paga al restaurante SOLO su importe; el 10 % no lo ve el restaurante).
+    // Cena Especial con precio fijado por el admin: se cobra tal cual, sin 10 % ni pago al restaurante.
+    const isSpecialPriced = !!(table.is_special && table.deposit_amount)
+    const priceCents = isSpecialPriced ? Math.round(Number(table.deposit_amount) * 100) : 200
+    const restaurantPriced = isSpecialPriced && table.special_price_by !== 'admin'
+    const feeCents = restaurantPriced ? Math.round(priceCents * 0.1) : 0
+    const unitAmount = priceCents + feeCents
+    const restaurantAmount = restaurantPriced ? priceCents : 0
+
+    const lineItems: any[] = [
+      {
+        price_data: {
+          currency: 'eur',
+          product_data: {
+            name: isSpecialPriced && table.special_guest_name
+              ? `Cena con ${table.special_guest_name} en ${table.restaurant_name}`
+              : `Reserva en ${table.restaurant_name}`,
+            description: restaurantPriced
+              ? 'Reserva de cena especial, no reembolsable — Table4Singles'
+              : 'Depósito de reserva no reembolsable — Table4Singles',
+          },
+          unit_amount: priceCents,
+        },
+        quantity: 1,
+      },
+    ]
+    if (feeCents > 0) {
+      lineItems.push({
+        price_data: {
+          currency: 'eur',
+          product_data: { name: 'Gestión Table4Singles (10 %)' },
+          unit_amount: feeCents,
+        },
+        quantity: 1,
+      })
+    }
 
     const session = await stripe.checkout.sessions.create({
       mode: 'payment',
       payment_method_types: ['card'],
-      line_items: [
-        {
-          price_data: {
-            currency: 'eur',
-            product_data: {
-              name: `Reserva en ${table.restaurant_name}`,
-              description: 'Depósito de reserva no reembolsable — Table4Singles',
-            },
-            unit_amount: unitAmount,
-          },
-          quantity: 1,
-        },
-      ],
+      line_items: lineItems,
       success_url: `${origin}?payment=success&table=${tableId}`,
       cancel_url: `${origin}?payment=cancelled&table=${tableId}`,
       metadata: {
@@ -120,6 +140,9 @@ serve(async (req) => {
       table_id: tableId,
       stripe_session_id: session.id,
       amount: unitAmount,
+      restaurant_amount: restaurantAmount,
+      fee_amount: unitAmount - restaurantAmount,
+      payout_status: restaurantAmount > 0 ? 'pending' : 'none',
       currency: 'eur',
       status: 'pending',
     })

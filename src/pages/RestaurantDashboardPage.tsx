@@ -1,3 +1,4 @@
+import { SpecialEarnings } from '@/components/SpecialEarnings'
 import { showBilling } from '@/lib/billing'
 import { useState, useMemo, useEffect } from 'react'
 import { UtensilsCrossed, Users, Star, Loader2, XCircle, Calendar, Clock, CalendarClock, CalendarDays, AlertCircle, CheckCircle, CreditCard, TrendingUp, QrCode } from 'lucide-react'
@@ -81,6 +82,8 @@ export function RestaurantDashboardPage({ onNavigate, onAuthClick }: RestaurantD
         {/* Desktop: banner arriba a todo lo ancho; contenido principal (KPIs + próximas mesas) a
             la izquierda, accesos rápidos como columna fija a la derecha. Móvil: todo apilado en
             el mismo orden que antes (banner, KPIs, accesos, mesas) — el grid solo actúa en lg:. */}
+        <SpecialEarnings />
+
         <div className="lg:grid lg:grid-cols-3 lg:gap-6 lg:items-start">
 
           {/* Banner de suscripción */}

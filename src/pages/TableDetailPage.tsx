@@ -1,3 +1,4 @@
+import { dinerPrice } from '@/lib/pricing'
 import { useState, useEffect, useRef } from 'react'
 import { ArrowLeft, MapPin, Clock, Users, Calendar, Loader2, MessageSquare, Star, Download, UserPlus, XCircle, PartyPopper, Check, Mail, Pencil, Save, UserMinus, BellRing, Sparkles, Flag } from 'lucide-react'
 import { Navbar } from '@/components/Navbar'
@@ -39,6 +40,7 @@ export function TableDetailPage({ tableId, paymentSuccess, paymentCancelled, onN
   const isRestaurantUser = effectiveRole === 'restaurant'
   const { table, participants, hostProfile, loading, error, joinTable, cancelTable, refresh } = useTableDetail(tableId)
   const tablePrice = table?.is_special && table.deposit_amount ? Number(table.deposit_amount) : 2
+  const diner = dinerPrice({ isSpecial: table?.is_special, depositAmount: table?.deposit_amount, priceBy: table?.special_price_by })
   const { reviews, submitReview } = useReviews(tableId)
   const { messages, sendMessage } = useMessages(tableId)
   const { sendInvitation } = useInvitations(null)
@@ -240,6 +242,7 @@ export function TableDetailPage({ tableId, paymentSuccess, paymentCancelled, onN
         special_guest_bio: editIsSpecial ? editGuestBio.trim() || null : null,
         special_guest_photo_url: editIsSpecial ? editGuestPhotoUrl.trim() || null : null,
         deposit_amount: editIsSpecial ? Number(editGuestPrice) || 2 : 2,
+        special_price_by: 'restaurant',
       })
       .eq('id', table.id)
     if (err) {
@@ -540,8 +543,11 @@ export function TableDetailPage({ tableId, paymentSuccess, paymentCancelled, onN
               {user && !isHost && !isParticipant && !isFull && !isCancelled && !isPast && table?.is_active !== false && !isRestaurantUser && (
                 <>
                   <button onClick={handleJoinDeposit} disabled={joining} className="w-full py-3 bg-primary-500 text-white rounded-xl font-medium hover:bg-primary-600 disabled:opacity-50 transition-colors text-sm flex items-center justify-center gap-1.5">
-                    {joining ? t('card.redirecting') : t('tableDetail.reservePrice').replace('{price}', String(tablePrice))}
+                    {joining ? t('card.redirecting') : t('tableDetail.reservePrice').replace('{price}', String(diner.total))}
                   </button>
+                  {diner.fee > 0 && (
+                    <p className="text-xs text-gray-500 dark:text-gray-400 text-center">{t('specialGuest.priceBreakdown').replace('{price}', String(diner.price)).replace('{fee}', String(diner.fee))}</p>
+                  )}
                   <p className="text-xs text-gray-400 dark:text-gray-500 text-center">{t('tableDetail.guaranteedSpot')}</p>
                   {joinError && <p className="text-xs text-red-600 text-center">{joinError}</p>}
                 </>
@@ -711,7 +717,7 @@ export function TableDetailPage({ tableId, paymentSuccess, paymentCancelled, onN
         {showCancel && myParticipation && (
           <CancelModal
             joinType="deposit"
-            depositAmount={tablePrice}
+            depositAmount={diner.total}
             onClose={() => setShowCancel(false)}
             onConfirm={handleCancelReservation}
           />

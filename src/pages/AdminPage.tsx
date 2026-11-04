@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useEffect } from 'react'
 import {
   Users, UtensilsCrossed, Award, CreditCard, Loader2, RefreshCw,
   TrendingUp, Euro, CheckCircle, ShieldAlert, BellRing, Eye, MousePointerClick,
@@ -19,7 +19,7 @@ interface AdminPageProps {
   onAuthClick: (mode?: 'signin' | 'signup') => void
 }
 
-type Tab = 'resumen' | 'usuarios' | 'restaurantes' | 'embajadores' | 'movimientos' | 'demanda' | 'funnel' | 'especiales' | 'reportes'
+type Tab = 'resumen' | 'usuarios' | 'restaurantes' | 'embajadores' | 'movimientos' | 'demanda' | 'funnel' | 'especiales' | 'reportes' | 'pagos'
 
 const DAY_KEYS = ['demand.dayMon', 'demand.dayTue', 'demand.dayWed', 'demand.dayThu', 'demand.dayFri', 'demand.daySat', 'demand.daySun']
 
@@ -75,6 +75,7 @@ export function AdminPage({ onNavigate, onAuthClick }: AdminPageProps) {
     { id: 'demanda',      label: t('admin.tabDemanda').replace('{count}', String(demandRequests.filter(d => d.status === 'active').length)), icon: <BellRing className="w-4 h-4" /> },
     { id: 'funnel',       label: t('admin.tabFunnel'),                                                                                   icon: <Filter className="w-4 h-4" /> },
     { id: 'especiales',   label: t('specialGuest.adminTabLabel'),                                                                        icon: <Sparkles className="w-4 h-4" /> },
+    { id: 'pagos',        label: 'Pagos a restaurantes',                                                                                 icon: <Euro className="w-4 h-4" /> },
     { id: 'reportes',     label: t('admin.tabReportes').replace('{count}', String(reports.filter(r => r.status === 'pending').length)), icon: <Flag className="w-4 h-4" /> },
   ]
 
@@ -114,6 +115,7 @@ export function AdminPage({ onNavigate, onAuthClick }: AdminPageProps) {
             {tab === 'demanda'      && <TabDemanda requests={demandRequests} t={t} dateLocale={dateLocale} />}
             {tab === 'funnel'       && <TabFunnel events={analyticsEvents} t={t} language={language} />}
             {tab === 'especiales'   && <TabEspeciales restaurants={restaurants} t={t} dateLocale={dateLocale} />}
+            {tab === 'pagos'        && <TabPagos />}
             {tab === 'reportes'     && <TabReportes reports={reports} t={t} dateLocale={dateLocale} onChanged={refresh} />}
           </>
         )}
@@ -581,6 +583,7 @@ function TabEspeciales({ restaurants, t, dateLocale }: { restaurants: AdminResta
         special_guest_bio: guestBio.trim() || null,
         special_guest_photo_url: guestPhotoUrl.trim() || null,
         deposit_amount: price,
+        special_price_by: 'admin',
       })
       .eq('id', selectedTableId)
     setSaving(false)
@@ -681,7 +684,7 @@ function TabEspeciales({ restaurants, t, dateLocale }: { restaurants: AdminResta
               onChange={e => setGuestPrice(e.target.value)}
               className="w-full px-4 py-2.5 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 dark:text-white rounded-xl text-sm focus:ring-2 focus:ring-[#129a93] outline-none"
             />
-            <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">{t('specialGuest.priceHint')}</p>
+            <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">{t('specialGuest.priceHintAdmin')}</p>
           </div>
           <button
             onClick={handleSave}
@@ -705,4 +708,54 @@ function Td({ children }: { children: React.ReactNode }) {
 }
 function fmtDate(iso: string, locale: string = 'es-ES') {
   return new Date(iso).toLocaleDateString(locale, { day: 'numeric', month: 'short', year: 'numeric' })
+}
+
+// Cenas especiales: lo que Table4Singles debe pagar a cada restaurante (solo su importe, sin el 10 %).
+function TabPagos() {
+  const [rows, setRows] = useState<{ restaurant_id: string; restaurant_name: string; bookings: number; pending_cents: number; paid_cents: number }[] | null>(null)
+  const [busy, setBusy] = useState<string | null>(null)
+  const [err, setErr] = useState<string | null>(null)
+  const eur = (c: number) => (c / 100).toLocaleString('es-ES', { style: 'currency', currency: 'EUR' })
+
+  const load = async () => {
+    const { data, error } = await supabase.rpc('admin_restaurant_payouts')
+    if (error) setErr(error.message); else setRows(data ?? [])
+  }
+  useEffect(() => { load() }, [])
+
+  const markPaid = async (id: string, name: string, cents: number) => {
+    if (!window.confirm(`¿Marcar como pagados ${eur(cents)} a ${name}?`)) return
+    setBusy(id)
+    const { error } = await supabase.rpc('admin_mark_restaurant_paid', { p_restaurant: id })
+    setBusy(null)
+    if (error) setErr(error.message); else load()
+  }
+
+  if (err) return <p className="text-sm text-red-600">{err}</p>
+  if (!rows) return <Loader2 className="w-5 h-5 animate-spin text-gray-400" />
+  return (
+    <div className="space-y-3">
+      <p className="text-sm text-gray-500 dark:text-gray-400">Importe de cada restaurante en sus cenas especiales (sin el 10 % de gestión). Las reservas canceladas no cuentan.</p>
+      {rows.length === 0 && <p className="text-sm text-gray-400">Todavía no hay cenas especiales cobradas.</p>}
+      {rows.map(r => (
+        <div key={r.restaurant_id} className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-4 flex items-center gap-4">
+          <div className="flex-1 min-w-0">
+            <p className="font-semibold text-gray-900 dark:text-white truncate">{r.restaurant_name}</p>
+            <p className="text-xs text-gray-500">{r.bookings} reservas · pagado {eur(r.paid_cents)}</p>
+          </div>
+          <div className="text-right">
+            <p className="text-xs text-gray-500">Pendiente de pagar</p>
+            <p className="font-bold text-gray-900 dark:text-white">{eur(r.pending_cents)}</p>
+          </div>
+          <button
+            disabled={r.pending_cents === 0 || busy === r.restaurant_id}
+            onClick={() => markPaid(r.restaurant_id, r.restaurant_name, r.pending_cents)}
+            className="px-3 py-2 bg-primary-500 text-white rounded-lg text-xs font-semibold disabled:opacity-40"
+          >
+            Marcar como pagado
+          </button>
+        </div>
+      ))}
+    </div>
+  )
 }

@@ -68,6 +68,7 @@ export interface DiningTable {
   cuisine_type: string | null
   languages: string[] | null
   deposit_amount: number
+  special_price_by?: 'restaurant' | 'admin'
   host_reminder_sent: boolean
   is_active: boolean
   available_until: string | null

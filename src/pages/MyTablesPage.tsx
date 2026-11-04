@@ -1,3 +1,4 @@
+import { dinerPrice } from '@/lib/pricing'
 import { useState, useEffect } from 'react'
 import { Plus, CalendarDays, Users, Clock, Loader2, UtensilsCrossed, XCircle, ToggleLeft, ToggleRight } from 'lucide-react'
 import { Navbar } from '@/components/Navbar'
@@ -241,7 +242,7 @@ export function MyTablesPage({ onNavigate, onAuthClick, initialTab }: MyTablesPa
                               💬 {t('invite.inviteViaWhatsApp')}
                             </button>
                             {canCancel ? (
-                            <button onClick={() => setCancelReservationTarget({ id: r.id, joinType: r.join_type, depositAmount: dt?.is_special && dt?.deposit_amount ? Number(dt.deposit_amount) : 2 })} className="text-xs text-red-500 hover:text-red-600 font-medium flex items-center gap-1">
+                            <button onClick={() => setCancelReservationTarget({ id: r.id, joinType: r.join_type, depositAmount: dinerPrice({ isSpecial: dt?.is_special, depositAmount: dt?.deposit_amount, priceBy: dt?.special_price_by }).total })} className="text-xs text-red-500 hover:text-red-600 font-medium flex items-center gap-1">
                               <XCircle className="w-3.5 h-3.5" /> {t('card.cancelReservation')}
                             </button>
                             ) : (
@@ -299,7 +300,16 @@ export function MyTablesPage({ onNavigate, onAuthClick, initialTab }: MyTablesPa
             depositAmount={cancelReservationTarget.depositAmount}
             onClose={() => setCancelReservationTarget(null)}
             onConfirm={async () => {
-              await cancelReservation(cancelReservationTarget.id)
+              try {
+                await cancelReservation(cancelReservationTarget.id)
+              } catch (e: any) {
+                if (String(e?.message).includes('CANCEL_TOO_LATE')) {
+                  setCancelReservationTarget(null)
+                  window.alert(t('myTables.cancelDeadline'))
+                  return
+                }
+                throw e
+              }
               setCancelReservationTarget(null)
             }}
           />

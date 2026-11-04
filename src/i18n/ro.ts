@@ -103,7 +103,7 @@ export const ro = {
       description: 'Fiecare seară în care o masă rămâne goală înseamnă bani pierduți definitiv. Table4Singles o umple cu persoane singure care caută exact asta: planuri și companie. Tu publici când îți convine, noi aducem oamenii.',
       cta: 'Înregistrează-ți restaurantul gratuit',
       secondaryCta: 'Vezi cum funcționează',
-      fact1: '3 luni la prețul uneia',
+      fact1: 'Primele 3 luni gratuite',
       fact2: 'Fără angajament',
       fact3: 'Gata în 2 minute',
     },
@@ -153,7 +153,7 @@ export const ro = {
       title: 'Tot ce trebuie să știi',
       subtitle: 'Cele mai frecvente întrebări, rezolvate',
       q1: 'Cât costă exact?',
-      a1: '10€/lună, fără cost de configurare. Cu oferta de lansare, prima ta plată de 10€ acoperă primele trei luni.',
+      a1: 'Înscrierea este gratuită și nu plătești nimic în primele trei luni. Apoi, 10 €/lună, fără costuri de configurare.',
       q2: 'Trebuie să ofer reduceri la meniu?',
       a2: 'Nu. Meniul și prețurile tale rămân aceleași — Table4Singles doar îți aduce comeseni la mesele pe care alegi să le publici.',
       q3: 'Ce se întâmplă dacă nu se înscrie nimeni la o masă?',
@@ -165,8 +165,8 @@ export const ro = {
     },
     finalCta: {
       badge: 'Ofertă de lansare',
-      title: '3 luni la prețul uneia',
-      desc: 'Preț normal: 10€/lună. Cu oferta de lansare, prima ta plată acoperă primele trei luni.',
+      title: 'Primele 3 luni gratuite',
+      desc: 'Înscrie-te gratuit și nu plăti nimic 3 luni. Apoi, 10 €/lună fără angajament.',
       button: 'Înregistrează-ți restaurantul gratuit',
     },
     footer: {

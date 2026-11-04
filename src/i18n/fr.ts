@@ -103,7 +103,7 @@ export const fr = {
       description: 'Chaque soir où une table reste vide, c\'est de l\'argent perdu pour de bon. Table4Singles la remplit avec des célibataires qui cherchent exactement ça : un plan et de la compagnie. Vous publiez quand ça vous arrange, nous amenons les gens.',
       cta: 'Inscrivez votre restaurant gratuitement',
       secondaryCta: 'Voir comment ça marche',
-      fact1: '3 mois au prix d\'1',
+      fact1: 'Gratuit les 3 premiers mois',
       fact2: 'Sans engagement',
       fact3: 'Prêt en 2 minutes',
     },
@@ -153,7 +153,7 @@ export const fr = {
       title: 'Tout ce que vous devez savoir',
       subtitle: 'Les questions les plus fréquentes, résolues',
       q1: 'Combien ça coûte exactement ?',
-      a1: '10€/mois, sans frais de mise en place. Avec l\'offre de lancement, votre premier paiement de 10€ couvre les trois premiers mois.',
+      a1: 'L’inscription est gratuite et tu ne paies rien pendant les trois premiers mois. Ensuite, 10 €/mois, sans frais de configuration.',
       q2: 'Dois-je proposer des réductions sur ma carte ?',
       a2: 'Non. Votre carte et vos prix restent les mêmes — Table4Singles vous amène simplement des convives aux tables que vous choisissez de publier.',
       q3: 'Que se passe-t-il si personne ne s\'inscrit à une table ?',
@@ -165,8 +165,8 @@ export const fr = {
     },
     finalCta: {
       badge: 'Offre de lancement',
-      title: '3 mois au prix d\'1',
-      desc: 'Prix normal : 10€/mois. Avec l\'offre de lancement, votre premier paiement couvre les trois premiers mois.',
+      title: 'Gratuit les 3 premiers mois',
+      desc: 'Inscris-toi gratuitement et ne paie rien pendant 3 mois. Ensuite, 10 €/mois sans engagement.',
       button: 'Inscrivez votre restaurant gratuitement',
     },
     footer: {

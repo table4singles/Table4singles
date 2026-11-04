@@ -103,7 +103,7 @@ export const en = {
       description: 'Every night a table stays empty is money that never comes back. Table4Singles fills it with singles looking for exactly that: plans and company. You publish whenever it suits you, we bring the people.',
       cta: 'Register your restaurant for free',
       secondaryCta: 'See how it works',
-      fact1: '3 months for the price of 1',
+      fact1: 'Free for the first 3 months',
       fact2: 'No commitment',
       fact3: 'Ready in 2 minutes',
     },
@@ -153,7 +153,7 @@ export const en = {
       title: 'Everything you need to know',
       subtitle: 'The most common questions, answered',
       q1: 'How much does it cost exactly?',
-      a1: '10€/month, no setup cost. With the launch offer, your first payment of 10€ covers the first three months.',
+      a1: 'Signing up is free and you pay nothing for the first three months. After that, 10€/month, no setup cost.',
       q2: 'Do I have to offer discounts on my menu?',
       a2: 'No. Your menu and your prices stay exactly as they are — Table4Singles just brings diners to the tables you choose to publish.',
       q3: 'What if nobody joins a table?',
@@ -165,8 +165,8 @@ export const en = {
     },
     finalCta: {
       badge: 'Launch offer',
-      title: '3 months for the price of 1',
-      desc: 'Regular price: 10€/month. With the launch offer, your first payment covers the first three months.',
+      title: 'Free for the first 3 months',
+      desc: 'Sign up for free and pay nothing for 3 months. After that, 10€/month with no commitment.',
       button: 'Register your restaurant for free',
     },
     footer: {

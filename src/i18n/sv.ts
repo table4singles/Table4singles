@@ -103,7 +103,7 @@ export const sv = {
       description: 'Varje kväll ett bord står tomt är pengar som aldrig kommer tillbaka. Table4Singles fyller det med singlar som söker precis det: sällskap och en kväll ute. Du publicerar när det passar dig, vi tar hit folket.',
       cta: 'Registrera din restaurang gratis',
       secondaryCta: 'Se hur det fungerar',
-      fact1: '3 månader för priset av 1',
+      fact1: 'Gratis de första 3 månaderna',
       fact2: 'Ingen bindningstid',
       fact3: 'Klart på 2 minuter',
     },
@@ -153,7 +153,7 @@ export const sv = {
       title: 'Allt du behöver veta',
       subtitle: 'De vanligaste frågorna, besvarade',
       q1: 'Vad kostar det exakt?',
-      a1: '10€/månad, ingen startavgift. Med lanseringserbjudandet täcker din första betalning på 10€ de tre första månaderna.',
+      a1: 'Registreringen är gratis och du betalar inget de första tre månaderna. Därefter 10 €/månad, ingen startavgift.',
       q2: 'Måste jag erbjuda rabatter på menyn?',
       a2: 'Nej. Din meny och dina priser förblir som vanligt — Table4Singles tar bara hit gäster till borden du väljer att publicera.',
       q3: 'Vad händer om ingen anmäler sig till ett bord?',
@@ -165,8 +165,8 @@ export const sv = {
     },
     finalCta: {
       badge: 'Lanseringserbjudande',
-      title: '3 månader för priset av 1',
-      desc: 'Ordinarie pris: 10€/månad. Med lanseringserbjudandet täcker din första betalning de tre första månaderna.',
+      title: 'Gratis de första 3 månaderna',
+      desc: 'Registrera dig gratis och betala inget i 3 månader. Därefter 10 €/månad utan bindningstid.',
       button: 'Registrera din restaurang gratis',
     },
     footer: {

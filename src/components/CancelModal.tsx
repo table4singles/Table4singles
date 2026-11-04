@@ -5,11 +5,12 @@ import { useLanguage } from '@/contexts/LanguageContext'
 interface CancelModalProps {
   joinType: 'word' | 'deposit'
   depositAmount?: number
+  isSpecial?: boolean
   onClose: () => void
   onConfirm: () => Promise<void>
 }
 
-export function CancelModal({ joinType, depositAmount = 2, onClose, onConfirm }: CancelModalProps) {
+export function CancelModal({ joinType, depositAmount = 2, isSpecial = false, onClose, onConfirm }: CancelModalProps) {
   const { t } = useLanguage()
   const [loading, setLoading] = useState(false)
 
@@ -32,13 +33,17 @@ export function CancelModal({ joinType, depositAmount = 2, onClose, onConfirm }:
         <div className="px-6 pb-6">
           {joinType === 'deposit' ? (
             <>
+              {isSpecial ? (
+                <p className="text-sm font-medium text-green-700 bg-green-50 rounded-xl p-3 mb-4">{t('cancel.specialRefund')}</p>
+              ) : (
               <div className="flex items-start gap-2 bg-amber-50 border border-amber-200 rounded-xl p-3 mb-4">
-                <AlertTriangle className="w-5 h-5 text-amber-500 flex-shrink-0 mt-0.5" />
-                <div>
-                  <p className="text-sm font-semibold text-amber-800 mb-1">{t('cancel.depositWarning')}</p>
-                  <p className="text-xs text-amber-700">{t('cancel.depositDesc').replace('{amount}', String(depositAmount))}</p>
+                  <AlertTriangle className="w-5 h-5 text-amber-500 flex-shrink-0 mt-0.5" />
+                  <div>
+                    <p className="text-sm font-semibold text-amber-800 mb-1">{t('cancel.depositWarning')}</p>
+                    <p className="text-xs text-amber-700">{t('cancel.depositDesc').replace('{amount}', String(depositAmount))}</p>
+                  </div>
                 </div>
-              </div>
+                )}
             </>
           ) : (
             <>

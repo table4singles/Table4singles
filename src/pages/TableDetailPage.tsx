@@ -548,6 +548,7 @@ export function TableDetailPage({ tableId, paymentSuccess, paymentCancelled, onN
                   {diner.fee > 0 && (
                     <p className="text-xs text-gray-500 dark:text-gray-400 text-center">{t('specialGuest.priceBreakdown').replace('{price}', String(diner.price)).replace('{fee}', String(diner.fee))}</p>
                   )}
+                  {table?.is_special && <p className="text-xs text-green-700 dark:text-green-400 text-center">{t('specialGuest.refundPolicy')}</p>}
                   <p className="text-xs text-gray-400 dark:text-gray-500 text-center">{t('tableDetail.guaranteedSpot')}</p>
                   {joinError && <p className="text-xs text-red-600 text-center">{joinError}</p>}
                 </>

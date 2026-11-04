@@ -32,7 +32,7 @@ export function MyTablesPage({ onNavigate, onAuthClick, initialTab }: MyTablesPa
     if (initialTab) setTab(initialTab)
   }, [initialTab])
   const [cancelTableId, setCancelTableId] = useState<string | null>(null)
-  const [cancelReservationTarget, setCancelReservationTarget] = useState<{ id: string; joinType: 'word' | 'deposit'; depositAmount: number } | null>(null)
+  const [cancelReservationTarget, setCancelReservationTarget] = useState<{ id: string; joinType: 'word' | 'deposit'; depositAmount: number; isSpecial: boolean } | null>(null)
   const [togglingId, setTogglingId] = useState<string | null>(null)
 
   const localeMap: Record<string, string> = {
@@ -242,7 +242,7 @@ export function MyTablesPage({ onNavigate, onAuthClick, initialTab }: MyTablesPa
                               💬 {t('invite.inviteViaWhatsApp')}
                             </button>
                             {canCancel ? (
-                            <button onClick={() => setCancelReservationTarget({ id: r.id, joinType: r.join_type, depositAmount: dinerPrice({ isSpecial: dt?.is_special, depositAmount: dt?.deposit_amount, priceBy: dt?.special_price_by }).total })} className="text-xs text-red-500 hover:text-red-600 font-medium flex items-center gap-1">
+                            <button onClick={() => setCancelReservationTarget({ id: r.id, joinType: r.join_type, isSpecial: !!dt?.is_special, depositAmount: dinerPrice({ isSpecial: dt?.is_special, depositAmount: dt?.deposit_amount, priceBy: dt?.special_price_by }).total })} className="text-xs text-red-500 hover:text-red-600 font-medium flex items-center gap-1">
                               <XCircle className="w-3.5 h-3.5" /> {t('card.cancelReservation')}
                             </button>
                             ) : (
@@ -298,10 +298,11 @@ export function MyTablesPage({ onNavigate, onAuthClick, initialTab }: MyTablesPa
           <CancelModal
             joinType="deposit"
             depositAmount={cancelReservationTarget.depositAmount}
+            isSpecial={cancelReservationTarget.isSpecial}
             onClose={() => setCancelReservationTarget(null)}
             onConfirm={async () => {
               try {
-                await cancelReservation(cancelReservationTarget.id)
+                await cancelReservation(cancelReservationTarget.id, cancelReservationTarget.isSpecial)
               } catch (e: any) {
                 if (String(e?.message).includes('CANCEL_TOO_LATE')) {
                   setCancelReservationTarget(null)

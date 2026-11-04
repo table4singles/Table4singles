@@ -221,9 +221,16 @@ export function useMyTables(userId: string | null) {
     await fetchMyTables()
   }, [fetchMyTables])
 
-  const cancelReservation = useCallback(async (participantId: string) => {
-    const { error: err } = await supabase.rpc('cancel_reservation', { p_participant_id: participantId })
-    if (err) throw err
+  // Las cenas especiales se cancelan por la función que además devuelve el importe en Stripe.
+  const cancelReservation = useCallback(async (participantId: string, isSpecial = false) => {
+    if (isSpecial) {
+      const { data, error: fnErr } = await supabase.functions.invoke('cancel-reservation', { body: { participantId } })
+      if (fnErr) throw fnErr
+      if (!data?.ok) throw new Error(data?.error ?? 'cancel failed')
+    } else {
+      const { error: err } = await supabase.rpc('cancel_reservation', { p_participant_id: participantId })
+      if (err) throw err
+    }
     await fetchMyTables()
   }, [fetchMyTables])
 

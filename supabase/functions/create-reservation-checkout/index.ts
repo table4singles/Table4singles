@@ -98,7 +98,7 @@ serve(async (req) => {
               ? `Cena con ${table.special_guest_name} en ${table.restaurant_name}`
               : `Reserva en ${table.restaurant_name}`,
             description: restaurantPriced
-              ? 'Reserva de cena especial, no reembolsable — Table4Singles'
+              ? 'Cena especial: reembolso completo si cancelas hasta el día anterior — Table4Singles'
               : 'Depósito de reserva no reembolsable — Table4Singles',
           },
           unit_amount: priceCents,

@@ -712,7 +712,7 @@ function fmtDate(iso: string, locale: string = 'es-ES') {
 
 // Cenas especiales: lo que Table4Singles debe pagar a cada restaurante (solo su importe, sin el 10 %).
 function TabPagos() {
-  const [rows, setRows] = useState<{ restaurant_id: string; restaurant_name: string; bookings: number; pending_cents: number; paid_cents: number }[] | null>(null)
+  const [rows, setRows] = useState<{ restaurant_id: string; restaurant_name: string; bookings: number; upcoming_cents: number; due_cents: number; paid_cents: number }[] | null>(null)
   const [busy, setBusy] = useState<string | null>(null)
   const [err, setErr] = useState<string | null>(null)
   const eur = (c: number) => (c / 100).toLocaleString('es-ES', { style: 'currency', currency: 'EUR' })
@@ -735,21 +735,21 @@ function TabPagos() {
   if (!rows) return <Loader2 className="w-5 h-5 animate-spin text-gray-400" />
   return (
     <div className="space-y-3">
-      <p className="text-sm text-gray-500 dark:text-gray-400">Importe de cada restaurante en sus cenas especiales (sin el 10 % de gestión). Las reservas canceladas no cuentan.</p>
+      <p className="text-sm text-gray-500 dark:text-gray-400">Importe de cada restaurante en sus cenas especiales (sin el 10 % de gestión). Solo se debe cuando la cena ya se ha celebrado; las canceladas se devuelven al comensal y no cuentan.</p>
       {rows.length === 0 && <p className="text-sm text-gray-400">Todavía no hay cenas especiales cobradas.</p>}
       {rows.map(r => (
         <div key={r.restaurant_id} className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-4 flex items-center gap-4">
           <div className="flex-1 min-w-0">
             <p className="font-semibold text-gray-900 dark:text-white truncate">{r.restaurant_name}</p>
-            <p className="text-xs text-gray-500">{r.bookings} reservas · pagado {eur(r.paid_cents)}</p>
+            <p className="text-xs text-gray-500">{r.bookings} reservas · próximas {eur(r.upcoming_cents)} · pagado {eur(r.paid_cents)}</p>
           </div>
           <div className="text-right">
-            <p className="text-xs text-gray-500">Pendiente de pagar</p>
-            <p className="font-bold text-gray-900 dark:text-white">{eur(r.pending_cents)}</p>
+            <p className="text-xs text-gray-500">Debes pagar (cenas celebradas)</p>
+            <p className="font-bold text-gray-900 dark:text-white">{eur(r.due_cents)}</p>
           </div>
           <button
-            disabled={r.pending_cents === 0 || busy === r.restaurant_id}
-            onClick={() => markPaid(r.restaurant_id, r.restaurant_name, r.pending_cents)}
+            disabled={r.due_cents === 0 || busy === r.restaurant_id}
+            onClick={() => markPaid(r.restaurant_id, r.restaurant_name, r.due_cents)}
             className="px-3 py-2 bg-primary-500 text-white rounded-lg text-xs font-semibold disabled:opacity-40"
           >
             Marcar como pagado

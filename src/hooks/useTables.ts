@@ -182,8 +182,10 @@ export function useTableDetail(tableId: string | null) {
 
   const cancelTable = useCallback(async () => {
     if (!tableId) throw new Error('No table selected')
-    const { error: err } = await supabase.from('dining_tables').update({ status: 'cancelled' }).eq('id', tableId)
-    if (err) throw err
+    // La función devuelve el dinero de todos los comensales y cancela la mesa
+    const { data, error: fnErr } = await supabase.functions.invoke('cancel-table', { body: { tableId: tableId } })
+    if (fnErr) throw fnErr
+    if (!data?.ok) throw new Error(data?.error ?? 'cancel failed')
     await fetchTable()
   }, [tableId, fetchTable])
 
@@ -216,8 +218,10 @@ export function useMyTables(userId: string | null) {
   useEffect(() => { fetchMyTables() }, [fetchMyTables])
 
   const cancelHostedTable = useCallback(async (tableId: string) => {
-    const { error: err } = await supabase.from('dining_tables').update({ status: 'cancelled' }).eq('id', tableId)
-    if (err) throw err
+    // La función devuelve el dinero de todos los comensales y cancela la mesa
+    const { data, error: fnErr } = await supabase.functions.invoke('cancel-table', { body: { tableId: tableId } })
+    if (fnErr) throw fnErr
+    if (!data?.ok) throw new Error(data?.error ?? 'cancel failed')
     await fetchMyTables()
   }, [fetchMyTables])
 

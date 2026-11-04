@@ -1,3 +1,4 @@
+import { showBilling } from '@/lib/billing'
 import { useState, useRef, useEffect } from 'react'
 import { LayoutGrid, Search, Plus, CalendarDays, CalendarClock, Mail, User, LogOut, Bell, LayoutDashboard, Settings, Users, FileText, Star, Award, CreditCard, ShieldCheck, ArrowLeftRight } from 'lucide-react'
 import { useAuth } from '@/contexts/AuthContext'
@@ -77,6 +78,7 @@ export function Navbar({ currentPage, onNavigate, onAuthClick }: NavbarProps) {
               <NavLink active={currentPage === 'agenda'} onClick={() => onNavigate('agenda')} icon={<CalendarClock className="w-4 h-4" />} label={t('nav.agenda')} />
               <NavLink active={currentPage === 'my-tables'} onClick={() => onNavigate('my-tables')} icon={<CalendarDays className="w-4 h-4" />} label={t('nav.myTables')} />
               <NavLink active={currentPage === 'reviews'} onClick={() => onNavigate('reviews')} icon={<Star className="w-4 h-4" />} label={t('nav.reviews')} />
+              {showBilling(profile?.subscription_status) && (
               <NavLink
                 active={currentPage === 'subscription'}
                 onClick={() => onNavigate('subscription')}
@@ -84,6 +86,7 @@ export function Navbar({ currentPage, onNavigate, onAuthClick }: NavbarProps) {
                 label={t('nav.subscription')}
                 alert={!profile?.subscription_status || profile.subscription_status === 'canceled' || profile.subscription_status === 'past_due'}
               />
+              )}
             </>
           )}
           {user && effectiveRole === 'user' && (
@@ -163,6 +166,7 @@ export function Navbar({ currentPage, onNavigate, onAuthClick }: NavbarProps) {
                     </button>
                     {effectiveRole === 'restaurant' && (
                       <>
+                        {showBilling(profile?.subscription_status) && (
                         <button onClick={() => { onNavigate('subscription'); setShowMenu(false) }} className="w-full px-4 py-3 text-left text-sm text-gray-200 hover:bg-white/5 flex items-center gap-2">
                           <CreditCard className="w-4 h-4" />
                           <span className="flex-1">{t('nav.subscription')}</span>
@@ -170,6 +174,7 @@ export function Navbar({ currentPage, onNavigate, onAuthClick }: NavbarProps) {
                             <span className="w-2 h-2 rounded-full bg-gold-400 flex-shrink-0" />
                           )}
                         </button>
+                        )}
                         <button onClick={() => { onNavigate('aviso-legal'); setShowMenu(false) }} className="w-full px-4 py-3 text-left text-sm text-gray-200 hover:bg-white/5 flex items-center gap-2">
                           <FileText className="w-4 h-4" /> {t('settings.privacy.terms')}
                         </button>

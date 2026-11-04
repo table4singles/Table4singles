@@ -1,3 +1,4 @@
+import { showBilling } from '@/lib/billing'
 import { useState, useMemo, useEffect } from 'react'
 import { UtensilsCrossed, Users, Star, Loader2, XCircle, Calendar, Clock, CalendarClock, CalendarDays, AlertCircle, CheckCircle, CreditCard, TrendingUp, QrCode } from 'lucide-react'
 import { Navbar } from '@/components/Navbar'
@@ -95,7 +96,7 @@ export function RestaurantDashboardPage({ onNavigate, onAuthClick }: RestaurantD
               <span className="text-orange-800 dark:text-orange-300 font-medium">{t('restaurantDashboard.subscriptionPastDue')}</span>
               <button onClick={() => onNavigate('subscription')} className="ml-auto text-xs text-orange-700 dark:text-orange-400 hover:underline font-medium">{t('restaurantDashboard.viewSubscription')}</button>
             </div>
-          ) : (
+          ) : !showBilling(profile?.subscription_status) ? null : (
             <div className="lg:col-start-1 lg:col-span-3 lg:row-start-1 flex items-center gap-3 bg-[#129a93]/5 border border-[#129a93]/20 rounded-xl px-4 py-3 mb-6 lg:mb-0">
               <CreditCard className="w-4 h-4 text-[#129a93] flex-shrink-0" />
               <div className="flex-1 min-w-0">
@@ -205,6 +206,7 @@ export function RestaurantDashboardPage({ onNavigate, onAuthClick }: RestaurantD
               <span className="text-purple-600 dark:text-purple-400 text-xs font-medium mt-2 inline-block group-hover:underline">{t('restaurantDashboard.goToAnalytics')} →</span>
             </button>
 
+            {showBilling(profile?.subscription_status) && (
             <button
               onClick={() => onNavigate('subscription')}
               className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-4 text-left hover:shadow-md hover:border-green-300 dark:hover:border-green-600 transition-all group"
@@ -218,6 +220,7 @@ export function RestaurantDashboardPage({ onNavigate, onAuthClick }: RestaurantD
               <p className="text-xs text-gray-500 dark:text-gray-400">{t('restaurantDashboard.subscriptionDesc')}</p>
               <span className="text-green-600 dark:text-green-400 text-xs font-medium mt-2 inline-block group-hover:underline">{t('restaurantDashboard.goToSubscription')} →</span>
             </button>
+            )}
 
             {user && (
               <button

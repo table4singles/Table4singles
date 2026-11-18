@@ -257,8 +257,10 @@ export function TableDetailPage({ tableId, paymentSuccess, paymentCancelled, onN
   const handleRemoveParticipant = async (participantId: string) => {
     setRemovingParticipantId(participantId)
     try {
-      const { error: err } = await supabase.rpc('remove_participant', { p_participant_id: participantId })
+      // La función quita al comensal y le devuelve lo que pagó
+      const { data, error: err } = await supabase.functions.invoke('remove-participant', { body: { participantId } })
       if (err) throw err
+      if (!data?.ok) throw new Error(data?.error ?? 'remove failed')
       await refresh()
     } finally {
       setRemovingParticipantId(null)

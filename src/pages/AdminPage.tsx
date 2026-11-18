@@ -19,7 +19,7 @@ interface AdminPageProps {
   onAuthClick: (mode?: 'signin' | 'signup') => void
 }
 
-type Tab = 'resumen' | 'usuarios' | 'restaurantes' | 'embajadores' | 'movimientos' | 'demanda' | 'funnel' | 'especiales' | 'reportes' | 'pagos'
+type Tab = 'resumen' | 'usuarios' | 'restaurantes' | 'embajadores' | 'movimientos' | 'demanda' | 'funnel' | 'especiales' | 'reportes' | 'pagos' | 'reembolsos'
 
 const DAY_KEYS = ['demand.dayMon', 'demand.dayTue', 'demand.dayWed', 'demand.dayThu', 'demand.dayFri', 'demand.daySat', 'demand.daySun']
 
@@ -76,6 +76,7 @@ export function AdminPage({ onNavigate, onAuthClick }: AdminPageProps) {
     { id: 'funnel',       label: t('admin.tabFunnel'),                                                                                   icon: <Filter className="w-4 h-4" /> },
     { id: 'especiales',   label: t('specialGuest.adminTabLabel'),                                                                        icon: <Sparkles className="w-4 h-4" /> },
     { id: 'pagos',        label: 'Pagos a restaurantes',                                                                                 icon: <Euro className="w-4 h-4" /> },
+    { id: 'reembolsos',   label: 'Reembolsos',                                                                                           icon: <RefreshCw className="w-4 h-4" /> },
     { id: 'reportes',     label: t('admin.tabReportes').replace('{count}', String(reports.filter(r => r.status === 'pending').length)), icon: <Flag className="w-4 h-4" /> },
   ]
 
@@ -116,6 +117,7 @@ export function AdminPage({ onNavigate, onAuthClick }: AdminPageProps) {
             {tab === 'funnel'       && <TabFunnel events={analyticsEvents} t={t} language={language} />}
             {tab === 'especiales'   && <TabEspeciales restaurants={restaurants} t={t} dateLocale={dateLocale} />}
             {tab === 'pagos'        && <TabPagos />}
+            {tab === 'reembolsos'   && <TabReembolsos />}
             {tab === 'reportes'     && <TabReportes reports={reports} t={t} dateLocale={dateLocale} onChanged={refresh} />}
           </>
         )}
@@ -754,6 +756,61 @@ function TabPagos() {
           >
             Marcar como pagado
           </button>
+        </div>
+      ))}
+    </div>
+  )
+}
+
+// Solicitudes de reembolso pendientes: reembolsos automáticos que fallaron o cancelaciones sin pasar por la función.
+function TabReembolsos() {
+  type Claim = { id: string; created_at: string; status: string; reason: string; diner_name: string; restaurant_name: string | null; table_date: string | null; amount_cents: number | null; payment_status: string | null }
+  const [rows, setRows] = useState<Claim[] | null>(null)
+  const [busy, setBusy] = useState<string | null>(null)
+  const [err, setErr] = useState<string | null>(null)
+  const eur = (c: number | null) => c == null ? '—' : (c / 100).toLocaleString('es-ES', { style: 'currency', currency: 'EUR' })
+
+  const load = async () => {
+    const { data, error } = await supabase.rpc('admin_refund_claims')
+    if (error) setErr(error.message); else setRows((data as Claim[]) ?? [])
+  }
+  useEffect(() => { load() }, [])
+
+  const refund = async (c: Claim) => {
+    if (!window.confirm(`¿Devolver ${eur(c.amount_cents)} a ${c.diner_name} en Stripe?`)) return
+    setBusy(c.id); setErr(null)
+    const { data, error } = await supabase.functions.invoke('admin-refund', { body: { claimId: c.id } })
+    setBusy(null)
+    if (error) setErr(error.message); else if (!data?.ok) setErr(data?.error ?? 'No se pudo devolver'); else load()
+  }
+  const resolveManual = async (c: Claim) => {
+    if (!window.confirm(`¿Marcar como ya devuelto a mano (${c.diner_name})?`)) return
+    setBusy(c.id)
+    const { error } = await supabase.rpc('admin_resolve_refund_claim', { p_id: c.id })
+    setBusy(null)
+    if (error) setErr(error.message); else load()
+  }
+
+  if (!rows) return err ? <p className="text-sm text-red-600">{err}</p> : <Loader2 className="w-5 h-5 animate-spin text-gray-400" />
+  const pending = rows.filter(r => r.status === 'pending')
+  return (
+    <div className="space-y-3">
+      <p className="text-sm text-gray-500 dark:text-gray-400">Reembolsos que no se pudieron hacer solos (cancelación de mesa o de cena especial). «Devolver en Stripe» lo reintenta; «Ya devuelto a mano» solo cierra la solicitud.</p>
+      {err && <p className="text-sm text-red-600">{err}</p>}
+      {pending.length === 0 && <p className="text-sm text-gray-400">No hay reembolsos pendientes.</p>}
+      {rows.map(c => (
+        <div key={c.id} className={`bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-4 flex flex-wrap items-center gap-3 ${c.status !== 'pending' ? 'opacity-50' : ''}`}>
+          <div className="flex-1 min-w-[12rem]">
+            <p className="font-semibold text-gray-900 dark:text-white">{c.diner_name} · {eur(c.amount_cents)}</p>
+            <p className="text-xs text-gray-500">{c.restaurant_name ?? '—'}{c.table_date ? ` · ${c.table_date}` : ''} · {new Date(c.created_at).toLocaleDateString('es-ES')}</p>
+            <p className="text-xs text-gray-400">{c.reason}{c.payment_status === 'refunded' ? ' · ya devuelto en Stripe' : ''}</p>
+          </div>
+          {c.status === 'pending' ? (
+            <div className="flex gap-2">
+              <button disabled={busy === c.id || c.payment_status !== 'paid'} onClick={() => refund(c)} className="px-3 py-2 bg-primary-500 text-white rounded-lg text-xs font-semibold disabled:opacity-40">Devolver en Stripe</button>
+              <button disabled={busy === c.id} onClick={() => resolveManual(c)} className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-xs font-semibold disabled:opacity-40">Ya devuelto a mano</button>
+            </div>
+          ) : <span className="text-xs text-gray-500">Resuelto</span>}
         </div>
       ))}
     </div>

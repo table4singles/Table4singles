@@ -1068,6 +1068,7 @@ export const ro = {
     avatarAlt: 'Fotografie de profil',
     avatarOptional: 'Fotografie de profil (opțional)',
     avatarRequired: 'Fotografie de profil (obligatoriu)',
+    mustBeAdult: 'Introdu data nașterii: trebuie să ai cel puțin 18 ani.',
     fullNameLabel: 'Nume complet',
     streetLabel: 'Stradă și număr',
     streetPlaceholder: 'Str. Principală 12, et. 3',

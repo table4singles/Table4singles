@@ -1068,6 +1068,7 @@ export const sv = {
     avatarAlt: 'Profilbild',
     avatarOptional: 'Profilbild (valfritt)',
     avatarRequired: 'Profilbild (obligatoriskt)',
+    mustBeAdult: 'Ange ditt födelsedatum: du måste vara minst 18 år.',
     fullNameLabel: 'Fullständigt namn',
     streetLabel: 'Gata och nummer',
     streetPlaceholder: 'Storgatan 12, 3 tr',

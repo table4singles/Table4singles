@@ -1068,6 +1068,7 @@ export const zh = {
     avatarAlt: '头像',
     avatarOptional: '头像（可选）',
     avatarRequired: '头像（必填）',
+    mustBeAdult: '请填写出生日期：您必须年满18岁。',
     fullNameLabel: '姓名',
     streetLabel: '街道及门牌号',
     streetPlaceholder: '主街12号，3楼',

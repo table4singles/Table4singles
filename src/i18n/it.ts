@@ -1068,6 +1068,7 @@ export const it = {
     avatarAlt: 'Foto profilo',
     avatarOptional: 'Foto profilo (facoltativa)',
     avatarRequired: 'Foto profilo (obbligatoria)',
+    mustBeAdult: 'Inserisci la tua data di nascita: devi avere almeno 18 anni.',
     fullNameLabel: 'Nome completo',
     streetLabel: 'Via e numero civico',
     streetPlaceholder: 'Via Roma 12, 3° piano',

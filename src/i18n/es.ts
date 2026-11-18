@@ -1056,6 +1056,7 @@ export const es = {
     avatarAlt: 'Foto de perfil',
     avatarOptional: 'Foto de perfil (opcional)',
     avatarRequired: 'Foto de perfil (obligatoria)',
+    mustBeAdult: 'Indica tu fecha de nacimiento: debes ser mayor de 18 años.',
     fullNameLabel: 'Nombre completo',
     streetLabel: 'Calle y número',
     streetPlaceholder: 'Calle Mayor 12, 3ºB',

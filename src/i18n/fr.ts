@@ -1068,6 +1068,7 @@ export const fr = {
     avatarAlt: 'Photo de profil',
     avatarOptional: 'Photo de profil (facultatif)',
     avatarRequired: 'Photo de profil (obligatoire)',
+    mustBeAdult: 'Indique ta date de naissance : tu dois avoir au moins 18 ans.',
     fullNameLabel: 'Nom complet',
     streetLabel: 'Rue et numéro',
     streetPlaceholder: '12 rue de la Paix, 3e étage',

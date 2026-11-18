@@ -1068,6 +1068,7 @@ export const de = {
     avatarAlt: 'Profilbild',
     avatarOptional: 'Profilbild (optional)',
     avatarRequired: 'Profilbild (erforderlich)',
+    mustBeAdult: 'Gib dein Geburtsdatum an: Du musst mindestens 18 Jahre alt sein.',
     fullNameLabel: 'Vollständiger Name',
     streetLabel: 'Straße und Hausnummer',
     streetPlaceholder: 'Musterstraße 12, 3. Stock',

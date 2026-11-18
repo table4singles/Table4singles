@@ -1068,6 +1068,7 @@ export const ar = {
     avatarAlt: 'صورة الملف الشخصي',
     avatarOptional: 'صورة الملف الشخصي (اختياري)',
     avatarRequired: 'صورة الملف الشخصي (إلزامي)',
+    mustBeAdult: 'أدخل تاريخ ميلادك: يجب أن يكون عمرك 18 عامًا على الأقل.',
     fullNameLabel: 'الاسم الكامل',
     streetLabel: 'الشارع ورقم المبنى',
     streetPlaceholder: 'شارع الملك 12، الطابق 3',

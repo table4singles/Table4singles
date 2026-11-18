@@ -112,6 +112,13 @@ export function OnboardingPage({ onNavigate }: { onNavigate: (page: string, id?:
 
   const handleSubmit = async () => {
     if (!user || !isValid) return
+    if (!isRestaurant) {
+      // Foto obligatoria (lo dice el formulario) y mayoría de edad (las condiciones exigen 18+)
+      if (!avatarUrl) { setError(t('onboardingExtra.avatarRequired')); return }
+      const dob = dateOfBirth ? new Date(`${dateOfBirth}T00:00:00`) : null
+      const adultSince = new Date(); adultSince.setFullYear(adultSince.getFullYear() - 18)
+      if (!dob || isNaN(dob.getTime()) || dob > adultSince) { setError(t('onboardingExtra.mustBeAdult')); return }
+    }
     setSaving(true)
     setError(null)
 

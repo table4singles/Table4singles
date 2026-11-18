@@ -1092,6 +1092,7 @@ export const en = {
     avatarAlt: 'Profile photo',
     avatarOptional: 'Profile photo (optional)',
     avatarRequired: 'Profile photo (required)',
+    mustBeAdult: 'Enter your date of birth: you must be at least 18 years old.',
     fullNameLabel: 'Full name',
     streetLabel: 'Street and number',
     streetPlaceholder: '123 Main St, 3rd floor',

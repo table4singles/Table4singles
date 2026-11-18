@@ -1068,6 +1068,7 @@ export const uk = {
     avatarAlt: 'Фото профілю',
     avatarOptional: 'Фото профілю (необов’язково)',
     avatarRequired: 'Фото профілю (обов’язково)',
+    mustBeAdult: 'Вкажіть дату народження: вам має бути не менше 18 років.',
     fullNameLabel: 'Повне ім’я',
     streetLabel: 'Вулиця та номер будинку',
     streetPlaceholder: 'вул. Хрещатик 12, 3 поверх',

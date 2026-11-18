@@ -1068,6 +1068,7 @@ export const ru = {
     avatarAlt: 'Фото профиля',
     avatarOptional: 'Фото профиля (необязательно)',
     avatarRequired: 'Фото профиля (обязательно)',
+    mustBeAdult: 'Укажите дату рождения: вам должно быть не менее 18 лет.',
     fullNameLabel: 'Полное имя',
     streetLabel: 'Улица и номер дома',
     streetPlaceholder: 'ул. Ленина 12, 3 этаж',

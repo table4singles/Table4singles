@@ -1068,6 +1068,7 @@ export const ja = {
     avatarAlt: 'プロフィール写真',
     avatarOptional: 'プロフィール写真（任意）',
     avatarRequired: 'プロフィール写真（必須）',
+    mustBeAdult: '生年月日を入力してください。18歳以上である必要があります。',
     fullNameLabel: '氏名',
     streetLabel: '番地・住所',
     streetPlaceholder: '〇〇通り12番地 3階',

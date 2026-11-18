@@ -89,7 +89,10 @@ async function confirmReservation(
     type: 'new_reservation',
     title: `¡Nueva reserva! ${occupied}/${table.max_seats}`,
     body: `${dinerName} se ha apuntado a tu mesa${timeStr ? ` de las ${timeStr}` : ''} (${table.date})`,
-    metadata: { table_id: tableId, user_id: userId, table_name: table.restaurant_name },
+    metadata: {
+      table_id: tableId, user_id: userId, table_name: table.restaurant_name, restaurant: table.restaurant_name,
+      name: dinerName, occupied, max_seats: table.max_seats, date: table.date, time: timeStr || null,
+    },
     read: false,
   })
 

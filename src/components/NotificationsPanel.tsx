@@ -49,9 +49,22 @@ function getNotificationText(n: Notification, t: (key: string) => string, locale
     case 'table_cancelled':
       return { title: t('notifications.types.tableCancelled.title'), body: t('notifications.types.tableCancelled.body').replace('{restaurant}', restaurant) }
     case 'reminder_guest':
-      return { title: t('notifications.types.reminderGuest.title'), body: t('notifications.types.reminderGuest.body').replace('{restaurant}', restaurant).replace('{date}', date).replace('{time}', time) }
+      return time
+        ? { title: t('notifications.types.reminderGuest.title'), body: t('notifications.types.reminderGuest.body').replace('{restaurant}', restaurant).replace('{date}', date).replace('{time}', time) }
+        : { title: t('notifications.types.reminderGuest.title'), body: t('notifications.types.reminderGuest.bodyNoTime').replace('{restaurant}', restaurant).replace('{date}', date) }
     case 'reminder_host':
-      return { title: t('notifications.types.reminderHost.title'), body: t('notifications.types.reminderHost.body').replace('{restaurant}', restaurant).replace('{time}', time) }
+      return time
+        ? { title: t('notifications.types.reminderHost.title'), body: t('notifications.types.reminderHost.body').replace('{restaurant}', restaurant).replace('{time}', time) }
+        : { title: t('notifications.types.reminderHost.title'), body: t('notifications.types.reminderHost.bodyNoTime').replace('{restaurant}', restaurant) }
+    case 'new_reservation': {
+      const occupied = metaStr(m, 'occupied')
+      const max = metaStr(m, 'max_seats')
+      if (!occupied) return { title: n.title, body: n.body }
+      const body = time
+        ? t('notifications.types.newReservation.bodyTime').replace('{name}', name || someone).replace('{time}', time).replace('{date}', date)
+        : t('notifications.types.newReservation.body').replace('{name}', name || someone).replace('{date}', date)
+      return { title: t('notifications.types.newReservation.title').replace('{occupied}', occupied).replace('{max}', max), body }
+    }
     case 'new_restaurant_review':
       return { title: t('notifications.types.newRestaurantReview.title'), body: t('notifications.types.newRestaurantReview.body').replace('{name}', name || someone).replace('{rating}', rating) }
     case 'updated_restaurant_review':

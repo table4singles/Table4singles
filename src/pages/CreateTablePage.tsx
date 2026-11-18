@@ -20,6 +20,7 @@ export function CreateTablePage({ onNavigate, onAuthClick }: CreateTablePageProp
 
   const [availableFrom, setAvailableFrom] = useState(new Date().toISOString().split('T')[0])
   const [availableUntil, setAvailableUntil] = useState('')
+  const [mealTime, setMealTime] = useState('')
   const [maxSeats, setMaxSeats] = useState(6)
   const [zone, setZone] = useState('salon')
   const [customZone, setCustomZone] = useState('')
@@ -49,7 +50,7 @@ export function CreateTablePage({ onNavigate, onAuthClick }: CreateTablePageProp
       restaurant_country: profile.country ?? '',
       restaurant_image_url: profile.restaurant_photos?.[0] ?? null,
       date: availableFrom,
-      time: null,
+      time: mealTime || null,
       available_until: availableUntil || null,
       max_seats: maxSeats,
       available_seats: maxSeats,
@@ -74,6 +75,7 @@ export function CreateTablePage({ onNavigate, onAuthClick }: CreateTablePageProp
     setSuccess(false)
     setAvailableFrom(new Date().toISOString().split('T')[0])
     setAvailableUntil('')
+    setMealTime('')
     setMaxSeats(6)
     setZone('salon')
     setCustomZone('')
@@ -166,6 +168,16 @@ export function CreateTablePage({ onNavigate, onAuthClick }: CreateTablePageProp
             <p className="text-xs text-gray-400 dark:text-gray-500 mt-2">
               {t('createTable.availabilityHint')}
             </p>
+            <div className="mt-4">
+              <label className="block text-xs text-gray-500 dark:text-gray-400 mb-1.5">{t('createTable.mealTime')}</label>
+              <input
+                type="time"
+                value={mealTime}
+                onChange={e => setMealTime(e.target.value)}
+                className="w-full sm:w-48 px-3 py-2.5 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 dark:text-white rounded-xl text-sm"
+              />
+              <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">{t('createTable.mealTimeHint')}</p>
+            </div>
           </div>
 
           {/* Número de comensales */}

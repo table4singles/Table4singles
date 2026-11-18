@@ -233,7 +233,7 @@ export function TableDetailPage({ tableId, paymentSuccess, paymentCancelled, onN
       .from('dining_tables')
       .update({
         date: editDate,
-        time: editTime,
+        time: editTime || null,
         max_seats: editMaxSeats,
         available_seats: editMaxSeats - occupied,
         description: editZone || null,

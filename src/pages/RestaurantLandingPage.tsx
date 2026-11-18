@@ -18,93 +18,76 @@ export function RestaurantLandingPage({ onNavigate, onAuthClick }: RestaurantLan
     <div className="min-h-screen bg-navy-950">
       <Navbar currentPage="restaurant-landing" onNavigate={onNavigate} onAuthClick={onAuthClick} />
 
-      {/* HERO — full-bleed photo + dark gold gradient */}
-      <section className="relative overflow-hidden text-white">
-        <img src="/hero-dinner.jpg" alt="" className="absolute inset-0 w-full h-full object-cover" />
-        <div className="absolute inset-0 bg-gradient-to-br from-black/90 via-navy-950/85 to-primary-950/70" />
-        <div className="absolute -top-24 -right-16 w-96 h-96 rounded-full bg-gold-400/10 blur-3xl" />
-        <div className="absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-navy-950 to-transparent" />
-
-        <div className="relative max-w-4xl mx-auto px-4 pt-20 pb-28 md:pt-28 md:pb-36 text-center">
-          <p className="inline-flex items-center gap-2 text-xs font-bold tracking-[0.18em] uppercase text-gold-300 bg-gold-400/10 border border-gold-400/30 rounded-full px-4 py-1.5 mb-6">
-            <Sparkles className="w-3.5 h-3.5" /> {t('restaurantLanding.hero.eyebrow')}
-          </p>
-          <h1 className="font-display text-4xl md:text-6xl font-bold mb-6 leading-[1.1] drop-shadow-sm whitespace-pre-line">
-            {t('restaurantLanding.hero.title')}
-          </h1>
-          <p className="text-lg md:text-xl text-white/90 max-w-2xl mx-auto mb-10 leading-relaxed">
-            {t('restaurantLanding.hero.description')}
-          </p>
-
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-12">
-            <button
-              onClick={() => onAuthClick('signup')}
-              className="inline-flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-gold-300 to-gold-500 text-navy-900 hover:from-gold-200 hover:to-gold-400 rounded-full font-bold text-lg shadow-glow-gold hover:-translate-y-0.5 transition-all"
-            >
-              {t('restaurantLanding.hero.cta')} <ArrowRight className="w-5 h-5" />
-            </button>
-            <a href="#como-funciona" className="text-white/80 font-semibold hover:text-gold-300 underline underline-offset-4">
-              {t('restaurantLanding.hero.secondaryCta')}
-            </a>
+      {/* HERO — texto a la izquierda, panel real del producto a la derecha */}
+      <section className="relative overflow-hidden text-white border-b border-white/10">
+        <div className="absolute -top-32 -right-24 w-[28rem] h-[28rem] rounded-full bg-gold-400/10 blur-3xl" />
+        <div className="relative max-w-6xl mx-auto px-4 pt-16 pb-20 md:pt-24 md:pb-28 grid lg:grid-cols-[1.05fr_.95fr] gap-12 lg:gap-16 items-center">
+          <div>
+            <p className="inline-flex items-center gap-2 text-xs font-semibold tracking-[0.16em] uppercase text-gold-300 mb-6">
+              <Sparkles className="w-3.5 h-3.5" /> {t('restaurantLanding.hero.eyebrow')}
+            </p>
+            <h1 className="font-display text-4xl md:text-6xl font-semibold mb-6 leading-[1.06] whitespace-pre-line">
+              {t('restaurantLanding.hero.title')}
+            </h1>
+            <p className="text-lg text-gray-400 max-w-xl mb-9 leading-relaxed">
+              {t('restaurantLanding.hero.description')}
+            </p>
+            <div className="flex flex-col sm:flex-row sm:items-center gap-4 mb-10">
+              <button
+                onClick={() => onAuthClick('signup')}
+                className="inline-flex items-center justify-center gap-2 px-7 py-3.5 bg-gold-400 text-navy-950 hover:bg-gold-300 rounded-full font-semibold transition-colors"
+              >
+                {t('restaurantLanding.hero.cta')} <ArrowRight className="w-4 h-4" />
+              </button>
+              <a href="#como-funciona" className="text-gray-300 font-medium hover:text-gold-300 underline underline-offset-4 decoration-white/20">
+                {t('restaurantLanding.hero.secondaryCta')}
+              </a>
+            </div>
+            <div className="flex flex-wrap gap-x-7 gap-y-2 text-sm text-gray-400">
+              <span className="flex items-center gap-2"><span className="w-1.5 h-1.5 rounded-full bg-gold-400" /> {t('restaurantLanding.hero.fact1')}</span>
+              <span className="flex items-center gap-2"><span className="w-1.5 h-1.5 rounded-full bg-gold-400" /> {t('restaurantLanding.hero.fact2')}</span>
+              <span className="flex items-center gap-2"><span className="w-1.5 h-1.5 rounded-full bg-gold-400" /> {t('restaurantLanding.hero.fact3')}</span>
+            </div>
           </div>
-
-          <div className="flex flex-wrap items-center justify-center gap-x-8 gap-y-3 text-sm font-medium text-white/80">
-            <span className="flex items-center gap-1.5"><Euro className="w-4 h-4 text-gold-400" /> {t('restaurantLanding.hero.fact1')}</span>
-            <span className="flex items-center gap-1.5"><Ban className="w-4 h-4 text-gold-400" /> {t('restaurantLanding.hero.fact2')}</span>
-            <span className="flex items-center gap-1.5"><Smartphone className="w-4 h-4 text-gold-400" /> {t('restaurantLanding.hero.fact3')}</span>
-          </div>
+          <AgendaMock />
         </div>
       </section>
 
-      {/* PROBLEMA → SOLUCIÓN */}
-      <section className="relative py-20 bg-navy-950">
-        <div className="max-w-4xl mx-auto px-4 text-center">
-          <span className="inline-flex items-center gap-2 text-xs font-bold tracking-[0.16em] uppercase text-gold-300 bg-gold-400/10 border border-gold-400/25 rounded-full px-4 py-1.5 mb-6">
-            <TrendingDown className="w-3.5 h-3.5" /> {t('restaurantLanding.problem.eyebrow')}
-          </span>
-          <h2 className="font-display text-3xl md:text-4xl font-bold text-white mb-5 leading-tight">
-            {t('restaurantLanding.problem.title')}
-          </h2>
-          <p className="text-lg text-gray-400 max-w-2xl mx-auto leading-relaxed">
-            {t('restaurantLanding.problem.desc')}
-          </p>
+      {/* PROBLEMA */}
+      <section className="py-20 bg-navy-950 border-b border-white/10">
+        <div className="max-w-6xl mx-auto px-4 grid md:grid-cols-[.9fr_1.1fr] gap-10 md:gap-16 items-start">
+          <div>
+            <span className="inline-flex items-center gap-2 text-xs font-semibold tracking-[0.16em] uppercase text-gold-300 mb-4">
+              <TrendingDown className="w-3.5 h-3.5" /> {t('restaurantLanding.problem.eyebrow')}
+            </span>
+            <h2 className="font-display text-3xl md:text-4xl font-semibold text-white leading-tight">{t('restaurantLanding.problem.title')}</h2>
+          </div>
+          <p className="text-lg text-gray-400 leading-relaxed">{t('restaurantLanding.problem.desc')}</p>
         </div>
       </section>
 
-      {/* HOW IT WORKS — alternating rows */}
-      <section id="como-funciona" className="py-20 bg-navy-900 scroll-mt-16">
-        <div className="max-w-5xl mx-auto px-4">
-          <div className="text-center mb-16">
-            <h2 className="font-display text-3xl md:text-4xl italic text-white mb-3">{t('restaurantLanding.steps.title')}</h2>
+      {/* CÓMO FUNCIONA — tres pasos en una tira */}
+      <section id="como-funciona" className="py-20 bg-navy-950 scroll-mt-16">
+        <div className="max-w-6xl mx-auto px-4">
+          <div className="max-w-2xl mb-12">
+            <h2 className="font-display text-3xl md:text-4xl font-semibold text-white mb-3">{t('restaurantLanding.steps.title')}</h2>
             <p className="text-gray-400 text-lg">{t('restaurantLanding.steps.subtitle')}</p>
           </div>
-
-          <div className="space-y-14">
-            <StepRow
-              number={1}
-              stepLabel={t('restaurantLanding.steps.step')}
-              icon={<UserPlus className="w-7 h-7 text-navy-900" />}
-              bg="from-gold-300 to-gold-500"
-              title={t('restaurantLanding.steps.step1Title')}
-              desc={t('restaurantLanding.steps.step1Desc')}
-            />
-            <StepRow
-              number={2}
-              stepLabel={t('restaurantLanding.steps.step')}
-              icon={<CalendarPlus className="w-7 h-7 text-navy-900" />}
-              bg="from-gold-300 to-gold-500"
-              title={t('restaurantLanding.steps.step2Title')}
-              desc={t('restaurantLanding.steps.step2Desc')}
-              reverse
-            />
-            <StepRow
-              number={3}
-              stepLabel={t('restaurantLanding.steps.step')}
-              icon={<Users className="w-7 h-7 text-navy-900" />}
-              bg="from-gold-300 to-gold-500"
-              title={t('restaurantLanding.steps.step3Title')}
-              desc={t('restaurantLanding.steps.step3Desc')}
-            />
+          <div className="grid md:grid-cols-3 border border-white/10 rounded-2xl overflow-hidden divide-y md:divide-y-0 md:divide-x divide-white/10 bg-navy-900/60">
+            {[
+              { n: 1, icon: <UserPlus className="w-5 h-5" />, title: t('restaurantLanding.steps.step1Title'), desc: t('restaurantLanding.steps.step1Desc') },
+              { n: 2, icon: <CalendarPlus className="w-5 h-5" />, title: t('restaurantLanding.steps.step2Title'), desc: t('restaurantLanding.steps.step2Desc') },
+              { n: 3, icon: <Users className="w-5 h-5" />, title: t('restaurantLanding.steps.step3Title'), desc: t('restaurantLanding.steps.step3Desc') },
+            ].map(st => (
+              <div key={st.n} className="p-8">
+                <div className="flex items-center justify-between mb-6">
+                  <span className="font-display text-5xl text-gold-300 italic leading-none">{st.n}</span>
+                  <span className="w-10 h-10 rounded-xl border border-white/10 bg-white/5 flex items-center justify-center text-gold-300">{st.icon}</span>
+                </div>
+                <h3 className="font-display text-xl font-semibold text-white mb-2 leading-snug">{st.title}</h3>
+                <p className="text-sm text-gray-400 leading-relaxed">{st.desc}</p>
+              </div>
+            ))}
           </div>
         </div>
       </section>
@@ -224,17 +207,47 @@ export function RestaurantLandingPage({ onNavigate, onAuthClick }: RestaurantLan
   )
 }
 
-function StepRow({ number, stepLabel, icon, bg, title, desc, reverse }: { number: number; stepLabel: string; icon: React.ReactNode; bg: string; title: string; desc: string; reverse?: boolean }) {
+function AgendaMock() {
+  const { t, language } = useLanguage()
+  const day = (offset: number) => {
+    const d = new Date(); d.setDate(d.getDate() + offset)
+    return d.toLocaleDateString(language, { weekday: 'short' })
+  }
+  const Seats = ({ filled, total }: { filled: number; total: number }) => (
+    <span className="flex gap-1">
+      {Array.from({ length: total }).map((_, i) => (
+        <span key={i} className={`w-2.5 h-2.5 rounded-full border border-gold-400 ${i < filled ? 'bg-gold-400' : ''}`} />
+      ))}
+    </span>
+  )
   return (
-    <div className={`flex items-center gap-8 md:gap-14 ${reverse ? 'md:flex-row-reverse' : ''}`}>
-      <div className={`flex-shrink-0 w-20 h-20 md:w-24 md:h-24 rounded-3xl bg-gradient-to-br ${bg} shadow-glow-gold flex items-center justify-center`}>
-        {icon}
+    <div className="rounded-2xl border border-white/10 bg-navy-900 shadow-2xl shadow-black/50 overflow-hidden" aria-label={t('restaurantLanding.mock.agenda')}>
+      <div className="flex items-center justify-between px-5 py-4 border-b border-white/10 text-sm text-gray-400">
+        <span className="flex gap-1.5"><i className="w-2.5 h-2.5 rounded-full bg-white/10" /><i className="w-2.5 h-2.5 rounded-full bg-white/10" /><i className="w-2.5 h-2.5 rounded-full bg-white/10" /></span>
+        <span>{t('restaurantLanding.mock.agenda')}</span>
+        <span className="text-[11px] font-semibold tracking-wider text-gold-300 bg-gold-400/10 rounded-full px-2.5 py-0.5">{t('restaurantLanding.mock.example')}</span>
       </div>
-      <div>
-        <span className="text-xs font-bold tracking-[0.16em] uppercase text-gold-400">{stepLabel} {number}</span>
-        <h3 className="font-display font-semibold text-xl md:text-2xl text-white mt-1 mb-2">{title}</h3>
-        <p className="text-gray-400 leading-relaxed">{desc}</p>
+      <div className="px-5 pt-5 pb-2">
+        <h3 className="font-display text-xl font-semibold text-white">{t('restaurantLanding.mock.thisWeek')}</h3>
       </div>
+      <ul className="px-5 pb-2 text-white">
+        <li className="flex items-center gap-4 py-4 border-t border-white/10">
+          <span className="w-20 text-sm font-semibold capitalize tabular-nums">{day(1)} 21:00</span>
+          <span className="flex-1 text-sm font-medium">{t('restaurantLanding.mock.sharedTable').replace('{n}', '6')}</span>
+          <span className="flex flex-col items-end gap-1"><Seats filled={4} total={6} /><span className="text-xs text-gray-400">{t('restaurantLanding.mock.seats').replace('{n}', '4').replace('{m}', '6')}</span></span>
+        </li>
+        <li className="flex items-center gap-4 py-4 border-t border-white/10">
+          <span className="w-20 text-sm font-semibold capitalize tabular-nums">{day(2)} 20:30</span>
+          <span className="flex-1 text-sm font-medium">{t('restaurantLanding.special.title')}</span>
+          <span className="text-xs font-semibold text-emerald-300 bg-emerald-400/10 rounded-full px-2.5 py-0.5">{t('restaurantLanding.mock.full')}</span>
+        </li>
+        <li className="flex items-center gap-4 py-4 border-t border-white/10">
+          <span className="w-20 text-sm font-semibold capitalize tabular-nums">{day(3)} 21:30</span>
+          <span className="flex-1 text-sm font-medium">{t('restaurantLanding.mock.sharedTable').replace('{n}', '4')}</span>
+          <span className="text-xs font-semibold text-gold-300 bg-gold-400/10 rounded-full px-2.5 py-0.5">{t('restaurantLanding.mock.open')}</span>
+        </li>
+      </ul>
+      <div className="px-5 py-3.5 border-t border-white/10 bg-white/[0.03] text-xs text-gray-400">{t('restaurantLanding.mock.live')}</div>
     </div>
   )
 }

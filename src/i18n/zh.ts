@@ -138,6 +138,16 @@ export const zh = {
       t5Title: '特邀嘉宾晚宴',
       t5Desc: '用特别嘉宾突出一张餐桌（厨师、侍酒师，由您决定），设定您的价格，每个已预订的席位我们都会向您支付该金额。',
     },
+    mock: {
+      agenda: '您的日程',
+      thisWeek: '本周',
+      example: '示例',
+      sharedTable: '{n} 人共享餐桌',
+      seats: '{n}/{m} 个席位',
+      full: '已满',
+      open: '开放',
+      live: '实时预订',
+    },
     special: {
       title: '特邀嘉宾晚餐',
       subtitle: '与人们想认识的人同桌：厨师、侍酒师、运动员，由您决定',

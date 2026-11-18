@@ -138,6 +138,16 @@ export const de = {
       t5Title: 'Dinner mit besonderem Gast',
       t5Desc: 'Hebe einen Tisch mit einem besonderen Gast hervor (ein Koch, ein Sommelier, wen du möchtest), lege deinen Preis fest und wir zahlen dir diesen Betrag für jeden gebuchten Platz.',
     },
+    mock: {
+      agenda: 'Deine Agenda',
+      thisWeek: 'Diese Woche',
+      example: 'BEISPIEL',
+      sharedTable: 'Gemeinsamer Tisch für {n}',
+      seats: '{n} von {m} Plätzen',
+      full: 'Voll',
+      open: 'Offen',
+      live: 'Buchungen in Echtzeit',
+    },
     special: {
       title: 'Abendessen mit besonderem Gast',
       subtitle: 'Ein Tisch mit jemandem, den man kennenlernen will: ein Koch, ein Sommelier, ein Sportler, wen du möchtest',

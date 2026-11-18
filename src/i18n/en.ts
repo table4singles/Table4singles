@@ -138,6 +138,16 @@ export const en = {
       t5Title: 'Special guest dinners',
       t5Desc: 'Feature a table with someone special (a chef, a sommelier, whoever you choose), set your price and we pay you that amount for every seat booked.',
     },
+    mock: {
+      agenda: 'Your agenda',
+      thisWeek: 'This week',
+      example: 'EXAMPLE',
+      sharedTable: 'Shared table for {n}',
+      seats: '{n} of {m} seats',
+      full: 'Full',
+      open: 'Open',
+      live: 'Bookings in real time',
+    },
     special: {
       title: 'Special guest dinners',
       subtitle: 'A table with someone people want to meet: a chef, a sommelier, an athlete, whoever you choose',

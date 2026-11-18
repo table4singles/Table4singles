@@ -138,6 +138,16 @@ export const sv = {
       t5Title: 'Middagar med specialgäst',
       t5Desc: 'Lyft fram ett bord med någon speciell (en kock, en sommelier, vem du vill), sätt ditt pris så betalar vi dig det beloppet för varje bokad plats.',
     },
+    mock: {
+      agenda: 'Din agenda',
+      thisWeek: 'Den här veckan',
+      example: 'EXEMPEL',
+      sharedTable: 'Gemensamt bord för {n}',
+      seats: '{n} av {m} platser',
+      full: 'Fullt',
+      open: 'Öppet',
+      live: 'Bokningar i realtid',
+    },
     special: {
       title: 'Middagar med specialgäst',
       subtitle: 'Ett bord med någon man vill träffa: en kock, en sommelier, en idrottare, vem du vill',

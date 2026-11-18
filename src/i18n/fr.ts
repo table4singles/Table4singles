@@ -138,6 +138,16 @@ export const fr = {
       t5Title: 'Dîners avec invité spécial',
       t5Desc: 'Mets en avant une table avec quelqu’un de spécial (un chef, un sommelier, qui tu veux), fixe ton prix et nous te versons ce montant pour chaque place réservée.',
     },
+    mock: {
+      agenda: 'Ton agenda',
+      thisWeek: 'Cette semaine',
+      example: 'EXEMPLE',
+      sharedTable: 'Table partagée de {n}',
+      seats: '{n} places sur {m}',
+      full: 'Complète',
+      open: 'Ouverte',
+      live: 'Réservations en temps réel',
+    },
     special: {
       title: 'Dîners avec invité spécial',
       subtitle: 'Une table avec quelqu’un que l’on veut rencontrer : un chef, un sommelier, un sportif, qui tu veux',

@@ -122,6 +122,16 @@ export const es = {
       t5Title: 'Cenas con invitado especial',
       t5Desc: 'Destaca una mesa con alguien especial (un chef, un sumiller, quien tú decidas), pon tu precio y te pagamos ese importe por cada plaza reservada.',
     },
+    mock: {
+      agenda: 'Tu agenda',
+      thisWeek: 'Esta semana',
+      example: 'EJEMPLO',
+      sharedTable: 'Mesa compartida de {n}',
+      seats: '{n} de {m} plazas',
+      full: 'Completa',
+      open: 'Abierta',
+      live: 'Reservas en tiempo real',
+    },
     special: {
       title: 'Cenas con invitado especial',
       subtitle: 'Una mesa con alguien que atrae: un chef, un sumiller, un deportista, quien tú decidas',

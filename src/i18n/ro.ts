@@ -138,6 +138,16 @@ export const ro = {
       t5Title: 'Cine cu invitat special',
       t5Desc: 'Pune în evidență o masă cu cineva special (un bucătar, un somelier, pe cine alegi tu), stabilește-ți prețul și îți plătim acea sumă pentru fiecare loc rezervat.',
     },
+    mock: {
+      agenda: 'Agenda ta',
+      thisWeek: 'Săptămâna aceasta',
+      example: 'EXEMPLU',
+      sharedTable: 'Masă comună pentru {n}',
+      seats: '{n} din {m} locuri',
+      full: 'Completă',
+      open: 'Deschisă',
+      live: 'Rezervări în timp real',
+    },
     special: {
       title: 'Cine cu invitat special',
       subtitle: 'O masă cu cineva pe care vrei să îl cunoști: un bucătar, un somelier, un sportiv, pe cine alegi tu',

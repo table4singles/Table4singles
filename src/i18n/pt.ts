@@ -138,6 +138,16 @@ export const pt = {
       t5Title: 'Jantares com convidado especial',
       t5Desc: 'Destaca uma mesa com alguém especial (um chef, um sommelier, quem tu decidires), define o teu preço e pagamos-te esse valor por cada lugar reservado.',
     },
+    mock: {
+      agenda: 'A tua agenda',
+      thisWeek: 'Esta semana',
+      example: 'EXEMPLO',
+      sharedTable: 'Mesa partilhada de {n}',
+      seats: '{n} de {m} lugares',
+      full: 'Completa',
+      open: 'Aberta',
+      live: 'Reservas em tempo real',
+    },
     special: {
       title: 'Jantares com convidado especial',
       subtitle: 'Uma mesa com alguém que se quer conhecer: um chef, um sommelier, um desportista, quem tu decidires',

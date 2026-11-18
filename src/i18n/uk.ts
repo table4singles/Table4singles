@@ -93,6 +93,7 @@ export const uk = {
     footer: {
       legal: 'Правова інформація',
       privacy: 'Політика конфіденційності',
+      terms: 'Умови бронювання',
       tagline: 'Спільні вечері по всьому світу',
     },
   },
@@ -942,6 +943,7 @@ export const uk = {
     becauseSameTime: 'Бо це твій звичний час',
     reservePrice: 'Забронювати · {price} €',
     guaranteedSpot: 'Місце гарантовано після бронювання.',
+    acceptTerms: 'Бронюючи, ви приймаєте умови бронювання та повернення коштів.',
     spotReserved: 'Місце заброньовано',
     tableFullMsg: 'Стіл заповнений',
     tableCancelledMsg: 'Стіл скасовано',

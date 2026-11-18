@@ -93,6 +93,7 @@ export const it = {
     footer: {
       legal: 'Note legali',
       privacy: 'Informativa sulla privacy',
+      terms: 'Condizioni di prenotazione',
       tagline: 'Cene condivise in tutto il mondo',
     },
   },
@@ -942,6 +943,7 @@ export const it = {
     becauseSameTime: 'Perché è la tua fascia oraria abituale',
     reservePrice: 'Prenota posto · {price} €',
     guaranteedSpot: 'Il tuo posto è garantito con la prenotazione.',
+    acceptTerms: 'Prenotando accetti le condizioni di prenotazione e rimborso.',
     spotReserved: 'Posto prenotato',
     tableFullMsg: 'Tavolo completo',
     tableCancelledMsg: 'Tavolo annullato',

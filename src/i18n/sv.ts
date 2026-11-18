@@ -93,6 +93,7 @@ export const sv = {
     footer: {
       legal: 'Juridisk information',
       privacy: 'Integritetspolicy',
+      terms: 'Bokningsvillkor',
       tagline: 'Delade middagar i hela världen',
     },
   },
@@ -942,6 +943,7 @@ export const sv = {
     becauseSameTime: 'Eftersom det är din vanliga tid',
     reservePrice: 'Boka plats · {price} €',
     guaranteedSpot: 'Din plats garanteras när du bokar.',
+    acceptTerms: 'Genom att boka godkänner du bokningsvillkoren och återbetalningsreglerna.',
     spotReserved: 'Plats bokad',
     tableFullMsg: 'Bord fullt',
     tableCancelledMsg: 'Bord avbokat',

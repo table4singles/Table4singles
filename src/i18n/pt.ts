@@ -93,6 +93,7 @@ export const pt = {
     footer: {
       legal: 'Aviso Legal',
       privacy: 'Política de Privacidade',
+      terms: 'Condições de reserva',
       tagline: 'Jantares partilhados em todo o mundo',
     },
   },
@@ -942,6 +943,7 @@ export const pt = {
     becauseSameTime: 'Porque é o teu horário habitual',
     reservePrice: 'Reservar lugar · {price} €',
     guaranteedSpot: 'O seu lugar fica garantido ao reservar.',
+    acceptTerms: 'Ao reservar aceitas as condições de reserva e reembolso.',
     spotReserved: 'Lugar reservado',
     tableFullMsg: 'Mesa completa',
     tableCancelledMsg: 'Mesa cancelada',

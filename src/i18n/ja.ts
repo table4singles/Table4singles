@@ -93,6 +93,7 @@ export const ja = {
     footer: {
       legal: '法的通知',
       privacy: 'プライバシーポリシー',
+      terms: '予約条件',
       tagline: '世界中でシェアディナー',
     },
   },
@@ -942,6 +943,7 @@ export const ja = {
     becauseSameTime: 'いつもの時間帯だから',
     reservePrice: '席を予約 · {price} €',
     guaranteedSpot: '予約すると席が確保されます。',
+    acceptTerms: '予約することで、予約および返金の条件に同意したものとみなされます。',
     spotReserved: '席を予約済み',
     tableFullMsg: '満席',
     tableCancelledMsg: 'テーブルキャンセル済み',

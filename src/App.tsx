@@ -23,6 +23,7 @@ import { ProfilePage } from '@/pages/ProfilePage'
 import { SettingsPage } from '@/pages/SettingsPage'
 import { PrivacyPolicyPage } from '@/pages/PrivacyPolicyPage'
 import { AvisoLegalPage } from '@/pages/AvisoLegalPage'
+import { ReservationTermsPage } from '@/pages/ReservationTermsPage'
 import { AmbassadorPage } from '@/pages/AmbassadorPage'
 import { SubscriptionPage } from '@/pages/SubscriptionPage'
 import { AdminPage } from '@/pages/AdminPage'
@@ -56,7 +57,7 @@ function AppRouter() {
         : profile.role
       setPage(savedMode === 'restaurant' ? 'restaurant-dashboard' : 'browse')
     }
-    if (!loading && !user && !['landing', 'restaurant-landing', 'politica-privacidad', 'aviso-legal', 'flyer', 'table-detail', 'restaurant-profile'].includes(page)) setPage('landing')
+    if (!loading && !user && !['landing', 'restaurant-landing', 'politica-privacidad', 'aviso-legal', 'condiciones-reserva', 'flyer', 'table-detail', 'restaurant-profile'].includes(page)) setPage('landing')
   }, [user, loading, profile])
 
   // Landing de captación para restaurantes (/restaurantes) — ruta pública sin login
@@ -228,6 +229,8 @@ function AppRouter() {
         return selectedId ? <FlyerPage restaurantId={selectedId} /> : null
       case 'politica-privacidad':
         return <PrivacyPolicyPage onNavigate={navigate} returnTo={selectedId ?? 'landing'} />
+      case 'condiciones-reserva':
+        return <ReservationTermsPage onNavigate={navigate} returnTo={selectedId ?? 'landing'} />
       case 'aviso-legal':
         return <AvisoLegalPage onNavigate={navigate} returnTo={selectedId ?? 'landing'} />
       case 'ambassador':

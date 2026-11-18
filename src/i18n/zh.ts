@@ -93,6 +93,7 @@ export const zh = {
     footer: {
       legal: '法律声明',
       privacy: '隐私政策',
+      terms: '预订条款',
       tagline: '全球共享晚餐',
     },
   },
@@ -942,6 +943,7 @@ export const zh = {
     becauseSameTime: '因为这是你常订的时段',
     reservePrice: '预订座位 · {price} €',
     guaranteedSpot: '预订后座位有保障。',
+    acceptTerms: '预订即表示您接受预订与退款条款。',
     spotReserved: '已预订座位',
     tableFullMsg: '座位已满',
     tableCancelledMsg: '餐桌已取消',

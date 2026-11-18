@@ -93,6 +93,7 @@ export const fr = {
     footer: {
       legal: 'Mentions légales',
       privacy: 'Politique de confidentialité',
+      terms: 'Conditions de réservation',
       tagline: 'Dîners partagés dans le monde entier',
     },
   },
@@ -942,6 +943,7 @@ export const fr = {
     becauseSameTime: "Parce que c'est ton créneau habituel",
     reservePrice: 'Réserver une place · {price} €',
     guaranteedSpot: 'Votre place est garantie lors de la réservation.',
+    acceptTerms: 'En réservant, tu acceptes les conditions de réservation et de remboursement.',
     spotReserved: 'Place réservée',
     tableFullMsg: 'Table complète',
     tableCancelledMsg: 'Table annulée',

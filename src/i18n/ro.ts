@@ -93,6 +93,7 @@ export const ro = {
     footer: {
       legal: 'Aviz Legal',
       privacy: 'Politica de Confidențialitate',
+      terms: 'Condiții de rezervare',
       tagline: 'Cine împreună în toată lumea',
     },
   },
@@ -942,6 +943,7 @@ export const ro = {
     becauseSameTime: 'Pentru că e intervalul tău obișnuit',
     reservePrice: 'Rezervă loc · {price} €',
     guaranteedSpot: 'Locul tău este garantat la rezervare.',
+    acceptTerms: 'Rezervând, accepți condițiile de rezervare și rambursare.',
     spotReserved: 'Loc rezervat',
     tableFullMsg: 'Masă completă',
     tableCancelledMsg: 'Masă anulată',

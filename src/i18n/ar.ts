@@ -93,6 +93,7 @@ export const ar = {
     footer: {
       legal: 'إشعار قانوني',
       privacy: 'سياسة الخصوصية',
+      terms: 'شروط الحجز',
       tagline: 'عشاء مشترك في جميع أنحاء العالم',
     },
   },
@@ -942,6 +943,7 @@ export const ar = {
     becauseSameTime: 'لأنه وقتك المعتاد',
     reservePrice: 'احجز مقعدًا · {price} €',
     guaranteedSpot: 'مقعدك مضمون عند الحجز.',
+    acceptTerms: 'بالحجز فإنك توافق على شروط الحجز والاسترداد.',
     spotReserved: 'تم حجز المقعد',
     tableFullMsg: 'الطاولة ممتلئة',
     tableCancelledMsg: 'أُلغيت الطاولة',

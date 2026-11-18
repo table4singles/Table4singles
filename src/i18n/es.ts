@@ -77,6 +77,7 @@ export const es = {
     footer: {
       legal: 'Aviso Legal',
       privacy: 'Política de Privacidad',
+      terms: 'Condiciones de reserva',
       tagline: 'Cenas compartidas en todo el mundo',
     },
   },
@@ -628,6 +629,7 @@ export const es = {
     becauseSameTime: 'Porque suele ser tu franja horaria',
     reservePrice: 'Reservar plaza · {price} €',
     guaranteedSpot: 'Tu plaza queda garantizada al reservar.',
+    acceptTerms: 'Al reservar aceptas las condiciones de reserva y reembolsos.',
     spotReserved: 'Plaza reservada',
     tableFullMsg: 'Mesa completa',
     tableCancelledMsg: 'Mesa cancelada',

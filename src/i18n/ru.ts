@@ -93,6 +93,7 @@ export const ru = {
     footer: {
       legal: 'Правовая информация',
       privacy: 'Политика конфиденциальности',
+      terms: 'Условия бронирования',
       tagline: 'Совместные ужины по всему миру',
     },
   },
@@ -942,6 +943,7 @@ export const ru = {
     becauseSameTime: 'Потому что это твоё привычное время',
     reservePrice: 'Забронировать · {price} €',
     guaranteedSpot: 'Место гарантировано после бронирования.',
+    acceptTerms: 'Бронируя, вы принимаете условия бронирования и возврата средств.',
     spotReserved: 'Место забронировано',
     tableFullMsg: 'Стол заполнен',
     tableCancelledMsg: 'Стол отменён',

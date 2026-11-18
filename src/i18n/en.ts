@@ -93,6 +93,7 @@ export const en = {
     footer: {
       legal: 'Legal Notice',
       privacy: 'Privacy Policy',
+      terms: 'Booking terms',
       tagline: 'Shared dinners around the world',
     },
   },
@@ -964,6 +965,7 @@ export const en = {
     becauseSameTime: "Because it's your usual time slot",
     reservePrice: 'Reserve seat · €{price}',
     guaranteedSpot: 'Your seat is guaranteed when you book.',
+    acceptTerms: 'By booking you accept the booking and refund terms.',
     spotReserved: 'Seat reserved',
     tableFullMsg: 'Table full',
     tableCancelledMsg: 'Table cancelled',

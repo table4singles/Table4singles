@@ -181,6 +181,8 @@ export function LandingPage({ onNavigate, onAuthClick }: LandingPageProps) {
               <button onClick={() => onNavigate('aviso-legal')} className="hover:text-gold-400 transition-colors">{t('landing.footer.legal')}</button>
               <span className="text-gray-700">|</span>
               <button onClick={() => onNavigate('politica-privacidad')} className="hover:text-gold-400 transition-colors">{t('landing.footer.privacy')}</button>
+              <span className="text-gray-700">|</span>
+              <button onClick={() => onNavigate('condiciones-reserva')} className="hover:text-gold-400 transition-colors">{t('landing.footer.terms')}</button>
             </div>
           </div>
           <p className="text-center text-gray-500 text-sm">{t('landing.footer.tagline')}</p>

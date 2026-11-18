@@ -552,6 +552,7 @@ export function TableDetailPage({ tableId, paymentSuccess, paymentCancelled, onN
                   )}
                   {table?.is_special && <p className="text-xs text-green-700 dark:text-green-400 text-center">{t('specialGuest.refundPolicy')}</p>}
                   <p className="text-xs text-gray-400 dark:text-gray-500 text-center">{t('tableDetail.guaranteedSpot')}</p>
+                  <p className="text-xs text-gray-400 dark:text-gray-500 text-center"><button type="button" onClick={() => onNavigate('condiciones-reserva', 'browse')} className="underline hover:text-gray-600 dark:hover:text-gray-300">{t('tableDetail.acceptTerms')}</button></p>
                   {joinError && <p className="text-xs text-red-600 text-center">{joinError}</p>}
                 </>
               )}

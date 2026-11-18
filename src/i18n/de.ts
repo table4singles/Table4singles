@@ -93,6 +93,7 @@ export const de = {
     footer: {
       legal: 'Impressum',
       privacy: 'Datenschutz',
+      terms: 'Buchungsbedingungen',
       tagline: 'Gemeinsame Abendessen weltweit',
     },
   },
@@ -942,6 +943,7 @@ export const de = {
     becauseSameTime: 'Weil es deine übliche Uhrzeit ist',
     reservePrice: 'Platz reservieren · {price} €',
     guaranteedSpot: 'Dein Platz ist nach der Reservierung garantiert.',
+    acceptTerms: 'Mit der Buchung akzeptierst du die Buchungs- und Erstattungsbedingungen.',
     spotReserved: 'Platz reserviert',
     tableFullMsg: 'Tisch voll',
     tableCancelledMsg: 'Tisch storniert',

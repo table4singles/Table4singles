@@ -211,6 +211,8 @@ export function RestaurantLandingPage({ onNavigate, onAuthClick }: RestaurantLan
             <button onClick={() => onNavigate('aviso-legal', 'restaurant-landing')} className="hover:text-gold-400 transition-colors">{t('landing.footer.legal')}</button>
             <span className="text-gray-700">|</span>
             <button onClick={() => onNavigate('politica-privacidad', 'restaurant-landing')} className="hover:text-gold-400 transition-colors">{t('landing.footer.privacy')}</button>
+            <span className="text-gray-700">|</span>
+            <button onClick={() => onNavigate('condiciones-reserva', 'restaurant-landing')} className="hover:text-gold-400 transition-colors">{t('landing.footer.terms')}</button>
           </div>
           <p className="text-gray-500 text-sm text-center">
             {t('restaurantLanding.footer.hasAccount')}{' '}

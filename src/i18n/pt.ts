@@ -384,6 +384,7 @@ export const pt = {
     diner: 'comensal',
     diners: 'comensais',
     beFirstJoin: 'Seja o primeiro a juntar-se',
+    commonInterests: 'Interesses em comum contigo',
   },
   create: {
     back: 'Voltar',

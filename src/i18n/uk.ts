@@ -384,6 +384,7 @@ export const uk = {
     diner: 'гість',
     diners: 'гостей',
     beFirstJoin: 'Будьте першим',
+    commonInterests: 'Є спільні інтереси',
   },
   create: {
     back: 'Назад',

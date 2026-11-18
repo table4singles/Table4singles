@@ -384,6 +384,7 @@ export const ru = {
     diner: 'гость',
     diners: 'гостей',
     beFirstJoin: 'Будьте первым',
+    commonInterests: 'Есть общие интересы',
   },
   create: {
     back: 'Назад',

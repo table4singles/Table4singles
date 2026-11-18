@@ -384,6 +384,7 @@ export const ar = {
     diner: 'ضيف',
     diners: 'ضيوف',
     beFirstJoin: 'كن أول من ينضم',
+    commonInterests: 'اهتمامات مشتركة معك',
   },
   create: {
     back: 'رجوع',

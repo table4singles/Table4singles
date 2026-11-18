@@ -384,6 +384,7 @@ export const ja = {
     diner: 'ゲスト',
     diners: 'ゲスト',
     beFirstJoin: '最初に参加しましょう',
+    commonInterests: '共通の趣味があります',
   },
   create: {
     back: '戻る',

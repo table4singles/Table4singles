@@ -5,6 +5,7 @@ import type { TableParticipantBasic } from '@/hooks/useRestaurants'
 import { CommensalModal } from '@/components/CommensalModal'
 import { Avatar } from '@/components/Avatar'
 import { useLanguage } from '@/contexts/LanguageContext'
+import { useAuth } from '@/contexts/AuthContext'
 import { appLocale } from '@/lib/locale'
 
 interface TableCardProps {
@@ -29,7 +30,17 @@ export function TableCard({ table, participants, onClick, showRestaurant }: Tabl
   })
   const formattedTime = table.time ? table.time.slice(0, 5) : null
 
+  const { profile, user } = useAuth()
   const approved = (participants ?? []).filter(p => p.status === 'approved')
+  // Intereses en común entre quien mira y los comensales ya apuntados (sin contarse a sí mismo)
+  const myInterests = new Set(profile?.interests ?? [])
+  const common = new Set<string>()
+  if (myInterests.size > 0) {
+    for (const p of approved) {
+      if (p.user_id === user?.id) continue
+      for (const i of ((p.profiles as { interests?: string[] | null } | null)?.interests ?? [])) if (myInterests.has(i)) common.add(i)
+    }
+  }
   const visibleAvatars = approved.slice(0, 4)
   const extraCount = approved.length - visibleAvatars.length
 
@@ -113,6 +124,7 @@ export function TableCard({ table, participants, onClick, showRestaurant }: Tabl
                     {approved.length === 1
                       ? `1 ${t('card.diner')}`
                       : `${approved.length} ${t('card.diners')}`}
+                    {common.size > 0 && <span className="text-[#129a93]"> · {t('card.commonInterests').replace('{n}', String(common.size))}</span>}
                   </span>
                 </>
               ) : (

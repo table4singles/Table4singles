@@ -384,6 +384,7 @@ export const it = {
     diner: 'commensale',
     diners: 'commensali',
     beFirstJoin: 'Sii il primo a unirti',
+    commonInterests: 'Interessi in comune con te',
   },
   create: {
     back: 'Indietro',

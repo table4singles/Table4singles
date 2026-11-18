@@ -384,6 +384,7 @@ export const de = {
     diner: 'Gast',
     diners: 'Gäste',
     beFirstJoin: 'Sei der Erste, der beitritt',
+    commonInterests: 'Gemeinsame Interessen mit dir',
   },
   create: {
     back: 'Zurück',

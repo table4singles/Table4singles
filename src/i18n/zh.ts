@@ -384,6 +384,7 @@ export const zh = {
     diner: '用餐者',
     diners: '用餐者',
     beFirstJoin: '成为第一个加入的人',
+    commonInterests: '与您有共同兴趣',
   },
   create: {
     back: '返回',

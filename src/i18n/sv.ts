@@ -384,6 +384,7 @@ export const sv = {
     diner: 'gäst',
     diners: 'gäster',
     beFirstJoin: 'Bli först att gå med',
+    commonInterests: 'Gemensamma intressen med dig',
   },
   create: {
     back: 'Tillbaka',

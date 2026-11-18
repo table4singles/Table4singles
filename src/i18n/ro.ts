@@ -384,6 +384,7 @@ export const ro = {
     diner: 'comensal',
     diners: 'comesali',
     beFirstJoin: 'Fii primul care se alătură',
+    commonInterests: 'Interese comune cu tine',
   },
   create: {
     back: 'Înapoi',

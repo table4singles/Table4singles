@@ -365,6 +365,7 @@ export const es = {
     diner: 'comensal',
     diners: 'comensales',
     beFirstJoin: 'Sé el primero en unirte',
+    commonInterests: 'Intereses en común contigo',
   },
   create: {
     back: 'Volver',

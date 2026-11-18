@@ -384,6 +384,7 @@ export const en = {
     diner: 'diner',
     diners: 'diners',
     beFirstJoin: 'Be the first to join',
+    commonInterests: 'Interests in common with you',
   },
   create: {
     back: 'Back',
